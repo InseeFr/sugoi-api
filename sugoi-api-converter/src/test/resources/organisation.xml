@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns3:Organisation xmlns:ns2="http://xml.insee.fr/schema"
+    xmlns:ns3="http://xml.insee.fr/schema/annuaire">
+    <Identifiant>XJHFLG4</Identifiant>
+    <NomCommun>INSEE-DG</NomCommun>
+    <DomaineDeGestion>TEST</DomaineDeGestion>
+    <Description>INSEE</Description>
+    <AdresseMessagerie>accueil@domain.tld</AdresseMessagerie>
+    <FacSimile>0123456789</FacSimile>
+    <AdressePostale>
+        <ns2:LigneUne>17 bd adolphe pinard</ns2:LigneUne>
+        <ns2:LigneDeux></ns2:LigneDeux>
+        <ns2:LigneTrois></ns2:LigneTrois>
+        <ns2:LigneQuatre></ns2:LigneQuatre>
+        <ns2:LigneCinq></ns2:LigneCinq>
+        <ns2:LigneSix></ns2:LigneSix>
+        <ns2:LigneSept>92240 Malakoff</ns2:LigneSept>
+    </AdressePostale>
+    <OrganisationDeRattachementUri>null133546546</OrganisationDeRattachementUri>
+    <Propriete>Test1</Propriete>
+    <Propriete>Test2</Propriete>
+</ns3:Organisation>

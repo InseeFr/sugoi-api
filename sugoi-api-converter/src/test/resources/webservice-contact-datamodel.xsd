@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://xml.insee.fr/schema/annuaire" version="0.2"
+	xmlns="http://xml.insee.fr/schema/annuaire"
+	xmlns:ie="http://xml.insee.fr/schema">
+
+	<xs:import namespace="http://xml.insee.fr/schema"
+		schemaLocation="adresse.xsd" />
+	<xs:element name="Contact" type="ContactType">
+	</xs:element>
+	<xs:element name="Organisation" type="OrganisationType" />
+	<xs:element name="PasswordChangeRequest"
+		type="PasswordChangeRequestType" />
+	<xs:element name="ErrorResult" type="ErrorResultType">
+	</xs:element>
+	<xs:element name="Habilitations" type="HabilitationsType"></xs:element>
+	<xs:element name="InfoFormattage" type="InfoFormattageType" />
+	<xs:element name="IdContact" type="IdentifiantType">
+	</xs:element>
+	<xs:element name="IdOrganisation" type="IdentifiantType">
+	</xs:element>
+	<xs:element name="ListeIdContacts"
+		type="ListeIdContactsType">
+	</xs:element>
+	<xs:element name="ListeIdOrganisations"
+		type="ListeIdOrganisationsType" />
+	<xs:element name="Profil" type="ProfilType" />
+
+
+	<xs:complexType name="ContactType">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="Identifiant"
+				type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						Identifiant unique, qui peut servir d'identifiant
+						de
+						connexion
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="NomCommun"
+				type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Nom et prénom du contact</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="Nom" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						Nom du contact
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="Prenom" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						Prenom du contact
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="DomaineDeGestion"
+				type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Domaine de gestion du contact dans l'annuaire
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="Description"
+				type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Description du contact</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="Civilite" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Civilité</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="IdentifiantMetier"
+				type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						Identifiant métier du contact
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="AdresseMessagerie"
+				type="emailType">
+				<xs:annotation>
+					<xs:documentation>Adresse de messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="NumeroTelephone"
+				type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Numéro de téléphone</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="TelephonePortable"
+				type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Numéro de téléphone portable</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="FacSimile"
+				type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Numéro de téléphone de fac simile
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="MotDePasseExiste"
+				type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Mot de passe</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0"
+				name="CertificatAuthentification" type="xs:base64Binary">
+				<xs:annotation>
+					<xs:documentation>Certificat client pour l'authentification
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="AdressePostale"
+				type="ie:AdressePostaleType">
+				<xs:annotation>
+					<xs:documentation>
+						Adresse postale complète du contact ou de
+						l'organisation de
+						rattachement
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0"
+				name="OrganisationDeRattachementUri" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Organisation de rattachement</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element minOccurs="0" name="RepertoireDeDistribution"
+				type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						Répertoire pour cette organisation sur la
+						plateforme
+						AXWAY
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="Propriete"
+				type="xs:string" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+						propriété. Cette attribut permet, par exemple, de
+						stocker des informations
+						pour download
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="InseeRoleApplicatif"
+				type="xs:string" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+						inseeRoleApplicatif. Cette attribut permet, par
+						exemple, de
+						stocker des informations
+						pour spécifier une habilitation
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="CodePin"
+				type="xs:base64Binary">
+				<xs:annotation>
+					<xs:documentation>Code PIN pour l'authentification
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="DateCreation"
+				type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>Date de creation du contact
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="OrganisationType">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="Identifiant"
+				type="xs:token">
+				<xs:annotation>
+					<xs:documentation>Identifiant unique</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="NomCommun" type="xs:token">
+				<xs:annotation>
+					<xs:documentation>
+						Nom ou raison sociale de l'organisation ou nom du
+						service
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="DomaineDeGestion"
+				type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Domaine de gestion du contact dans l'annuaire
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="Description"
+				type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Description de l'organisation ou du service
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="AdresseMessagerie"
+				type="emailType">
+				<xs:annotation>
+					<xs:documentation>Adresse de messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="NumeroTelephone"
+				type="xs:token">
+				<xs:annotation>
+					<xs:documentation>Numéro de téléphone</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="FacSimile" type="xs:token">
+				<xs:annotation>
+					<xs:documentation>Numéro de fac simile</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="AdressePostale"
+				type="ie:AdressePostaleType" />
+			<xs:element minOccurs="0" name="CleDeChiffrement"
+				type="xs:base64Binary" maxOccurs="unbounded" />
+			<xs:element minOccurs="0"
+				name="OrganisationDeRattachementUri" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Organisation de rattachement</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="RepertoireDeDistribution"
+				type="xs:token">
+				<xs:annotation>
+					<xs:documentation>
+						Répertoire pour cette organisation sur la
+						plateforme
+						AXWAY
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="Propriete"
+				type="xs:string" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+						propriété. Cette attribut permet, par exemple, de
+						stocker des informations
+						pour download
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="emailType">
+		<xs:annotation>
+			<xs:documentation>
+				Schema definition for an email address.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:normalizedString">
+			<xs:pattern value="(\w|\.)+@(\w+\.)+\w+" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="PasswordChangeRequestType">
+		<xs:sequence>
+			<xs:element name="AdresseMessagerie" type="emailType"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="AdressePostale"
+				type="ie:AdressePostaleType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Le mot de passe reinitialise sera envoye a cette
+						adresse en priorite.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AncienMotDePasse" type="xs:string"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="NouveauMotDePasse" type="xs:string"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="InfoFormattageEnvoi"
+				type="InfoFormattageType" minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="InfoFormattageType">
+		<xs:sequence>
+			<xs:element name="ChefSignataire" type="xs:string"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="HotlineFax" type="xs:string"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="HotlineMail" type="xs:string"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="HotlineTel" type="xs:string"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="IdentifiantApplication" type="xs:string"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="IdentifiantEnt" type="xs:string"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="ModeleCourrier" type="xs:string"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="NomDepartement" type="xs:string"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="NomDirection" type="xs:string"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="NomApplicationLettre" type="xs:string"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="NomService" type="xs:string"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="NomSignataire" type="xs:string"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="UEIdentifiant" type="xs:string"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="URLSite" type="xs:anyURI" minOccurs="0" />
+			<xs:element name="Logo" type="xs:string" minOccurs="0"
+				maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ErrorResultType">
+		<xs:sequence>
+			<xs:element name="Exception" type="xs:string"
+				minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element name="Message" type="xs:string" minOccurs="1"
+				maxOccurs="1"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="HabilitationsType">
+		<xs:sequence>
+			<xs:element name="application" type="ApplicationType"
+				maxOccurs="unbounded">
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+
+	<xs:complexType name="ApplicationType">
+		<xs:sequence>
+			<xs:element type="RoleType" name="role"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="name" />
+	</xs:complexType>
+
+
+	<xs:complexType name="RoleType">
+		<xs:sequence>
+			<xs:element type="xs:string" name="propriete"
+				maxOccurs="unbounded" minOccurs="0" />
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="name" />
+	</xs:complexType>
+
+	<xs:complexType name="IdentifiantType">
+		<xs:sequence>
+			<xs:element name="DomaineDeGestion" type="xs:string"
+				minOccurs="0"></xs:element>
+			<xs:element name="LdapURL" type="xs:anyURI" minOccurs="0"></xs:element>
+		</xs:sequence>
+		<xs:attribute name="identifiant"></xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="ListeIdContactsType">
+		<xs:sequence>
+			<xs:element name="IdContact" type="IdentifiantType"
+				maxOccurs="unbounded"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ListeIdOrganisationsType">
+		<xs:sequence>
+			<xs:element name="IdOrganisation" type="IdentifiantType"
+				maxOccurs="unbounded"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="ProfilType">
+		<xs:sequence>
+			<xs:element type="xs:string" name="nomProfil"
+				maxOccurs="1" />
+			<xs:element type="xs:string" name="ldapUrl" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element type="xs:integer" name="port" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element type="xs:string" name="brancheContact"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element type="xs:string" name="brancheAdresse"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element type="xs:string" name="brancheOrganisation"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element type="xs:boolean" name="mailUnicity"
+				maxOccurs="1" />
+			<xs:element type="xs:boolean" name="idGlobalUnicity"
+				maxOccurs="1" />
+			<xs:element type="xs:boolean"
+				name="passwordReleasedAllowed" maxOccurs="1" />
+			<xs:element type="xs:boolean" name="pwdResetAllowed"
+				maxOccurs="1" />
+			<xs:element type="xs:boolean" name="verifyChangePassword"
+				maxOccurs="1" />
+			<xs:element type="xs:integer" name="longueurMiniPassword"
+				maxOccurs="1" />
+			<xs:element type="xs:integer"
+				name="nombreMaxHabilitations" maxOccurs="1" />
+			<xs:element type="xs:boolean" name="vlvSupported"
+				maxOccurs="1" />
+			<xs:element type="xs:boolean" name="vlvEnabled"
+				maxOccurs="1" />
+			<xs:element type="xs:boolean" name="pagingSupported"
+				maxOccurs="1" />
+			<xs:element type="xs:string" name="objectClassContact"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

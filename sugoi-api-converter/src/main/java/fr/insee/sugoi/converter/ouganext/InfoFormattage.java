@@ -1,0 +1,208 @@
+package fr.insee.sugoi.converter.ouganext;
+
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
+/**
+ * Java class for InfoFormattageType complex type.
+ * 
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
+ * 
+ * <pre>
+ * &lt;complexType name="InfoFormattageType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="ChefSignataire" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="HotlineFax" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="HotlineMail" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="HotlineTel" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="IdentifiantApplication" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="IdentifiantEnt" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="ModeleCourrier" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="NomDepartement" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="NomDirection" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="NomFamille" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="NomService" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="NomSignataire" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="UEIdentifiant" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="URLSite" type="{http://www.w3.org/2001/XMLSchema}anyURI"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@JacksonXmlRootElement(localName = "InfoFormattage", namespace = Namespace.ANNUAIRE)
+@JsonPropertyOrder({ "chefSignataire", "hotlineFax", "hotlineMail", "hotlineTel", "identifiantApplication",
+    "identifiantEnt", "modeleCourrier", "nomDepartement", "nomDirection", "nomApplicationLettre", "nomService",
+    "nomSignataire", "ueIdentifiant", "urlSite", "logo", "adresseMessagerieEmettrice" })
+public class InfoFormattage {
+
+  @JacksonXmlProperty(localName = "ChefSignataire", namespace = Namespace.ANNUAIRE)
+  protected String chefSignataire;
+  @JacksonXmlProperty(localName = "HotlineFax", namespace = Namespace.ANNUAIRE)
+  protected String hotlineFax;
+  @JacksonXmlProperty(localName = "HotlineMail", namespace = Namespace.ANNUAIRE)
+  protected String hotlineMail;
+  @JacksonXmlProperty(localName = "HotlineTel", namespace = Namespace.ANNUAIRE)
+  protected String hotlineTel;
+  @JacksonXmlProperty(localName = "IdentifiantApplication", namespace = Namespace.ANNUAIRE)
+  protected String identifiantApplication;
+  @JacksonXmlProperty(localName = "IdentifiantEnt", namespace = Namespace.ANNUAIRE)
+  protected String identifiantEnt;
+  @JacksonXmlProperty(localName = "ModeleCourrier", namespace = Namespace.ANNUAIRE)
+  protected String modeleCourrier;
+  @JacksonXmlProperty(localName = "NomDepartement", namespace = Namespace.ANNUAIRE)
+  protected String nomDepartement;
+  @JacksonXmlProperty(localName = "NomDirection", namespace = Namespace.ANNUAIRE)
+  protected String nomDirection;
+  @JacksonXmlProperty(localName = "NomApplicationLettre", namespace = Namespace.ANNUAIRE)
+  protected String nomApplicationLettre;
+  @JacksonXmlProperty(localName = "NomService", namespace = Namespace.ANNUAIRE)
+  protected String nomService;
+  @JacksonXmlProperty(localName = "NomSignataire", namespace = Namespace.ANNUAIRE)
+  protected String nomSignataire;
+  @JacksonXmlProperty(localName = "UEIdentifiant", namespace = Namespace.ANNUAIRE)
+  protected String ueIdentifiant;
+  @JacksonXmlProperty(localName = "URLSite", namespace = Namespace.ANNUAIRE)
+  protected String urlSite;
+  @JacksonXmlProperty(localName = "Logo", namespace = Namespace.ANNUAIRE)
+  protected String logo;
+  @JacksonXmlProperty(localName = "AdresseMessagerieEmettrice", namespace = Namespace.ANNUAIRE)
+  protected String adresseMessagerieEmettrice;
+
+  public String getChefSignataire() {
+    return chefSignataire;
+  }
+
+  public void setChefSignataire(String value) {
+    this.chefSignataire = value;
+  }
+
+  public String getHotlineFax() {
+    return hotlineFax;
+  }
+
+  public void setHotlineFax(String value) {
+    this.hotlineFax = value;
+  }
+
+  public String getHotlineMail() {
+    return hotlineMail;
+  }
+
+  public void setHotlineMail(String value) {
+    this.hotlineMail = value;
+  }
+
+  public String getHotlineTel() {
+    return hotlineTel;
+  }
+
+  public void setHotlineTel(String value) {
+    this.hotlineTel = value;
+  }
+
+  public String getIdentifiantApplication() {
+    return identifiantApplication;
+  }
+
+  public void setIdentifiantApplication(String value) {
+    this.identifiantApplication = value;
+  }
+
+  public String getIdentifiantEnt() {
+    return identifiantEnt;
+  }
+
+  public void setIdentifiantEnt(String value) {
+    this.identifiantEnt = value;
+  }
+
+  public String getModeleCourrier() {
+    return modeleCourrier;
+  }
+
+  public void setModeleCourrier(String value) {
+    this.modeleCourrier = value;
+  }
+
+  public String getNomDepartement() {
+    return nomDepartement;
+  }
+
+  public void setNomDepartement(String value) {
+    this.nomDepartement = value;
+  }
+
+  public String getNomDirection() {
+    return nomDirection;
+  }
+
+  public void setNomDirection(String value) {
+    this.nomDirection = value;
+  }
+
+  public String getNomApplicationLettre() {
+    return nomApplicationLettre;
+  }
+
+  public void setNomApplicationLettre(String value) {
+    this.nomApplicationLettre = value;
+  }
+
+  public String getNomService() {
+    return nomService;
+  }
+
+  public void setNomService(String value) {
+    this.nomService = value;
+  }
+
+  public String getNomSignataire() {
+    return nomSignataire;
+  }
+
+  public void setNomSignataire(String value) {
+    this.nomSignataire = value;
+  }
+
+  public String getUeIdentifiant() {
+    return ueIdentifiant;
+  }
+
+  public void setUeIdentifiant(String value) {
+    this.ueIdentifiant = value;
+  }
+
+  public String getUrlSite() {
+    return urlSite;
+  }
+
+  public void setUrlSite(String value) {
+    this.urlSite = value;
+  }
+
+  public String getLogo() {
+    return logo;
+  }
+
+  public void setLogo(String logo) {
+    this.logo = logo;
+  }
+
+  public String getAdresseMessagerieEmettrice() {
+    return adresseMessagerieEmettrice;
+  }
+
+  public void setAdresseMessagerieEmettrice(String adresseMessagerieEmettrice) {
+    this.adresseMessagerieEmettrice = adresseMessagerieEmettrice;
+  }
+
+}

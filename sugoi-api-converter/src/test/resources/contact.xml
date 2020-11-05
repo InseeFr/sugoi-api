@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns3:Contact xmlns:ns2="http://xml.insee.fr/schema"
+    xmlns:ns3="http://xml.insee.fr/schema/annuaire">
+    <Identifiant>test</Identifiant>
+    <NomCommun>Test</NomCommun>
+    <Nom>test</Nom>
+    <Prenom>test</Prenom>
+    <DomaineDeGestion>testDG</DomaineDeGestion>
+    <Description>description</Description>
+    <Civilite>M</Civilite>
+    <IdentifiantMetier>123456789</IdentifiantMetier>
+    <AdresseMessagerie>tes.tkmgfdl@jhk.gmail</AdresseMessagerie>
+    <NumeroTelephone>0123456789</NumeroTelephone>
+    <TelephonePortable>061245789636</TelephonePortable>
+    <FacSimile>0123456789</FacSimile>
+    <CertificatAuthentification>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</CertificatAuthentification>
+    <AdressePostale>
+        <ns2:LigneUne>15 rue Gabriel Peri</ns2:LigneUne>
+        <ns2:LigneDeux></ns2:LigneDeux>
+        <ns2:LigneTrois></ns2:LigneTrois>
+        <ns2:LigneQuatre></ns2:LigneQuatre>
+        <ns2:LigneCinq></ns2:LigneCinq>
+        <ns2:LigneSix></ns2:LigneSix>
+        <ns2:LigneSept>92240 Malakoff</ns2:LigneSept>
+    </AdressePostale>
+    <OrganisationDeRattachementUri>null133546546</OrganisationDeRattachementUri>
+    <Propriete>TestProp1</Propriete>
+    <Propriete>TestProp2</Propriete>
+    <CodePin>AAA=</CodePin>
+</ns3:Contact>
