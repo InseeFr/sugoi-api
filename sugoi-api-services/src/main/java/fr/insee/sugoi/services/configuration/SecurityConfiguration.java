@@ -36,6 +36,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   private boolean ldapAccountManagmentEnabled = true;
 
   /**
+   * Ldap url where are stored accounts for managment
+   */
+  private String ldapAccountManagmentUrl;
+  /**
+   * Base DN where are stored ldap accounts for managment
+   */
+  private String ldapAccountManagmentUserBase;
+  /**
+   * Group DN where are stored permissions for ldap accounts for managment
+   */
+  private String ldapAccountManagmentGroupeBase;
+
+  /**
    * Enable test user user:password for development
    */
   private boolean testUserEnabled = true;
@@ -93,7 +106,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     if (ldapAccountManagmentEnabled) {
-      // TODO
+      auth.ldapAuthentication().userSearchBase(ldapAccountManagmentUserBase)
+          .groupSearchBase(ldapAccountManagmentGroupeBase).contextSource().url(ldapAccountManagmentUrl);
     }
     if (testUserEnabled) {
       auth.inMemoryAuthentication().withUser("user").password("{noop}password").roles("USER");
@@ -130,6 +144,30 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   public void setTestUserEnabled(boolean testUserEnabled) {
     this.testUserEnabled = testUserEnabled;
+  }
+
+  public String getLdapAccountManagmentUrl() {
+    return ldapAccountManagmentUrl;
+  }
+
+  public void setLdapAccountManagmentUrl(String ldapAccountManagmentUrl) {
+    this.ldapAccountManagmentUrl = ldapAccountManagmentUrl;
+  }
+
+  public String getLdapAccountManagmentUserBase() {
+    return ldapAccountManagmentUserBase;
+  }
+
+  public void setLdapAccountManagmentUserBase(String ldapAccountManagmentUserBase) {
+    this.ldapAccountManagmentUserBase = ldapAccountManagmentUserBase;
+  }
+
+  public String getLdapAccountManagmentGroupeBase() {
+    return ldapAccountManagmentGroupeBase;
+  }
+
+  public void setLdapAccountManagmentGroupeBase(String ldapAccountManagmentGroupeBase) {
+    this.ldapAccountManagmentGroupeBase = ldapAccountManagmentGroupeBase;
   }
 
 }
