@@ -1,7 +1,5 @@
 package fr.insee.sugoi.services.configuration;
 
-import java.util.regex.Pattern;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,23 +13,29 @@ public class CorsConfiguration {
     /**
      * Pattern of urls accepted by CORS protection
      */
-    private String pathPattern = "/**";
+    private String PATH_PATTERN = "/**";
+
+    /**
+     * Array of origins allowed to connect
+     */
+    private String[] allowedOrigins = {};
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping(pathPattern);
+                registry.addMapping(PATH_PATTERN).allowedOrigins(allowedOrigins);
             }
         };
     }
 
-    public String getPathPattern() {
-        return pathPattern;
+    public String[] getAllowedOrigins() {
+        return allowedOrigins;
     }
 
-    public void setPathPattern(String pathPattern) {
-        this.pathPattern = pathPattern;
+    public void setAllowedOrigins(String[] allowedOrigins) {
+        this.allowedOrigins = allowedOrigins;
     }
+
 }

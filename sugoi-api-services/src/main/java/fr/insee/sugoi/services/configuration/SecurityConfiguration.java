@@ -23,17 +23,23 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   /**
    * Enable basic authentication
    */
-  private boolean basicAuthenticationEnabled = true;
+  private boolean basicAuthenticationEnabled = false;
 
   /**
    * Enable bearer authentication
+   * 
+   * A Spring Security oAuth configuration is mandatory if enabled
+   * 
+   * For instance you should add the
+   * spring.security.oauth2.resourceserver.jwt.jwk-set-uri property by the public
+   * key location of your oAuth server
    */
-  private boolean bearerAuthenticationEnabled = true;
+  private boolean bearerAuthenticationEnabled = false;
 
   /**
    * Enable basic authentication over ldap connection
    */
-  private boolean ldapAccountManagmentEnabled = true;
+  private boolean ldapAccountManagmentEnabled = false;
 
   /**
    * Ldap url where are stored accounts for managment
@@ -47,11 +53,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
    * Group DN where are stored permissions for ldap accounts for managment
    */
   private String ldapAccountManagmentGroupeBase;
-
-  /**
-   * Enable test user user:password for development
-   */
-  private boolean testUserEnabled = true;
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
@@ -109,9 +110,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
       auth.ldapAuthentication().userSearchBase(ldapAccountManagmentUserBase)
           .groupSearchBase(ldapAccountManagmentGroupeBase).contextSource().url(ldapAccountManagmentUrl);
     }
-    if (testUserEnabled) {
-      auth.inMemoryAuthentication().withUser("user").password("{noop}password").roles("USER");
-    }
   }
 
   public boolean isBasicAuthenticationEnabled() {
@@ -136,14 +134,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   public void setLdapAccountManagmentEnabled(boolean ldapAccountManagmentEnabled) {
     this.ldapAccountManagmentEnabled = ldapAccountManagmentEnabled;
-  }
-
-  public boolean isTestUserEnabled() {
-    return testUserEnabled;
-  }
-
-  public void setTestUserEnabled(boolean testUserEnabled) {
-    this.testUserEnabled = testUserEnabled;
   }
 
   public String getLdapAccountManagmentUrl() {
