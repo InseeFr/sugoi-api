@@ -1,3 +1,16 @@
+/*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package fr.insee.sugoi.converter.ouganext;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -6,11 +19,9 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 /**
  * Java class for InfoFormattageType complex type.
- * 
- * <p>
- * The following schema fragment specifies the expected content contained within
- * this class.
- * 
+ *
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ *
  * <pre>
  * &lt;complexType name="InfoFormattageType">
  *   &lt;complexContent>
@@ -35,45 +46,73 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @JacksonXmlRootElement(localName = "InfoFormattage", namespace = Namespace.ANNUAIRE)
-@JsonPropertyOrder({ "chefSignataire", "hotlineFax", "hotlineMail", "hotlineTel", "identifiantApplication",
-    "identifiantEnt", "modeleCourrier", "nomDepartement", "nomDirection", "nomApplicationLettre", "nomService",
-    "nomSignataire", "ueIdentifiant", "urlSite", "logo", "adresseMessagerieEmettrice" })
+@JsonPropertyOrder({
+  "chefSignataire",
+  "hotlineFax",
+  "hotlineMail",
+  "hotlineTel",
+  "identifiantApplication",
+  "identifiantEnt",
+  "modeleCourrier",
+  "nomDepartement",
+  "nomDirection",
+  "nomApplicationLettre",
+  "nomService",
+  "nomSignataire",
+  "ueIdentifiant",
+  "urlSite",
+  "logo",
+  "adresseMessagerieEmettrice"
+})
 public class InfoFormattage {
 
   @JacksonXmlProperty(localName = "ChefSignataire", namespace = Namespace.ANNUAIRE)
   protected String chefSignataire;
+
   @JacksonXmlProperty(localName = "HotlineFax", namespace = Namespace.ANNUAIRE)
   protected String hotlineFax;
+
   @JacksonXmlProperty(localName = "HotlineMail", namespace = Namespace.ANNUAIRE)
   protected String hotlineMail;
+
   @JacksonXmlProperty(localName = "HotlineTel", namespace = Namespace.ANNUAIRE)
   protected String hotlineTel;
+
   @JacksonXmlProperty(localName = "IdentifiantApplication", namespace = Namespace.ANNUAIRE)
   protected String identifiantApplication;
+
   @JacksonXmlProperty(localName = "IdentifiantEnt", namespace = Namespace.ANNUAIRE)
   protected String identifiantEnt;
+
   @JacksonXmlProperty(localName = "ModeleCourrier", namespace = Namespace.ANNUAIRE)
   protected String modeleCourrier;
+
   @JacksonXmlProperty(localName = "NomDepartement", namespace = Namespace.ANNUAIRE)
   protected String nomDepartement;
+
   @JacksonXmlProperty(localName = "NomDirection", namespace = Namespace.ANNUAIRE)
   protected String nomDirection;
+
   @JacksonXmlProperty(localName = "NomApplicationLettre", namespace = Namespace.ANNUAIRE)
   protected String nomApplicationLettre;
+
   @JacksonXmlProperty(localName = "NomService", namespace = Namespace.ANNUAIRE)
   protected String nomService;
+
   @JacksonXmlProperty(localName = "NomSignataire", namespace = Namespace.ANNUAIRE)
   protected String nomSignataire;
+
   @JacksonXmlProperty(localName = "UEIdentifiant", namespace = Namespace.ANNUAIRE)
   protected String ueIdentifiant;
+
   @JacksonXmlProperty(localName = "URLSite", namespace = Namespace.ANNUAIRE)
   protected String urlSite;
+
   @JacksonXmlProperty(localName = "Logo", namespace = Namespace.ANNUAIRE)
   protected String logo;
+
   @JacksonXmlProperty(localName = "AdresseMessagerieEmettrice", namespace = Namespace.ANNUAIRE)
   protected String adresseMessagerieEmettrice;
 
@@ -204,5 +243,4 @@ public class InfoFormattage {
   public void setAdresseMessagerieEmettrice(String adresseMessagerieEmettrice) {
     this.adresseMessagerieEmettrice = adresseMessagerieEmettrice;
   }
-
 }

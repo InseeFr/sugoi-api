@@ -1,68 +1,86 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package fr.insee.sugoi.model;
 
-import java.util.List;
-
-import fr.insee.sugoi.model.Technique.Store;
+import java.util.Map;
 
 public class UserStorage {
-    private String name;
-    private String userBranch;
-    private String organizationBranch;
-    private List<Organization> organizations;
-    private List<User> users;
+  private String name;
+  private String userSource;
+  private String organizationSource;
+  private Map<String, String> properties;
+  private String readerType;
+  private String writerType;
 
-    private Store store;
+  public String getName() {
+    return this.name;
+  }
 
-    public UserStorage() {
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    }
+  public String getUserSource() {
+    return userSource;
+  }
 
-    public List<User> getUsers() {
-        return this.users;
-    }
+  public void setUserSource(String userSource) {
+    this.userSource = userSource;
+  }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
+  public String getOrganizationSource() {
+    return organizationSource;
+  }
 
-    public String getName() {
-        return this.name;
-    }
+  public void setOrganizationSource(String organizationSource) {
+    this.organizationSource = organizationSource;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public Map<String, String> getProperties() {
+    return properties;
+  }
 
-    public String getUserBranch() {
-        return this.userBranch;
-    }
+  public void setProperties(Map<String, String> properties) {
+    this.properties = properties;
+  }
 
-    public void setUserBranch(String userBranch) {
-        this.userBranch = userBranch;
-    }
+  @Override
+  public String toString() {
+    return "UserStorage [name="
+        + name
+        + ", organizationSource="
+        + organizationSource
+        + ", properties="
+        + properties
+        + ", userSource="
+        + userSource
+        + "]";
+  }
 
-    public String getOrganizationBranch() {
-        return this.organizationBranch;
-    }
+  public String getReaderType() {
+    return readerType;
+  }
 
-    public void setOrganizationBranch(String organizationBranch) {
-        this.organizationBranch = organizationBranch;
-    }
+  public void setReaderType(String readerType) {
+    this.readerType = readerType;
+  }
 
-    public List<Organization> getOrganizations() {
-        return this.organizations;
-    }
+  public String getWriterType() {
+    return writerType;
+  }
 
-    public void setOrganizations(List<Organization> organizations) {
-        this.organizations = organizations;
-    }
-
-    public Store getStore() {
-        return this.store;
-    }
-
-    public void setStore(Store connection) {
-        this.store = connection;
-    }
-
+  public void setWriterType(String writerType) {
+    this.writerType = writerType;
+  }
 }

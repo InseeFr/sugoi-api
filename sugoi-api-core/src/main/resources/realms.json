@@ -1,0 +1,134 @@
+[
+  {
+    "name": "realm-IMAGINART",
+    "url": "http://placehold.it/32x32",
+    "appSource": "bethnielsen@imaginart.com",
+    "userStorages": [
+      {
+        "name": "userStorage-Contreras",
+        "userSource": "bethcontreras@imaginart.com",
+        "organizationSource": "bethcontreras@imaginart.com"
+      },
+      {
+        "name": "userStorage-Barlow",
+        "userSource": "bethbarlow@imaginart.com",
+        "organizationSource": "bethbarlow@imaginart.com"
+      },
+      {
+        "name": "userStorage-Welch",
+        "userSource": "bethwelch@imaginart.com",
+        "organizationSource": "bethwelch@imaginart.com"
+      }
+    ]
+  },
+  {
+    "name": "realm-CRUSTATIA",
+    "url": "http://placehold.it/32x32",
+    "appSource": "bethwelch@crustatia.com",
+    "userStorages": [
+      {
+        "name": "userStorage-Lambert",
+        "userSource": "bethlambert@crustatia.com",
+        "organizationSource": "bethlambert@crustatia.com"
+      },
+      {
+        "name": "userStorage-Jarvis",
+        "userSource": "bethjarvis@crustatia.com",
+        "organizationSource": "bethjarvis@crustatia.com"
+      },
+      {
+        "name": "userStorage-Wynn",
+        "userSource": "bethwynn@crustatia.com",
+        "organizationSource": "bethwynn@crustatia.com"
+      }
+    ]
+  },
+  {
+    "name": "realm-BRAINCLIP",
+    "url": "http://placehold.it/32x32",
+    "appSource": "bethwynn@brainclip.com",
+    "userStorages": [
+      {
+        "name": "userStorage-Stout",
+        "userSource": "bethstout@brainclip.com",
+        "organizationSource": "bethstout@brainclip.com"
+      },
+      {
+        "name": "userStorage-Estes",
+        "userSource": "bethestes@brainclip.com",
+        "organizationSource": "bethestes@brainclip.com"
+      },
+      {
+        "name": "userStorage-Sutton",
+        "userSource": "bethsutton@brainclip.com",
+        "organizationSource": "bethsutton@brainclip.com"
+      }
+    ]
+  },
+  {
+    "name": "realm-UBERLUX",
+    "url": "http://placehold.it/32x32",
+    "appSource": "bethsutton@uberlux.com",
+    "userStorages": [
+      {
+        "name": "userStorage-Strickland",
+        "userSource": "bethstrickland@uberlux.com",
+        "organizationSource": "bethstrickland@uberlux.com"
+      },
+      {
+        "name": "userStorage-Parker",
+        "userSource": "bethparker@uberlux.com",
+        "organizationSource": "bethparker@uberlux.com"
+      },
+      {
+        "name": "userStorage-Wolfe",
+        "userSource": "bethwolfe@uberlux.com",
+        "organizationSource": "bethwolfe@uberlux.com"
+      }
+    ]
+  },
+  {
+    "name": "realm-ENDIPIN",
+    "url": "http://placehold.it/32x32",
+    "appSource": "bethwolfe@endipin.com",
+    "userStorages": [
+      {
+        "name": "userStorage-Branch",
+        "userSource": "bethbranch@endipin.com",
+        "organizationSource": "bethbranch@endipin.com"
+      },
+      {
+        "name": "userStorage-Mcdonald",
+        "userSource": "bethmcdonald@endipin.com",
+        "organizationSource": "bethmcdonald@endipin.com"
+      },
+      {
+        "name": "userStorage-Fry",
+        "userSource": "bethfry@endipin.com",
+        "organizationSource": "bethfry@endipin.com"
+      }
+    ]
+  },
+  {
+    "name": "realm-CINESANCT",
+    "url": "http://placehold.it/32x32",
+    "appSource": "bethfry@cinesanct.com",
+    "userStorages": [
+      {
+        "name": "userStorage-Brooks",
+        "userSource": "bethbrooks@cinesanct.com",
+        "organizationSource": "bethbrooks@cinesanct.com"
+      },
+      {
+        "name": "userStorage-Day",
+        "userSource": "bethday@cinesanct.com",
+        "organizationSource": "bethday@cinesanct.com"
+      },
+      {
+        "name": "userStorage-Walsh",
+        "userSource": "bethwalsh@cinesanct.com",
+        "organizationSource": "bethwalsh@cinesanct.com"
+      }
+    ]
+  }
+]

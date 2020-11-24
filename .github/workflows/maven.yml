@@ -25,7 +25,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: war
-          path: sugoi-api-services/target/*.war
+          path: sugoi-api-rest-services/target/*.war
 
   docker:
     needs: build

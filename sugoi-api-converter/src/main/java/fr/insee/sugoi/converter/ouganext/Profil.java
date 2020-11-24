@@ -1,44 +1,86 @@
+/*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package fr.insee.sugoi.converter.ouganext;
-
-import java.util.Arrays;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import java.util.Arrays;
+import java.util.List;
 
-@JsonPropertyOrder({ "nomProfil", "ldapUrl", "port", "brancheContact", "brancheAdresse", "brancheOrganisation",
-    "mailUnicity", "idGlobalUnicity", "passwordReleasedAllowed", "pwdResetAllowed", "verifyChangePassword",
-    "longueurMiniPassword", "nombreMaxHabilitations", "vlvSupported", "vlvEnabled", "pagingSupported",
-    "objectClassContact", "habilitationsPossibles", "branchesApplicativesPossibles", "groupesPossibles" })
+@JsonPropertyOrder({
+  "nomProfil",
+  "ldapUrl",
+  "port",
+  "brancheContact",
+  "brancheAdresse",
+  "brancheOrganisation",
+  "mailUnicity",
+  "idGlobalUnicity",
+  "passwordReleasedAllowed",
+  "pwdResetAllowed",
+  "verifyChangePassword",
+  "longueurMiniPassword",
+  "nombreMaxHabilitations",
+  "vlvSupported",
+  "vlvEnabled",
+  "pagingSupported",
+  "objectClassContact",
+  "habilitationsPossibles",
+  "branchesApplicativesPossibles",
+  "groupesPossibles"
+})
 @JacksonXmlRootElement(localName = "Profil", namespace = Namespace.ANNUAIRE)
 public class Profil {
 
-  public static final ObjectClass[] TABLEAU_CLASSES_DEFAUT = { ObjectClass.TOP, ObjectClass.INSEE_COMPTE,
-      ObjectClass.INSEE_CONTACT, ObjectClass.INSEE_ATTRIBUTS_AUTHENTIFICATION, ObjectClass.INSEE_ATTRIBUTS_HABILITATION,
-      ObjectClass.INSEE_ATTRIBUTS_COMMUNICATION };
+  public static final ObjectClass[] TABLEAU_CLASSES_DEFAUT = {
+    ObjectClass.TOP,
+    ObjectClass.INSEE_COMPTE,
+    ObjectClass.INSEE_CONTACT,
+    ObjectClass.INSEE_ATTRIBUTS_AUTHENTIFICATION,
+    ObjectClass.INSEE_ATTRIBUTS_HABILITATION,
+    ObjectClass.INSEE_ATTRIBUTS_COMMUNICATION
+  };
 
   @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
   private String ldapUrl;
+
   @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
   private int port;
 
   @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
   private String username;
+
   @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
   private String password;
 
   // Autorisation de mettre le mot de passe dans le DLM
   @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
   private boolean passwordReleasedAllowed = false;
+
   @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
   private boolean verifyChangePassword = false;
+
   @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
   private String brancheContact;
+
   @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
   private String brancheAdresse;
+
   @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
   private String brancheOrganisation;
+
   @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
   private String nomProfil;
 
@@ -80,6 +122,7 @@ public class Profil {
   // Support de la pagination ou du vlv
   @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
   private boolean vlvSupported = false;
+
   @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
   private boolean pagingSupported = false;
 
@@ -89,12 +132,37 @@ public class Profil {
 
   @Override
   public String toString() {
-    return "Profil [ldapUrl=" + ldapUrl + ", port=" + port + ", username=" + username + ", password=" + password
-        + ", passwordReleasedAllowed=" + passwordReleasedAllowed + ", verifyChangePassword=" + verifyChangePassword
-        + ", brancheContact=" + brancheContact + ", brancheAdresse=" + brancheAdresse + ", brancheOrganisation="
-        + brancheOrganisation + ", nomProfil=" + nomProfil + ", pwdResetAllowed=" + pwdResetAllowed + ", mailUnicity="
-        + mailUnicity + ", longueurMiniPassword=" + longueurMiniPassword + ", vlvSupported=" + vlvSupported
-        + ", pagingSupported=" + pagingSupported + "]";
+    return "Profil [ldapUrl="
+        + ldapUrl
+        + ", port="
+        + port
+        + ", username="
+        + username
+        + ", password="
+        + password
+        + ", passwordReleasedAllowed="
+        + passwordReleasedAllowed
+        + ", verifyChangePassword="
+        + verifyChangePassword
+        + ", brancheContact="
+        + brancheContact
+        + ", brancheAdresse="
+        + brancheAdresse
+        + ", brancheOrganisation="
+        + brancheOrganisation
+        + ", nomProfil="
+        + nomProfil
+        + ", pwdResetAllowed="
+        + pwdResetAllowed
+        + ", mailUnicity="
+        + mailUnicity
+        + ", longueurMiniPassword="
+        + longueurMiniPassword
+        + ", vlvSupported="
+        + vlvSupported
+        + ", pagingSupported="
+        + pagingSupported
+        + "]";
   }
 
   public String getLdapUrl() {
@@ -272,5 +340,4 @@ public class Profil {
   public void setGroupesPossibles(List<Groupe> groupesPossibles) {
     this.groupesPossibles = groupesPossibles;
   }
-
 }
