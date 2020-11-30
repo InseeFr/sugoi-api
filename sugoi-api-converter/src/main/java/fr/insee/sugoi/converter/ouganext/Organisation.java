@@ -1,28 +1,37 @@
+/*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package fr.insee.sugoi.converter.ouganext;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import fr.insee.sugoi.converter.ouganext.adapters.OrganisationSerializer;
+import fr.insee.sugoi.converter.utils.MapFromAttribute;
+import fr.insee.sugoi.converter.utils.MapFromHashmapElement;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-
-import fr.insee.sugoi.converter.ouganext.adapters.OrganisationSerializer;
-import fr.insee.sugoi.converter.utils.MapFromAttribute;
-import fr.insee.sugoi.converter.utils.MapFromHashmapElement;
-
 /**
  * Java class for OrganisationType complex type.
- * 
- * <p>
- * The following schema fragment specifies the expected content contained within
- * this class.
- * 
+ *
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ *
  * <pre>
  * &lt;complexType name="OrganisationType">
  *   &lt;complexContent>
@@ -43,13 +52,22 @@ import fr.insee.sugoi.converter.utils.MapFromHashmapElement;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder({ "identifiant", "nomCommun", "domaineDeGestion", "description", "adresseMessagerie",
-    "numeroTelephone", "facSimile", "adresse", "cleDeChiffrement", "organisationDeRattachement",
-    "repertoireDeDistribution", "propriete" })
+@JsonPropertyOrder({
+  "identifiant",
+  "nomCommun",
+  "domaineDeGestion",
+  "description",
+  "adresseMessagerie",
+  "numeroTelephone",
+  "facSimile",
+  "adresse",
+  "cleDeChiffrement",
+  "organisationDeRattachement",
+  "repertoireDeDistribution",
+  "propriete"
+})
 @JacksonXmlRootElement(localName = "Organisation", namespace = Namespace.ANNUAIRE)
 public class Organisation {
 
@@ -198,12 +216,30 @@ public class Organisation {
   }
 
   public String toString() {
-    return "Organisation [nomCommun=" + nomCommun + ", domaineDeGestion=" + domaineDeGestion + ", description="
-        + description + ", adresseMessagerie=" + adresseMessagerie + ", numeroTelephone=" + numeroTelephone
-        + ", facSimile=" + facSimile + ", adresse=" + adresse + ", cleDeChiffrement="
-        + Arrays.toString(cleDeChiffrement) + ", organisationDeRattachement="
+    return "Organisation [nomCommun="
+        + nomCommun
+        + ", domaineDeGestion="
+        + domaineDeGestion
+        + ", description="
+        + description
+        + ", adresseMessagerie="
+        + adresseMessagerie
+        + ", numeroTelephone="
+        + numeroTelephone
+        + ", facSimile="
+        + facSimile
+        + ", adresse="
+        + adresse
+        + ", cleDeChiffrement="
+        + Arrays.toString(cleDeChiffrement)
+        + ", organisationDeRattachement="
         + ((organisationDeRattachement == null) ? "" : organisationDeRattachement.getIdentifiant())
-        + ", repertoireDeDistribution=" + repertoireDeDistribution + ", identifiant=" + identifiant + ", propriete="
-        + propriete + "]";
+        + ", repertoireDeDistribution="
+        + repertoireDeDistribution
+        + ", identifiant="
+        + identifiant
+        + ", propriete="
+        + propriete
+        + "]";
   }
 }

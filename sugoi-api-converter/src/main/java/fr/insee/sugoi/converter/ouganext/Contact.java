@@ -1,12 +1,21 @@
+/*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package fr.insee.sugoi.converter.ouganext;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -14,21 +23,21 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-
 import fr.insee.sugoi.converter.ouganext.adapters.CertificateDeserializer;
 import fr.insee.sugoi.converter.ouganext.adapters.CertificateSerializer;
 import fr.insee.sugoi.converter.ouganext.adapters.OrganisationDeserializer;
 import fr.insee.sugoi.converter.ouganext.adapters.OrganisationSerializer;
 import fr.insee.sugoi.converter.utils.MapFromAttribute;
 import fr.insee.sugoi.converter.utils.MapFromHashmapElement;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
 
 /**
  * Java class for ContactType complex type.
- * 
- * <p>
- * The following schema fragment specifies the expected content contained within
- * this class.
- * 
+ *
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ *
  * <pre>
  * &lt;complexType name="ContactType">
  *   &lt;complexContent>
@@ -67,17 +76,41 @@ import fr.insee.sugoi.converter.utils.MapFromHashmapElement;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
-
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder({ "identifiant", "nomCommun", "nom", "prenom", "domaineDeGestion", "description", "civilite",
-    "identifiantMetier", "adresseMessagerie", "numeroTelephone", "telephonePortable", "facSimile", "hasPassword",
-    "certificate", "adresse", "organisationDeRattachementUri", "organisation", "repertoireDeDistribution", "propriete",
-    "inseeRoleApplicatif", "codePin", "dateCreation", "inseeTimbre", "inseeOrganisme",
-    "inseeAdresseCorrespondantLigne1", "inseeAdresseCorrespondantLigne2", "inseeAdresseCorrespondantLigne3",
-    "postalCode", "inseeNomCorrespondant", "inseeMailCorrespondant", "inseeTelephoneNumberCorrespondant" })
+@JsonPropertyOrder({
+  "identifiant",
+  "nomCommun",
+  "nom",
+  "prenom",
+  "domaineDeGestion",
+  "description",
+  "civilite",
+  "identifiantMetier",
+  "adresseMessagerie",
+  "numeroTelephone",
+  "telephonePortable",
+  "facSimile",
+  "hasPassword",
+  "certificate",
+  "adresse",
+  "organisationDeRattachementUri",
+  "organisation",
+  "repertoireDeDistribution",
+  "propriete",
+  "inseeRoleApplicatif",
+  "codePin",
+  "dateCreation",
+  "inseeTimbre",
+  "inseeOrganisme",
+  "inseeAdresseCorrespondantLigne1",
+  "inseeAdresseCorrespondantLigne2",
+  "inseeAdresseCorrespondantLigne3",
+  "postalCode",
+  "inseeNomCorrespondant",
+  "inseeMailCorrespondant",
+  "inseeTelephoneNumberCorrespondant"
+})
 @JacksonXmlRootElement(localName = "Contact", namespace = Namespace.ANNUAIRE)
 public class Contact {
 
@@ -189,7 +222,6 @@ public class Contact {
   @MapFromHashmapElement(hashMapName = "metadatas", hashMapKey = "dateCreation")
   @JsonProperty(value = "DateCreation")
   private Date dateCreation;
-
 
   /* CAS DE L'AGENT INSEE */
 
@@ -452,5 +484,4 @@ public class Contact {
   public void setPostalCode(String postalCode) {
     this.postalCode = postalCode;
   }
-
 }
