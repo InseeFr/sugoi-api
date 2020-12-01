@@ -1,4 +1,4 @@
-package fr.insee.sugoi.core.store.impl;
+package fr.insee.sugoi.store.ldap;
 
 import fr.insee.sugoi.core.configuration.RealmProvider;
 import fr.insee.sugoi.core.configuration.StoreStorage;
@@ -13,18 +13,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class StoreProviderImpl implements StoreProvider {
+public class LdapStoreProviderImpl implements StoreProvider {
 
-  @Autowired private RealmProvider realmProvider;
-  @Autowired private StoreStorage connectionStorage;
+  @Autowired
+  private RealmProvider realmProvider;
+  @Autowired
+  private StoreStorage connectionStorage;
 
-  @Value("${fr.insee.sugoi.ldap.default.username}")
+  @Value("${fr.insee.sugoi.ldap.default.username:}")
   private String defaultUsername;
 
-  @Value("${fr.insee.sugoi.ldap.default.password}")
+  @Value("${fr.insee.sugoi.ldap.default.password:}")
   private String defaultPassword;
 
-  @Value("${fr.insee.sugoi.ldap.default.pool}")
+  @Value("${fr.insee.sugoi.ldap.default.pool:}")
   private String defaultPoolSize;
 
   @Override

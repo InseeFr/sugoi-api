@@ -13,58 +13,42 @@
  */
 package fr.insee.sugoi.core.configuration.impl;
 
-import fr.insee.sugoi.core.configuration.RealmProvider;
-import fr.insee.sugoi.core.configuration.RealmStorage;
-import fr.insee.sugoi.core.configuration.StoreStorage;
-import fr.insee.sugoi.core.utils.Exceptions.RealmNotFoundException;
-import fr.insee.sugoi.model.Realm;
-import fr.insee.sugoi.model.UserStorage;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+
+import fr.insee.sugoi.core.configuration.RealmProvider;
+import fr.insee.sugoi.core.configuration.RealmStorage;
+import fr.insee.sugoi.core.configuration.StoreStorage;
+import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.UserStorage;
 
 @Component
 public class RealmStorageImpl implements RealmStorage {
 
-  @Value("${fr.insee.sugoi.ldap.default.username}")
-  private String defaultUsername;
+  @Autowired
+  private RealmProvider realmProvider;
 
-  @Value("${fr.insee.sugoi.ldap.default.password}")
-  private String defaultPassword;
+  @Autowired
+  private StoreStorage connectionStorage;
 
-  @Value("${fr.insee.sugoi.ldap.default.pool}")
-  private String defaultPoolSize;
-
-  @Autowired private RealmProvider realmProvider;
-
-  @Autowired private StoreStorage connectionStorage;
-
-  @Cacheable
   public Realm getRealm(String realmName) {
-    try {
-      Realm realm = realmProvider.load(realmName);
-      return realm;
-    } catch (RealmNotFoundException e) {
-      throw new RuntimeException(e);
-    }
+    Realm realm = realmProvider.load(realmName);
+    return realm;
   }
 
   private Map<String, String> generateConf(Realm realm, UserStorage userStorage) {
     Map<String, String> config = new HashMap<>();
     config.put("name", userStorage.getName() != null ? userStorage.getName() : realm.getName());
     config.put("url", realm.getUrl());
-    config.put("username", defaultUsername);
-    config.put("password", defaultPassword);
-    config.put("pool_size", defaultPoolSize);
     config.put("user_source", userStorage.getUserSource());
     config.put("app_source", realm.getAppSource());
     config.put("organization_source", userStorage.getOrganizationSource());
     config.put("realm_name", realm.getName());
-    config.put("type", "ldap");
+    config.put("type", "file");
     return config;
   }
 

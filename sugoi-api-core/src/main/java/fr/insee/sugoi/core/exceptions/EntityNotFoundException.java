@@ -11,16 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.insee.sugoi.core.utils.Exceptions;
+package fr.insee.sugoi.core.exceptions;
 
-public class RealmNotFoundException extends RuntimeException {
+public class EntityNotFoundException extends RuntimeException {
 
   /** */
   private static final long serialVersionUID = 1L;
 
   private String message;
 
-  public RealmNotFoundException(String message) {
+  public EntityNotFoundException(String message) {
     this.message = message;
   }
 

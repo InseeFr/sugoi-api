@@ -14,6 +14,7 @@
 package fr.insee.sugoi.services.controller.v2;
 
 import fr.insee.sugoi.core.service.ConfigService;
+import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.services.mapper.RealmViewMapper;
 import fr.insee.sugoi.services.view.RealmView;
 import java.util.List;
@@ -37,7 +38,8 @@ public class ConfigController {
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
       value = "/realm/{id}")
   public RealmView getRealm(@PathVariable("id") String id) {
-    return realmViewMapper.mapperHandly(configService.getRealm(id));
+    Realm realm = configService.getRealm(id);
+    return realmViewMapper.mapperHandly(realm);
   }
 
   @GetMapping(

@@ -11,18 +11,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.insee.sugoi.core.mapper;
+package fr.insee.sugoi.core.exceptions;
 
-import com.unboundid.ldap.sdk.SearchResultEntry;
-import fr.insee.sugoi.core.mapper.properties.OrganizationLdap;
-import fr.insee.sugoi.model.Organization;
+public class RealmNotFoundException extends RuntimeException {
 
-public class OrganizationLdapMapper {
+  /** */
+  private static final long serialVersionUID = 1L;
 
-  public static Organization mapFromSearchEntry(SearchResultEntry searchResultEntry) {
-    Organization org =
-        GenericLdapMapper.transform(searchResultEntry, OrganizationLdap.class, Organization.class);
-    org.setGpgkey(searchResultEntry.getAttribute("inseeClefChiffrement").getValueByteArray());
-    return org;
+  private String message;
+
+  public RealmNotFoundException(String message) {
+    this.message = message;
+  }
+
+  public String getMessage() {
+    return this.message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
   }
 }

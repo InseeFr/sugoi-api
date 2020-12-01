@@ -1,0 +1,14 @@
+[
+  {
+    "name": "realm1",
+    "url": "storage.example.com/realms1",
+    "appSource": "storage.example.com/realms1/appSource",
+    "userStorages": [
+      {
+        "name": "userStorage1",
+        "userSource": "storage.example.com/realms1/userStorage/userStorage1/users",
+        "organizationSource": "storage.example.com/realms1/userStorage/userStorage1/organization"
+      }
+    ]
+  }
+]

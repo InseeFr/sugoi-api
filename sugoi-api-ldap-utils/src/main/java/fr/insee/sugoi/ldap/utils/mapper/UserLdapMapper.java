@@ -14,7 +14,8 @@
 package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.SearchResultEntry;
-import fr.insee.sugoi.core.mapper.properties.UserLdap;
+
+import fr.insee.sugoi.ldap.utils.mapper.properties.UserLdap;
 import fr.insee.sugoi.model.User;
 
 public class UserLdapMapper {

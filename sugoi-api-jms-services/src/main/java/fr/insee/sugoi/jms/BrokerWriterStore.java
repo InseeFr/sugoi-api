@@ -11,13 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.insee.sugoi.core.dao.broker;
+package fr.insee.sugoi.jms;
+
+import java.util.Map;
+
+import org.springframework.jms.core.JmsTemplate;
 
 import fr.insee.sugoi.core.store.WriterStore;
-import fr.insee.sugoi.core.utils.broker.JmsFactory;
+import fr.insee.sugoi.jms.utils.JmsFactory;
 import fr.insee.sugoi.model.User;
-import java.util.Map;
-import org.springframework.jms.core.JmsTemplate;
 
 public class BrokerWriterStore implements WriterStore {
 

@@ -13,6 +13,10 @@
  */
 package fr.insee.sugoi.store.ldap;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.unboundid.ldap.sdk.Filter;
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
@@ -22,23 +26,22 @@ import com.unboundid.ldap.sdk.SearchRequest;
 import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
-import fr.insee.sugoi.core.mapper.AddressLdapMapper;
-import fr.insee.sugoi.core.mapper.OrganizationLdapMapper;
-import fr.insee.sugoi.core.mapper.UserLdapMapper;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
 import fr.insee.sugoi.core.store.PageResult;
 import fr.insee.sugoi.core.store.PageableResult;
 import fr.insee.sugoi.core.store.ReaderStore;
-import fr.insee.sugoi.core.utils.Exceptions.EntityNotFoundException;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
+import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;
+import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
+import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class LdapReaderStore implements ReaderStore {
 
@@ -79,48 +82,24 @@ public class LdapReaderStore implements ReaderStore {
   }
 
   @Override
-  public PageResult<User> searchUsers(
-      String identifiant,
-      String nomCommun,
-      String description,
-      String organisationId,
-      String domaineGestion,
-      String mail,
-      PageableResult pageable,
-      String typeRecherche,
-      List<String> habilitations,
-      String application,
-      String role,
-      String rolePropriete,
-      String certificat) {
+  public PageResult<User> searchUsers(String identifiant, String nomCommun, String description, String organisationId,
+      String domaineGestion, String mail, PageableResult pageable, String typeRecherche, List<String> habilitations,
+      String application, String role, String rolePropriete, String certificat) {
     try {
       PageResult<User> page = new PageResult<>();
-      Filter filter =
-          LdapUtils.filterRechercher(
-              typeRecherche,
-              identifiant,
-              nomCommun,
-              description,
-              organisationId,
-              mail,
-              pageable,
-              habilitations,
-              certificat);
-      SearchRequest searchRequest =
-          new SearchRequest(
-              config.get("user_branch"), SearchScope.SUBORDINATE_SUBTREE, filter, "*", "+");
+      Filter filter = LdapUtils.filterRechercher(typeRecherche, identifiant, nomCommun, description, organisationId,
+          mail, pageable, habilitations, certificat);
+      SearchRequest searchRequest = new SearchRequest(config.get("user_branch"), SearchScope.SUBORDINATE_SUBTREE,
+          filter, "*", "+");
       LdapUtils.setRequestControls(searchRequest, pageable);
       SearchResult searchResult = ldapPoolConnection.search(searchRequest);
-      List<User> users =
-          searchResult.getSearchEntries().stream()
-              .map(e -> UserLdapMapper.mapFromSearchEntry(e))
-              .collect(Collectors.toList());
+      List<User> users = searchResult.getSearchEntries().stream().map(e -> UserLdapMapper.mapFromSearchEntry(e))
+          .collect(Collectors.toList());
       LdapUtils.setResponseControls(page, searchResult);
       page.setResults(users);
       return page;
     } catch (LDAPSearchException e) {
-      throw new RuntimeException(
-          "Impossible de recupérer les utilisateurs du domaine " + domaineGestion);
+      throw new RuntimeException("Impossible de recupérer les utilisateurs du domaine " + domaineGestion);
     }
   }
 

@@ -13,19 +13,22 @@
  */
 package fr.insee.sugoi.core.configuration;
 
-import fr.insee.sugoi.core.utils.Exceptions.RealmNotFoundException;
+import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
+
 /**
  * This is called to fetch realms configuration.
  *
- * <p>All implementations need to declare a value for the property `fr.insee.sugoi.config.type` like
- * this :
+ * <p>
+ * All implementations need to declare a value for the property
+ * `fr.insee.sugoi.config.type` like this :
  *
  * <pre>
- * @ConditionalOnProperty(
+ * &#64;ConditionalOnProperty(
  *  value = "fr.insee.sugoi.realm.config.type",
  *  havingValue = "<value>",
  *  matchIfMissing = false)
@@ -33,10 +36,11 @@ import java.util.List;
  */
 public interface RealmProvider {
 
+  @Cacheable(value = "Realm", key = "#realmName")
   public Realm load(String realmName) throws RealmNotFoundException;
 
-  public default UserStorage loadUserStorageByUserStorageName(
-      String realmName, String userStorageName) throws RealmNotFoundException {
+  public default UserStorage loadUserStorageByUserStorageName(String realmName, String userStorageName)
+      throws RealmNotFoundException {
     Realm r = load(realmName);
     if (r != null) {
 
@@ -50,8 +54,7 @@ public interface RealmProvider {
     throw new RealmNotFoundException(String.format("No user Storage %s found", userStorageName));
   }
 
-  public default Realm loadRealmByUserStorageName(String userStorageName)
-      throws RealmNotFoundException {
+  public default Realm loadRealmByUserStorageName(String userStorageName) throws RealmNotFoundException {
     for (Realm r : findAll()) {
       for (UserStorage us : r.getUserStorages()) {
         if (us.getName().equalsIgnoreCase(userStorageName)) {
@@ -59,9 +62,9 @@ public interface RealmProvider {
         }
       }
     }
-    throw new RealmNotFoundException(
-        String.format("No Realm found for user Storage %s", userStorageName));
+    throw new RealmNotFoundException(String.format("No Realm found for user Storage %s", userStorageName));
   }
 
+  @Cacheable("Realms")
   public List<Realm> findAll();
 }

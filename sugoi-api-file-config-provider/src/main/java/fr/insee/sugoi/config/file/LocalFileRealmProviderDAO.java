@@ -17,48 +17,52 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.core.configuration.RealmProvider;
-import fr.insee.sugoi.core.utils.Exceptions.RealmNotFoundException;
+import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.Realm;
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(
-    value = "fr.insee.sugoi.realm.config.type",
-    havingValue = "local",
-    matchIfMissing = false)
+@ConditionalOnProperty(value = "fr.insee.sugoi.realm.config.type", havingValue = "local", matchIfMissing = true)
 public class LocalFileRealmProviderDAO implements RealmProvider {
 
-  @Value("${fr.insee.sugoi.realm.config.local.path:}")
-  private String localFilePath;
+    @Value("${fr.insee.sugoi.realm.config.local.path:/realms.json}")
+    private String localFilePath;
 
-  private List<Realm> realms;
-  private ObjectMapper mapper = new ObjectMapper();
+    private List<Realm> realms;
+    private ObjectMapper mapper = new ObjectMapper();
 
-  @Override
-  public Realm load(String realmName) throws RealmNotFoundException {
-    if (realms == null) {
-      try {
-        realms = mapper.readValue(localFilePath, new TypeReference<List<Realm>>() {});
-      } catch (JsonProcessingException e) {
-        e.printStackTrace();
-      }
+    @Override
+    public Realm load(String realmName) {
+        if (realms == null) {
+            try {
+                URL is = this.getClass().getResource(localFilePath);
+                realms = mapper.readValue(is, new TypeReference<List<Realm>>() {
+                });
+            } catch (IOException e) {
+                throw new RealmNotFoundException(e.getMessage());
+            }
+        }
+        return realms.stream().filter(r -> r.getName().equalsIgnoreCase(realmName)).findFirst().orElse(null);
     }
-    return realms.stream()
-        .filter(r -> r.getName().equalsIgnoreCase(realmName))
-        .findFirst()
-        .orElse(null);
-  }
 
-  @Override
-  public List<Realm> findAll() {
-    try {
-      realms = mapper.readValue(localFilePath, new TypeReference<List<Realm>>() {});
-    } catch (Exception e) {
-      e.printStackTrace();
+    @Override
+    public List<Realm> findAll() {
+        try {
+            URL is = this.getClass().getResource(localFilePath);
+            realms = mapper.readValue(is, new TypeReference<List<Realm>>() {
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return realms;
     }
-    return realms;
-  }
 }

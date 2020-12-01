@@ -14,14 +14,14 @@
 package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.SearchResultEntry;
-import fr.insee.sugoi.core.mapper.properties.OrganizationLdap;
+
+import fr.insee.sugoi.ldap.utils.mapper.properties.OrganizationLdap;
 import fr.insee.sugoi.model.Organization;
 
 public class OrganizationLdapMapper {
 
   public static Organization mapFromSearchEntry(SearchResultEntry searchResultEntry) {
-    Organization org =
-        GenericLdapMapper.transform(searchResultEntry, OrganizationLdap.class, Organization.class);
+    Organization org = GenericLdapMapper.transform(searchResultEntry, OrganizationLdap.class, Organization.class);
     org.setGpgkey(searchResultEntry.getAttribute("inseeClefChiffrement").getValueByteArray());
     return org;
   }

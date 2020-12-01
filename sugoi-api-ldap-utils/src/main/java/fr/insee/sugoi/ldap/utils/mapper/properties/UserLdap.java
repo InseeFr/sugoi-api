@@ -13,9 +13,9 @@
  */
 package fr.insee.sugoi.ldap.utils.mapper.properties;
 
-import fr.insee.sugoi.core.mapper.properties.utils.AttributeLdapName;
-import fr.insee.sugoi.core.mapper.properties.utils.MapToAttribute;
-import fr.insee.sugoi.core.mapper.properties.utils.MapToMapElement;
+import fr.insee.sugoi.ldap.utils.mapper.properties.utils.AttributeLdapName;
+import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToAttribute;
+import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToMapElement;
 
 public class UserLdap {
 
