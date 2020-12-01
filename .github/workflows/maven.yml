@@ -21,11 +21,15 @@ jobs:
           java-version: 11
       - name: Build with Maven
         run: mvn -B package --file pom.xml
+      - name: Test with Maven
+        run: mvn verify
+      - name: Spotless check
+        run: mvn spotless:check
       - name: Upload war
         uses: actions/upload-artifact@v2
         with:
           name: war
-          path: sugoi-api-rest-services/target/*.war
+          path: sugoi-api-distribution/sugoi-api-distribution-war/target/*.war
 
   docker:
     needs: build
@@ -37,7 +41,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: war
-          path: sugoi-api-services/target
+          path: sugoi-api-distribution/sugoi-api-distribution-war/target/sugoi-api.war
       - name: Docker meta
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v1.8.4

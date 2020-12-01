@@ -10,10 +10,11 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>fr.insee.sugoi</groupId>
-  <artifactId>sugoi-api-distribution-jar</artifactId>
+  <artifactId>sugoi-api-distribution-war</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  <packaging>war</packaging>
 
-  <name>sugoi-api-distribution-jar</name>
+  <name>sugoi-api-distribution-war</name>
 
   <dependencies>
     <dependency>
@@ -147,6 +148,17 @@
     </extensions>
 
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <warName>sugoi-api</warName>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+          <attachClasses>true</attachClasses>
+          <classesClassifier>classes</classesClassifier>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
