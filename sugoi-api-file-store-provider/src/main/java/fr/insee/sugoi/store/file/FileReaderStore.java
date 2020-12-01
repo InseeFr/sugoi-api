@@ -1,6 +1,7 @@
 package fr.insee.sugoi.store.file;
 
 import java.util.List;
+import java.util.Map;
 
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
@@ -11,7 +12,10 @@ import fr.insee.sugoi.model.User;
 
 public class FileReaderStore implements ReaderStore {
 
-    @Override
+    public FileReaderStore(Map<String, String> generateConfig) {
+	}
+
+	@Override
     public User searchUser(String domaine, String id) {
         // TODO Auto-generated method stub
         return null;

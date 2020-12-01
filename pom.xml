@@ -73,6 +73,31 @@
         <artifactId>sugoi-api-ldap-utils</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>fr.insee.sugoi</groupId>
+        <artifactId>sugoi-api-file-config-provider</artifactId>
+        <version>${project.version}</version>
+
+      </dependency>
+
+      <dependency>
+        <groupId>fr.insee.sugoi</groupId>
+        <artifactId>sugoi-api-file-store-provider</artifactId>
+        <version>${project.version}</version>
+
+      </dependency>
+
+      <dependency>
+        <groupId>fr.insee.sugoi</groupId>
+        <artifactId>sugoi-api-ldap-config-provider</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>fr.insee.sugoi</groupId>
+        <artifactId>sugoi-api-ldap-store-provider</artifactId>
+        <version>${project.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <modules>
