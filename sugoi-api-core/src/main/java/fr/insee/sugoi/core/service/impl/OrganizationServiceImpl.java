@@ -13,27 +13,28 @@
  */
 package fr.insee.sugoi.core.service.impl;
 
-import fr.insee.sugoi.core.configuration.RealmStorage;
-import fr.insee.sugoi.core.service.OrganizationService;
-import fr.insee.sugoi.core.store.StoreProvider;
-import fr.insee.sugoi.model.Organization;
-import fr.insee.sugoi.model.UserStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import fr.insee.sugoi.core.service.OrganizationService;
+import fr.insee.sugoi.core.technics.RealmProvider;
+import fr.insee.sugoi.core.technics.StoreProvider;
+import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.UserStorage;
 
 @Service
 public class OrganizationServiceImpl implements OrganizationService {
 
-  @Autowired private RealmStorage realmStorage;
+  @Autowired
+  private RealmProvider realmProvider;
 
-  @Autowired private StoreProvider storeProvider;
+  @Autowired
+  private StoreProvider storeProvider;
 
   @Override
   public Organization searchOrganization(String realmName, String name) {
-    UserStorage userStorage = realmStorage.getRealm(realmName).getUserStorages().get(0);
-    return storeProvider
-        .getStoreForUserStorage(realmName, userStorage.getName())
-        .getReader()
+    UserStorage userStorage = realmProvider.load(realmName).getUserStorages().get(0);
+    return storeProvider.getStoreForUserStorage(realmName, userStorage.getName()).getReader()
         .searchOrganization(realmName, name);
   }
 }

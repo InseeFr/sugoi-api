@@ -17,7 +17,10 @@ import com.unboundid.ldap.sdk.DeleteRequest;
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
 import com.unboundid.ldap.sdk.LDAPException;
-import fr.insee.sugoi.core.store.WriterStore;
+
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+
+import fr.insee.sugoi.core.technics.WriterStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.model.User;
 import java.util.Map;

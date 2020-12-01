@@ -13,22 +13,20 @@
  */
 package fr.insee.sugoi.config.file;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insee.sugoi.core.configuration.RealmProvider;
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
-import fr.insee.sugoi.model.Realm;
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+
+import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
+import fr.insee.sugoi.core.technics.RealmProvider;
+import fr.insee.sugoi.model.Realm;
 
 @Component
 @ConditionalOnProperty(value = "fr.insee.sugoi.realm.config.type", havingValue = "local", matchIfMissing = true)

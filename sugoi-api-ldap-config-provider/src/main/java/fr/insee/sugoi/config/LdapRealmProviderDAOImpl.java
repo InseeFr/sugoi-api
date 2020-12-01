@@ -30,8 +30,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import fr.insee.sugoi.core.configuration.RealmProvider;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
+import fr.insee.sugoi.core.technics.RealmProvider;
 import fr.insee.sugoi.ldap.utils.LdapFilter;
 import fr.insee.sugoi.ldap.utils.mapper.RealmLdapMapper;
 import fr.insee.sugoi.model.Realm;

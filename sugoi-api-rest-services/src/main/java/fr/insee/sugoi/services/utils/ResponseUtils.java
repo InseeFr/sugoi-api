@@ -13,20 +13,23 @@
  */
 package fr.insee.sugoi.services.utils;
 
-import fr.insee.sugoi.core.store.PageResult;
 import java.net.URI;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import fr.insee.sugoi.core.model.PageResult;
 
 @Component
 public class ResponseUtils {
 
   private static <T> URI fetchNextResultUri(PageResult<T> page) {
-    UriComponentsBuilder uriComponents =
-        UriComponentsBuilder.newInstance().scheme("http").host("www.google.com").path("/");
+    UriComponentsBuilder uriComponents = UriComponentsBuilder.newInstance().scheme("http").host("www.google.com")
+        .path("/");
     if (page.isHasMoreResult()) {
-      if (page.getSearchCookie() != null) {}
+      if (page.getSearchCookie() != null) {
+      }
 
       if (page.getNextStart() > 0) {
         uriComponents = uriComponents.queryParam("start", page.getNextStart());
@@ -35,8 +38,8 @@ public class ResponseUtils {
     return uriComponents.build().toUri();
   }
 
-  public static HttpHeaders ajouterHeadersTotalSizeEtNextLocation(
-      PageResult<?> page, boolean premiereRecherche, int sizeDemande) {
+  public static HttpHeaders ajouterHeadersTotalSizeEtNextLocation(PageResult<?> page, boolean premiereRecherche,
+      int sizeDemande) {
     HttpHeaders headers = new HttpHeaders();
     // Try to get total result size, return -1 if cannot
     if (page.getPageSize() == -1 && premiereRecherche && page.getResults().size() < sizeDemande) {

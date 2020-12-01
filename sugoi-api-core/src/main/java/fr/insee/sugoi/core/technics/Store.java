@@ -11,13 +11,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.insee.sugoi.core.store;
+package fr.insee.sugoi.core.technics;
 
-import fr.insee.sugoi.model.User;
+public class Store {
 
-public interface WriterStore {
+  private WriterStore writer;
 
-  String deleteUser(String domain, String id);
+  private ReaderStore reader;
 
-  User createUser(User user);
+  public Store(ReaderStore readerStore, WriterStore writerStore) {
+    this.writer = writerStore;
+    this.reader = readerStore;
+  }
+
+  public WriterStore getWriter() {
+    return this.writer;
+  }
+
+  public void setWriter(WriterStore writer) {
+    this.writer = writer;
+  }
+
+  public ReaderStore getReader() {
+    return this.reader;
+  }
+
+  public void setReader(ReaderStore reader) {
+    this.reader = reader;
+  }
 }

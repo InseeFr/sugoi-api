@@ -11,14 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.insee.sugoi.core.configuration;
+package fr.insee.sugoi.core.technics;
+
+import java.util.List;
+
+import org.springframework.cache.annotation.Cacheable;
 
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
-import java.util.List;
-
-import org.springframework.cache.annotation.Cacheable;
 
 /**
  * This is called to fetch realms configuration.

@@ -31,9 +31,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
-import fr.insee.sugoi.core.store.PageResult;
-import fr.insee.sugoi.core.store.PageableResult;
-import fr.insee.sugoi.core.store.ReaderStore;
+import fr.insee.sugoi.core.model.PageResult;
+import fr.insee.sugoi.core.model.PageableResult;
+import fr.insee.sugoi.core.technics.ReaderStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;

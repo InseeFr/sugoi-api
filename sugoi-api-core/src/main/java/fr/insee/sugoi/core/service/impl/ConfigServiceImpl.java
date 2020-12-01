@@ -13,26 +13,29 @@
  */
 package fr.insee.sugoi.core.service.impl;
 
-import fr.insee.sugoi.core.configuration.RealmStorage;
-import fr.insee.sugoi.core.service.ConfigService;
-import fr.insee.sugoi.model.Realm;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import fr.insee.sugoi.core.service.ConfigService;
+import fr.insee.sugoi.core.technics.RealmProvider;
+import fr.insee.sugoi.model.Realm;
 
 /** ConfigServiceImpl */
 @Service
 public class ConfigServiceImpl implements ConfigService {
 
-  @Autowired private RealmStorage realmStorage;
+  @Autowired
+  private RealmProvider realmProvider;
 
   @Override
   public Realm getRealm(String name) {
-    return realmStorage.getRealm(name);
+    return realmProvider.load(name);
   }
 
   @Override
   public List<Realm> getRealms() {
-    return realmStorage.getRealms();
+    return realmProvider.findAll();
   }
 }

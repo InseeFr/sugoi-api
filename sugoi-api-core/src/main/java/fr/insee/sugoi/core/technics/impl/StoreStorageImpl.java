@@ -11,20 +11,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.insee.sugoi.core.configuration.impl;
+package fr.insee.sugoi.core.technics.impl;
 
-import fr.insee.sugoi.core.configuration.StoreStorage;
-import fr.insee.sugoi.core.store.ReaderStore;
-import fr.insee.sugoi.core.store.Store;
-import fr.insee.sugoi.core.store.WriterStore;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+
+import fr.insee.sugoi.core.technics.ReaderStore;
+import fr.insee.sugoi.core.technics.Store;
+import fr.insee.sugoi.core.technics.StoreStorage;
+import fr.insee.sugoi.core.technics.WriterStore;
+import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.UserStorage;
 
 @Component
 @ConfigurationProperties(prefix = "fr.insee.sugoi.store")
@@ -34,34 +38,34 @@ public class StoreStorageImpl implements StoreStorage {
 
   private static final Map<String, Store> connections = new HashMap<>();
 
-  @Autowired private ApplicationContext applicationContext;
+  @Autowired
+  private ApplicationContext applicationContext;
 
   private String defaultWriter;
 
   private String defaultReader;
 
   @Override
-  public Store getStore(String readerType, String writerType, Map<String, String> config) {
+  public Store getStore(Realm realm, UserStorage userStorage) {
+    String writerType = userStorage.getWriterType();
+    String readerType = userStorage.getReaderType();
+    String name = userStorage.getName() != null ? userStorage.getName() : realm.getName();
     if (writerType == null) {
       writerType = defaultWriter;
     }
     if (readerType == null) {
       readerType = defaultReader;
     }
-
-    if (!connections.containsKey(config.get("name"))) {
-      logger.info("Chargement de la configuration {}", config.get("name"));
-      WriterStore writerStore = (WriterStore) applicationContext.getBean(writerType, config);
-      ReaderStore readerStore = (ReaderStore) applicationContext.getBean(readerType, config);
-      logger.info(
-          "Création de la configuration de type ({},{}) pour {}",
-          readerStore.getClass().getSimpleName(),
-          writerStore.getClass().getSimpleName(),
-          config.get("name"));
-      connections.put(config.get("name"), new Store(readerStore, writerStore));
+    if (!connections.containsKey(name)) {
+      logger.info("Chargement de la configuration {}", name);
+      WriterStore writerStore = (WriterStore) applicationContext.getBean(writerType, realm, userStorage);
+      ReaderStore readerStore = (ReaderStore) applicationContext.getBean(readerType, realm, userStorage);
+      logger.info("Création de la configuration de type ({},{}) pour {}", readerStore.getClass().getSimpleName(),
+          writerStore.getClass().getSimpleName(), name);
+      connections.put(name, new Store(readerStore, writerStore));
     }
 
-    return connections.get(config.get("name"));
+    return connections.get(name);
   }
 
   public String getDefaultWriter() {

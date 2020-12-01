@@ -17,7 +17,7 @@ import java.util.Map;
 
 import org.springframework.jms.core.JmsTemplate;
 
-import fr.insee.sugoi.core.store.WriterStore;
+import fr.insee.sugoi.core.technics.WriterStore;
 import fr.insee.sugoi.jms.utils.JmsFactory;
 import fr.insee.sugoi.model.User;
 

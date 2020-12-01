@@ -13,16 +13,18 @@
  */
 package fr.insee.sugoi.ldap.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.unboundid.asn1.ASN1OctetString;
 import com.unboundid.ldap.sdk.Control;
 import com.unboundid.ldap.sdk.Filter;
 import com.unboundid.ldap.sdk.SearchRequest;
 import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.controls.SimplePagedResultsControl;
-import fr.insee.sugoi.core.store.PageResult;
-import fr.insee.sugoi.core.store.PageableResult;
-import java.util.ArrayList;
-import java.util.List;
+
+import fr.insee.sugoi.core.model.PageResult;
+import fr.insee.sugoi.core.model.PageableResult;
 
 public class LdapUtils {
 
@@ -30,16 +32,8 @@ public class LdapUtils {
     return "uid=" + id + "," + baseDn;
   }
 
-  public static Filter filterRechercher(
-      String typeRecherche,
-      String identifiant,
-      String nomCommun,
-      String description,
-      String organisationId,
-      String mail,
-      PageableResult pageable,
-      List<String> habilitations,
-      String certificat) {
+  public static Filter filterRechercher(String typeRecherche, String identifiant, String nomCommun, String description,
+      String organisationId, String mail, PageableResult pageable, List<String> habilitations, String certificat) {
     List<Filter> filters = new ArrayList<>();
     if (identifiant != null) {
       filters.add(LdapFilter.contains("uid", identifiant));

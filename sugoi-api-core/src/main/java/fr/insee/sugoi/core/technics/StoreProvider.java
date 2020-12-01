@@ -1,4 +1,4 @@
-package fr.insee.sugoi.core.store;
+package fr.insee.sugoi.core.technics;
 
 public interface StoreProvider {
 

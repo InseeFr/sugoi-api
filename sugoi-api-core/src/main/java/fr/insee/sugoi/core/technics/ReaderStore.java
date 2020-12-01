@@ -11,31 +11,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.insee.sugoi.core.store;
+package fr.insee.sugoi.core.technics;
 
+import java.util.List;
+
+import fr.insee.sugoi.core.model.PageResult;
+import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
-import java.util.List;
 
 public interface ReaderStore {
 
   public User searchUser(String domaine, String id);
 
-  public PageResult<User> searchUsers(
-      String identifiant,
-      String nomCommun,
-      String description,
-      String organisationId,
-      String domaineGestion,
-      String mail,
-      PageableResult pageable,
-      String typeRecherche,
-      List<String> habilitations,
-      String application,
-      String role,
-      String rolePropriete,
-      String certificat);
+  public PageResult<User> searchUsers(String identifiant, String nomCommun, String description, String organisationId,
+      String domaineGestion, String mail, PageableResult pageable, String typeRecherche, List<String> habilitations,
+      String application, String role, String rolePropriete, String certificat);
 
   public Organization searchOrganization(String domaine, String id);
 

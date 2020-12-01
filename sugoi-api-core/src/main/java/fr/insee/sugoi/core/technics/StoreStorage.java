@@ -11,15 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.insee.sugoi.core.configuration;
+package fr.insee.sugoi.core.technics;
 
+import fr.insee.sugoi.core.technics.impl.StoreStorageImpl;
 import fr.insee.sugoi.model.Realm;
-import java.util.List;
+import fr.insee.sugoi.model.UserStorage;
 
-/** This class manage the different configuration on the current realm */
-public interface RealmStorage {
+/**
+ * Store configuration from realm Each realm declares a writerType and a
+ * readerType (could be null).
+ *
+ * <p>
+ * Default implementation fetch beans from the name of the type
+ *
+ * @see StoreStorageImpl for details
+ */
+public interface StoreStorage {
 
-  public Realm getRealm(String realmName);
-
-  public List<Realm> getRealms();
+  public Store getStore(Realm realm, UserStorage userStorage);
 }

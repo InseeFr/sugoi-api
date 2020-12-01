@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.insee.sugoi.core.store;
+package fr.insee.sugoi.core.model;
 
 public class PageableResult {
   private static final int TAILLE_RECHERCHE_DEFAUT = 20;

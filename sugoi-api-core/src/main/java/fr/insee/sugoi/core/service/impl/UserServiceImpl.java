@@ -13,34 +13,35 @@
  */
 package fr.insee.sugoi.core.service.impl;
 
-import fr.insee.sugoi.core.configuration.RealmStorage;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import fr.insee.sugoi.core.model.PageResult;
+import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.service.UserService;
-import fr.insee.sugoi.core.store.PageResult;
-import fr.insee.sugoi.core.store.PageableResult;
-import fr.insee.sugoi.core.store.StoreProvider;
+import fr.insee.sugoi.core.technics.RealmProvider;
+import fr.insee.sugoi.core.technics.StoreProvider;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-  @Autowired private RealmStorage realmStorage;
+  @Autowired
+  private StoreProvider storeProvider;
 
-  @Autowired private StoreProvider storeProvider;
+  @Autowired
+  private RealmProvider realmProvider;
 
   public User searchUser(String domaine, String id) {
     try {
-      Realm realm = realmStorage.getRealm(domaine);
+      Realm realm = realmProvider.load(domaine);
       UserStorage userStorage = realm.getUserStorages().get(0);
-      User user =
-          storeProvider
-              .getStoreForUserStorage(realm.getName(), userStorage.getName())
-              .getReader()
-              .searchUser(domaine, id);
+      User user = storeProvider.getStoreForUserStorage(realm.getName(), userStorage.getName()).getReader()
+          .searchUser(domaine, id);
       return user;
     } catch (Exception e) {
       throw new RuntimeException(e);
@@ -48,22 +49,9 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public PageResult<User> searchUsers(
-      String identifiant,
-      String nomCommun,
-      String description,
-      String organisationId,
-      String domaineGestion,
-      String mail,
-      String cookie,
-      int size,
-      int offset,
-      String typeRecherche,
-      List<String> habilitations,
-      String application,
-      String role,
-      String rolePropriete,
-      String certificat) {
+  public PageResult<User> searchUsers(String identifiant, String nomCommun, String description, String organisationId,
+      String domaineGestion, String mail, String cookie, int size, int offset, String typeRecherche,
+      List<String> habilitations, String application, String role, String rolePropriete, String certificat) {
     try {
       PageableResult pageable = new PageableResult();
       pageable.setSize(size);
@@ -71,25 +59,11 @@ public class UserServiceImpl implements UserService {
         pageable.setCookie(cookie.getBytes());
       }
       pageable.setFirst(offset);
-      Realm realm = realmStorage.getRealm(domaineGestion);
+      Realm realm = realmProvider.load(domaineGestion);
       UserStorage userStorage = realm.getUserStorages().get(0);
-      return storeProvider
-          .getStoreForUserStorage(realm.getName(),userStorage.getName())
-          .getReader()
-          .searchUsers(
-              identifiant,
-              nomCommun,
-              description,
-              organisationId,
-              domaineGestion,
-              mail,
-              pageable,
-              typeRecherche,
-              habilitations,
-              application,
-              role,
-              rolePropriete,
-              certificat);
+      return storeProvider.getStoreForUserStorage(realm.getName(), userStorage.getName()).getReader().searchUsers(
+          identifiant, nomCommun, description, organisationId, domaineGestion, mail, pageable, typeRecherche,
+          habilitations, application, role, rolePropriete, certificat);
     } catch (Exception e) {
       throw new RuntimeException("Erreur lors de la récupération des utilisateurs");
     }
