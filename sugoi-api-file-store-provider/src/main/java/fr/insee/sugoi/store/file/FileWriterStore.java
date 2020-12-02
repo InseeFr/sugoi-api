@@ -13,7 +13,7 @@
 */
 package fr.insee.sugoi.store.file;
 
-import fr.insee.sugoi.core.technics.WriterStore;
+import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.model.User;
 import java.util.Map;
 

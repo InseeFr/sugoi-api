@@ -35,8 +35,23 @@ import org.springframework.context.annotation.Configuration;
 public class SpringDocConfiguration {
   private static final Logger logger = LoggerFactory.getLogger(SpringDocConfiguration.class);
 
-  @Value("${fr.insee.sugoi.springdoc.issuer.url:}")
-  public String issuerURL;
+  @Value("${fr.insee.sugoi.springdoc.issuer.url.authorization:}")
+  public String issuerAuthorizationURL;
+
+  @Value("${fr.insee.sugoi.springdoc.issuer.url.refresh:}")
+  public String issuerRefreshURL;
+
+  @Value("${fr.insee.sugoi.springdoc.issuer.url.token:}")
+  public String issuerTokenURL;
+
+  @Value("${fr.insee.sugoi.springdoc.issuer.description:}")
+  public String issuerDescription;
+
+  @Value("${fr.insee.sugoi.springdoc.contact.name:}")
+  public String contactName;
+
+  @Value("${fr.insee.sugoi.springdoc.contact.email:}")
+  public String contactEmail;
 
   public final String OAUTHSCHEME = "oAuthScheme";
   public final String SCHEMEBASIC = "basic";
@@ -55,13 +70,14 @@ public class SpringDocConfiguration {
                 new SecurityScheme()
                     .type(SecurityScheme.Type.OAUTH2)
                     .in(SecurityScheme.In.HEADER)
-                    .description("Authentification keycloak")
+                    .description(issuerDescription)
                     .flows(
                         new OAuthFlows()
                             .authorizationCode(
                                 new OAuthFlow()
-                                    .authorizationUrl(issuerURL + "/protocol/openid-connect/auth")
-                                    .tokenUrl(issuerURL + "/protocol/openid-connect/token")))));
+                                    .authorizationUrl(issuerAuthorizationURL)
+                                    .tokenUrl(issuerTokenURL)
+                                    .refreshUrl(issuerRefreshURL)))));
     return openapi;
   }
 
@@ -123,6 +139,10 @@ public class SpringDocConfiguration {
 
   private OpenAPI createOpenAPI() {
     logger.info("surcharge de la configuration swagger");
+    Contact contact = new Contact().url("https://github.com/InseeFrLab/sugoi-api");
+    if (true) {
+      contact = contact.email("email@insee.fr").name("Outils transverses");
+    }
     final OpenAPI openapi =
         new OpenAPI()
             .info(
@@ -133,11 +153,7 @@ public class SpringDocConfiguration {
                         new License()
                             .name("Apache 2.0")
                             .url("http://www.apache.org/licenses/LICENSE-2.0.html"))
-                    .contact(
-                        new Contact()
-                            .email("email@insee.fr")
-                            .name("Outils transverses")
-                            .url("https://github.com/InseeFrLab/sugoi-api")));
+                    .contact(contact));
 
     return openapi;
   }

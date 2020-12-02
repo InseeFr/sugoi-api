@@ -11,12 +11,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.core.technics.impl;
+package fr.insee.sugoi.core.store.impl;
 
-import fr.insee.sugoi.core.technics.RealmProvider;
-import fr.insee.sugoi.core.technics.Store;
-import fr.insee.sugoi.core.technics.StoreProvider;
-import fr.insee.sugoi.core.technics.StoreStorage;
+import fr.insee.sugoi.core.realm.RealmProvider;
+import fr.insee.sugoi.core.store.Store;
+import fr.insee.sugoi.core.store.StoreProvider;
+import fr.insee.sugoi.core.store.StoreStorage;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import org.springframework.beans.factory.annotation.Autowired;

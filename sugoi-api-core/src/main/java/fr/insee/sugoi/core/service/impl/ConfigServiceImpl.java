@@ -13,8 +13,8 @@
 */
 package fr.insee.sugoi.core.service.impl;
 
+import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.ConfigService;
-import fr.insee.sugoi.core.technics.RealmProvider;
 import fr.insee.sugoi.model.Realm;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

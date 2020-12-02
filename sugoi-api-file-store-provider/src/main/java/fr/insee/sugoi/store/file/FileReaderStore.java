@@ -15,7 +15,7 @@ package fr.insee.sugoi.store.file;
 
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
-import fr.insee.sugoi.core.technics.ReaderStore;
+import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;

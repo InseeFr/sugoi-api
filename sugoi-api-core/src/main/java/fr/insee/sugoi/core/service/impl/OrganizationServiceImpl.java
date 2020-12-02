@@ -13,9 +13,9 @@
 */
 package fr.insee.sugoi.core.service.impl;
 
+import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.OrganizationService;
-import fr.insee.sugoi.core.technics.RealmProvider;
-import fr.insee.sugoi.core.technics.StoreProvider;
+import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.UserStorage;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -20,7 +20,7 @@ import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
-import fr.insee.sugoi.core.technics.RealmProvider;
+import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.ldap.utils.LdapFilter;
 import fr.insee.sugoi.ldap.utils.mapper.RealmLdapMapper;
 import fr.insee.sugoi.model.Realm;

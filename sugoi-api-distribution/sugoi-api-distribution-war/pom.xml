@@ -122,7 +122,6 @@
     <dependency>
       <groupId>fr.insee.sugoi</groupId>
       <artifactId>sugoi-api-ldap-config-provider</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
     </dependency>
 
     <dependency>

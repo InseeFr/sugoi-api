@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.app;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -21,12 +22,14 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 @SpringBootApplication(scanBasePackages = {"fr.insee.sugoi"})
 public class SugoiApiServicesApplication extends SpringBootServletInitializer {
 
+  @Value("${fr.insee.sugoi.tomcat.properties.default.location:}")
+  public String propertiesLocation;
+
   @Override
   protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
     return application
         .properties(
-            "spring.config.location=classpath:/,file:${catalina.base}/webapps/"
-                + "sugoi.properties")
+            "spring.config.location=classpath:/,file:" + propertiesLocation + "sugoi.properties")
         .sources(SugoiApiServicesApplication.class);
   }
 

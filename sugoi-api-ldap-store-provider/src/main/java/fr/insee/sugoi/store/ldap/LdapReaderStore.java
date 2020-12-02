@@ -25,7 +25,7 @@ import com.unboundid.ldap.sdk.SearchScope;
 import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
-import fr.insee.sugoi.core.technics.ReaderStore;
+import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;

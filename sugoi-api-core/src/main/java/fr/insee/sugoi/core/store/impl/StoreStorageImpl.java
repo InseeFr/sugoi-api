@@ -11,12 +11,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.core.technics.impl;
+package fr.insee.sugoi.core.store.impl;
 
-import fr.insee.sugoi.core.technics.ReaderStore;
-import fr.insee.sugoi.core.technics.Store;
-import fr.insee.sugoi.core.technics.StoreStorage;
-import fr.insee.sugoi.core.technics.WriterStore;
+import fr.insee.sugoi.core.store.ReaderStore;
+import fr.insee.sugoi.core.store.Store;
+import fr.insee.sugoi.core.store.StoreStorage;
+import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.HashMap;

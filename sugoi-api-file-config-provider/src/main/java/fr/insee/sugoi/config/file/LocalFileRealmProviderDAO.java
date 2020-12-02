@@ -16,7 +16,7 @@ package fr.insee.sugoi.config.file;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
-import fr.insee.sugoi.core.technics.RealmProvider;
+import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.model.Realm;
 import java.io.IOException;
 import java.net.URL;
