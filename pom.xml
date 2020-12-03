@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.insee.sugoi</groupId>
   <artifactId>sugoi-api-parent</artifactId>
@@ -64,7 +65,37 @@
       </dependency>
       <dependency>
         <groupId>fr.insee.sugoi</groupId>
+        <artifactId>sugoi-api-rest-services</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>fr.insee.sugoi</groupId>
         <artifactId>sugoi-api-ldap-utils</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>fr.insee.sugoi</groupId>
+        <artifactId>sugoi-api-file-config-provider</artifactId>
+        <version>${project.version}</version>
+
+      </dependency>
+
+      <dependency>
+        <groupId>fr.insee.sugoi</groupId>
+        <artifactId>sugoi-api-file-store-provider</artifactId>
+        <version>${project.version}</version>
+
+      </dependency>
+
+      <dependency>
+        <groupId>fr.insee.sugoi</groupId>
+        <artifactId>sugoi-api-ldap-config-provider</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>fr.insee.sugoi</groupId>
+        <artifactId>sugoi-api-ldap-store-provider</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>
@@ -74,11 +105,13 @@
     <module>sugoi-api-core</module>
     <module>sugoi-api-rest-services</module>
     <module>sugoi-api-converter</module>
+    <module>sugoi-api-distribution</module>
     <module>sugoi-api-file-config-provider</module>
+    <module>sugoi-api-file-store-provider</module>
     <module>sugoi-api-ldap-config-provider</module>
     <module>sugoi-api-ldap-store-provider</module>
-    <module>sugoi-api-distribution</module>
     <module>sugoi-api-ldap-utils</module>
+    <module>sugoi-api-jms-services</module>
   </modules>
   <build>
     <plugins>
@@ -212,7 +245,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-							</content>
+              </content>
               <!-- or <file>${basedir}/license-header</file> -->
             </licenseHeader>
           </java>
