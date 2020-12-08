@@ -16,7 +16,7 @@ package fr.insee.sugoi.store.file;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.store.ReaderStore;
-import fr.insee.sugoi.model.Habilitation;
+import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import java.util.List;
@@ -27,7 +27,7 @@ public class FileReaderStore implements ReaderStore {
   public FileReaderStore(Map<String, String> generateConfig) {}
 
   @Override
-  public User searchUser(String domaine, String id) {
+  public User getUser(String id) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -38,7 +38,6 @@ public class FileReaderStore implements ReaderStore {
       String nomCommun,
       String description,
       String organisationId,
-      String domaineGestion,
       String mail,
       PageableResult pageable,
       String typeRecherche,
@@ -52,14 +51,40 @@ public class FileReaderStore implements ReaderStore {
   }
 
   @Override
-  public Organization searchOrganization(String domaine, String id) {
+  public Organization getOrganization(String id) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Habilitation getHabilitation(String domaine, String id) {
+  public PageResult<User> getUsersInGroup(String groupName) {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  @Override
+  public Organization searchOrganizations(
+      Map<String, String> searchProperties, PageableResult pageable, String searchOperator) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Group getGroup(String name) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public PageResult<Group> searchGroups(
+      Map<String, String> searchProperties, PageableResult pageable, String searchOperator) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public boolean validateCredentials(User user, String credential) {
+    // TODO Auto-generated method stub
+    return false;
   }
 }

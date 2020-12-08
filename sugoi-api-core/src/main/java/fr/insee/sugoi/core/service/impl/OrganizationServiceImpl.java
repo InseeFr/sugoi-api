@@ -34,6 +34,6 @@ public class OrganizationServiceImpl implements OrganizationService {
     return storeProvider
         .getStoreForUserStorage(realmName, userStorage.getName())
         .getReader()
-        .searchOrganization(realmName, name);
+        .getOrganization(name);
   }
 }

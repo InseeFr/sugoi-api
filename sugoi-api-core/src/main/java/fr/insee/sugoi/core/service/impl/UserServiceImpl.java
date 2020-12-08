@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
           storeProvider
               .getStoreForUserStorage(realm.getName(), userStorage.getName())
               .getReader()
-              .searchUser(domaine, id);
+              .getUser(id);
       return user;
     } catch (Exception e) {
       throw new RuntimeException(e);
@@ -81,7 +81,6 @@ public class UserServiceImpl implements UserService {
               nomCommun,
               description,
               organisationId,
-              domaineGestion,
               mail,
               pageable,
               typeRecherche,
