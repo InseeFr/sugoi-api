@@ -117,4 +117,12 @@ public class UserController {
       return ResponseEntity.status(500).build();
     }
   }
+
+  @GetMapping(
+      path = {"/delete/{realm}/user/{id}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  public void deleteUser(
+      @PathVariable(name = "realm") String realm, @PathVariable(name = "id") String id) {
+    userService.delete(realm, id);
+  }
 }

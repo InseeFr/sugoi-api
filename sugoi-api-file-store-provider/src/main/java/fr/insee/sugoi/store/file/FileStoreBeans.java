@@ -23,13 +23,13 @@ import org.springframework.context.annotation.Lazy;
 @Configuration
 public class FileStoreBeans {
 
-  @Bean
+  @Bean("FileReaderStore")
   @Lazy
   public FileReaderStore fileReaderStore(Realm realm, UserStorage userStorage) {
     return new FileReaderStore(generateConfig(realm, userStorage));
   }
 
-  @Bean
+  @Bean("FileWriterStore")
   @Lazy
   public FileWriterStore fileWriterStore(Realm realm, UserStorage userStorage) {
     return new FileWriterStore(generateConfig(realm, userStorage));

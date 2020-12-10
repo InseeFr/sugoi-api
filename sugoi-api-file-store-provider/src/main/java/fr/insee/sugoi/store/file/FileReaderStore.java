@@ -26,6 +26,8 @@ public class FileReaderStore implements ReaderStore {
 
   public FileReaderStore(Map<String, String> generateConfig) {}
 
+  public FileReaderStore() {}
+
   @Override
   public User getUser(String id) {
     // TODO Auto-generated method stub
