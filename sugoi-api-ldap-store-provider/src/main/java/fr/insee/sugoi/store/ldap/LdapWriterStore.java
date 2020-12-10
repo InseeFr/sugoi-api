@@ -14,27 +14,24 @@
 package fr.insee.sugoi.store.ldap;
 
 import com.unboundid.ldap.sdk.DeleteRequest;
-import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
 import com.unboundid.ldap.sdk.LDAPException;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
+import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.User;
 import java.util.Map;
 
 public class LdapWriterStore implements WriterStore {
 
-  private LDAPConnection ldapConnection;
   private LDAPConnectionPool ldapPoolConnection;
-  private LdapReaderStore ldapReader;
-
   private Map<String, String> config;
 
   public LdapWriterStore(Map<String, String> config) {
     try {
-      this.ldapConnection = LdapFactory.getSingleConnection(config);
+      LdapFactory.getSingleConnection(config);
       this.ldapPoolConnection = LdapFactory.getConnectionPool(config);
-      this.ldapReader = new LdapReaderStore(config);
+      new LdapReaderStore(config);
       this.config = config;
     } catch (LDAPException e) {
       throw new RuntimeException(e);
@@ -42,19 +39,72 @@ public class LdapWriterStore implements WriterStore {
   }
 
   @Override
-  public String deleteUser(String domain, String id) {
+  public void deleteUser(String id) {
     try {
       DeleteRequest dr = new DeleteRequest("uid=" + id + "," + config.get("user_branch"));
       ldapPoolConnection.delete(dr);
     } catch (LDAPException e) {
       throw new RuntimeException("Impossible de supprimer l'utilisateur");
     }
-    return null;
   }
 
   @Override
   public User createUser(User user) {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  @Override
+  public User updateUser(User updatedUser) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void deleteGroup(String name) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public Group createGroup(Group group) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Group updateGroup(Group updatedGroup) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void deleteOrganization(String name) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public Group createOrganization(Group group) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Group updateOrganization(Group updatedGroup) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void deleteUserFromGroup(String groupName, String userId) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void addUserToGroup(String groupName, String userId) {
+    // TODO Auto-generated method stub
+
   }
 }
