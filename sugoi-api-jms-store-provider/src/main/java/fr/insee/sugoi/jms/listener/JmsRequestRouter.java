@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class JmsRouter {
+public class JmsRequestRouter {
 
   @Autowired
   private StoreProvider storeProvider;

@@ -23,16 +23,9 @@ import org.springframework.context.annotation.Lazy;
 
 @Configuration
 public class JmsStoreBeans {
-  @Value("${fr.insee.sugoi.ldap.default.username:}")
-  private String defaultUsername;
 
-  @Value("${fr.insee.sugoi.ldap.default.password:}")
-  private String defaultPassword;
-
-  @Value("${fr.insee.sugoi.ldap.default.pool:}")
-  private String defaultPoolSize;
-
-  @Autowired JmsWriterStore JmsWriterStore;
+  @Autowired
+  JmsWriterStore JmsWriterStore;
 
   @Bean
   @Lazy

@@ -11,17 +11,19 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+
 package fr.insee.sugoi.jms.configuration;
 
 import javax.jms.ConnectionFactory;
+
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.core.JmsTemplate;
@@ -30,61 +32,57 @@ import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
 
 /** ConsumerConfiguration */
+@ConditionalOnProperty(name = "fr.insee.sugoi.jms.broker.url", havingValue = "", matchIfMissing = false)
 @Configuration
-@EnableJms
 public class JmsConfiguration {
 
-  private static final Logger logger = LogManager.getLogger(JmsConfiguration.class);
+    private static final Logger logger = LogManager.getLogger(JmsConfiguration.class);
 
-  @Value("${fr.insee.sugoi.jms.broker.url}")
-  private String url;
+    @Value("${fr.insee.sugoi.jms.broker.url}")
+    private String url;
 
-  @Value("${fr.insee.sugoi.jms.broker.username:}")
-  private String username;
+    @Value("${fr.insee.sugoi.jms.broker.username:}")
+    private String username;
 
-  @Value("${fr.insee.sugoi.jms.broker.password:}")
-  private String password;
+    @Value("${fr.insee.sugoi.jms.broker.password:}")
+    private String password;
 
-  @Bean
-  public ActiveMQConnectionFactory connectionFactory() {
-    ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
-    logger.info("Configure jms connection for uri: {}", url);
-    connectionFactory.setBrokerURL(url);
-    if (username != null) {
-      connectionFactory.setUserName(username);
+    @Bean
+    public ActiveMQConnectionFactory connectionFactory() {
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
+        logger.info("Configure jms connection for uri: {}", url);
+        connectionFactory.setBrokerURL(url);
+        if (username != null) {
+            connectionFactory.setUserName(username);
+        }
+        if (password != null) {
+            connectionFactory.setPassword(password);
+        }
+
+        return connectionFactory;
     }
-    if (password != null) {
-      connectionFactory.setPassword(password);
+
+    @Bean
+    public JmsTemplate getJmsTemplate() {
+        JmsTemplate template = new JmsTemplate();
+        template.setConnectionFactory(connectionFactory());
+        template.setMessageConverter(messageConverter());
+        return template;
     }
 
-    return connectionFactory;
-  }
+    @Bean
+    public JmsListenerContainerFactory<?> myFactory(ConnectionFactory connectionFactory,
+            DefaultJmsListenerContainerFactoryConfigurer configurer) {
+        DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+        configurer.configure(factory, connectionFactory);
+        return factory;
+    }
 
-  @Bean
-  public JmsTemplate getJmsTemplate() {
-    JmsTemplate template = new JmsTemplate();
-    template.setConnectionFactory(connectionFactory());
-    template.setMessageConverter(messageConverter());
-    return template;
-  }
-
-  @Bean
-  public JmsListenerContainerFactory<?> myFactory(
-      ConnectionFactory connectionFactory,
-      DefaultJmsListenerContainerFactoryConfigurer configurer) {
-    DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-    // This provides all boot's default to this factory, including the message
-    // converter
-    configurer.configure(factory, connectionFactory);
-    // You could still override some of Boot's default if necessary.
-    return factory;
-  }
-
-  @Bean
-  public static MessageConverter messageConverter() {
-    MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
-    converter.setTargetType(MessageType.TEXT);
-    converter.setTypeIdPropertyName("_type");
-    return converter;
-  }
+    @Bean
+    public static MessageConverter messageConverter() {
+        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+        converter.setTargetType(MessageType.TEXT);
+        converter.setTypeIdPropertyName("_type");
+        return converter;
+    }
 }

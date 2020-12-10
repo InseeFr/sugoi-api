@@ -13,15 +13,34 @@
 */
 package fr.insee.sugoi.jms;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import fr.insee.sugoi.jms.exception.BrokerException;
+import fr.insee.sugoi.jms.writer.JmsWriter;
+
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
-@ActiveProfiles("brokerEmbedded")
-public class ApplicationTest {
+@ActiveProfiles("withoutBroker")
+public class JmsNoBrokerTests {
+
+  @Autowired
+  private JmsWriter jmsWriter;
 
   @Test
-  void contextLoads() {
+  public void testWithNoBroker() throws Exception {
+    Assertions.assertThrows(BrokerException.class, () -> {
+      Map<String, Object> params = new HashMap<>();
+      jmsWriter.writeRequestInQueue("queueTests", "toto", params);
+    });
   }
+
 }

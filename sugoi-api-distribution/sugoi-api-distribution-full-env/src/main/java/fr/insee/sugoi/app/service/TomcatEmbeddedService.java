@@ -37,8 +37,7 @@ public class TomcatEmbeddedService {
 
   private static Map<String, Tomcat> tomcats = new HashMap<>();
 
-  private static void launchTomcat(
-      String name, String warURL, int httpPort, int httpsPort, String configFile)
+  private static void launchTomcat(String name, String warURL, int httpPort, int httpsPort, String configFile)
       throws ServletException, IOException {
 
     String workUri = getWorkUri();
@@ -70,10 +69,8 @@ public class TomcatEmbeddedService {
     connectorHttps.setProxyName(name);
     SSLHostConfig sslHostConfig = new SSLHostConfig();
     sslHostConfig.setSslProtocol("TLS");
-    File keystoreFile =
-        new File(
-            URLDecoder.decode(
-                SugoiTestService.class.getResource("/ssl/server.p12").getFile(), "UTF8"));
+    File keystoreFile = new File(
+        URLDecoder.decode(SugoiTestService.class.getResource("/ssl/server.p12").getFile(), "UTF8"));
     sslHostConfig.setCertificateKeystoreFile(keystoreFile.getAbsolutePath());
     sslHostConfig.setCertificateKeystorePassword("changeit");
     sslHostConfig.setCertificateKeystoreType("PKCS12");
@@ -83,11 +80,9 @@ public class TomcatEmbeddedService {
     // Valve pour HTTPS via HAProxy
     RemoteIpValve remoteIpValve = new RemoteIpValve();
     remoteIpValve.setProtocolHeader("X-Forwarded-Proto");
-
     tomcat.getHost().getPipeline().addValve(remoteIpValve);
 
     Context ctx = tomcat.addWebapp("", new File(warURL).getAbsolutePath());
-
     try {
       tomcat.start();
     } catch (LifecycleException e1) {
@@ -104,13 +99,8 @@ public class TomcatEmbeddedService {
     }
 
     // Copy properties on tomcat and reload
-    FileUtils.copyFile(
-        new File(workUri + "/../src/main/resources" + configFile),
-        new File(
-            workUri
-                + "/tomcatit/"
-                + name
-                + "/webapps/ROOT/WEB-INF/classes/application.properties"));
+    FileUtils.copyFile(new File(workUri + "/../src/main/resources" + configFile),
+        new File(workUri + "/tomcatit/" + name + "/webapps/ROOT/WEB-INF/classes/application.properties"));
     ctx.reload();
 
     while (tomcat.getServer().getState() != LifecycleState.STARTED) {
@@ -126,25 +116,20 @@ public class TomcatEmbeddedService {
   }
 
   private static String getWorkUri() {
-    File folder =
-        new File(
-            Paths.get(System.getProperty("user.dir")).toAbsolutePath()
-                + "/sugoi-api-distribution/sugoi-api-distribution-war/target/");
+    File folder = new File(Paths.get(System.getProperty("user.dir")).toAbsolutePath()
+        + "/sugoi-api-distribution/sugoi-api-distribution-war/target/");
     String workUri;
     if (folder.exists()) {
-      workUri =
-          Paths.get(System.getProperty("user.dir")).toAbsolutePath()
-              + "/sugoi-api-distribution/sugoi-api-distribution-full-env/target/";
+      workUri = Paths.get(System.getProperty("user.dir")).toAbsolutePath()
+          + "/sugoi-api-distribution/sugoi-api-distribution-full-env/target/";
     } else {
-      workUri =
-          Paths.get(System.getProperty("user.dir")).toAbsolutePath()
-              + "/../../sugoi-api-distribution/sugoi-api-distribution-full-env/target/";
+      workUri = Paths.get(System.getProperty("user.dir")).toAbsolutePath()
+          + "/../../sugoi-api-distribution/sugoi-api-distribution-full-env/target/";
     }
     return workUri;
   }
 
-  public static Boolean start(String name, int httpPort, int httpsPort, String propertiesFile)
-      throws Exception {
+  public static Boolean start(String name, int httpPort, int httpsPort, String propertiesFile) throws Exception {
     launchTomcat(name, getWarUri(), httpPort, httpsPort, propertiesFile);
     return true;
   }
@@ -165,18 +150,12 @@ public class TomcatEmbeddedService {
   public static String getWarUri() throws Exception {
     Path userDir = UserDirService.getUserDir();
     String warUri;
-    File folder =
-        new File(
-            userDir.toAbsolutePath()
-                + "/sugoi-api-distribution/sugoi-api-distribution-war/target/");
+    File folder = new File(userDir.toAbsolutePath() + "/sugoi-api-distribution/sugoi-api-distribution-war/target/");
     if (folder.exists()) {
-      warUri =
-          userDir.toAbsolutePath()
-              + "/sugoi-api-distribution/sugoi-api-distribution-war/target/sugoi-api.war";
+      warUri = userDir.toAbsolutePath() + "/sugoi-api-distribution/sugoi-api-distribution-war/target/sugoi-api.war";
     } else {
-      warUri =
-          userDir.toAbsolutePath()
-              + "/../../sugoi-api-distribution/sugoi-api-distribution-war/target/sugoi-api.war";
+      warUri = userDir.toAbsolutePath()
+          + "/../../sugoi-api-distribution/sugoi-api-distribution-war/target/sugoi-api.war";
     }
     if (!new File(warUri).exists()) {
       throw new Exception("War not present");
