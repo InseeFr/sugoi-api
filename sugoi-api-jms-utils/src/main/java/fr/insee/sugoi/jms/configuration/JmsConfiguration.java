@@ -11,11 +11,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
 package fr.insee.sugoi.jms.configuration;
 
 import javax.jms.ConnectionFactory;
-
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,57 +30,61 @@ import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
 
 /** ConsumerConfiguration */
-@ConditionalOnProperty(name = "fr.insee.sugoi.jms.broker.url", havingValue = "", matchIfMissing = false)
+@ConditionalOnProperty(
+    name = "fr.insee.sugoi.jms.broker.url",
+    havingValue = "",
+    matchIfMissing = false)
 @Configuration
 public class JmsConfiguration {
 
-    private static final Logger logger = LogManager.getLogger(JmsConfiguration.class);
+  private static final Logger logger = LogManager.getLogger(JmsConfiguration.class);
 
-    @Value("${fr.insee.sugoi.jms.broker.url}")
-    private String url;
+  @Value("${fr.insee.sugoi.jms.broker.url}")
+  private String url;
 
-    @Value("${fr.insee.sugoi.jms.broker.username:}")
-    private String username;
+  @Value("${fr.insee.sugoi.jms.broker.username:}")
+  private String username;
 
-    @Value("${fr.insee.sugoi.jms.broker.password:}")
-    private String password;
+  @Value("${fr.insee.sugoi.jms.broker.password:}")
+  private String password;
 
-    @Bean
-    public ActiveMQConnectionFactory connectionFactory() {
-        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
-        logger.info("Configure jms connection for uri: {}", url);
-        connectionFactory.setBrokerURL(url);
-        if (username != null) {
-            connectionFactory.setUserName(username);
-        }
-        if (password != null) {
-            connectionFactory.setPassword(password);
-        }
-
-        return connectionFactory;
+  @Bean
+  public ActiveMQConnectionFactory connectionFactory() {
+    ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
+    logger.info("Configure jms connection for uri: {}", url);
+    connectionFactory.setBrokerURL(url);
+    if (username != null) {
+      connectionFactory.setUserName(username);
+    }
+    if (password != null) {
+      connectionFactory.setPassword(password);
     }
 
-    @Bean
-    public JmsTemplate getJmsTemplate() {
-        JmsTemplate template = new JmsTemplate();
-        template.setConnectionFactory(connectionFactory());
-        template.setMessageConverter(messageConverter());
-        return template;
-    }
+    return connectionFactory;
+  }
 
-    @Bean
-    public JmsListenerContainerFactory<?> myFactory(ConnectionFactory connectionFactory,
-            DefaultJmsListenerContainerFactoryConfigurer configurer) {
-        DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-        configurer.configure(factory, connectionFactory);
-        return factory;
-    }
+  @Bean
+  public JmsTemplate getJmsTemplate() {
+    JmsTemplate template = new JmsTemplate();
+    template.setConnectionFactory(connectionFactory());
+    template.setMessageConverter(messageConverter());
+    return template;
+  }
 
-    @Bean
-    public static MessageConverter messageConverter() {
-        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
-        converter.setTargetType(MessageType.TEXT);
-        converter.setTypeIdPropertyName("_type");
-        return converter;
-    }
+  @Bean
+  public JmsListenerContainerFactory<?> myFactory(
+      ConnectionFactory connectionFactory,
+      DefaultJmsListenerContainerFactoryConfigurer configurer) {
+    DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+    configurer.configure(factory, connectionFactory);
+    return factory;
+  }
+
+  @Bean
+  public static MessageConverter messageConverter() {
+    MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+    converter.setTargetType(MessageType.TEXT);
+    converter.setTypeIdPropertyName("_type");
+    return converter;
+  }
 }

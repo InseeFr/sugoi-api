@@ -16,7 +16,6 @@ package fr.insee.sugoi.jms;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -24,8 +23,7 @@ import org.springframework.context.annotation.Lazy;
 @Configuration
 public class JmsStoreBeans {
 
-  @Autowired
-  JmsWriterStore JmsWriterStore;
+  @Autowired JmsWriterStore JmsWriterStore;
 
   @Bean
   @Lazy

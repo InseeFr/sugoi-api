@@ -34,13 +34,16 @@ public class LdapStoreBeans {
   @Value("${fr.insee.sugoi.ldap.default.pool:}")
   private String defaultPoolSize;
 
-  @Bean
+  @Value("${fr.insee.sugoi.ldap.default.port:}")
+  private String defaultPort;
+
+  @Bean("LdapReaderStore")
   @Lazy
   public LdapReaderStore ldapReaderStore(Realm realm, UserStorage userStorage) {
     return new LdapReaderStore(generateConfig(realm, userStorage));
   }
 
-  @Bean
+  @Bean("LdapWriterStore")
   @Lazy
   public LdapWriterStore ldapWriterStore(Realm realm, UserStorage userStorage) {
     return new LdapWriterStore(generateConfig(realm, userStorage));
@@ -50,6 +53,7 @@ public class LdapStoreBeans {
     Map<String, String> config = new HashMap<>();
     config.put("name", userStorage.getName() != null ? userStorage.getName() : realm.getName());
     config.put("url", realm.getUrl());
+    config.put("port", defaultPort);
     config.put("username", defaultUsername);
     config.put("password", defaultPassword);
     config.put("pool_size", defaultPoolSize);

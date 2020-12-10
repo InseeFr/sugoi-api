@@ -25,8 +25,7 @@ import fr.insee.sugoi.model.User;
 @Component
 public class JmsWriterStore implements WriterStore {
 
-  @Autowired
-  JmsWriter jmsWriter;
+  @Autowired JmsWriter jmsWriter;
 
   @Value("${fr.insee.sugoi.jms.queue.requests.name:}")
   private String queueRequestName;

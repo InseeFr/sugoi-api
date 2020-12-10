@@ -29,31 +29,30 @@ public class SugoiTestService {
 
   private static boolean fork;
 
-  private static boolean enabledEmbeddedLdap = PropertiesLoaderService
-      .load("fr.insee.sugoi.full.env.ldap.embedded.enabled").equals("true");
+  private static boolean enabledEmbeddedLdap =
+      PropertiesLoaderService.load("fr.insee.sugoi.full.env.ldap.embedded.enabled").equals("true");
 
-  private static boolean enabledEmbeddedBroker = PropertiesLoaderService
-      .load("fr.insee.sugoi.full.env.broker.embedded.enabled").equals("true");
+  private static boolean enabledEmbeddedBroker =
+      PropertiesLoaderService.load("fr.insee.sugoi.full.env.broker.embedded.enabled")
+          .equals("true");
 
-  private static boolean enabledEmbeddedTomcat1 = PropertiesLoaderService
-      .load("fr.insee.sugoi.full.env.tomcat1.embedded.enabled").equals("true");
-  private static int httpPortEmbeddedTomcat1 = Integer
-      .parseInt(PropertiesLoaderService.load("fr.insee.sugoi.full.env.tomcat1.port.http"));
-  private static int httpsPortEmbeddedTomcat1 = Integer
-      .parseInt(PropertiesLoaderService.load("fr.insee.sugoi.full.env.tomcat1.port.https"));
-  private static String nameEmbeddedTomcat1 = PropertiesLoaderService.load("fr.insee.sugoi.full.env.tomcat1.name");
-  private static String propertiesFileEmbeddedTomcat1 = PropertiesLoaderService
-      .load("fr.insee.sugoi.full.env.tomcat1.properties.file");
+  private static boolean enabledEmbeddedTomcat =
+      PropertiesLoaderService.load("fr.insee.sugoi.full.env.tomcat.embedded.enabled")
+          .equals("true");
+  private static int httpPortEmbeddedTomcat =
+      Integer.parseInt(PropertiesLoaderService.load("fr.insee.sugoi.full.env.tomcat.port.http"));
+  private static int httpsPortEmbeddedTomcat =
+      Integer.parseInt(PropertiesLoaderService.load("fr.insee.sugoi.full.env.tomcat.port.https"));
 
-  private static boolean enabledEmbeddedTomcat2 = PropertiesLoaderService
-      .load("fr.insee.sugoi.full.env.tomcat2.embedded.enabled").equals("true");
-  private static int httpPortEmbeddedTomcat2 = Integer
-      .parseInt(PropertiesLoaderService.load("fr.insee.sugoi.full.env.tomcat2.port.http"));
-  private static int httpsPortEmbeddedTomcat2 = Integer
-      .parseInt(PropertiesLoaderService.load("fr.insee.sugoi.full.env.tomcat2.port.https"));
-  private static String nameEmbeddedTomcat2 = PropertiesLoaderService.load("fr.insee.sugoi.full.env.tomcat2.name");
-  private static String propertiesFileEmbeddedTomcat2 = PropertiesLoaderService
-      .load("fr.insee.sugoi.full.env.tomcat2.properties.file");
+  private static String nameEmbeddedTomcat1 =
+      PropertiesLoaderService.load("fr.insee.sugoi.full.env.tomcat1.name");
+  private static String propertiesFileEmbeddedTomcat1 =
+      PropertiesLoaderService.load("fr.insee.sugoi.full.env.tomcat1.properties.file");
+
+  private static String nameEmbeddedTomcat2 =
+      PropertiesLoaderService.load("fr.insee.sugoi.full.env.tomcat2.name");
+  private static String propertiesFileEmbeddedTomcat2 =
+      PropertiesLoaderService.load("fr.insee.sugoi.full.env.tomcat2.properties.file");
 
   /**
    * Démarrage des services de test.
@@ -76,64 +75,66 @@ public class SugoiTestService {
   }
 
   private static void startServers() throws InterruptedException {
-    ExecutorService execs = Executors.newFixedThreadPool(4, new ThreadFactory() {
+    ExecutorService execs =
+        Executors.newFixedThreadPool(
+            4,
+            new ThreadFactory() {
 
-      @Override
-      public Thread newThread(Runnable runnable) {
-        Thread thread = new Thread(runnable);
-        thread.setDaemon(true);
-        return thread;
-      }
-    });
+              @Override
+              public Thread newThread(Runnable runnable) {
+                Thread thread = new Thread(runnable);
+                thread.setDaemon(true);
+                return thread;
+              }
+            });
     if (enabledEmbeddedLdap) {
-      execs.submit(() -> {
-        try {
-          LdapEmbeddedService.start();
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      });
+      execs.submit(
+          () -> {
+            try {
+              LdapEmbeddedService.start();
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+          });
     }
     if (enabledEmbeddedBroker) {
-      execs.submit(() -> {
-        try {
-          BrokerEmbeddedService.start();
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      });
+      execs.submit(
+          () -> {
+            try {
+              BrokerEmbeddedService.start();
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+          });
     }
-    if (enabledEmbeddedTomcat1) {
-      execs.submit(() -> {
-        try {
-          TomcatEmbeddedService.start(nameEmbeddedTomcat1, httpPortEmbeddedTomcat1, httpsPortEmbeddedTomcat1,
-              propertiesFileEmbeddedTomcat1);
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      });
+    if (enabledEmbeddedTomcat) {
+      execs.submit(
+          () -> {
+            try {
+              TomcatEmbeddedService.start(
+                  nameEmbeddedTomcat1,
+                  propertiesFileEmbeddedTomcat1,
+                  nameEmbeddedTomcat2,
+                  propertiesFileEmbeddedTomcat2,
+                  httpPortEmbeddedTomcat,
+                  httpsPortEmbeddedTomcat);
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+          });
     }
-    if (enabledEmbeddedTomcat2) {
-      execs.submit(() -> {
-        try {
-          TomcatEmbeddedService.start(nameEmbeddedTomcat2, httpPortEmbeddedTomcat2, httpsPortEmbeddedTomcat2,
-              propertiesFileEmbeddedTomcat2);
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      });
-    }
-    execs.submit(() -> {
-      try {
-        ServerSocket shutdownSocket = new ServerSocket(4567);
-        Socket sock = shutdownSocket.accept();
-        sock.close();
-        shutdownSocket.close();
-        stopAll();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    });
+    execs.submit(
+        () -> {
+          try {
+            ServerSocket shutdownSocket = new ServerSocket(4567);
+            Socket sock = shutdownSocket.accept();
+            sock.close();
+            shutdownSocket.close();
+            stopAll();
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        });
 
     if (!fork) {
       execs.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);

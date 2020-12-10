@@ -22,6 +22,5 @@ import org.springframework.test.context.ActiveProfiles;
 public class ApplicationTest {
 
   @Test
-  void contextLoads() {
-  }
+  void contextLoads() {}
 }

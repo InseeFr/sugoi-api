@@ -22,8 +22,8 @@ public class BrokerRequest implements Serializable {
   /** */
   private static final long serialVersionUID = 1L;
 
-  public String method;
-  public Map<String, Object> methodParams = new HashMap<>();
+  private String method;
+  private Map<String, Object> methodParams = new HashMap<>();
 
   public BrokerRequest(String method, Map<String, Object> methodParams) {
     this.method = method;

@@ -18,11 +18,15 @@ import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.jms.model.BrokerRequest;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JmsRequestRouter {
+
+  private static final Logger logger = LogManager.getLogger(JmsReceiverRequest.class);
 
   @Autowired
   private StoreProvider storeProvider;
@@ -31,9 +35,11 @@ public class JmsRequestRouter {
   private RealmProvider realmProvider;
 
   public void exec(BrokerRequest request) {
-    Realm realm = realmProvider.load((String) request.getmethodParams().get("domaine"));
+    logger.info("Receive request from Broker for realm {} operation:{}", request.getmethodParams().get("domain"),
+        request.getMethod());
+    Realm realm = realmProvider.load((String) request.getmethodParams().get("domain"));
     UserStorage userStorage = realm.getUserStorages().get(0);
-    switch (request.method) {
+    switch (request.getMethod()) {
       case "deleteUser":
         storeProvider.getStoreForUserStorage(realm.getName(), userStorage.getName()).getWriter().deleteUser("id");
         break;

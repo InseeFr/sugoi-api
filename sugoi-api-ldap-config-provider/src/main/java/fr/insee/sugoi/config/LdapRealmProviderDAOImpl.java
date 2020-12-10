@@ -49,7 +49,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   private String url;
 
   @Value("${fr.insee.sugoi.config.ldap.profils.port:}")
-  private String port;
+  private int port;
 
   @Value("${fr.insee.sugoi.config.ldap.profils.branche:}")
   private String baseDn;
@@ -60,7 +60,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   public Realm load(String realmName) {
     logger.info("Loading configuration from ldap://{}:{}/{}", url, port, baseDn);
     try (LDAPConnectionPool ldapConnection =
-        new LDAPConnectionPool(new LDAPConnection(url, 389), 1)) {
+        new LDAPConnectionPool(new LDAPConnection(url, port), 1)) {
       SearchResultEntry entry =
           ldapConnection.getEntry("cn=Profil_" + realmName + "_WebServiceLdap," + baseDn);
       logger.debug("Found entry {}", entry.getDN());
@@ -77,7 +77,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   public List<Realm> findAll() {
     logger.info("Loading realms configurations from ldap://{}:{}/{}", url, port, baseDn);
     try (LDAPConnectionPool ldapConnection =
-        new LDAPConnectionPool(new LDAPConnection(url, 389), 1)) {
+        new LDAPConnectionPool(new LDAPConnection(url, port), 1)) {
       SearchRequest searchRequest =
           new SearchRequest(
               baseDn, SearchScope.ONE, LdapFilter.create("(objectClass=*)"), "*", "+");
@@ -86,6 +86,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
           .map(e -> realmMapper.mapFromSearchEntry(e))
           .collect(Collectors.toList());
     } catch (Exception e) {
+      e.printStackTrace();
       throw new RealmNotFoundException("Impossible de charger les realms");
     }
   }
