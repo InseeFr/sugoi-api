@@ -39,4 +39,10 @@ public interface WriterStore {
   void deleteUserFromGroup(String groupName, String userId);
 
   void addUserToGroup(String groupName, String userId);
+
+  void reinitPassword(User user);
+
+  void initPassword(User user, String password);
+
+  void changePasswordResestStatus(User user, boolean isReset);
 }

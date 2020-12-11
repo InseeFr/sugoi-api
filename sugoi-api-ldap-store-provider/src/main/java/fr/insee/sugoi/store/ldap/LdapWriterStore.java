@@ -107,4 +107,22 @@ public class LdapWriterStore implements WriterStore {
     // TODO Auto-generated method stub
 
   }
+
+  @Override
+  public void reinitPassword(User user) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void initPassword(User user, String password) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void changePasswordResestStatus(User user, boolean isReset) {
+    // TODO Auto-generated method stub
+
+  }
 }
