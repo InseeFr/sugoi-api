@@ -11,7 +11,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.services.configuration;
+package fr.insee.sugoi.commons.services.configuration;
 
 import java.util.Collection;
 import java.util.List;
@@ -38,10 +38,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   /**
    * Enable bearer authentication
    *
-   * <p>A Spring Security oAuth configuration is mandatory if enabled
+   * <p>
+   * A Spring Security oAuth configuration is mandatory if enabled
    *
-   * <p>For instance you should add the spring.security.oauth2.resourceserver.jwt.jwk-set-uri
-   * property by the public key location of your oAuth server
+   * <p>
+   * For instance you should add the
+   * spring.security.oauth2.resourceserver.jwt.jwk-set-uri property by the public
+   * key location of your oAuth server
    */
   private boolean bearerAuthenticationEnabled = false;
 
@@ -65,27 +68,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
     // allow jwt bearer authentication
     if (bearerAuthenticationEnabled) {
-      http.oauth2ResourceServer(
-          oauth2 ->
-              oauth2.jwt(
-                  jwtConfigurer -> {
-                    jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter());
-                  }));
+      http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> {
+        jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter());
+      }));
     }
     // security constraints
-    http.authorizeRequests(
-        authz ->
-            authz
-                .antMatchers(HttpMethod.OPTIONS)
-                .permitAll()
-                .antMatchers(HttpMethod.GET, "/**")
-                .permitAll()
-                .antMatchers("/swagger-ui/**", "/v3/api-docs/**")
-                .permitAll()
-                .antMatchers("/**")
-                .authenticated()
-                .anyRequest()
-                .denyAll());
+    http.authorizeRequests(authz -> authz.antMatchers(HttpMethod.OPTIONS).permitAll().antMatchers(HttpMethod.GET, "/**")
+        .permitAll().antMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll().antMatchers("/**").authenticated()
+        .anyRequest().denyAll());
   }
 
   // Customization to get Keycloak Role
@@ -99,24 +89,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter() {
     return new Converter<Jwt, Collection<GrantedAuthority>>() {
       @Override
-      @SuppressWarnings({"unchecked", "serial"})
+      @SuppressWarnings({ "unchecked", "serial" })
       public Collection<GrantedAuthority> convert(Jwt source) {
-        return ((Map<String, List<String>>) source.getClaim("realm_access"))
-            .get("roles").stream()
-                .map(
-                    s ->
-                        new GrantedAuthority() {
-                          @Override
-                          public String getAuthority() {
-                            return "ROLE_" + s;
-                          }
+        return ((Map<String, List<String>>) source.getClaim("realm_access")).get("roles").stream()
+            .map(s -> new GrantedAuthority() {
+              @Override
+              public String getAuthority() {
+                return "ROLE_" + s;
+              }
 
-                          @Override
-                          public String toString() {
-                            return getAuthority();
-                          }
-                        })
-                .collect(Collectors.toList());
+              @Override
+              public String toString() {
+                return getAuthority();
+              }
+            }).collect(Collectors.toList());
       }
     };
   }
@@ -126,12 +112,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     if (ldapAccountManagmentEnabled) {
-      auth.ldapAuthentication()
-          .userSearchBase(ldapAccountManagmentUserBase)
-          .userSearchFilter("(uid={0})")
-          .groupSearchBase(ldapAccountManagmentGroupeBase)
-          .contextSource()
-          .url(ldapAccountManagmentUrl);
+      auth.ldapAuthentication().userSearchBase(ldapAccountManagmentUserBase).userSearchFilter("(uid={0})")
+          .groupSearchBase(ldapAccountManagmentGroupeBase).contextSource().url(ldapAccountManagmentUrl);
     }
   }
 

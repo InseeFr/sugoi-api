@@ -11,11 +11,11 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.services.controller.technics;
+package fr.insee.sugoi.commons.services.controller.technics;
 
 import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
-import fr.insee.sugoi.services.view.ErrorView;
+import fr.insee.sugoi.commons.services.view.ErrorView;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -30,8 +30,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(RealmNotFoundException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
+    final ResponseEntity<ErrorView> response = new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
     return response;
   }
 
@@ -40,8 +39,8 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(EntityNotFoundException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
+    final ResponseEntity<ErrorView> response = new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
     return response;
   }
+
 }

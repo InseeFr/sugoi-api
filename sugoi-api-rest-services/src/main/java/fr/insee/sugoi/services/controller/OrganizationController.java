@@ -11,7 +11,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.services.controller.v2;
+package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.service.OrganizationService;
 import fr.insee.sugoi.model.Organization;
@@ -24,17 +24,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = {"/v2", "/"})
+@RequestMapping(value = { "/v2", "/" })
 @Tag(name = "Organization")
 public class OrganizationController {
 
-  @Autowired private OrganizationService organizationService;
+  @Autowired
+  private OrganizationService organizationService;
 
-  @GetMapping(
-      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
-      value = "/{domaine}/organization/{name}")
-  public Organization getMethodName(
-      @PathVariable("domaine") String realm, @PathVariable("name") String name) throws Exception {
+  @GetMapping(produces = { MediaType.APPLICATION_XML_VALUE,
+      MediaType.APPLICATION_JSON_VALUE }, value = "/{domaine}/organization/{name}")
+  public Organization getMethodName(@PathVariable("domaine") String realm, @PathVariable("name") String name)
+      throws Exception {
     return organizationService.searchOrganization(realm, name);
   }
 }

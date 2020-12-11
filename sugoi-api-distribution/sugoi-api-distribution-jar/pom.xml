@@ -26,6 +26,7 @@
         </exclusion>
       </exclusions>
     </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-log4j2</artifactId>
@@ -105,7 +106,7 @@
 
     <dependency>
       <groupId>fr.insee.sugoi</groupId>
-      <artifactId>sugoi-api-converter</artifactId>
+      <artifactId>sugoi-api-rest-old-services</artifactId>
     </dependency>
 
     <dependency>

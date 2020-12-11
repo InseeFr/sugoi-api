@@ -11,7 +11,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.services.controller.v2;
+package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.model.Realm;
@@ -27,27 +27,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = {"/v2/config", "/config"})
+@RequestMapping(value = { "/v2/config", "/config" })
 public class ConfigController {
 
-  @Autowired private ConfigService configService;
+  @Autowired
+  private ConfigService configService;
 
-  @Autowired private RealmViewMapper realmViewMapper;
+  @Autowired
+  private RealmViewMapper realmViewMapper;
 
-  @GetMapping(
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
-      value = "/realm/{id}")
+  @GetMapping(produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }, value = "/realm/{id}")
   public RealmView getRealm(@PathVariable("id") String id) {
     Realm realm = configService.getRealm(id);
     return realmViewMapper.mapperHandly(realm);
   }
 
-  @GetMapping(
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
-      value = "/realms")
+  @GetMapping(produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }, value = "/realms")
   public List<RealmView> getRealms() {
-    return configService.getRealms().stream()
-        .map(realm -> realmViewMapper.mapperHandly(realm))
+    return configService.getRealms().stream().map(realm -> realmViewMapper.mapperHandly(realm))
         .collect(Collectors.toList());
   }
 }
