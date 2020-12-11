@@ -20,10 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jms.annotation.JmsListener;
 
-@ConditionalOnProperty(
-    name = "fr.insee.sugoi.jms.receiver.response.enabled",
-    havingValue = "true",
-    matchIfMissing = false)
+@ConditionalOnProperty(name = "fr.insee.sugoi.jms.receiver.response.enabled", havingValue = "true", matchIfMissing = false)
 public class JmsReceiverResponse {
 
   private static final Logger logger = LogManager.getLogger(JmsReceiverRequest.class);
@@ -36,13 +33,13 @@ public class JmsReceiverResponse {
 
   @JmsListener(destination = "${fr.insee.sugoi.jms.queue.response.name:}")
   public void onResponse(BrokerResponse response) {
-    logger.info("New message on queue {}", queueResponseName);
+    logger.debug("New message on queue {} message: {}", queueResponseName, response);
     System.out.println(response);
   }
 
   @JmsListener(destination = "${fr.insee.sugoi.jms.priority.queue.response.name}")
   public void onUrgentResponse(BrokerResponse response) {
-    logger.info("New message on queue {}", queueUrgentResponseName);
+    logger.debug("New message on queue {} message: {}", queueUrgentResponseName, response);
     System.out.println(response);
   }
 }

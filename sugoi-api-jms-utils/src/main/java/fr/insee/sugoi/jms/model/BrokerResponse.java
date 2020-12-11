@@ -13,6 +13,8 @@
 */
 package fr.insee.sugoi.jms.model;
 
+import java.util.UUID;
+
 /** BrokerResponse */
 public class BrokerResponse {
 
@@ -20,7 +22,11 @@ public class BrokerResponse {
 
   private Object object;
 
-  public BrokerResponse() {}
+  private UUID uuid;
+
+  public BrokerResponse() {
+    uuid = UUID.randomUUID();
+  }
 
   public String getComment() {
     return comment;
@@ -36,5 +42,19 @@ public class BrokerResponse {
 
   public void setObject(Object object) {
     this.object = object;
+  }
+
+  public UUID getUuid() {
+    return uuid;
+  }
+
+  public void setUuid(UUID uuid) {
+    this.uuid = uuid;
+  }
+
+  @Override
+  public String toString() {
+    // TODO Auto-generated method stub
+    return "{uuid: " + uuid.toString() + " comment: " + comment + "}";
   }
 }

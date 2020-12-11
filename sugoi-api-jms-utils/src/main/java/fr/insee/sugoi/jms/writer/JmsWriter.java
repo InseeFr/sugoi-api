@@ -30,10 +30,10 @@ public class JmsWriter {
 
   private static final Logger logger = LogManager.getLogger(JmsWriter.class);
 
-  @Autowired JmsTemplate jmsTemplate;
+  @Autowired
+  JmsTemplate jmsTemplate;
 
-  public void writeRequestInQueue(
-      String queueName, String methodName, Map<String, Object> methodParams) {
+  public void writeRequestInQueue(String queueName, String methodName, Map<String, Object> methodParams) {
     BrokerRequest request = new BrokerRequest();
     request.setMethod(methodName);
     for (String key : new ArrayList<>(methodParams.keySet())) {
@@ -41,9 +41,9 @@ public class JmsWriter {
     }
     try {
       jmsTemplate.convertAndSend(queueName, request);
-      logger.info("Message send in queue {}", queueName);
+      logger.debug("Send request {} in queue {}", request, queueName);
     } catch (JmsException e) {
-      logger.info("Error when sending message to broker");
+      logger.debug("Error when sending message {} to broker in queue {}", request, queueName);
       throw new BrokerException(e.getMessage());
     }
   }
