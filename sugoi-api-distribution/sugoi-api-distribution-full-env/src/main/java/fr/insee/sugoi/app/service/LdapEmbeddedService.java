@@ -29,17 +29,21 @@ import java.util.logging.ConsoleHandler;
 public class LdapEmbeddedService {
 
   private static int port =
-      Integer.parseInt(PropertiesLoaderService.load("fr.insee.sugoi.full.env.ldap.embedded.port"));
+      Integer.parseInt(
+          PropertiesLoaderService.load("fr.insee.sugoi.full.env.ldap.embedded.port", "10389"));
   private static String ldifPath =
-      PropertiesLoaderService.load("fr.insee.sugoi.full.env.ldap.embedded.ldif.path");
+      PropertiesLoaderService.load(
+          "fr.insee.sugoi.full.env.ldap.embedded.ldif.path", "/ldap-data/init-ldap.ldif");
   private static String schemaPath =
-      PropertiesLoaderService.load("fr.insee.sugoi.full.env.ldap.embedded.schema.path");
+      PropertiesLoaderService.load(
+          "fr.insee.sugoi.full.env.ldap.embedded.schema.path", "/ldap-data/init-schema.txt");
   private static String baseDn =
-      PropertiesLoaderService.load("fr.insee.sugoi.full.env.ldap.embedded.base.dn");
+      PropertiesLoaderService.load("fr.insee.sugoi.full.env.ldap.embedded.base.dn", "o=insee,c=fr");
   private static String username =
-      PropertiesLoaderService.load("fr.insee.sugoi.full.env.ldap.embedded.username");
+      PropertiesLoaderService.load(
+          "fr.insee.sugoi.full.env.ldap.embedded.username", "cn=Directory Manager");
   private static String password =
-      PropertiesLoaderService.load("fr.insee.sugoi.full.env.ldap.embedded.password");
+      PropertiesLoaderService.load("fr.insee.sugoi.full.env.ldap.embedded.password", "password");
 
   private static InMemoryDirectoryServer ds;
 

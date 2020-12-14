@@ -28,20 +28,23 @@ public class JmsRequestRouter {
 
   private static final Logger logger = LogManager.getLogger(JmsReceiverRequest.class);
 
-  @Autowired
-  private StoreProvider storeProvider;
+  @Autowired private StoreProvider storeProvider;
 
-  @Autowired
-  private RealmProvider realmProvider;
+  @Autowired private RealmProvider realmProvider;
 
   public void exec(BrokerRequest request) {
-    logger.info("Receive request from Broker for realm {} operation:{}", request.getmethodParams().get("domain"),
+    logger.info(
+        "Receive request from Broker for realm {} operation:{}",
+        request.getmethodParams().get("domain"),
         request.getMethod());
     Realm realm = realmProvider.load((String) request.getmethodParams().get("domain"));
     UserStorage userStorage = realm.getUserStorages().get(0);
     switch (request.getMethod()) {
       case "deleteUser":
-        storeProvider.getStoreForUserStorage(realm.getName(), userStorage.getName()).getWriter().deleteUser("id");
+        storeProvider
+            .getStoreForUserStorage(realm.getName(), userStorage.getName())
+            .getWriter()
+            .deleteUser("id");
         break;
 
       default:

@@ -23,11 +23,13 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(name = "fr.insee.sugoi.jms.receiver.request.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(
+    name = "fr.insee.sugoi.jms.receiver.request.enabled",
+    havingValue = "true",
+    matchIfMissing = false)
 public class JmsReceiverRequest {
 
-  @Autowired
-  JmsRequestRouter router;
+  @Autowired JmsRequestRouter router;
 
   private static final Logger logger = LogManager.getLogger(JmsReceiverRequest.class);
 

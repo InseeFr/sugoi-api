@@ -33,8 +33,7 @@ public class BrokerRequest implements Serializable {
     this.methodParams = methodParams;
   }
 
-  public BrokerRequest() {
-  }
+  public BrokerRequest() {}
 
   public String getMethod() {
     return this.method;
@@ -63,6 +62,12 @@ public class BrokerRequest implements Serializable {
   @Override
   public String toString() {
     // TODO Auto-generated method stub
-    return "{uuid: " + uuid.toString() + " method: " + method + " params: " + methodParams.toString() + "}";
+    return "{uuid: "
+        + uuid.toString()
+        + " method: "
+        + method
+        + " params: "
+        + methodParams.toString()
+        + "}";
   }
 }

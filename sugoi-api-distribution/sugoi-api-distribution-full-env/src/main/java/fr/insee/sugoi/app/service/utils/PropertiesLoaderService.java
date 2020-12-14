@@ -21,7 +21,7 @@ import java.util.Properties;
 
 public class PropertiesLoaderService {
 
-  public static String load(String name) {
+  public static String load(String name, String defaultValue) {
     Properties props = new Properties();
     if (System.getProperty(name) != null) {
       return System.getProperty(name);
@@ -37,12 +37,12 @@ public class PropertiesLoaderService {
         }
 
         props.load(PropertiesLoaderService.class.getResourceAsStream("/application.properties"));
-        return props.getProperty(name);
+        return (props.getProperty(name) != null) ? props.getProperty(name) : defaultValue;
       } catch (Exception e) {
         try {
 
           props.load(PropertiesLoaderService.class.getResourceAsStream("/application.properties"));
-          return props.getProperty(name);
+          return (props.getProperty(name) != null) ? props.getProperty(name) : defaultValue;
 
         } catch (IOException e1) {
           throw new RuntimeException("Properties " + name + " not found");

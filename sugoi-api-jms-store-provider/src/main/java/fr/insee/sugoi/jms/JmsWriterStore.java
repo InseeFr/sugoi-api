@@ -13,14 +13,13 @@
 */
 package fr.insee.sugoi.jms;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.jms.writer.JmsWriter;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Component
 public class JmsWriterStore implements WriterStore {
@@ -122,5 +121,4 @@ public class JmsWriterStore implements WriterStore {
     // TODO Auto-generated method stub
 
   }
-
 }

@@ -20,7 +20,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jms.annotation.JmsListener;
 
-@ConditionalOnProperty(name = "fr.insee.sugoi.jms.receiver.response.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(
+    name = "fr.insee.sugoi.jms.receiver.response.enabled",
+    havingValue = "true",
+    matchIfMissing = false)
 public class JmsReceiverResponse {
 
   private static final Logger logger = LogManager.getLogger(JmsReceiverRequest.class);
