@@ -44,5 +44,5 @@ public interface WriterStore {
 
   void initPassword(User user, String password);
 
-  void changePasswordResestStatus(User user, boolean isReset);
+  void changePasswordResetStatus(User user, boolean isReset);
 }

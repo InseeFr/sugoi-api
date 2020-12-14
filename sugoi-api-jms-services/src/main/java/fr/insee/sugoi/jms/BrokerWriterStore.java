@@ -106,7 +106,7 @@ public class BrokerWriterStore implements WriterStore {
   }
 
   @Override
-  public void changePasswordResestStatus(User user, boolean isReset) {
+  public void changePasswordResetStatus(User user, boolean isReset) {
     // TODO Auto-generated method stub
 
   }
