@@ -43,7 +43,7 @@ public class LdapFactory {
       openLdapPoolConnection.put(
           config.get("name"),
           new LDAPConnectionPool(
-              new LDAPConnection(config.get("url"), 389),
+              new LDAPConnection(config.get("url"), Integer.valueOf(config.get("port"))),
               Integer.valueOf(config.get("pool_size"))));
     }
     return openLdapPoolConnection.get(config.get("name"));
@@ -52,7 +52,9 @@ public class LdapFactory {
   public static LDAPConnection getSingleConnection(Map<String, String> config)
       throws LDAPException {
     if (!openLdapMonoConnection.containsKey(config.get("name"))) {
-      openLdapMonoConnection.put(config.get("name"), new LDAPConnection(config.get("url"), 389));
+      openLdapMonoConnection.put(
+          config.get("name"),
+          new LDAPConnection(config.get("url"), Integer.valueOf(config.get("port"))));
     }
     return openLdapMonoConnection.get(config.get("name"));
   }

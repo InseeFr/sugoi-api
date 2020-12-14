@@ -11,7 +11,7 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Logger name="fr.insee.sugoi.converter" level="debug" additivity="false">
+        <Logger name="fr.insee.sugoi" level="debug" additivity="false">
             <AppenderRef ref="ConsoleAppender" />
         </Logger>
 

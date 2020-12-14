@@ -7,6 +7,7 @@
     <groupId>fr.insee.sugoi</groupId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
+  
   <packaging>pom</packaging>
   <groupId>fr.insee.sugoi</groupId>
   <artifactId>sugoi-api-distribution</artifactId>
@@ -16,6 +17,7 @@
   <modules>
     <module>sugoi-api-distribution-jar</module>
     <module>sugoi-api-distribution-war</module>
+    <module>sugoi-api-distribution-full-env</module>
   </modules>
 
 

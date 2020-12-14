@@ -1,0 +1,264 @@
+# RACINE
+dn: o=insee,c=fr
+objectclass: top
+objectclass: organization
+o: insee
+
+
+# BRANCHE APPLICATION
+dn: ou=Applications,o=insee,c=fr
+objectclass: top
+objectclass: organizationalUnit
+ou: applications
+
+
+# BRANCHE APPLICATIVE APPLI TEST
+dn: ou=Applitest,ou=Applications,o=insee,c=fr
+objectclass: top
+objectclass: organizationalUnit
+ou: Applitest
+description: Branche privative de l'application applitest
+
+dn: uid=appli_applitest,ou=Applitest,ou=Applications,o=insee,c=fr
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: inseeApplication
+cn: appli_applitest
+sn: appli_applitest
+givenname: appli_applitest
+uid: appli_applitest
+userpassword: applitest
+
+dn: ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
+objectclass: top
+objectclass: organizationalUnit
+ou: Applitest_Objets
+
+dn: cn=Administrateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
+cn: Administrateurs_Applitest
+objectclass: groupOfUniqueNames
+
+dn: cn=Utilisateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
+cn: Utilisateurs_Applitest
+objectclass: groupOfUniqueNames
+uniquemember: uid=Testd,ou=SSM,o=insee,c=fr
+uniquemember: uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+
+# BRANCHE APPLICATIVE WEB SERVICE
+dn: ou=WebServicesLdap,ou=Applications,o=insee,c=fr
+objectclass: top
+objectclass: organizationalUnit
+ou: WebServicesLdap
+description: Branche privative de l'application WebServicesLdap
+
+dn: uid=appli_WebServicesLdap,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: inseeApplication
+cn: WebServicesLdap
+sn: WebServicesLdap
+givenname: WebServicesLdap
+uid: appli_WebServicesLdap
+userpassword: webservices
+
+dn: ou=WebServicesLdap_Objets,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
+objectclass: top
+objectclass: organizationalUnit
+ou: WebServicesLdap_Objets
+description: Objets privatifs de l'application WebServicesLdap
+
+dn: cn=Administrateurs_WebServicesLdap,ou=WebServicesLdap_Objets,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
+description: Administrateurs généraux du WS gestion des contacts
+cn: Administrateurs_WebServicesLdap
+objectclass: top
+objectclass: groupOfUniqueNames
+uniquemember: uid=appli_webservicesldap,ou=Webservicesldap,ou=Applications,o=insee,c=fr
+
+dn: cn=Utilisateurs_contacts_domaine2_WebServicesLdap,ou=WebServicesLdap_Obje
+ ts,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
+description: Utilisateur du webservices contact(champ de gestion SERV2010)
+cn: Utilisateurs_contacts_domaine2_WebServicesLdap
+objectclass: groupOfUniqueNames
+
+dn: cn=profil-contact-WebServicesLdap,ou=WebServicesLdap_Objets,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
+cn: profil-contact-WebServicesLdap
+objectclass: inseeOrganizationalRole
+
+dn: cn=Profil_domaine2_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We
+ bServicesLdap_Objets,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
+cn: Profil_domaine2_WebServiceLdap
+objectclass: inseeOrganizationalRole
+inseepropriete: ldapUrl$localhost
+inseepropriete: ldapPort$10389
+inseepropriete: brancheContact$ou=contacts,ou=clients_domaine2,o=insee,c=fr
+inseepropriete: brancheAdresse$ou=adresses,ou=clients_domaine2,o=insee,c=fr
+inseepropriete: brancheOrganisation$ou=organisations,ou=clients_domaine2,o=in
+ see,c=fr
+description: domaine2
+
+dn: cn=Profil_domaine1_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We
+ bServicesLdap_Objets,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
+cn: Profil_domaine1_WebServiceLdap
+objectclass: inseeOrganizationalRole
+inseepropriete: ldapUrl$localhost
+inseepropriete: ldapPort$10389
+inseepropriete: brancheContact$ou=contacts,ou=clients_domaine1,o=insee,c=fr
+inseepropriete: brancheAdresse$ou=adresses,ou=clients_domaine1,o=insee,c=fr
+inseepropriete: brancheOrganisation$ou=organisations,ou=clients_domaine1,o=in
+ see,c=fr
+inseepropriete: habilitationsPossibles$propriete_role_appli
+inseepropriete: branchesApplicativesPossibles$applitest
+description: domaine1
+
+dn: cn=Utilisateurs_contacts_domaine1_WebServicesLdap,ou=WebServicesLdap_Obje
+ ts,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
+description: Utilisateur du webservices contact
+cn: Utilisateurs_contacts_domaine1_WebServicesLdap
+objectclass: groupOfUniqueNames
+uniqueMember: uid=appli_applitest,ou=Applitest,ou=Applications,o=insee,c=fr
+
+
+# DOMAINE DE GESTION 1
+dn: ou=clients_domaine1,o=insee,c=fr
+description: domaine de gestion des clients de diffusion sirene
+objectclass: top
+objectclass: organizationalUnit
+ou: clients_domaine1
+
+dn: ou=contacts,ou=clients_domaine1,o=insee,c=fr
+description: contact du domaine de gestion des clients diffusion sirene
+objectclass: top
+objectclass: organizationalUnit
+ou: contacts
+
+dn: ou=organisations,ou=clients_domaine1,o=insee,c=fr
+description: organisations du domaine de gestion des clients diffusion sirene
+objectclass: top
+objectclass: organizationalUnit
+ou: organisations
+
+dn: ou=adresses,ou=clients_domaine1,o=insee,c=fr
+objectclass: top
+objectclass: organizationalUnit
+ou: adresses
+description: domaine de gestion des adresses postales de réception des fichiers par les
+
+dn: uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+inseeOrganisationDN: uid=testo,ou=organisations,ou=clients_domaine1,o=insee,c=fr
+mail: test@test.fr
+uid: testc
+inseeAdressePostaleDN: l=testa,ou=adresses,ou=clients_domaine1,o=insee,c=fr
+telephoneNumber: 1209883940
+cn: Testy Test
+inseegroupedefaut: prop_role_applitest
+inseegroupedefaut: role2_applitest
+inseegroupedefaut: prop1_TestIgnoreCase_applitest
+inseegroupedefaut: Prop2_TestIgnoreCase_applitest
+
+dn: uid=testo,ou=organisations,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeOrganisation
+uid: testo
+description: Insee
+
+dn: l=testa, ou=adresses,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: locality
+objectClass: inseeAdressePostale
+l: testa
+inseeAdressePostaleCorrespondantLigne4: 88 AVE VERDIER
+inseeAdressePostaleCorrespondantLigne3: _
+inseeAdressePostaleCorrespondantLigne2: _
+inseeAdressePostaleCorrespondantLigne1: Insee
+inseeAdressePostaleCorrespondantLigne7: _
+inseeAdressePostaleCorrespondantLigne6: 92120 MONTROUGE
+inseeAdressePostaleCorrespondantLigne5: _
+
+
+# DOMAINE DE GESTION 2
+dn: ou=clients_domaine2,o=insee,c=fr
+description: domaine de gestion des clients de diffusion sirene
+objectclass: top
+objectclass: organizationalUnit
+ou: clients_domaine1
+
+dn: ou=contacts,ou=clients_domaine2,o=insee,c=fr
+description: contact du domaine de gestion des clients diffusion sirene
+objectclass: top
+objectclass: organizationalUnit
+ou: contacts
+
+dn: ou=organisations,ou=clients_domaine2,o=insee,c=fr
+description: organisations du domaine de gestion des clients diffusion sirene
+objectclass: top
+objectclass: organizationalUnit
+ou: organisations
+
+dn: ou=adresses,ou=clients_domaine2,o=insee,c=fr
+objectclass: top
+objectclass: organizationalUnit
+ou: adresses
+description: domaine de gestion des adresses postales de réception des fichiers par les
+
+
+# DOMAINE DE GESTION SSM
+dn: cn=Profil_SSM_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We
+ bServicesLdap_Objets,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
+cn: Profil_SSM_WebServiceLdap
+objectclass: inseeOrganizationalRole
+inseepropriete: ldapUrl$localhost
+inseepropriete: ldapPort$10389
+inseepropriete: brancheContact$ou=SSM,o=insee,c=fr
+inseepropriete: objectclasscontact$top,person,organizationalPerson,inetOrgPerson,inseeAuthenticatedUser
+inseepropriete: branchesApplicativesPossibles$applitest
+description: SSM
+
+dn: ou=SSM,o=insee,c=fr
+description: domaine de gestion des SSM
+objectclass: top
+objectclass: organizationalUnit
+ou: SSM
+
+dn: uid=UTILISATEURSSM,ou=SSM,o=insee,c=fr
+uid: UTILISATEURSSM
+userPassword: {SHA}c3q3RSeNwMY7E09Ve9oBHw+MVXg=
+inseeGroupeDefaut: role_applicatif
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: inseeAuthenticatedUser
+cn: Alfred Dupont
+sn: Dupont
+givenName: Alfred
+mail: alfred.dupont@gouv.test
+description: utilisateur de test ssm
+
+dn: uid=Testd,ou=SSM,o=insee,c=fr
+uid: Testd
+userPassword: {SHA}c3q3RSeNwMY7E09Ve9oBHw+MVXg3=
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: inseeAuthenticatedUser
+cn: Dodo Dupont 2
+sn: Dupont 2
+givenName: Alfred2
+mail: alfred.dupont@gouv.test2
+description: utilisateur de test ssm
+inseeGroupeDefaut: role_applicatif
+inseegroupedefaut: prop_role_applitest
+inseegroupedefaut: role2_applitest
+inseegroupedefaut: prop1_TestIgnoreCase_applitest
+inseegroupedefaut: Prop2_TestIgnoreCase_applitest

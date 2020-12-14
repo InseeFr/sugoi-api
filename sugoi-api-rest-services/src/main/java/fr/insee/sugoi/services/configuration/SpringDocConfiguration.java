@@ -141,7 +141,7 @@ public class SpringDocConfiguration {
     logger.info("surcharge de la configuration swagger");
     Contact contact = new Contact().url("https://github.com/InseeFrLab/sugoi-api");
     if (true) {
-      contact = contact.email("email@insee.fr").name("Outils transverses");
+      contact = contact.email(contactEmail).name(contactEmail);
     }
     final OpenAPI openapi =
         new OpenAPI()

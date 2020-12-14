@@ -8,6 +8,7 @@
   <name>sugoi-api-parent</name>
   <description>User services management</description>
   <packaging>pom</packaging>
+
   <properties>
     <junit.version>5.6.0</junit.version>
     <maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version>
@@ -27,25 +28,15 @@
     <spring-boot.version>2.3.3.RELEASE</spring-boot.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+
   <dependencies>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-jersey</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.junit.vintage</groupId>
-          <artifactId>junit-vintage-engine</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+
+
   </dependencies>
+
   <dependencyManagement>
     <dependencies>
+
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
@@ -53,38 +44,42 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+
+
       <dependency>
         <groupId>fr.insee.sugoi</groupId>
         <artifactId>sugoi-api-core</artifactId>
         <version>${project.version}</version>
       </dependency>
+
       <dependency>
         <groupId>fr.insee.sugoi</groupId>
         <artifactId>sugoi-api-converter</artifactId>
         <version>${project.version}</version>
       </dependency>
+
       <dependency>
         <groupId>fr.insee.sugoi</groupId>
         <artifactId>sugoi-api-rest-services</artifactId>
         <version>${project.version}</version>
       </dependency>
+
       <dependency>
         <groupId>fr.insee.sugoi</groupId>
         <artifactId>sugoi-api-ldap-utils</artifactId>
         <version>${project.version}</version>
       </dependency>
+
       <dependency>
         <groupId>fr.insee.sugoi</groupId>
         <artifactId>sugoi-api-file-config-provider</artifactId>
         <version>${project.version}</version>
-
       </dependency>
 
       <dependency>
         <groupId>fr.insee.sugoi</groupId>
         <artifactId>sugoi-api-file-store-provider</artifactId>
         <version>${project.version}</version>
-
       </dependency>
 
       <dependency>
@@ -98,8 +93,46 @@
         <artifactId>sugoi-api-ldap-store-provider</artifactId>
         <version>${project.version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>fr.insee.sugoi</groupId>
+        <artifactId>sugoi-api-jms-store-provider</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>fr.insee.sugoi</groupId>
+        <artifactId>sugoi-api-jms-utils</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.unboundid</groupId>
+        <artifactId>unboundid-ldapsdk</artifactId>
+        <version>5.1.2</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>tomcat-catalina</artifactId>
+        <version>9.0.40</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>tomcat-jasper</artifactId>
+        <version>9.0.40</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.6</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
+
   <modules>
     <module>sugoi-api-model</module>
     <module>sugoi-api-core</module>
@@ -111,7 +144,9 @@
     <module>sugoi-api-ldap-config-provider</module>
     <module>sugoi-api-ldap-store-provider</module>
     <module>sugoi-api-ldap-utils</module>
-    <module>sugoi-api-jms-services</module>
+    <module>sugoi-api-jms-store-provider</module>
+    <module>sugoi-api-jms-utils</module>
+
   </modules>
   <build>
     <plugins>

@@ -39,4 +39,6 @@ public interface UserService {
       String certificat);
 
   User create(String realm, String storage, User user);
+
+  User delete(String realm, String id);
 }
