@@ -14,7 +14,6 @@
 package fr.insee.sugoi.store.ldap;
 
 import com.unboundid.ldap.sdk.Filter;
-import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
 import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldap.sdk.LDAPSearchException;
@@ -31,7 +30,7 @@ import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
-import fr.insee.sugoi.model.Habilitation;
+import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import java.util.List;
@@ -42,7 +41,6 @@ import org.apache.logging.log4j.Logger;
 
 public class LdapReaderStore implements ReaderStore {
 
-  private LDAPConnection ldapConnection;
   private LDAPConnectionPool ldapPoolConnection;
 
   private static final Logger logger = LogManager.getLogger(LdapReaderStore.class);
@@ -52,7 +50,7 @@ public class LdapReaderStore implements ReaderStore {
   public LdapReaderStore(Map<String, String> config) {
     logger.debug("Configuring LdapReaderStore with config : {}", config);
     try {
-      this.ldapConnection = LdapFactory.getSingleConnection(config);
+      LdapFactory.getSingleConnection(config);
       this.ldapPoolConnection = LdapFactory.getConnectionPool(config);
       this.config = config;
     } catch (LDAPException e) {
@@ -61,14 +59,14 @@ public class LdapReaderStore implements ReaderStore {
   }
 
   @Override
-  public User searchUser(String realmName, String id) {
-    logger.debug("Searching {} in {}", id, realmName);
+  public User getUser(String id) {
+    logger.debug("Searching user {}", id);
     SearchResultEntry entry = getEntryByDn("uid=" + id + "," + config.get("user_source"));
     return UserLdapMapper.mapFromSearchEntry(entry);
   }
 
   @Override
-  public Organization searchOrganization(String domaine, String id) {
+  public Organization getOrganization(String id) {
     SearchResultEntry entry = getEntryByDn("uid=" + id + "," + config.get("organization_source"));
     Organization org = OrganizationLdapMapper.mapFromSearchEntry(entry);
     if (org.getAttributes().containsKey("adressDn")) {
@@ -84,7 +82,6 @@ public class LdapReaderStore implements ReaderStore {
       String nomCommun,
       String description,
       String organisationId,
-      String domaineGestion,
       String mail,
       PageableResult pageable,
       String typeRecherche,
@@ -119,8 +116,7 @@ public class LdapReaderStore implements ReaderStore {
       page.setResults(users);
       return page;
     } catch (LDAPSearchException e) {
-      throw new RuntimeException(
-          "Impossible de recupérer les utilisateurs du domaine " + domaineGestion);
+      throw new RuntimeException("Fail to execute user search", e);
     }
   }
 
@@ -136,8 +132,34 @@ public class LdapReaderStore implements ReaderStore {
   }
 
   @Override
-  public Habilitation getHabilitation(String domaine, String id) {
+  public PageResult<User> getUsersInGroup(String groupName) {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  @Override
+  public Organization searchOrganizations(
+      Map<String, String> searchProperties, PageableResult pageable, String searchOperator) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Group getGroup(String name) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public PageResult<Group> searchGroups(
+      Map<String, String> searchProperties, PageableResult pageable, String searchOperator) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public boolean validateCredentials(User user, String credential) {
+    // TODO Auto-generated method stub
+    return false;
   }
 }

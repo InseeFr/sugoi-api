@@ -13,11 +13,36 @@
 */
 package fr.insee.sugoi.core.store;
 
+import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.User;
 
 public interface WriterStore {
 
-  String deleteUser(String domain, String id);
+  void deleteUser(String id);
 
   User createUser(User user);
+
+  User updateUser(User updatedUser);
+
+  void deleteGroup(String name);
+
+  Group createGroup(Group group);
+
+  Group updateGroup(Group updatedGroup);
+
+  void deleteOrganization(String name);
+
+  Group createOrganization(Group group);
+
+  Group updateOrganization(Group updatedGroup);
+
+  void deleteUserFromGroup(String groupName, String userId);
+
+  void addUserToGroup(String groupName, String userId);
+
+  void reinitPassword(User user);
+
+  void initPassword(User user, String password);
+
+  void changePasswordResetStatus(User user, boolean isReset);
 }

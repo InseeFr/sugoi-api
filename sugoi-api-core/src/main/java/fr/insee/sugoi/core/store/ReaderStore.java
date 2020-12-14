@@ -15,21 +15,21 @@ package fr.insee.sugoi.core.store;
 
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
-import fr.insee.sugoi.model.Habilitation;
+import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import java.util.List;
+import java.util.Map;
 
 public interface ReaderStore {
 
-  public User searchUser(String domaine, String id);
+  public User getUser(String id);
 
   public PageResult<User> searchUsers(
       String identifiant,
       String nomCommun,
       String description,
       String organisationId,
-      String domaineGestion,
       String mail,
       PageableResult pageable,
       String typeRecherche,
@@ -39,7 +39,17 @@ public interface ReaderStore {
       String rolePropriete,
       String certificat);
 
-  public Organization searchOrganization(String domaine, String id);
+  public PageResult<User> getUsersInGroup(String groupName);
 
-  public Habilitation getHabilitation(String domaine, String id);
+  public Organization getOrganization(String id);
+
+  public Organization searchOrganizations(
+      Map<String, String> searchProperties, PageableResult pageable, String searchOperator);
+
+  public Group getGroup(String name);
+
+  public PageResult<Group> searchGroups(
+      Map<String, String> searchProperties, PageableResult pageable, String searchOperator);
+
+  public boolean validateCredentials(User user, String credential);
 }
