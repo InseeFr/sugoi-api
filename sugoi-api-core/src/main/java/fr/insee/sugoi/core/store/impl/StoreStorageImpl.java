@@ -46,7 +46,7 @@ public class StoreStorageImpl implements StoreStorage {
   public Store getStore(Realm realm, UserStorage userStorage) {
     String writerType = userStorage.getWriterType();
     String readerType = userStorage.getReaderType();
-    String name = userStorage.getName() != null ? userStorage.getName() : realm.getName();
+    String name = realm.getName() + "_" + userStorage.getName();
     if (writerType == null) {
       writerType = defaultWriter;
     }

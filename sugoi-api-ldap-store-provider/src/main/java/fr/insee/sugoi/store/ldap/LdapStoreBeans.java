@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
 
 @Configuration
 public class LdapStoreBeans {
@@ -39,12 +40,14 @@ public class LdapStoreBeans {
 
   @Bean("LdapReaderStore")
   @Lazy
+  @Scope("prototype")
   public LdapReaderStore ldapReaderStore(Realm realm, UserStorage userStorage) {
     return new LdapReaderStore(generateConfig(realm, userStorage));
   }
 
   @Bean("LdapWriterStore")
   @Lazy
+  @Scope("prototype")
   public LdapWriterStore ldapWriterStore(Realm realm, UserStorage userStorage) {
     return new LdapWriterStore(generateConfig(realm, userStorage));
   }
