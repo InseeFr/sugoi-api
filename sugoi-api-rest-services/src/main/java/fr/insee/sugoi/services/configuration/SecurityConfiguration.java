@@ -128,6 +128,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     if (ldapAccountManagmentEnabled) {
       auth.ldapAuthentication()
           .userSearchBase(ldapAccountManagmentUserBase)
+          .userSearchFilter("(uid={0})")
           .groupSearchBase(ldapAccountManagmentGroupeBase)
           .contextSource()
           .url(ldapAccountManagmentUrl);
