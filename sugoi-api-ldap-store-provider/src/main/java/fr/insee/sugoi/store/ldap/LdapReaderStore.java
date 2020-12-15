@@ -105,7 +105,7 @@ public class LdapReaderStore implements ReaderStore {
               certificat);
       SearchRequest searchRequest =
           new SearchRequest(
-              config.get("user_branch"), SearchScope.SUBORDINATE_SUBTREE, filter, "*", "+");
+              config.get("user_source"), SearchScope.SUBORDINATE_SUBTREE, filter, "*", "+");
       LdapUtils.setRequestControls(searchRequest, pageable);
       SearchResult searchResult = ldapPoolConnection.search(searchRequest);
       List<User> users =
