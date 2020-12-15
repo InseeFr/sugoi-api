@@ -11,18 +11,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.services.configuration;
+package fr.insee.sugoi.core.service;
 
-import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+public interface PasswordService {
 
-@Configuration
-public class CustomObjectMapper {
+  String generatePassword(int longueur);
 
-  @Bean
-  public OuganextSugoiMapper ouganextSugoiMapper() {
-    OuganextSugoiMapper ouganextSugoiMapper = new OuganextSugoiMapper();
-    return ouganextSugoiMapper;
-  }
+  boolean verifierFormatInitMotDePasse(String motDePasse, int longueurMinimale);
+
+  boolean verifierFormatChangeMotDePasse(String motDePasse, int longueurMinimale);
 }

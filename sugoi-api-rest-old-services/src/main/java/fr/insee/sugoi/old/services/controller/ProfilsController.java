@@ -11,40 +11,37 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.services.controller;
+package fr.insee.sugoi.old.services.controller;
 
+import fr.insee.sugoi.converter.ouganext.Profils;
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.model.Realm;
-import fr.insee.sugoi.services.mapper.RealmViewMapper;
-import fr.insee.sugoi.services.view.RealmView;
+import fr.insee.sugoi.old.services.utils.ResponseUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = { "/v2/config", "/config" })
-public class ConfigController {
+@RequestMapping("/v1/profils")
+public class ProfilsController {
 
   @Autowired
   private ConfigService configService;
 
-  @Autowired
-  private RealmViewMapper realmViewMapper;
-
-  @GetMapping(produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }, value = "/realm/{id}")
-  public RealmView getRealm(@PathVariable("id") String id) {
-    Realm realm = configService.getRealm(id);
-    return realmViewMapper.mapperHandly(realm);
-  }
-
-  @GetMapping(produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }, value = "/realms")
-  public List<RealmView> getRealms() {
-    return configService.getRealms().stream().map(realm -> realmViewMapper.mapperHandly(realm))
-        .collect(Collectors.toList());
+  @GetMapping(value = "/", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
+  public ResponseEntity<?> getProfils() {
+    List<Realm> realms = configService.getRealms();
+    Profils profils = new Profils();
+    profils.getListe().addAll(realms.stream().map(realm -> ResponseUtils.convertRealmToProfils(realm))
+        .flatMap(List::stream).collect(Collectors.toList()));
+    return new ResponseEntity<>(profils, HttpStatus.OK);
   }
 }

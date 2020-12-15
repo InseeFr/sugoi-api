@@ -11,7 +11,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.commons.services.view;
+package fr.insee.sugoi.old.services.view;
 
 public class ErrorView {
   private String message;

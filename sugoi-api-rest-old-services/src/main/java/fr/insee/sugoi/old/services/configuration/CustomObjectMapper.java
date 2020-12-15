@@ -11,18 +11,18 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.services.view;
+package fr.insee.sugoi.old.services.configuration;
 
-public class ErrorView {
-  private String message;
+import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-  public String getMessage() {
-    return this.message;
+@Configuration
+public class CustomObjectMapper {
+
+  @Bean
+  public OuganextSugoiMapper ouganextSugoiMapper() {
+    OuganextSugoiMapper ouganextSugoiMapper = new OuganextSugoiMapper();
+    return ouganextSugoiMapper;
   }
-
-  public void setMessage(String message) {
-    this.message = message;
-  }
-
-  public ErrorView() {}
 }

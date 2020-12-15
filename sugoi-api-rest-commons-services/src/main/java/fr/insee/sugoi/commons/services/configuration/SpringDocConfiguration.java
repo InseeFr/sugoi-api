@@ -57,27 +57,54 @@ public class SpringDocConfiguration {
   public final String SCHEMEBASIC = "basic";
 
   @Bean
-  @ConditionalOnProperty(name = "fr.insee.sugoi.security.bearer-authentication-enabled", havingValue = "true", matchIfMissing = false)
+  @ConditionalOnProperty(
+      name = "fr.insee.sugoi.security.bearer-authentication-enabled",
+      havingValue = "true",
+      matchIfMissing = false)
   public OpenAPI customOpenAPIOIDC() {
     final OpenAPI openapi = createOpenAPI();
-    openapi.components(new Components().addSecuritySchemes(OAUTHSCHEME,
-        new SecurityScheme().type(SecurityScheme.Type.OAUTH2).in(SecurityScheme.In.HEADER)
-            .description(issuerDescription).flows(new OAuthFlows().authorizationCode(new OAuthFlow()
-                .authorizationUrl(issuerAuthorizationURL).tokenUrl(issuerTokenURL).refreshUrl(issuerRefreshURL)))));
+    openapi.components(
+        new Components()
+            .addSecuritySchemes(
+                OAUTHSCHEME,
+                new SecurityScheme()
+                    .type(SecurityScheme.Type.OAUTH2)
+                    .in(SecurityScheme.In.HEADER)
+                    .description(issuerDescription)
+                    .flows(
+                        new OAuthFlows()
+                            .authorizationCode(
+                                new OAuthFlow()
+                                    .authorizationUrl(issuerAuthorizationURL)
+                                    .tokenUrl(issuerTokenURL)
+                                    .refreshUrl(issuerRefreshURL)))));
     return openapi;
   }
 
   @Bean
-  @ConditionalOnProperty(name = "fr.insee.sugoi.security.basic-authentication-enabled", havingValue = "true", matchIfMissing = false)
+  @ConditionalOnProperty(
+      name = "fr.insee.sugoi.security.basic-authentication-enabled",
+      havingValue = "true",
+      matchIfMissing = false)
   public OpenAPI customOpenAPIBasic() {
     final OpenAPI openapi = createOpenAPI();
-    openapi
-        .components(new Components().addSecuritySchemes(SCHEMEBASIC, new SecurityScheme().type(SecurityScheme.Type.HTTP)
-            .scheme(SCHEMEBASIC).in(SecurityScheme.In.HEADER).description("Authentification Basic").name("basicAuth")));
+    openapi.components(
+        new Components()
+            .addSecuritySchemes(
+                SCHEMEBASIC,
+                new SecurityScheme()
+                    .type(SecurityScheme.Type.HTTP)
+                    .scheme(SCHEMEBASIC)
+                    .in(SecurityScheme.In.HEADER)
+                    .description("Authentification Basic")
+                    .name("basicAuth")));
     return openapi;
   }
 
-  @ConditionalOnProperty(name = "fr.insee.sugoi.security.bearer-authentication-enabled", havingValue = "true", matchIfMissing = false)
+  @ConditionalOnProperty(
+      name = "fr.insee.sugoi.security.bearer-authentication-enabled",
+      havingValue = "true",
+      matchIfMissing = false)
   @Bean
   public OperationCustomizer addToken() {
     return (operation, handlerMethod) -> {
@@ -88,7 +115,10 @@ public class SpringDocConfiguration {
     };
   }
 
-  @ConditionalOnProperty(name = "fr.insee.sugoi.security.basic-authentication-enabled", havingValue = "true", matchIfMissing = false)
+  @ConditionalOnProperty(
+      name = "fr.insee.sugoi.security.basic-authentication-enabled",
+      havingValue = "true",
+      matchIfMissing = false)
   @Bean
   public OperationCustomizer addBasic() {
     return (operation, handlerMethod) -> {
@@ -113,9 +143,17 @@ public class SpringDocConfiguration {
     if (true) {
       contact = contact.email(contactEmail).name(contactEmail);
     }
-    final OpenAPI openapi = new OpenAPI().info(new Info().title("Swagger SUGOI").description("API de sugoi")
-        .license(new License().name("Apache 2.0").url("http://www.apache.org/licenses/LICENSE-2.0.html"))
-        .contact(contact));
+    final OpenAPI openapi =
+        new OpenAPI()
+            .info(
+                new Info()
+                    .title("Swagger SUGOI")
+                    .description("API de sugoi")
+                    .license(
+                        new License()
+                            .name("Apache 2.0")
+                            .url("http://www.apache.org/licenses/LICENSE-2.0.html"))
+                    .contact(contact));
 
     return openapi;
   }

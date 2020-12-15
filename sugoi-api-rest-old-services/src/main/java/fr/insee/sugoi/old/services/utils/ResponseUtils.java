@@ -11,29 +11,25 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.core.service.impl;
+package fr.insee.sugoi.old.services.utils;
 
-import fr.insee.sugoi.core.realm.RealmProvider;
-import fr.insee.sugoi.core.service.ConfigService;
+import fr.insee.sugoi.converter.ouganext.Profil;
 import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.UserStorage;
+import java.util.ArrayList;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-/** ConfigServiceImpl */
-@Service
-public class ConfigServiceImpl implements ConfigService {
+public class ResponseUtils {
 
-  @Autowired
-  private RealmProvider realmProvider;
-
-  @Override
-  public Realm getRealm(String name) {
-    return realmProvider.load(name);
-  }
-
-  @Override
-  public List<Realm> getRealms() {
-    return realmProvider.findAll();
+  public static List<Profil> convertRealmToProfils(Realm realm) {
+    List<Profil> profils = new ArrayList<>();
+    for (UserStorage userStorage : realm.getUserStorages()) {
+      Profil profil = new Profil();
+      profil.setBrancheOrganisation(realm.getAppSource());
+      profil.setLdapUrl(realm.getUrl());
+      profil.setNomProfil(userStorage.getName());
+      profils.add(profil);
+    }
+    return profils;
   }
 }

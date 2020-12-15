@@ -35,51 +35,81 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Users")
-@RequestMapping(value = { "/v2", "/" })
+@RequestMapping(value = {"/v2", "/"})
 public class UserController {
 
-  @Autowired
-  private UserService userService;
+  @Autowired private UserService userService;
 
-  @Operation(description = "Chercher un utilisateur par idep", operationId = "userSearch", summary = "Chercher un utilisateur par idep")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "search results matching criteria"),
-      @ApiResponse(responseCode = "404", description = "entity not found") })
-  @GetMapping(produces = { MediaType.APPLICATION_XML_VALUE,
-      MediaType.APPLICATION_JSON_VALUE }, value = "/{realm}/users/{username}")
-  public User getUserByUsernameAndDomaine(@PathVariable("username") String id, @PathVariable("realm") String domaine)
-      throws Exception {
+  @Operation(
+      description = "Chercher un utilisateur par idep",
+      operationId = "userSearch",
+      summary = "Chercher un utilisateur par idep")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "search results matching criteria"),
+        @ApiResponse(responseCode = "404", description = "entity not found")
+      })
+  @GetMapping(
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+      value = "/{realm}/users/{username}")
+  public User getUserByUsernameAndDomaine(
+      @PathVariable("username") String id, @PathVariable("realm") String domaine) throws Exception {
     return userService.searchUser(domaine, id);
   }
 
-  @GetMapping(produces = { MediaType.APPLICATION_XML_VALUE,
-      MediaType.APPLICATION_JSON_VALUE }, value = "/{domaine}/users")
-  public PageResult<User> getUsersByDomaine(@RequestParam(name = "identifiant", required = false) String identifiant,
+  @GetMapping(
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+      value = "/{domaine}/users")
+  public PageResult<User> getUsersByDomaine(
+      @RequestParam(name = "identifiant", required = false) String identifiant,
       @RequestParam(name = "nomCommun", required = false) String nomCommun,
       @RequestParam(name = "description", required = false) String description,
       @RequestParam(name = "organisationId", required = false) String organisationId,
-      @PathVariable(name = "domaine") String domaineGestion, @RequestParam(name = "mail", required = false) String mail,
+      @PathVariable(name = "domaine") String domaineGestion,
+      @RequestParam(name = "mail", required = false) String mail,
       @RequestParam(name = "size", defaultValue = "20") int size,
       @RequestParam(name = "start", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "searchCookie", required = false) String searchCookie,
-      @RequestParam(name = "typeRecherche", defaultValue = "et", required = true) String typeRecherche,
+      @RequestParam(name = "typeRecherche", defaultValue = "et", required = true)
+          String typeRecherche,
       @RequestParam(name = "habilitation", required = false) List<String> habilitations,
       @RequestParam(name = "application", required = false) String application,
       @RequestParam(name = "role", required = false) String role,
       @RequestParam(name = "rolePropriete", required = false) String rolePropriete,
-      @RequestParam(name = "body", defaultValue = "false", required = false) boolean resultatsDansBody,
-      @RequestParam(name = "idOnly", defaultValue = "false", required = false) boolean identifiantsSeuls,
+      @RequestParam(name = "body", defaultValue = "false", required = false)
+          boolean resultatsDansBody,
+      @RequestParam(name = "idOnly", defaultValue = "false", required = false)
+          boolean identifiantsSeuls,
       @RequestParam(name = "certificat", required = false) String certificat) {
 
-    PageResult<User> users = userService.searchUsers(identifiant, nomCommun, description, organisationId,
-        domaineGestion, mail, searchCookie, size, offset, typeRecherche, habilitations, application, role,
-        rolePropriete, certificat);
+    PageResult<User> users =
+        userService.searchUsers(
+            identifiant,
+            nomCommun,
+            description,
+            organisationId,
+            domaineGestion,
+            mail,
+            searchCookie,
+            size,
+            offset,
+            typeRecherche,
+            habilitations,
+            application,
+            role,
+            rolePropriete,
+            certificat);
     return users;
   }
 
-  @PostMapping(path = { "/{realm}/users", "/{realm}/{storage}/users" }, consumes = {
-      MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
-  public ResponseEntity<User> createUser(@PathVariable(name = "realm") String realm,
-      @PathVariable(name = "storage", required = false) String storage, User user) {
+  @PostMapping(
+      path = {"/{realm}/users", "/{realm}/{storage}/users"},
+      consumes = {MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  public ResponseEntity<User> createUser(
+      @PathVariable(name = "realm") String realm,
+      @PathVariable(name = "storage", required = false) String storage,
+      User user) {
     User createdUser;
     try {
       createdUser = userService.create(realm, storage, user);

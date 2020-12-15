@@ -1,5 +1,5 @@
 package fr.insee.sugoi.services.controller;
 
-public class ProfilController {
+public class HabilitationController {
     
 }
