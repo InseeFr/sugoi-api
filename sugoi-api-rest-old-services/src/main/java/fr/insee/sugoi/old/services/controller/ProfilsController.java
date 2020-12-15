@@ -32,16 +32,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/profils")
 public class ProfilsController {
 
-  @Autowired
-  private ConfigService configService;
+  @Autowired private ConfigService configService;
 
-  @GetMapping(value = "/", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+  @GetMapping(
+      value = "/",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
   public ResponseEntity<?> getProfils() {
     List<Realm> realms = configService.getRealms();
     Profils profils = new Profils();
-    profils.getListe().addAll(realms.stream().map(realm -> ResponseUtils.convertRealmToProfils(realm))
-        .flatMap(List::stream).collect(Collectors.toList()));
+    profils
+        .getListe()
+        .addAll(
+            realms.stream()
+                .map(realm -> ResponseUtils.convertRealmToProfils(realm))
+                .flatMap(List::stream)
+                .collect(Collectors.toList()));
     return new ResponseEntity<>(profils, HttpStatus.OK);
   }
 }

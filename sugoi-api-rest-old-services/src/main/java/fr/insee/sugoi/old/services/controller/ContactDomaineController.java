@@ -35,46 +35,54 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "V1 - Gestion des contacts")
 public class ContactDomaineController {
 
-        // @Autowired
-        // private UserService userService;
+  // @Autowired
+  // private UserService userService;
 
-        // @Autowired
-        // private OuganextSugoiMapper ouganextSugoiMapper;
+  // @Autowired
+  // private OuganextSugoiMapper ouganextSugoiMapper;
 
-        @PutMapping(value = "/{domaine}/contact/{id}", consumes = { MediaType.APPLICATION_XML_VALUE,
-                        MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
-                                        MediaType.APPLICATION_JSON_VALUE })
-        @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-        public ResponseEntity<?> createOrModifyContact(Contact contact, @PathVariable("id") String identifiant,
-                        @PathVariable("domaine") String domaine, @RequestParam("creation") boolean creation) {
-                // User user = ouganextSugoiMapper.serializeToSugoi(contact, User.class);
-                return null;
-        }
+  @PutMapping(
+      value = "/{domaine}/contact/{id}",
+      consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  public ResponseEntity<?> createOrModifyContact(
+      Contact contact,
+      @PathVariable("id") String identifiant,
+      @PathVariable("domaine") String domaine,
+      @RequestParam("creation") boolean creation) {
+    // User user = ouganextSugoiMapper.serializeToSugoi(contact, User.class);
+    return null;
+  }
 
-        @GetMapping(value = "/{domaine}/contact/{id}", produces = { MediaType.APPLICATION_XML_VALUE,
-                        MediaType.APPLICATION_JSON_VALUE })
-        @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
-        public ResponseEntity<?> getContactDomaine(@PathVariable("id") String identifiant,
-                        @PathVariable("domaine") String domaine) {
-                return null;
-        }
+  @GetMapping(
+      value = "/{domaine}/contact/{id}",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
+  public ResponseEntity<?> getContactDomaine(
+      @PathVariable("id") String identifiant, @PathVariable("domaine") String domaine) {
+    return null;
+  }
 
-        @DeleteMapping(value = "/{domaine}/contact/{id}", produces = { MediaType.APPLICATION_XML_VALUE,
-                        MediaType.APPLICATION_JSON_VALUE })
-        @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-        public ResponseEntity<?> deleteContact(@PathVariable("id") String identifiant,
-                        @PathVariable("domaine") String domaine) {
-                return null;
-        }
+  @DeleteMapping(
+      value = "/{domaine}/contact/{id}",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  public ResponseEntity<?> deleteContact(
+      @PathVariable("id") String identifiant, @PathVariable("domaine") String domaine) {
+    return null;
+  }
 
-        @PostMapping(value = "/{domaine}/contact/{id}/login", consumes = { MediaType.APPLICATION_XML_VALUE,
-                        MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
-                                        MediaType.APPLICATION_JSON_VALUE })
-        @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-        public ResponseEntity<?> envoiLogin(@PathVariable("id") String identifiant,
-                        @PathVariable("domaine") String domaine,
-                        @RequestParam("modeEnvoi") List<String> modeEnvoiStrings,
-                        @RequestBody InfoFormattage infoEnvoi) {
-                return null;
-        }
+  @PostMapping(
+      value = "/{domaine}/contact/{id}/login",
+      consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  public ResponseEntity<?> envoiLogin(
+      @PathVariable("id") String identifiant,
+      @PathVariable("domaine") String domaine,
+      @RequestParam("modeEnvoi") List<String> modeEnvoiStrings,
+      @RequestBody InfoFormattage infoEnvoi) {
+    return null;
+  }
 }

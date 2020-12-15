@@ -41,8 +41,13 @@ public class AuthorizeMethodDecider {
     if (enable) {
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       return authentication.getAuthorities().stream()
-          .map(authority -> extractRole(authority.getAuthority(), regexpConsult)).filter(authority -> authority != null)
-          .collect(Collectors.toList()).size() > 0 || isAtLeastGestionnaire(realm, userStorage) || isAdmin();
+                  .map(authority -> extractRole(authority.getAuthority(), regexpConsult))
+                  .filter(authority -> authority != null)
+                  .collect(Collectors.toList())
+                  .size()
+              > 0
+          || isAtLeastGestionnaire(realm, userStorage)
+          || isAdmin();
     }
     return true;
   }
@@ -51,8 +56,12 @@ public class AuthorizeMethodDecider {
     if (enable) {
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       return authentication.getAuthorities().stream()
-          .map(authority -> extractRole(authority.getAuthority(), regexpGest)).filter(authority -> authority != null)
-          .collect(Collectors.toList()).size() > 0 || isAdmin();
+                  .map(authority -> extractRole(authority.getAuthority(), regexpGest))
+                  .filter(authority -> authority != null)
+                  .collect(Collectors.toList())
+                  .size()
+              > 0
+          || isAdmin();
     }
     return true;
   }
@@ -61,8 +70,11 @@ public class AuthorizeMethodDecider {
     if (enable) {
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       return authentication.getAuthorities().stream()
-          .map(authority -> extractRole(authority.getAuthority(), regexpAdmin)).filter(authority -> authority != null)
-          .collect(Collectors.toList()).size() > 0;
+              .map(authority -> extractRole(authority.getAuthority(), regexpAdmin))
+              .filter(authority -> authority != null)
+              .collect(Collectors.toList())
+              .size()
+          > 0;
     }
     return true;
   }

@@ -33,46 +33,57 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "V1- Gestion descontacts")
 public class ContactsDomaineController {
 
-        @PostMapping(value = "/{domaine}/contacts", consumes = { MediaType.APPLICATION_XML_VALUE,
-                        MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
-                                        MediaType.APPLICATION_JSON_VALUE })
-        @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-        public ResponseEntity<?> createContactIdsentifiant(@PathVariable("domaine") String domaine,
-                        @RequestHeader("Slug") String slug, @RequestBody Contact contact) {
-                return null;
-        }
+  @PostMapping(
+      value = "/{domaine}/contacts",
+      consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  public ResponseEntity<?> createContactIdsentifiant(
+      @PathVariable("domaine") String domaine,
+      @RequestHeader("Slug") String slug,
+      @RequestBody Contact contact) {
+    return null;
+  }
 
-        @GetMapping(value = "/{domaine}/contacts", produces = { MediaType.APPLICATION_XML_VALUE,
-                        MediaType.APPLICATION_JSON_VALUE })
-        @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
-        public ResponseEntity<?> getContacts(@PathVariable("domaine") String domaine,
-                        @RequestParam("identifiant") String identifiant, @RequestParam("nomCommun") String nomCommun,
-                        @RequestParam("description") String description,
-                        @RequestParam("organisationId") String organisationId, @RequestParam("mail") String mail,
-                        @RequestParam(name = "size", defaultValue = "20") int size, @RequestParam("start") int offset,
-                        @RequestParam("searchCookie") String searchCookie,
-                        @RequestParam(name = "typeRecherche", defaultValue = "et") String typeRecherche,
-                        @RequestParam("habilitation") List<String> habilitations,
-                        @RequestParam("application") String application, @RequestParam("role") String role,
-                        @RequestParam("rolePropriete") String rolePropriete,
-                        @RequestParam(name = "body", defaultValue = "false") boolean resultatsDansBody,
-                        @RequestParam(name = "idOnly", defaultValue = "false") boolean identifiantsSeuls,
-                        @RequestParam("certificat") String certificat) {
-                return null;
-        }
+  @GetMapping(
+      value = "/{domaine}/contacts",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
+  public ResponseEntity<?> getContacts(
+      @PathVariable("domaine") String domaine,
+      @RequestParam("identifiant") String identifiant,
+      @RequestParam("nomCommun") String nomCommun,
+      @RequestParam("description") String description,
+      @RequestParam("organisationId") String organisationId,
+      @RequestParam("mail") String mail,
+      @RequestParam(name = "size", defaultValue = "20") int size,
+      @RequestParam("start") int offset,
+      @RequestParam("searchCookie") String searchCookie,
+      @RequestParam(name = "typeRecherche", defaultValue = "et") String typeRecherche,
+      @RequestParam("habilitation") List<String> habilitations,
+      @RequestParam("application") String application,
+      @RequestParam("role") String role,
+      @RequestParam("rolePropriete") String rolePropriete,
+      @RequestParam(name = "body", defaultValue = "false") boolean resultatsDansBody,
+      @RequestParam(name = "idOnly", defaultValue = "false") boolean identifiantsSeuls,
+      @RequestParam("certificat") String certificat) {
+    return null;
+  }
 
-        @GetMapping(value = "/{domaine}/contacts/certificat/{id}", produces = { MediaType.APPLICATION_XML_VALUE,
-                        MediaType.APPLICATION_JSON_VALUE })
-        @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
-        public ResponseEntity<?> getAPartirDeIdCertificat(@PathVariable("domaine") String domaine,
-                        @PathVariable("id") String id) {
-                return null;
-        }
+  @GetMapping(
+      value = "/{domaine}/contacts/certificat/{id}",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
+  public ResponseEntity<?> getAPartirDeIdCertificat(
+      @PathVariable("domaine") String domaine, @PathVariable("id") String id) {
+    return null;
+  }
 
-        @GetMapping(value = "/{domaine}/contacts/size", produces = { MediaType.APPLICATION_XML_VALUE,
-                        MediaType.APPLICATION_JSON_VALUE })
-        @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
-        public ResponseEntity<?> getContactsSize(@PathVariable("domaine") String domaine) {
-                return null;
-        }
+  @GetMapping(
+      value = "/{domaine}/contacts/size",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
+  public ResponseEntity<?> getContactsSize(@PathVariable("domaine") String domaine) {
+    return null;
+  }
 }

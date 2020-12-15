@@ -28,12 +28,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1")
 public class GroupeController {
 
-    @GetMapping(value = "/{domaine}/contacts/groupe/{application}/{groupe}", produces = {
-            MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
-    @Operation(deprecated = true, description = "", tags = "Recherche de contacts")
-    @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
-    public ResponseEntity<?> getContactByDomaineAndGroups(@PathVariable("domaine") String domaine,
-            @PathVariable("application") String application, @PathVariable("groupe") String groupe) {
-        return null;
-    }
+  @GetMapping(
+      value = "/{domaine}/contacts/groupe/{application}/{groupe}",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @Operation(deprecated = true, description = "", tags = "Recherche de contacts")
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
+  public ResponseEntity<?> getContactByDomaineAndGroups(
+      @PathVariable("domaine") String domaine,
+      @PathVariable("application") String application,
+      @PathVariable("groupe") String groupe) {
+    return null;
+  }
 }

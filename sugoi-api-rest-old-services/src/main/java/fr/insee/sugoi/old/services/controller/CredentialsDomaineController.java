@@ -28,10 +28,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1")
 public class CredentialsDomaineController {
 
-    @PostMapping(value = "/{domaine}/credentials/{id}", consumes = { MediaType.TEXT_PLAIN_VALUE })
-    @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-    public ResponseEntity<?> authentifierContact(@PathVariable("domaine") String domaine, @PathVariable("id") String id,
-            @RequestBody String motDePasse) {
-        return null;
-    }
+  @PostMapping(
+      value = "/{domaine}/credentials/{id}",
+      consumes = {MediaType.TEXT_PLAIN_VALUE})
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  public ResponseEntity<?> authentifierContact(
+      @PathVariable("domaine") String domaine,
+      @PathVariable("id") String id,
+      @RequestBody String motDePasse) {
+    return null;
+  }
 }

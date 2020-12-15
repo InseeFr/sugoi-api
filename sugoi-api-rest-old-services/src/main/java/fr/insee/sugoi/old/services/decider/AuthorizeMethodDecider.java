@@ -24,56 +24,67 @@ import org.springframework.stereotype.Component;
 @Component("OldAuthorizeMethodDecider")
 public class AuthorizeMethodDecider {
 
-    @Value("${fr.insee.sugoi.api.old.regexp.role.consultant:}")
-    private String regexpConsult;
+  @Value("${fr.insee.sugoi.api.old.regexp.role.consultant:}")
+  private String regexpConsult;
 
-    @Value("${fr.insee.sugoi.api.old.regexp.role.gestionnaire:}")
-    private String regexpGest;
+  @Value("${fr.insee.sugoi.api.old.regexp.role.gestionnaire:}")
+  private String regexpGest;
 
-    @Value("${fr.insee.sugoi.api.old.regexp.role.admin:}")
-    private String regexpAdmin;
+  @Value("${fr.insee.sugoi.api.old.regexp.role.admin:}")
+  private String regexpAdmin;
 
-    @Value("${fr.insee.sugoi.api.old.enable.preauthorize:false}")
-    private boolean enable;
+  @Value("${fr.insee.sugoi.api.old.enable.preauthorize:false}")
+  private boolean enable;
 
-    public boolean isAtLeastConsultant(String domaine) {
-        System.out.println(enable);
-        if (enable) {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            return authentication.getAuthorities().stream()
-                    .map(authority -> extractRole(authority.getAuthority(), regexpConsult))
-                    .filter(authority -> authority != null).collect(Collectors.toList()).size() > 0
-                    || isAtLeastGestionnaire(domaine) || isAdmin();
-        }
-        return true;
+  public boolean isAtLeastConsultant(String domaine) {
+    System.out.println(enable);
+    if (enable) {
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      return authentication.getAuthorities().stream()
+                  .map(authority -> extractRole(authority.getAuthority(), regexpConsult))
+                  .filter(authority -> authority != null)
+                  .collect(Collectors.toList())
+                  .size()
+              > 0
+          || isAtLeastGestionnaire(domaine)
+          || isAdmin();
     }
+    return true;
+  }
 
-    public boolean isAtLeastGestionnaire(String domaine) {
-        if (enable) {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            return authentication.getAuthorities().stream()
-                    .map(authority -> extractRole(authority.getAuthority(), regexpGest))
-                    .filter(authority -> authority != null).collect(Collectors.toList()).size() > 0 || isAdmin();
-        }
-        return true;
+  public boolean isAtLeastGestionnaire(String domaine) {
+    if (enable) {
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      return authentication.getAuthorities().stream()
+                  .map(authority -> extractRole(authority.getAuthority(), regexpGest))
+                  .filter(authority -> authority != null)
+                  .collect(Collectors.toList())
+                  .size()
+              > 0
+          || isAdmin();
     }
+    return true;
+  }
 
-    public boolean isAdmin() {
-        if (enable) {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            return authentication.getAuthorities().stream()
-                    .map(authority -> extractRole(authority.getAuthority(), regexpAdmin))
-                    .filter(authority -> authority != null).collect(Collectors.toList()).size() > 0;
-        }
-        return true;
+  public boolean isAdmin() {
+    if (enable) {
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      return authentication.getAuthorities().stream()
+              .map(authority -> extractRole(authority.getAuthority(), regexpAdmin))
+              .filter(authority -> authority != null)
+              .collect(Collectors.toList())
+              .size()
+          > 0;
     }
+    return true;
+  }
 
-    private String extractRole(String authority, String regexp) {
-        Pattern pattern = Pattern.compile(regexp);
-        Matcher matcher = pattern.matcher(authority);
-        if (matcher.matches()) {
-            return authority;
-        }
-        return null;
+  private String extractRole(String authority, String regexp) {
+    Pattern pattern = Pattern.compile(regexp);
+    Matcher matcher = pattern.matcher(authority);
+    if (matcher.matches()) {
+      return authority;
     }
+    return null;
+  }
 }

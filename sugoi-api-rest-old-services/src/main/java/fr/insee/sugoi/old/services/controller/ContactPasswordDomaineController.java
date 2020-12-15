@@ -32,36 +32,42 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "V1 - Gestion du mot de passe")
 public class ContactPasswordDomaineController {
 
-        @PostMapping(value = "/{domaine}/contact/{id}/password", consumes = { MediaType.APPLICATION_XML_VALUE,
-                        MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
-                                        MediaType.APPLICATION_JSON_VALUE })
-        @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-        public ResponseEntity<?> reinitPassword(@PathVariable("id") String identifiant,
-                        @PathVariable("domaine") String domaine,
-                        @RequestParam("modeEnvoi") List<String> modeEnvoisString,
-                        @RequestBody PasswordChangeRequest pcr) {
-                return null;
-        }
+  @PostMapping(
+      value = "/{domaine}/contact/{id}/password",
+      consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  public ResponseEntity<?> reinitPassword(
+      @PathVariable("id") String identifiant,
+      @PathVariable("domaine") String domaine,
+      @RequestParam("modeEnvoi") List<String> modeEnvoisString,
+      @RequestBody PasswordChangeRequest pcr) {
+    return null;
+  }
 
-        @PostMapping(value = "/{domaine}/contact/{id}/password/first", consumes = { MediaType.APPLICATION_XML_VALUE,
-                        MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
-                                        MediaType.APPLICATION_JSON_VALUE })
-        @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-        public ResponseEntity<?> initPassword(@PathVariable("id") String identifiant,
-                        @PathVariable("domaine") String domaine,
-                        @RequestParam("modeEnvoi") List<String> modeEnvoisString,
-                        @RequestBody PasswordChangeRequest pcr) {
-                return null;
-        }
+  @PostMapping(
+      value = "/{domaine}/contact/{id}/password/first",
+      consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  public ResponseEntity<?> initPassword(
+      @PathVariable("id") String identifiant,
+      @PathVariable("domaine") String domaine,
+      @RequestParam("modeEnvoi") List<String> modeEnvoisString,
+      @RequestBody PasswordChangeRequest pcr) {
+    return null;
+  }
 
-        @PutMapping(value = "/{domaine}/contact/{id}/password", consumes = { MediaType.APPLICATION_XML_VALUE,
-                        MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
-                                        MediaType.APPLICATION_JSON_VALUE })
-        @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-        public ResponseEntity<?> changePassword(@PathVariable("id") String identifiant,
-                        @PathVariable("domaine") String domaine,
-                        @RequestParam("modeEnvoi") List<String> modeEnvoisString,
-                        @RequestBody PasswordChangeRequest pcr) {
-                return null;
-        }
+  @PutMapping(
+      value = "/{domaine}/contact/{id}/password",
+      consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  public ResponseEntity<?> changePassword(
+      @PathVariable("id") String identifiant,
+      @PathVariable("domaine") String domaine,
+      @RequestParam("modeEnvoi") List<String> modeEnvoisString,
+      @RequestBody PasswordChangeRequest pcr) {
+    return null;
+  }
 }

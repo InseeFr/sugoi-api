@@ -28,29 +28,36 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1")
 @Tag(name = "V1 - Gestion des groupes")
 public class ContactGroupeDomaineController {
-        @GetMapping(value = "/{domaine}/contact/{id}/groupes", produces = { MediaType.APPLICATION_XML_VALUE,
-                        MediaType.APPLICATION_JSON_VALUE })
-        @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
-        public ResponseEntity<?> getGroups(@PathVariable("id") String identifiant,
-                        @PathVariable("domaine") String domaine) {
-                return null;
-        }
+  @GetMapping(
+      value = "/{domaine}/contact/{id}/groupes",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
+  public ResponseEntity<?> getGroups(
+      @PathVariable("id") String identifiant, @PathVariable("domaine") String domaine) {
+    return null;
+  }
 
-        @PutMapping(value = "/{domaine}/contact/{id}/groupes/{nomappli}/{nomgroupe}", produces = {
-                        MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
-        @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-        public ResponseEntity<?> addToGroup(@PathVariable("id") String identifiant,
-                        @PathVariable("domaine") String domaine, @PathVariable("nomappli") String nomAppli,
-                        @PathVariable("nomgroupe") String nomGroupe) {
-                return null;
-        }
+  @PutMapping(
+      value = "/{domaine}/contact/{id}/groupes/{nomappli}/{nomgroupe}",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  public ResponseEntity<?> addToGroup(
+      @PathVariable("id") String identifiant,
+      @PathVariable("domaine") String domaine,
+      @PathVariable("nomappli") String nomAppli,
+      @PathVariable("nomgroupe") String nomGroupe) {
+    return null;
+  }
 
-        @DeleteMapping(value = "{domaine}/contact/{id}/groupes/{nomappli}/{nomgroupe}", produces = {
-                        MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
-        @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-        public ResponseEntity<?> removeFromGroups(@PathVariable("id") String identifiant,
-                        @PathVariable("domaine") String domaine, @PathVariable("nomappli") String nomAppli,
-                        @PathVariable("nomgroupe") String nomGroupe) {
-                return null;
-        }
+  @DeleteMapping(
+      value = "{domaine}/contact/{id}/groupes/{nomappli}/{nomgroupe}",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  public ResponseEntity<?> removeFromGroups(
+      @PathVariable("id") String identifiant,
+      @PathVariable("domaine") String domaine,
+      @PathVariable("nomappli") String nomAppli,
+      @PathVariable("nomgroupe") String nomGroupe) {
+    return null;
+  }
 }

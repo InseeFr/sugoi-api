@@ -34,10 +34,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/profil")
 public class ProfilController {
 
-  @Autowired
-  private ConfigService configService;
+  @Autowired private ConfigService configService;
 
-  @GetMapping(value = "/{nom}", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+  @GetMapping(
+      value = "/{nom}",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
   public ResponseEntity<?> getProfil(@PathVariable("nom") String nom) {
     Realm realm = configService.getRealm(nom);
@@ -45,15 +46,18 @@ public class ProfilController {
     return new ResponseEntity<>(profil, HttpStatus.OK);
   }
 
-  @PutMapping(value = "/", consumes = { MediaType.APPLICATION_XML_VALUE,
-      MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
-          MediaType.APPLICATION_JSON_VALUE })
+  @PutMapping(
+      value = "/",
+      consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
   public ResponseEntity<?> createOrModifyProfil(@RequestBody Profil profil) {
     return null;
   }
 
-  @DeleteMapping(value = "/nom", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+  @DeleteMapping(
+      value = "/nom",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
   public ResponseEntity<?> deleteProfil(@PathVariable("nom") String nom) {
     return null;

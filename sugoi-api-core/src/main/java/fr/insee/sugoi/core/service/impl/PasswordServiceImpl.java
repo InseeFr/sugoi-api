@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.core.service.impl;
 
+import fr.insee.sugoi.core.service.PasswordService;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,8 +25,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import fr.insee.sugoi.core.service.PasswordService;
-
 @Service
 public class PasswordServiceImpl implements PasswordService {
 
@@ -33,20 +32,26 @@ public class PasswordServiceImpl implements PasswordService {
   private static final int NOMBRE_CARACTERE_NON_SPECIAUX_POUR_INITIALISATION = 2;
   // les miniscules sauf le i, le l et le o
   private static final String MINUSCULES = "abcdefghjkmnpqrstuvwxyz";
-  private static final Character[] MINUSCULES_ARRAY = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p',
-      'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+  private static final Character[] MINUSCULES_ARRAY = {
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v',
+    'w', 'x', 'y', 'z'
+  };
   // les majuscules sauf le I, le O et le Q
   private static final String MAJUSCULES = "ABCDEFGHJKLMNPRSTUVWXYZ";
-  private static final Character[] MAJUSCULES_ARRAY = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N',
-      'P', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+  private static final Character[] MAJUSCULES_ARRAY = {
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'U', 'V',
+    'W', 'X', 'Y', 'Z'
+  };
   // les chiffres sauf le 1 et le 0
   private static final String CHIFFRES = "23456789";
-  private static final Character[] CHIFFRES_ARRAY = { '2', '3', '4', '5', '6', '7', '8', '9' };
+  private static final Character[] CHIFFRES_ARRAY = {'2', '3', '4', '5', '6', '7', '8', '9'};
   // point d'exclamation, dollar, pourcent, esperluette, parentheses, asterisque,
   // plus, point
   // d'interrogation et arobase
   private static final String SPECIAUX = "!$%&()*+?@";
-  private static final Character[] SPECIAUX_ARRAY = { '!', '$', '%', '&', '(', ')', '*', '+', '?', '@' };
+  private static final Character[] SPECIAUX_ARRAY = {
+    '!', '$', '%', '&', '(', ')', '*', '+', '?', '@'
+  };
   private static final List<Character> SPECIAUX_LIST = Arrays.asList(SPECIAUX_ARRAY);
   private static final int NB_ITERATION_MAX = 20;
 
@@ -56,7 +61,7 @@ public class PasswordServiceImpl implements PasswordService {
    * Génère un certain nombre de mot passe selon la taille souhaitée.
    *
    * @param passwordLength la taille des mot de passe à générer
-   * @param nbPassword     le nombre à générer
+   * @param nbPassword le nombre à générer
    * @return la liste des mots de passe demandée.
    */
   public List<String> generatePasswords(Integer passwordLength, Integer nbPassword) {
@@ -124,7 +129,7 @@ public class PasswordServiceImpl implements PasswordService {
     // pour taille=8 et nbmax=20, cela se produit avec 1 chance sur
     // 1.099.511.627.776
     while ((SPECIAUX_LIST.contains(caracteresDuPassword.get(0))
-        || SPECIAUX_LIST.contains(caracteresDuPassword.get(caracteresDuPassword.size() - 1)))
+            || SPECIAUX_LIST.contains(caracteresDuPassword.get(caracteresDuPassword.size() - 1)))
         && nbEssai < NB_ITERATION_MAX) {
       Collections.shuffle(caracteresDuPassword);
       nbEssai++;
@@ -137,11 +142,10 @@ public class PasswordServiceImpl implements PasswordService {
   }
 
   /**
-   * Vérifie que le mot de passe passé en paramètre respecte bien la politique de
-   * mot de passe à usage unique de l'Insee. Au minimum à 8, la longueur minimale
-   * à tester peut être choisie.
+   * Vérifie que le mot de passe passé en paramètre respecte bien la politique de mot de passe à
+   * usage unique de l'Insee. Au minimum à 8, la longueur minimale à tester peut être choisie.
    *
-   * @param motDePasse       à tester
+   * @param motDePasse à tester
    * @param longueurMinimale du test
    * @return vrai si la taille est bonne et la politique respectée
    */
@@ -153,10 +157,24 @@ public class PasswordServiceImpl implements PasswordService {
       LOG.debug("longueur du mdp inférieure à la longueur minimale ou mot de passe null");
       return false;
     }
-    if (verifierExpReg(motDePasse,
-        "[" + MINUSCULES + MAJUSCULES + CHIFFRES + "]([" + MINUSCULES + MAJUSCULES + CHIFFRES + SPECIAUX + "]{"
-            + (motDePasse.length() - NOMBRE_CARACTERE_NON_SPECIAUX_POUR_INITIALISATION) + ",})[" + MINUSCULES
-            + MAJUSCULES + CHIFFRES + "]")
+    if (verifierExpReg(
+            motDePasse,
+            "["
+                + MINUSCULES
+                + MAJUSCULES
+                + CHIFFRES
+                + "](["
+                + MINUSCULES
+                + MAJUSCULES
+                + CHIFFRES
+                + SPECIAUX
+                + "]{"
+                + (motDePasse.length() - NOMBRE_CARACTERE_NON_SPECIAUX_POUR_INITIALISATION)
+                + ",})["
+                + MINUSCULES
+                + MAJUSCULES
+                + CHIFFRES
+                + "]")
         && (countMatches(motDePasse, "[" + SPECIAUX + "]") == 1)) {
       int compteur = 0;
 
@@ -170,11 +188,11 @@ public class PasswordServiceImpl implements PasswordService {
   }
 
   /**
-   * Vérifie que le mot de passe passé en paramètre respecte bien la politique de
-   * mot de passe de l'Insee lors d'un changement de mot de passe. Au minimum à 8,
-   * la longueur minimale à tester peut être choisie
+   * Vérifie que le mot de passe passé en paramètre respecte bien la politique de mot de passe de
+   * l'Insee lors d'un changement de mot de passe. Au minimum à 8, la longueur minimale à tester
+   * peut être choisie
    *
-   * @param motDePasse       à tester
+   * @param motDePasse à tester
    * @param longueurMinimale à vérifier
    * @return vrai si la longueur est suffisant et que la politique est respectée
    */
@@ -195,11 +213,11 @@ public class PasswordServiceImpl implements PasswordService {
   }
 
   /**
-   * Retourne true si le paramètre est non null et s'il est compatible avec
-   * l'expression régulière fournie.
+   * Retourne true si le paramètre est non null et s'il est compatible avec l'expression régulière
+   * fournie.
    *
    * @param valeurTest : valeur à controler
-   * @param expReg     : expression régulière pour le contrôle
+   * @param expReg : expression régulière pour le contrôle
    * @return true si v respecte l'expression régulière expReg
    */
   public static boolean verifierExpReg(String valeurTest, String expReg) {
@@ -214,12 +232,11 @@ public class PasswordServiceImpl implements PasswordService {
   }
 
   /**
-   * Retourne le nombre de fois où l'expression régulière expReg est retrouvée
-   * dans la chaîne v.<br>
+   * Retourne le nombre de fois où l'expression régulière expReg est retrouvée dans la chaîne v.<br>
    * Retourne 0 si v est null.
    *
    * @param valeurTest : valeur à contrôler
-   * @param expReg     : expression régulière pour le contrôle
+   * @param expReg : expression régulière pour le contrôle
    * @return nombre de fois où expReg est retrouvée dans v.
    */
   public static int countMatches(String valeurTest, String expReg) {

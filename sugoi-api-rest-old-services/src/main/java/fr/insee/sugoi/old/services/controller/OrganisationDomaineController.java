@@ -30,31 +30,36 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1")
 public class OrganisationDomaineController {
 
-        @PutMapping(value = "/{domaine}/organisation/{id}", consumes = { MediaType.APPLICATION_XML_VALUE,
-                        MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
-                                        MediaType.APPLICATION_JSON_VALUE })
-        @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-        public ResponseEntity<?> createOrModifyOrganisation(@PathVariable("domaine") String domaine,
-                        @PathVariable("id") String id, @RequestParam("creation") boolean creation,
-                        @RequestBody Organisation organisation) {
-                // TODO: process PUT request
+  @PutMapping(
+      value = "/{domaine}/organisation/{id}",
+      consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  public ResponseEntity<?> createOrModifyOrganisation(
+      @PathVariable("domaine") String domaine,
+      @PathVariable("id") String id,
+      @RequestParam("creation") boolean creation,
+      @RequestBody Organisation organisation) {
+    // TODO: process PUT request
 
-                return null;
-        }
+    return null;
+  }
 
-        @GetMapping(value = "/{domaine}/organisation/{id}", produces = { MediaType.APPLICATION_XML_VALUE,
-                        MediaType.APPLICATION_JSON_VALUE })
-        @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
-        public ResponseEntity<?> getOrganisationDomaine(@PathVariable("domaine") String domaine,
-                        @PathVariable("id") String id) {
-                return null;
-        }
+  @GetMapping(
+      value = "/{domaine}/organisation/{id}",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
+  public ResponseEntity<?> getOrganisationDomaine(
+      @PathVariable("domaine") String domaine, @PathVariable("id") String id) {
+    return null;
+  }
 
-        @DeleteMapping(value = "/{domaine}/organisation/{id}", produces = { MediaType.APPLICATION_XML_VALUE,
-                        MediaType.APPLICATION_JSON_VALUE })
-        @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-        public ResponseEntity<?> deleteOrganisation(@PathVariable("domaine") String domaine,
-                        @PathVariable("id") String id) {
-                return null;
-        }
+  @DeleteMapping(
+      value = "/{domaine}/organisation/{id}",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  public ResponseEntity<?> deleteOrganisation(
+      @PathVariable("domaine") String domaine, @PathVariable("id") String id) {
+    return null;
+  }
 }

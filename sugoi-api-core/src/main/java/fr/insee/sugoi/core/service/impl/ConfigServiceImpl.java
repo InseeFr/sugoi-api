@@ -24,8 +24,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ConfigServiceImpl implements ConfigService {
 
-  @Autowired
-  private RealmProvider realmProvider;
+  @Autowired private RealmProvider realmProvider;
 
   @Override
   public Realm getRealm(String name) {
