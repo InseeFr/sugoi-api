@@ -41,7 +41,7 @@ public class LdapWriterStore implements WriterStore {
   @Override
   public void deleteUser(String id) {
     try {
-      DeleteRequest dr = new DeleteRequest("uid=" + id + "," + config.get("user_branch"));
+      DeleteRequest dr = new DeleteRequest("uid=" + id + "," + config.get("user_source"));
       ldapPoolConnection.delete(dr);
     } catch (LDAPException e) {
       throw new RuntimeException("Impossible de supprimer l'utilisateur");
