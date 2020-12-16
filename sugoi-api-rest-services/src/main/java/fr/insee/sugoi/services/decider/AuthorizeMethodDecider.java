@@ -13,78 +13,38 @@
 */
 package fr.insee.sugoi.services.decider;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import fr.insee.sugoi.services.services.PermissionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component("NewAuthorizeMethodDecider")
 public class AuthorizeMethodDecider {
 
-  @Value("${fr.insee.sugoi.api.regexp.role.consultant:}")
-  private String regexpConsult;
-
-  @Value("${fr.insee.sugoi.api.regexp.role.gestionnaire:}")
-  private String regexpGest;
-
-  @Value("${fr.insee.sugoi.api.regexp.role.admin:}")
-  private String regexpAdmin;
-
   @Value("${fr.insee.sugoi.api.enable.preauthorize:false}")
   private boolean enable;
 
-  public boolean isAtLeastConsultant(String realm, String userStorage) {
+  @Autowired PermissionService permissionService;
+
+  public boolean isAtLeastReader(String realm, String userStorage) {
     System.out.println(enable);
     if (enable) {
-      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-      return authentication.getAuthorities().stream()
-                  .map(authority -> extractRole(authority.getAuthority(), regexpConsult))
-                  .filter(authority -> authority != null)
-                  .collect(Collectors.toList())
-                  .size()
-              > 0
-          || isAtLeastGestionnaire(realm, userStorage)
-          || isAdmin();
+      return permissionService.isAtLeastReader(realm, userStorage);
     }
     return true;
   }
 
-  public boolean isAtLeastGestionnaire(String realm, String userStorage) {
+  public boolean isAtLeastWriter(String realm, String userStorage) {
     if (enable) {
-      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-      return authentication.getAuthorities().stream()
-                  .map(authority -> extractRole(authority.getAuthority(), regexpGest))
-                  .filter(authority -> authority != null)
-                  .collect(Collectors.toList())
-                  .size()
-              > 0
-          || isAdmin();
+      return permissionService.isAtLeastWriter(realm, userStorage);
     }
     return true;
   }
 
   public boolean isAdmin() {
     if (enable) {
-      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-      return authentication.getAuthorities().stream()
-              .map(authority -> extractRole(authority.getAuthority(), regexpAdmin))
-              .filter(authority -> authority != null)
-              .collect(Collectors.toList())
-              .size()
-          > 0;
+      permissionService.isAdmin();
     }
     return true;
-  }
-
-  private String extractRole(String authority, String regexp) {
-    Pattern pattern = Pattern.compile(regexp);
-    Matcher matcher = pattern.matcher(authority);
-    if (matcher.matches()) {
-      return authority;
-    }
-    return null;
   }
 }

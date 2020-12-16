@@ -13,93 +13,95 @@
 */
 package fr.insee.sugoi.services.controller;
 
-import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.User;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(name = "Users")
+@Tag(name = "Manage users")
 @RequestMapping(value = {"/v2", "/"})
 public class UserController {
 
   @Autowired private UserService userService;
 
-  @Operation(
-      description = "Chercher un utilisateur par idep",
-      operationId = "userSearch",
-      summary = "Chercher un utilisateur par idep")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "200", description = "search results matching criteria"),
-        @ApiResponse(responseCode = "404", description = "entity not found")
-      })
   @GetMapping(
-      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
-      value = "/{realm}/users/{username}")
-  public User getUserByUsernameAndDomaine(
-      @PathVariable("username") String id, @PathVariable("realm") String domaine) throws Exception {
-    return userService.searchUser(domaine, id);
-  }
-
-  @GetMapping(
-      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
-      value = "/{domaine}/users")
-  public PageResult<User> getUsersByDomaine(
+      path = {"/{realm}/Users", "/{realm}/{storage}/Users"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#userStorage)")
+  public ResponseEntity<?> getUsers(
+      @PathVariable("realm") String realm,
+      @PathVariable(name = "storage", required = false) String userStorage,
       @RequestParam(name = "identifiant", required = false) String identifiant,
       @RequestParam(name = "nomCommun", required = false) String nomCommun,
       @RequestParam(name = "description", required = false) String description,
       @RequestParam(name = "organisationId", required = false) String organisationId,
-      @PathVariable(name = "domaine") String domaineGestion,
-      @RequestParam(name = "mail", required = false) String mail,
       @RequestParam(name = "size", defaultValue = "20") int size,
       @RequestParam(name = "start", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "searchCookie", required = false) String searchCookie,
       @RequestParam(name = "typeRecherche", defaultValue = "et", required = true)
           String typeRecherche,
       @RequestParam(name = "habilitation", required = false) List<String> habilitations,
-      @RequestParam(name = "application", required = false) String application,
-      @RequestParam(name = "role", required = false) String role,
-      @RequestParam(name = "rolePropriete", required = false) String rolePropriete,
-      @RequestParam(name = "body", defaultValue = "false", required = false)
-          boolean resultatsDansBody,
-      @RequestParam(name = "idOnly", defaultValue = "false", required = false)
-          boolean identifiantsSeuls,
-      @RequestParam(name = "certificat", required = false) String certificat) {
+      @RequestParam(name = "application", required = false) String application) {
+    // TODO: process GET request
 
-    PageResult<User> users =
-        userService.searchUsers(
-            identifiant,
-            nomCommun,
-            description,
-            organisationId,
-            domaineGestion,
-            mail,
-            searchCookie,
-            size,
-            offset,
-            typeRecherche,
-            habilitations,
-            application,
-            role,
-            rolePropriete,
-            certificat);
-    return users;
+    return null;
+  }
+
+  @PostMapping(
+      value = {"/{realm}/Users", "/{realm}/{storage}/Users"},
+      consumes = {MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#userStorage)")
+  public ResponseEntity<?> createUsers(
+      @PathVariable("realm") String realm,
+      @PathVariable("storage") String UserStorage,
+      @RequestBody User user) {
+    // TODO: process POST request
+
+    return new ResponseEntity<>(user, HttpStatus.CREATED);
+  }
+
+  @PutMapping(
+      value = {"/{realm}/Users/{id}", "/{realm}/{storage}/Users/{id}"},
+      consumes = {MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#userStorage)")
+  public ResponseEntity<?> updateUsers(
+      @PathVariable("realm") String realm,
+      @PathVariable("storage") String UserStorage,
+      @PathVariable("id") String id,
+      @RequestBody User user) {
+    // TODO: process PUT request
+
+    return new ResponseEntity<>(user, HttpStatus.OK);
+  }
+
+  @DeleteMapping(
+      value = {"/{realm}/Users/{id}", "/{realm}/{storage}/Users/{id}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#userStorage)")
+  public ResponseEntity<String> deleteUsers(
+      @PathVariable("realm") String realm,
+      @PathVariable("storage") String UserStorage,
+      @PathVariable("id") String id) {
+    // TODO: process DELETE request
+
+    return new ResponseEntity<String>(id, HttpStatus.OK);
   }
 
   @PostMapping(
