@@ -14,6 +14,7 @@
 package fr.insee.sugoi.services.services;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,11 +70,50 @@ public class PermissionService {
     return rights;
   }
 
+  public List<String> getRealmNameReader() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    List<String> rights = new ArrayList<>();
+    List<String> readRights =
+        authentication.getAuthorities().stream()
+            .map(authority -> extractRealm(authority.getAuthority(), regexpReader))
+            .filter(authority -> authority != null)
+            .collect(Collectors.toList());
+    rights.addAll(readRights);
+    return rights;
+  }
+
+  public List<String> getRealmNameWriter() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    List<String> rights = new ArrayList<>();
+    List<String> writeRights =
+        authentication.getAuthorities().stream()
+            .map(authority -> extractRealm(authority.getAuthority(), regexpWriter))
+            .filter(authority -> authority != null)
+            .collect(Collectors.toList());
+    rights.addAll(writeRights);
+    return rights;
+  }
+
+  public List<String> getMyRealm() {
+    List<String> rights = getRealmNameReader();
+    rights.addAll(getRealmNameWriter());
+    return new ArrayList<>(new HashSet<>(rights));
+  }
+
   private String extractRole(String authority, String regexp) {
     Pattern pattern = Pattern.compile(regexp);
     Matcher matcher = pattern.matcher(authority);
     if (matcher.matches()) {
       return authority;
+    }
+    return null;
+  }
+
+  private String extractRealm(String authority, String regexp) {
+    Pattern pattern = Pattern.compile(regexp);
+    Matcher matcher = pattern.matcher(authority);
+    if (matcher.matches()) {
+      matcher.group(1);
     }
     return null;
   }

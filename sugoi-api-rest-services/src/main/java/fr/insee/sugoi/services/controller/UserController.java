@@ -42,10 +42,10 @@ public class UserController {
   @GetMapping(
       path = {"/{realm}/Users", "/{realm}/{storage}/Users"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#userStorage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
   public ResponseEntity<?> getUsers(
       @PathVariable("realm") String realm,
-      @PathVariable(name = "storage", required = false) String userStorage,
+      @PathVariable(name = "storage", required = false) String storage,
       @RequestParam(name = "identifiant", required = false) String identifiant,
       @RequestParam(name = "nomCommun", required = false) String nomCommun,
       @RequestParam(name = "description", required = false) String description,
@@ -66,52 +66,11 @@ public class UserController {
       value = {"/{realm}/Users", "/{realm}/{storage}/Users"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#userStorage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
   public ResponseEntity<?> createUsers(
       @PathVariable("realm") String realm,
-      @PathVariable("storage") String UserStorage,
+      @PathVariable("storage") String storage,
       @RequestBody User user) {
-    // TODO: process POST request
-
-    return new ResponseEntity<>(user, HttpStatus.CREATED);
-  }
-
-  @PutMapping(
-      value = {"/{realm}/Users/{id}", "/{realm}/{storage}/Users/{id}"},
-      consumes = {MediaType.APPLICATION_JSON_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#userStorage)")
-  public ResponseEntity<?> updateUsers(
-      @PathVariable("realm") String realm,
-      @PathVariable("storage") String UserStorage,
-      @PathVariable("id") String id,
-      @RequestBody User user) {
-    // TODO: process PUT request
-
-    return new ResponseEntity<>(user, HttpStatus.OK);
-  }
-
-  @DeleteMapping(
-      value = {"/{realm}/Users/{id}", "/{realm}/{storage}/Users/{id}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#userStorage)")
-  public ResponseEntity<String> deleteUsers(
-      @PathVariable("realm") String realm,
-      @PathVariable("storage") String UserStorage,
-      @PathVariable("id") String id) {
-    // TODO: process DELETE request
-
-    return new ResponseEntity<String>(id, HttpStatus.OK);
-  }
-
-  @PostMapping(
-      path = {"/{realm}/users", "/{realm}/{storage}/users"},
-      consumes = {MediaType.APPLICATION_JSON_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  public ResponseEntity<User> createUser(
-      @PathVariable(name = "realm") String realm,
-      @PathVariable(name = "storage", required = false) String storage,
-      User user) {
     User createdUser;
     try {
       createdUser = userService.create(realm, storage, user);
@@ -121,11 +80,35 @@ public class UserController {
     }
   }
 
-  @DeleteMapping(
-      path = {"/delete/{realm}/user/{id}"},
+  @PutMapping(
+      value = {"/{realm}/Users/{id}", "/{realm}/{storage}/Users/{id}"},
+      consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  public void deleteUser(
-      @PathVariable(name = "realm") String realm, @PathVariable(name = "id") String id) {
-    userService.delete(realm, id);
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  public ResponseEntity<?> updateUsers(
+      @PathVariable("realm") String realm,
+      @PathVariable("storage") String storage,
+      @PathVariable("id") String id,
+      @RequestBody User user) {
+    // TODO: process PUT request
+    return new ResponseEntity<>(user, HttpStatus.OK);
+  }
+
+  @DeleteMapping(
+      value = {"/{realm}/Users/{id}", "/{realm}/{storage}/Users/{id}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  public ResponseEntity<User> deleteUsers(
+      @PathVariable("realm") String realm,
+      @PathVariable("storage") String storage,
+      @PathVariable("id") String id) {
+    // TODO: process DELETE request
+    User deletedUser;
+    try {
+      deletedUser = userService.delete(realm, id);
+      return ResponseEntity.status(HttpStatus.CREATED).body(deletedUser);
+    } catch (Exception e) {
+      return ResponseEntity.status(500).build();
+    }
   }
 }

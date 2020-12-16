@@ -14,6 +14,8 @@
 package fr.insee.sugoi.services.decider;
 
 import fr.insee.sugoi.services.services.PermissionService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,12 +23,20 @@ import org.springframework.stereotype.Component;
 @Component("NewAuthorizeMethodDecider")
 public class AuthorizeMethodDecider {
 
-  @Value("${fr.insee.sugoi.api.enable.preauthorize:false}")
+  private static final Logger logger = LogManager.getLogger(AuthorizeMethodDecider.class);
+
+  @Value("${fr.insee.sugoi.api.enable.preauthorize}")
   private boolean enable;
 
   @Autowired PermissionService permissionService;
 
+  public boolean gotAtLeastOneSugoiRole() {
+    return permissionService.extractSugoiRole().size() > 0;
+  }
+
   public boolean isAtLeastReader(String realm, String userStorage) {
+    logger.info(
+        "Check if user is at least reader on realm {} and userStorage {}", realm, userStorage);
     System.out.println(enable);
     if (enable) {
       return permissionService.isAtLeastReader(realm, userStorage);
@@ -35,6 +45,8 @@ public class AuthorizeMethodDecider {
   }
 
   public boolean isAtLeastWriter(String realm, String userStorage) {
+    logger.info(
+        "Check if user is at least writer on realm {} and userStorage {}", realm, userStorage);
     if (enable) {
       return permissionService.isAtLeastWriter(realm, userStorage);
     }
@@ -42,6 +54,7 @@ public class AuthorizeMethodDecider {
   }
 
   public boolean isAdmin() {
+    logger.info("Check if user is admin");
     if (enable) {
       permissionService.isAdmin();
     }

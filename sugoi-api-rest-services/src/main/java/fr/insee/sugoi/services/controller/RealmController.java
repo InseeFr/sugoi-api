@@ -19,6 +19,7 @@ import fr.insee.sugoi.services.services.PermissionService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -45,6 +46,7 @@ public class RealmController {
   @Autowired PermissionService permissionService;
 
   @GetMapping(value = "/realms")
+  @PreAuthorize("@NewAuthorizeMethodDecider.gotAtLeastOneSugoiRole()")
   public ResponseEntity<List<Realm>> getRealms(
       @RequestParam(name = "id", required = false) String id, Authentication authentication) {
     List<Realm> realms = new ArrayList<>();
@@ -55,7 +57,11 @@ public class RealmController {
     }
     // Filter realm before sending if user not admin
     if (!permissionService.isAdmin()) {
-      // TODO
+      List<String> userRealmsAuthorization = permissionService.getMyRealm();
+      realms =
+          realms.stream()
+              .filter(realm -> containsIgnoreCase(userRealmsAuthorization, realm.getName()))
+              .collect(Collectors.toList());
     }
     return new ResponseEntity<List<Realm>>(realms, HttpStatus.OK);
   }
@@ -88,5 +94,14 @@ public class RealmController {
   @PreAuthorize("@NewAuthorizeMethodDecider.isAdmin()")
   public ResponseEntity<String> deleteRealm(@PathVariable("id") String id) {
     return new ResponseEntity<String>(id, HttpStatus.OK);
+  }
+
+  private boolean containsIgnoreCase(List<String> list, String soughtFor) {
+    for (String current : list) {
+      if (current.equalsIgnoreCase(soughtFor)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

@@ -58,7 +58,7 @@ public class SpringDocConfiguration {
 
   @Bean
   @ConditionalOnProperty(
-      name = "fr.insee.sugoi.security.bearer-authentication-enabled",
+      name = "fr.insee.sugoi.springdoc.bearer-authentication-enabled",
       havingValue = "true",
       matchIfMissing = false)
   public OpenAPI customOpenAPIOIDC() {
@@ -83,7 +83,7 @@ public class SpringDocConfiguration {
 
   @Bean
   @ConditionalOnProperty(
-      name = "fr.insee.sugoi.security.basic-authentication-enabled",
+      name = "fr.insee.sugoi.springdoc.basic-authentication-enabled",
       havingValue = "true",
       matchIfMissing = false)
   public OpenAPI customOpenAPIBasic() {
@@ -102,7 +102,7 @@ public class SpringDocConfiguration {
   }
 
   @ConditionalOnProperty(
-      name = "fr.insee.sugoi.security.bearer-authentication-enabled",
+      name = "fr.insee.sugoi.springdoc.bearer-authentication-enabled",
       havingValue = "true",
       matchIfMissing = false)
   @Bean
@@ -116,7 +116,7 @@ public class SpringDocConfiguration {
   }
 
   @ConditionalOnProperty(
-      name = "fr.insee.sugoi.security.basic-authentication-enabled",
+      name = "fr.insee.sugoi.springdoc.basic-authentication-enabled",
       havingValue = "true",
       matchIfMissing = false)
   @Bean
@@ -140,7 +140,7 @@ public class SpringDocConfiguration {
   private OpenAPI createOpenAPI() {
     logger.info("surcharge de la configuration swagger");
     Contact contact = new Contact().url("https://github.com/InseeFrLab/sugoi-api");
-    if (true) {
+    if (contactEmail != null) {
       contact = contact.email(contactEmail).name(contactEmail);
     }
     final OpenAPI openapi =
