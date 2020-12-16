@@ -14,6 +14,7 @@
 package fr.insee.sugoi.core.store;
 
 import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 
 public interface WriterStore {
@@ -30,11 +31,11 @@ public interface WriterStore {
 
   Group updateGroup(Group updatedGroup);
 
-  void deleteOrganization(String name);
+  void deleteOrganization(String organizationId);
 
-  Group createOrganization(Group group);
+  Organization createOrganization(Organization organization);
 
-  Group updateOrganization(Group updatedGroup);
+  Organization updateOrganization(Organization updatedOrganization);
 
   void deleteUserFromGroup(String groupName, String userId);
 

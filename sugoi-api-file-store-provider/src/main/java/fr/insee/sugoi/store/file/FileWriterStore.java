@@ -15,6 +15,7 @@ package fr.insee.sugoi.store.file;
 
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import java.util.Map;
 
@@ -64,13 +65,13 @@ public class FileWriterStore implements WriterStore {
   }
 
   @Override
-  public Group createOrganization(Group group) {
+  public Organization createOrganization(Organization organization) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Group updateOrganization(Group updatedGroup) {
+  public Organization updateOrganization(Organization updatedOrganization) {
     // TODO Auto-generated method stub
     return null;
   }
