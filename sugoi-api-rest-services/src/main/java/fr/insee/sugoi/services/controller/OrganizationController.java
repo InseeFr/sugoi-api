@@ -13,8 +13,6 @@
 */
 package fr.insee.sugoi.services.controller;
 
-import fr.insee.sugoi.model.Organization;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,18 +27,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import fr.insee.sugoi.model.Organization;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
-@RequestMapping(value = {"/v2", "/"})
+@RequestMapping(value = { "/v2", "/" })
 @Tag(name = "Manage Organization")
+@SecurityRequirement(name = "oAuth")
 public class OrganizationController {
 
-  @GetMapping(
-      path = {"/{realm}/organizations", "/{realm}/{storage}/organizations"},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#userStorage)")
-  public ResponseEntity<?> getOrganizations(
-      @PathVariable("realm") String realm,
-      @PathVariable(name = "storage", required = false) String userStorage,
+  @GetMapping(path = { "/{realm}/organizations", "/{realm}/{storage}/organizations" }, produces = {
+      MediaType.APPLICATION_JSON_VALUE })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
+  public ResponseEntity<?> getOrganizations(@PathVariable("realm") String realm,
+      @PathVariable(name = "storage", required = false) String storage,
       @RequestParam(value = "application", required = false) String application,
       @RequestParam(value = "role", required = false) String role,
       @RequestParam(value = "property", required = false) String property) {
@@ -49,43 +50,31 @@ public class OrganizationController {
     return null;
   }
 
-  @PostMapping(
-      value = {"/{realm}/organizations", "/{realm}/{storage}/organizations"},
-      consumes = {MediaType.APPLICATION_JSON_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#userStorage)")
-  public ResponseEntity<?> createOrganizations(
-      @PathVariable("realm") String realm,
-      @PathVariable("storage") String UserStorage,
-      @RequestBody Organization organization) {
+  @PostMapping(value = { "/{realm}/organizations", "/{realm}/{storage}/organizations" }, consumes = {
+      MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  public ResponseEntity<?> createOrganizations(@PathVariable("realm") String realm,
+      @PathVariable("storage") String storage, @RequestBody Organization organization) {
     // TODO: process POST request
 
     return new ResponseEntity<>(organization, HttpStatus.CREATED);
   }
 
-  @PutMapping(
-      value = {"/{realm}/organizations/{id}", "/{realm}/{storage}/organizations/{id}"},
-      consumes = {MediaType.APPLICATION_JSON_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#userStorage)")
-  public ResponseEntity<?> updateOrganizations(
-      @PathVariable("realm") String realm,
-      @PathVariable("storage") String UserStorage,
-      @PathVariable("id") String id,
-      @RequestBody Organization organization) {
+  @PutMapping(value = { "/{realm}/organizations/{id}", "/{realm}/{storage}/organizations/{id}" }, consumes = {
+      MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  public ResponseEntity<?> updateOrganizations(@PathVariable("realm") String realm,
+      @PathVariable("storage") String storage, @PathVariable("id") String id, @RequestBody Organization organization) {
     // TODO: process PUT request
 
     return new ResponseEntity<>(organization, HttpStatus.OK);
   }
 
-  @DeleteMapping(
-      value = {"/{realm}/organizations/{id}", "/{realm}/{storage}/organizations/{id}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#userStorage)")
-  public ResponseEntity<String> deleteOrganizations(
-      @PathVariable("realm") String realm,
-      @PathVariable("storage") String UserStorage,
-      @PathVariable("id") String id) {
+  @DeleteMapping(value = { "/{realm}/organizations/{id}", "/{realm}/{storage}/organizations/{id}" }, produces = {
+      MediaType.APPLICATION_JSON_VALUE })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  public ResponseEntity<String> deleteOrganizations(@PathVariable("realm") String realm,
+      @PathVariable("storage") String storage, @PathVariable("id") String id) {
     // TODO: process DELETE request
 
     return new ResponseEntity<String>(id, HttpStatus.OK);

@@ -13,8 +13,6 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,20 +21,23 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @Tag(name = "V1 - Groupe")
 @RestController
 @RequestMapping("/v1")
+@SecurityRequirement(name = "basic")
+
 public class GroupeController {
 
-  @GetMapping(
-      value = "/{domaine}/contacts/groupe/{application}/{groupe}",
-      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @GetMapping(value = "/{domaine}/contacts/groupe/{application}/{groupe}", produces = { MediaType.APPLICATION_XML_VALUE,
+      MediaType.APPLICATION_JSON_VALUE })
   @Operation(deprecated = true, description = "", tags = "Recherche de contacts")
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
-  public ResponseEntity<?> getContactByDomaineAndGroups(
-      @PathVariable("domaine") String domaine,
-      @PathVariable("application") String application,
-      @PathVariable("groupe") String groupe) {
+  public ResponseEntity<?> getContactByDomaineAndGroups(@PathVariable("domaine") String domaine,
+      @PathVariable("application") String application, @PathVariable("groupe") String groupe) {
     return null;
   }
 }

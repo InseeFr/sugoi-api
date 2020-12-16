@@ -119,22 +119,22 @@ dn: cn=Utilisateurs_contacts_domaine1_WebServicesLdap,ou=WebServicesLdap_Obje
 description: Utilisateur du webservices contact
 cn: Utilisateurs_contacts_domaine1_WebServicesLdap
 objectclass: groupOfUniqueNames
-uniqueMember: uid=consultant_domaine_1,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+uniqueMember: uid=consultant_domaine_1,ou=Applitest,ou=Applications,o=insee,c=fr
 
 
 dn: cn=Admin_WebServicesLdap,ou=WebServicesLdap_Obje
  ts,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
 description: Utilisateur du webservices contact
-cn: Utilisateurs_contacts_domaine1_WebServicesLdap
+cn: Admin_WebServicesLdap
 objectclass: groupOfUniqueNames
-uniqueMember: uid=admin,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+uniqueMember: uid=admin,ou=Applitest,ou=Applications,o=insee,c=fr
 
 dn: cn=Gestionnaires_contacts_domaine2_WebServicesLdap,ou=WebServicesLdap_Obje
  ts,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
 description: Utilisateur du webservices contact
-cn: Utilisateurs_contacts_domaine1_WebServicesLdap
+cn: Gestionnaires_contacts_domaine2_WebServicesLdap
 objectclass: groupOfUniqueNames
-uniqueMember: uid=gestionnaire_domaine_2,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+uniqueMember: uid=gestionnaire_domaine_2,ou=Applitest,ou=Applications,o=insee,c=fr
 
 # DOMAINE DE GESTION 1
 dn: ou=clients_domaine1,o=insee,c=fr
@@ -279,40 +279,40 @@ inseegroupedefaut: Prop2_TestIgnoreCase_applitest
 
 
 
-dn: uid=admin,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+dn: uid=admin,ou=Applitest,ou=Applications,o=insee,c=fr
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
 objectclass: inetOrgPerson
 objectclass: inseeApplication
-cn: user_admin
-sn: user_admin
-givenname: user_admin
-uid: user_admin
+cn: admin
+sn: admin
+givenname: admin
+uid: admin
 userpassword: admin
 
 
-dn: uid=consultant_domaine_1,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+dn: uid=consultant_domaine_1,ou=Applitest,ou=Applications,o=insee,c=fr
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
 objectclass: inetOrgPerson
 objectclass: inseeApplication
-cn: user_consultant_domaine_1
-sn: user_consultant_domaine_1
-givenname: user_consultant_domaine_1
-uid: user_consultant_domaine_1
+cn: consultant_domaine_1
+sn: consultant_domaine_1
+givenname: consultant_domaine_1
+uid: consultant_domaine_1
 userpassword: consultant
 
 
-dn: uid=gestionnaire_domaine_2,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+dn: uid=gestionnaire_domaine_2,ou=Applitest,ou=Applications,o=insee,c=fr
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
 objectclass: inetOrgPerson
 objectclass: inseeApplication
-cn: user_gestionnaire_domaine_2
-sn: user_gestionnaire_domaine_2
-givenname: user_gestionnaire_domaine_2
-uid: user_gestionnaire_domaine_2
+cn: gestionnaire_domaine_2
+sn: gestionnaire_domaine_2
+givenname: gestionnaire_domaine_2
+uid: gestionnaire_domaine_2
 userpassword: gestionnaire

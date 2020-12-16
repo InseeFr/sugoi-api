@@ -13,12 +13,9 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
-import fr.insee.sugoi.converter.ouganext.Profils;
-import fr.insee.sugoi.core.service.ConfigService;
-import fr.insee.sugoi.model.Realm;
-import fr.insee.sugoi.old.services.utils.ResponseUtils;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,26 +25,27 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import fr.insee.sugoi.converter.ouganext.Profils;
+import fr.insee.sugoi.core.service.ConfigService;
+import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.old.services.utils.ResponseUtils;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @RestController
 @RequestMapping("/v1/profils")
+@SecurityRequirement(name = "basic")
 public class ProfilsController {
 
-  @Autowired private ConfigService configService;
+  @Autowired
+  private ConfigService configService;
 
-  @GetMapping(
-      value = "/",
-      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @GetMapping(value = "/", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
   @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
   public ResponseEntity<?> getProfils() {
     List<Realm> realms = configService.getRealms();
     Profils profils = new Profils();
-    profils
-        .getListe()
-        .addAll(
-            realms.stream()
-                .map(realm -> ResponseUtils.convertRealmToProfils(realm))
-                .flatMap(List::stream)
-                .collect(Collectors.toList()));
+    profils.getListe().addAll(realms.stream().map(realm -> ResponseUtils.convertRealmToProfils(realm))
+        .flatMap(List::stream).collect(Collectors.toList()));
     return new ResponseEntity<>(profils, HttpStatus.OK);
   }
 }

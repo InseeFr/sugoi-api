@@ -13,7 +13,6 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
-import fr.insee.sugoi.converter.ouganext.Organisation;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,40 +25,38 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import fr.insee.sugoi.converter.ouganext.Organisation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @RestController
 @RequestMapping("/v1")
+@SecurityRequirement(name = "basic")
 public class OrganisationDomaineController {
 
-  @PutMapping(
-      value = "/{domaine}/organisation/{id}",
-      consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
-      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PutMapping(value = "/{domaine}/organisation/{id}", consumes = { MediaType.APPLICATION_XML_VALUE,
+      MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
+          MediaType.APPLICATION_JSON_VALUE })
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-  public ResponseEntity<?> createOrModifyOrganisation(
-      @PathVariable("domaine") String domaine,
-      @PathVariable("id") String id,
-      @RequestParam("creation") boolean creation,
+  public ResponseEntity<?> createOrModifyOrganisation(@PathVariable("domaine") String domaine,
+      @PathVariable("id") String id, @RequestParam("creation") boolean creation,
       @RequestBody Organisation organisation) {
     // TODO: process PUT request
 
     return null;
   }
 
-  @GetMapping(
-      value = "/{domaine}/organisation/{id}",
-      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @GetMapping(value = "/{domaine}/organisation/{id}", produces = { MediaType.APPLICATION_XML_VALUE,
+      MediaType.APPLICATION_JSON_VALUE })
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
-  public ResponseEntity<?> getOrganisationDomaine(
-      @PathVariable("domaine") String domaine, @PathVariable("id") String id) {
+  public ResponseEntity<?> getOrganisationDomaine(@PathVariable("domaine") String domaine,
+      @PathVariable("id") String id) {
     return null;
   }
 
-  @DeleteMapping(
-      value = "/{domaine}/organisation/{id}",
-      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @DeleteMapping(value = "/{domaine}/organisation/{id}", produces = { MediaType.APPLICATION_XML_VALUE,
+      MediaType.APPLICATION_JSON_VALUE })
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-  public ResponseEntity<?> deleteOrganisation(
-      @PathVariable("domaine") String domaine, @PathVariable("id") String id) {
+  public ResponseEntity<?> deleteOrganisation(@PathVariable("domaine") String domaine, @PathVariable("id") String id) {
     return null;
   }
 }

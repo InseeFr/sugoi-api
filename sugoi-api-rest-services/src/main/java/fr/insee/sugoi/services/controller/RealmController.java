@@ -13,13 +13,10 @@
 */
 package fr.insee.sugoi.services.controller;
 
-import fr.insee.sugoi.core.service.ConfigService;
-import fr.insee.sugoi.model.Realm;
-import fr.insee.sugoi.services.services.PermissionService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,19 +33,28 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import fr.insee.sugoi.core.service.ConfigService;
+import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.services.services.PermissionService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
-@RequestMapping(value = {"/v2", "/"})
-@Tag(name = "Manage Realms and UserStorages")
+@RequestMapping(value = { "/v2", "/" })
+@Tag(name = "Manage Realms and storages")
+@SecurityRequirement(name = "oAuth")
 public class RealmController {
 
-  @Autowired ConfigService configService;
+  @Autowired
+  ConfigService configService;
 
-  @Autowired PermissionService permissionService;
+  @Autowired
+  PermissionService permissionService;
 
   @GetMapping(value = "/realms")
   @PreAuthorize("@NewAuthorizeMethodDecider.gotAtLeastOneSugoiRole()")
-  public ResponseEntity<List<Realm>> getRealms(
-      @RequestParam(name = "id", required = false) String id, Authentication authentication) {
+  public ResponseEntity<List<Realm>> getRealms(@RequestParam(name = "id", required = false) String id,
+      Authentication authentication) {
     List<Realm> realms = new ArrayList<>();
     if (id != null) {
       realms.add(configService.getRealm(id));
@@ -58,39 +64,30 @@ public class RealmController {
     // Filter realm before sending if user not admin
     if (!permissionService.isAdmin()) {
       List<String> userRealmsAuthorization = permissionService.getMyRealm();
-      realms =
-          realms.stream()
-              .filter(realm -> containsIgnoreCase(userRealmsAuthorization, realm.getName()))
-              .collect(Collectors.toList());
+      realms = realms.stream().filter(realm -> containsIgnoreCase(userRealmsAuthorization, realm.getName()))
+          .collect(Collectors.toList());
     }
     return new ResponseEntity<List<Realm>>(realms, HttpStatus.OK);
   }
 
-  @PostMapping(
-      value = "/realms",
-      consumes = {MediaType.APPLICATION_JSON_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @PostMapping(value = "/realms", consumes = { MediaType.APPLICATION_JSON_VALUE }, produces = {
+      MediaType.APPLICATION_JSON_VALUE })
   @PreAuthorize("@NewAuthorizeMethodDecider.isAdmin()")
   public ResponseEntity<Realm> createRealm(@RequestBody Realm realm) {
     // TODO: process POST request
     return new ResponseEntity<Realm>(realm, HttpStatus.CREATED);
   }
 
-  @PutMapping(
-      value = "/realms/{id}",
-      consumes = {MediaType.APPLICATION_JSON_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @PutMapping(value = "/realms/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE }, produces = {
+      MediaType.APPLICATION_JSON_VALUE })
   @PreAuthorize("@NewAuthorizeMethodDecider.isAdmin()")
-  public ResponseEntity<Realm> updateRealm(
-      @RequestBody Realm realm, @PathVariable("id") String id) {
+  public ResponseEntity<Realm> updateRealm(@RequestBody Realm realm, @PathVariable("id") String id) {
     // TODO: process PUT request
     return new ResponseEntity<Realm>(realm, HttpStatus.OK);
   }
 
-  @DeleteMapping(
-      value = "/realms/{id}",
-      consumes = {MediaType.APPLICATION_JSON_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @DeleteMapping(value = "/realms/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE }, produces = {
+      MediaType.APPLICATION_JSON_VALUE })
   @PreAuthorize("@NewAuthorizeMethodDecider.isAdmin()")
   public ResponseEntity<String> deleteRealm(@PathVariable("id") String id) {
     return new ResponseEntity<String>(id, HttpStatus.OK);

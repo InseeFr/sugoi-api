@@ -13,8 +13,8 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,66 +26,56 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/v1")
 @Tag(name = "V1 - Gestion des habilitations")
+@SecurityRequirement(name = "basic")
 public class ContactHabilitationDomaineController {
 
-  @GetMapping(
-      value = "/{domaine}/contact/{id}/habilitations",
-      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @GetMapping(value = "/{domaine}/contact/{id}/habilitations", produces = { MediaType.APPLICATION_XML_VALUE,
+      MediaType.APPLICATION_JSON_VALUE })
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
-  public ResponseEntity<?> getHabilitation(
-      @PathVariable("id") String identifiant, @PathVariable("domaine") String domaine) {
+  public ResponseEntity<?> getHabilitation(@PathVariable("id") String identifiant,
+      @PathVariable("domaine") String domaine) {
     return null;
   }
 
-  @PutMapping(
-      value = "/{domaine}/contact/{id}/habilitations/{application}",
-      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PutMapping(value = "/{domaine}/contact/{id}/habilitations/{application}", produces = {
+      MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-  public ResponseEntity<?> addHabilitations(
-      @PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine,
-      @PathVariable("application") String appName,
+  public ResponseEntity<?> addHabilitations(@PathVariable("id") String identifiant,
+      @PathVariable("domaine") String domaine, @PathVariable("application") String appName,
       @RequestParam("role") List<String> nomRoles) {
     return null;
   }
 
-  @PutMapping(
-      value = "/{domaine}/contact/{id}/habilitations/{application}/{role}",
-      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PutMapping(value = "/{domaine}/contact/{id}/habilitations/{application}/{role}", produces = {
+      MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-  public ResponseEntity<?> addHabilitationsWithProperty(
-      @PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine,
-      @PathVariable("application") String appName,
+  public ResponseEntity<?> addHabilitationsWithProperty(@PathVariable("id") String identifiant,
+      @PathVariable("domaine") String domaine, @PathVariable("application") String appName,
       @PathVariable("role") @RequestParam("propriete") List<String> nomRoles) {
     return null;
   }
 
-  @DeleteMapping(
-      value = "/{domaine}/contact/{id}/habilitations/{application}",
-      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @DeleteMapping(value = "/{domaine}/contact/{id}/habilitations/{application}", produces = {
+      MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-  public ResponseEntity<?> deleteHabilitations(
-      @PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine,
-      @PathVariable("application") String appName,
+  public ResponseEntity<?> deleteHabilitations(@PathVariable("id") String identifiant,
+      @PathVariable("domaine") String domaine, @PathVariable("application") String appName,
       @RequestParam("role") List<String> nomRoles) {
     return null;
   }
 
-  @DeleteMapping(
-      value = "/{domaine}/contact/{id}/habilitations/{application}/{role}",
-      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @DeleteMapping(value = "/{domaine}/contact/{id}/habilitations/{application}/{role}", produces = {
+      MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-  public ResponseEntity<?> deleteHabilitationsWithProperty(
-      @PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine,
-      @PathVariable("application") String appName,
-      @PathVariable("role") String nomRole,
-      @RequestParam("propriete") List<String> proprietes) {
+  public ResponseEntity<?> deleteHabilitationsWithProperty(@PathVariable("id") String identifiant,
+      @PathVariable("domaine") String domaine, @PathVariable("application") String appName,
+      @PathVariable("role") String nomRole, @RequestParam("propriete") List<String> proprietes) {
     return null;
   }
 }

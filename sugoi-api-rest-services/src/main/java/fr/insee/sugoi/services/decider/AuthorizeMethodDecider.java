@@ -37,7 +37,6 @@ public class AuthorizeMethodDecider {
   public boolean isAtLeastReader(String realm, String userStorage) {
     logger.info(
         "Check if user is at least reader on realm {} and userStorage {}", realm, userStorage);
-    System.out.println(enable);
     if (enable) {
       return permissionService.isAtLeastReader(realm, userStorage);
     }
