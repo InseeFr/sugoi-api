@@ -32,14 +32,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Manage applications")
-@RequestMapping(value = { "/v2", "/" })
+@RequestMapping(value = {"/v2", "/"})
 @SecurityRequirement(name = "oAuth")
 public class ApplicationController {
 
-  @GetMapping(path = { "/{realm}/applications", "/{realm}/{storage}/applications" }, produces = {
-      MediaType.APPLICATION_JSON_VALUE })
+  @GetMapping(
+      path = {"/{realm}/applications", "/{realm}/{storage}/applications"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
-  public ResponseEntity<?> getApplications(@PathVariable("realm") String realm,
+  public ResponseEntity<?> getApplications(
+      @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
       @RequestParam(value = "name", required = false) String name,
       @RequestParam(value = "owner", required = false) String owner) {
@@ -48,31 +50,43 @@ public class ApplicationController {
     return null;
   }
 
-  @PostMapping(value = { "/{realm}/applications", "/{realm}/{storage}/applications" }, consumes = {
-      MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
+  @PostMapping(
+      value = {"/{realm}/applications", "/{realm}/{storage}/applications"},
+      consumes = {MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
-  public ResponseEntity<?> createApplication(@PathVariable("realm") String realm,
-      @PathVariable("storage") String storage, @RequestBody Application application) {
+  public ResponseEntity<?> createApplication(
+      @PathVariable("realm") String realm,
+      @PathVariable("storage") String storage,
+      @RequestBody Application application) {
     // TODO: process POST request
 
     return new ResponseEntity<Application>(application, HttpStatus.CREATED);
   }
 
-  @PutMapping(value = { "/{realm}/applications/{id}", "/{realm}/{storage}/applications/{id}" }, consumes = {
-      MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
+  @PutMapping(
+      value = {"/{realm}/applications/{id}", "/{realm}/{storage}/applications/{id}"},
+      consumes = {MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
-  public ResponseEntity<?> updateApplication(@PathVariable("realm") String realm,
-      @PathVariable("storage") String storage, @PathVariable("id") String id, @RequestBody Application application) {
+  public ResponseEntity<?> updateApplication(
+      @PathVariable("realm") String realm,
+      @PathVariable("storage") String storage,
+      @PathVariable("id") String id,
+      @RequestBody Application application) {
     // TODO: process PUT request
 
     return new ResponseEntity<>(application, HttpStatus.OK);
   }
 
-  @DeleteMapping(value = { "/{realm}/applications/{id}", "/{realm}/{storage}/applications/{id}" }, produces = {
-      MediaType.APPLICATION_JSON_VALUE })
+  @DeleteMapping(
+      value = {"/{realm}/applications/{id}", "/{realm}/{storage}/applications/{id}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
-  public ResponseEntity<String> deleteApplication(@PathVariable("realm") String realm,
-      @PathVariable("storage") String storage, @PathVariable("id") String id) {
+  public ResponseEntity<String> deleteApplication(
+      @PathVariable("realm") String realm,
+      @PathVariable("storage") String storage,
+      @PathVariable("id") String id) {
     // TODO: process DELETE request
 
     return new ResponseEntity<String>(id, HttpStatus.OK);

@@ -13,6 +13,8 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,36 +25,40 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 @RestController
 @RequestMapping("/v1")
 @Tag(name = "V1 - Gestion des inseeRoleApplicatif")
 @SecurityRequirement(name = "basic")
 public class ContactInseeRoleApplicatifDomaineController {
 
-  @GetMapping(value = "/{domaine}/contact/{id}/inseeroles", produces = { MediaType.APPLICATION_XML_VALUE,
-      MediaType.APPLICATION_JSON_VALUE })
+  @GetMapping(
+      value = "/{domaine}/contact/{id}/inseeroles",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
-  public ResponseEntity<?> getInseeRoles(@PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine) {
+  public ResponseEntity<?> getInseeRoles(
+      @PathVariable("id") String identifiant, @PathVariable("domaine") String domaine) {
     return null;
   }
 
-  @PutMapping(value = "/{domaine}/contact/{id}/inseeroles/{inseerole}", produces = { MediaType.APPLICATION_XML_VALUE,
-      MediaType.APPLICATION_JSON_VALUE })
+  @PutMapping(
+      value = "/{domaine}/contact/{id}/inseeroles/{inseerole}",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-  public ResponseEntity<?> addInseeRoles(@PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine, @PathVariable("inseerole") String inseeRole) {
+  public ResponseEntity<?> addInseeRoles(
+      @PathVariable("id") String identifiant,
+      @PathVariable("domaine") String domaine,
+      @PathVariable("inseerole") String inseeRole) {
     return null;
   }
 
-  @DeleteMapping(value = "/{domaine}/contact/{id}/inseeroles/{inseerole}", produces = { MediaType.APPLICATION_XML_VALUE,
-      MediaType.APPLICATION_JSON_VALUE })
+  @DeleteMapping(
+      value = "/{domaine}/contact/{id}/inseeroles/{inseerole}",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-  public ResponseEntity<?> removeInseeRole(@PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine, @PathVariable("inseerole") String inseeRole) {
+  public ResponseEntity<?> removeInseeRole(
+      @PathVariable("id") String identifiant,
+      @PathVariable("domaine") String domaine,
+      @PathVariable("inseerole") String inseeRole) {
     return null;
   }
 }

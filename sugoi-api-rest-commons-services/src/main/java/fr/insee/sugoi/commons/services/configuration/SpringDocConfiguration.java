@@ -13,12 +13,6 @@
 */
 package fr.insee.sugoi.commons.services.configuration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
@@ -27,6 +21,11 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.OAuthFlow;
 import io.swagger.v3.oas.models.security.OAuthFlows;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SpringDocConfiguration {
@@ -56,14 +55,28 @@ public class SpringDocConfiguration {
   @Bean
   public OpenAPI customOpenAPIBasicAndOIDC() {
     final OpenAPI openapi = createOpenAPI();
-    openapi.components(new Components()
-        .addSecuritySchemes(SCHEMEBASIC,
-            new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme(SCHEMEBASIC).in(SecurityScheme.In.HEADER)
-                .description("Authentification Basic"))
-        .addSecuritySchemes(OAUTHSCHEME,
-            new SecurityScheme().type(SecurityScheme.Type.OAUTH2).in(SecurityScheme.In.HEADER)
-                .description(issuerDescription).flows(new OAuthFlows().authorizationCode(new OAuthFlow()
-                    .authorizationUrl(issuerAuthorizationURL).tokenUrl(issuerTokenURL).refreshUrl(issuerRefreshURL)))));
+    openapi.components(
+        new Components()
+            .addSecuritySchemes(
+                SCHEMEBASIC,
+                new SecurityScheme()
+                    .type(SecurityScheme.Type.HTTP)
+                    .scheme(SCHEMEBASIC)
+                    .in(SecurityScheme.In.HEADER)
+                    .description("Authentification Basic"))
+            .addSecuritySchemes(
+                OAUTHSCHEME,
+                new SecurityScheme()
+                    .type(SecurityScheme.Type.OAUTH2)
+                    .in(SecurityScheme.In.HEADER)
+                    .description(issuerDescription)
+                    .flows(
+                        new OAuthFlows()
+                            .authorizationCode(
+                                new OAuthFlow()
+                                    .authorizationUrl(issuerAuthorizationURL)
+                                    .tokenUrl(issuerTokenURL)
+                                    .refreshUrl(issuerRefreshURL)))));
     return openapi;
   }
 
@@ -73,9 +86,17 @@ public class SpringDocConfiguration {
     if (contactEmail != null) {
       contact = contact.email(contactEmail).name(contactEmail);
     }
-    final OpenAPI openapi = new OpenAPI().info(new Info().title("Swagger SUGOI").description("API de sugoi")
-        .license(new License().name("Apache 2.0").url("http://www.apache.org/licenses/LICENSE-2.0.html"))
-        .contact(contact));
+    final OpenAPI openapi =
+        new OpenAPI()
+            .info(
+                new Info()
+                    .title("Swagger SUGOI")
+                    .description("API de sugoi")
+                    .license(
+                        new License()
+                            .name("Apache 2.0")
+                            .url("http://www.apache.org/licenses/LICENSE-2.0.html"))
+                    .contact(contact));
 
     return openapi;
   }

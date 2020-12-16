@@ -13,12 +13,13 @@
 */
 package fr.insee.sugoi.services.controller;
 
+import fr.insee.sugoi.services.beans.MessageKeyValueGeneriqueBean;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +36,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.insee.sugoi.services.beans.MessageKeyValueGeneriqueBean;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-
 @RestController
 @RequestMapping("/debug")
 @SecurityRequirement(name = "oAuth")
@@ -46,10 +44,11 @@ public class DebugController {
   private static final Logger logger = LogManager.getLogger(DebugController.class);
   private static final String RETOUR_A_LA_LIGNE = "\n";
 
-  @Autowired
-  Environment env;
+  @Autowired Environment env;
 
-  @GetMapping(path = "/config", produces = { MediaType.TEXT_PLAIN_VALUE })
+  @GetMapping(
+      path = "/config",
+      produces = {MediaType.TEXT_PLAIN_VALUE})
   @ResponseBody
   @PreAuthorize("@NewAuthorizeMethodDecider.isAdmin()")
   public ResponseEntity<?> printConfig() {
@@ -71,8 +70,9 @@ public class DebugController {
       listeKeyProperties = new TreeSet<MessageKeyValueGeneriqueBean>();
 
       Map<String, Object> map = new HashMap<>();
-      for (Iterator<PropertySource<?>> it = ((AbstractEnvironment) env).getPropertySources().iterator(); it
-          .hasNext();) {
+      for (Iterator<PropertySource<?>> it =
+              ((AbstractEnvironment) env).getPropertySources().iterator();
+          it.hasNext(); ) {
         PropertySource<?> propertySource = (PropertySource<?>) it.next();
         if (propertySource instanceof MapPropertySource) {
           map.putAll(((MapPropertySource) propertySource).getSource());
@@ -87,11 +87,17 @@ public class DebugController {
       }
 
       for (MessageKeyValueGeneriqueBean mkgb : listeKeyProperties) {
-        MessageKeyValueGeneriqueBean messageKeyValueGeneriqueBean = (MessageKeyValueGeneriqueBean) mkgb;
-        sb.append(messageKeyValueGeneriqueBean.getKey().toString() + " = "
-            + messageKeyValueGeneriqueBean.getValue().toString() + RETOUR_A_LA_LIGNE);
-        sb.append("--------------------------------------------"
-            + "-------------------------------------------------------------" + RETOUR_A_LA_LIGNE);
+        MessageKeyValueGeneriqueBean messageKeyValueGeneriqueBean =
+            (MessageKeyValueGeneriqueBean) mkgb;
+        sb.append(
+            messageKeyValueGeneriqueBean.getKey().toString()
+                + " = "
+                + messageKeyValueGeneriqueBean.getValue().toString()
+                + RETOUR_A_LA_LIGNE);
+        sb.append(
+            "--------------------------------------------"
+                + "-------------------------------------------------------------"
+                + RETOUR_A_LA_LIGNE);
       }
 
     } catch (Exception e) {

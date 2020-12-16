@@ -13,8 +13,10 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
+import fr.insee.sugoi.converter.ouganext.Contact;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,52 +29,61 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.insee.sugoi.converter.ouganext.Contact;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 @RestController
 @RequestMapping("/v1")
 @Tag(name = "V1- Gestion des contacts")
 @SecurityRequirement(name = "basic")
 public class ContactsDomaineController {
 
-  @PostMapping(value = "/{domaine}/contacts", consumes = { MediaType.APPLICATION_XML_VALUE,
-      MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
-          MediaType.APPLICATION_JSON_VALUE })
+  @PostMapping(
+      value = "/{domaine}/contacts",
+      consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-  public ResponseEntity<?> createContactIdsentifiant(@PathVariable("domaine") String domaine,
-      @RequestHeader("Slug") String slug, @RequestBody Contact contact) {
+  public ResponseEntity<?> createContactIdsentifiant(
+      @PathVariable("domaine") String domaine,
+      @RequestHeader("Slug") String slug,
+      @RequestBody Contact contact) {
     return null;
   }
 
-  @GetMapping(value = "/{domaine}/contacts", produces = { MediaType.APPLICATION_XML_VALUE,
-      MediaType.APPLICATION_JSON_VALUE })
+  @GetMapping(
+      value = "/{domaine}/contacts",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
-  public ResponseEntity<?> getContacts(@PathVariable("domaine") String domaine,
-      @RequestParam("identifiant") String identifiant, @RequestParam("nomCommun") String nomCommun,
-      @RequestParam("description") String description, @RequestParam("organisationId") String organisationId,
-      @RequestParam("mail") String mail, @RequestParam(name = "size", defaultValue = "20") int size,
-      @RequestParam("start") int offset, @RequestParam("searchCookie") String searchCookie,
+  public ResponseEntity<?> getContacts(
+      @PathVariable("domaine") String domaine,
+      @RequestParam("identifiant") String identifiant,
+      @RequestParam("nomCommun") String nomCommun,
+      @RequestParam("description") String description,
+      @RequestParam("organisationId") String organisationId,
+      @RequestParam("mail") String mail,
+      @RequestParam(name = "size", defaultValue = "20") int size,
+      @RequestParam("start") int offset,
+      @RequestParam("searchCookie") String searchCookie,
       @RequestParam(name = "typeRecherche", defaultValue = "et") String typeRecherche,
-      @RequestParam("habilitation") List<String> habilitations, @RequestParam("application") String application,
-      @RequestParam("role") String role, @RequestParam("rolePropriete") String rolePropriete,
+      @RequestParam("habilitation") List<String> habilitations,
+      @RequestParam("application") String application,
+      @RequestParam("role") String role,
+      @RequestParam("rolePropriete") String rolePropriete,
       @RequestParam(name = "body", defaultValue = "false") boolean resultatsDansBody,
       @RequestParam(name = "idOnly", defaultValue = "false") boolean identifiantsSeuls,
       @RequestParam("certificat") String certificat) {
     return null;
   }
 
-  @GetMapping(value = "/{domaine}/contacts/certificat/{id}", produces = { MediaType.APPLICATION_XML_VALUE,
-      MediaType.APPLICATION_JSON_VALUE })
+  @GetMapping(
+      value = "/{domaine}/contacts/certificat/{id}",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
-  public ResponseEntity<?> getAPartirDeIdCertificat(@PathVariable("domaine") String domaine,
-      @PathVariable("id") String id) {
+  public ResponseEntity<?> getAPartirDeIdCertificat(
+      @PathVariable("domaine") String domaine, @PathVariable("id") String id) {
     return null;
   }
 
-  @GetMapping(value = "/{domaine}/contacts/size", produces = { MediaType.APPLICATION_XML_VALUE,
-      MediaType.APPLICATION_JSON_VALUE })
+  @GetMapping(
+      value = "/{domaine}/contacts/size",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
   public ResponseEntity<?> getContactsSize(@PathVariable("domaine") String domaine) {
     return null;

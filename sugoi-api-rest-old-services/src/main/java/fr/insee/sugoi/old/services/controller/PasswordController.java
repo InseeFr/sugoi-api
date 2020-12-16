@@ -13,6 +13,8 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
+import fr.insee.sugoi.core.service.PasswordService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,28 +24,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.insee.sugoi.core.service.PasswordService;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-
 @RestController
 @RequestMapping("/v1")
 @SecurityRequirement(name = "basic")
 public class PasswordController {
 
-  @Autowired
-  PasswordService passwordService;
+  @Autowired PasswordService passwordService;
 
   private static final int TAILLE_MINIMALE_PASSWORD = 8;
 
-  @GetMapping(value = "/password", produces = { MediaType.TEXT_PLAIN_VALUE })
-  public ResponseEntity<?> generatePasswords(@RequestParam("nb") int nb, @RequestParam("length") int length) {
+  @GetMapping(
+      value = "/password",
+      produces = {MediaType.TEXT_PLAIN_VALUE})
+  public ResponseEntity<?> generatePasswords(
+      @RequestParam("nb") int nb, @RequestParam("length") int length) {
     if (length < TAILLE_MINIMALE_PASSWORD) {
       return new ResponseEntity<>(
-          "Le paramètre length est obligatoire et doit être supérieur ou égal à " + TAILLE_MINIMALE_PASSWORD + ".",
+          "Le paramètre length est obligatoire et doit être supérieur ou égal à "
+              + TAILLE_MINIMALE_PASSWORD
+              + ".",
           HttpStatus.BAD_REQUEST);
     }
     if (nb < 1) {
-      return new ResponseEntity<>("Le paramètre nb est obligatoire et doit être positif.", HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>(
+          "Le paramètre nb est obligatoire et doit être positif.", HttpStatus.BAD_REQUEST);
     }
     StringBuilder listeMdp = new StringBuilder();
     for (int i = 0; i < nb - 1; i++) {

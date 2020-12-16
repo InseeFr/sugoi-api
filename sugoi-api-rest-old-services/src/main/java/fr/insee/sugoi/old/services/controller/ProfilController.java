@@ -13,6 +13,11 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
+import fr.insee.sugoi.converter.ouganext.Profil;
+import fr.insee.sugoi.core.service.ConfigService;
+import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.old.services.utils.ResponseUtils;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,21 +31,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.insee.sugoi.converter.ouganext.Profil;
-import fr.insee.sugoi.core.service.ConfigService;
-import fr.insee.sugoi.model.Realm;
-import fr.insee.sugoi.old.services.utils.ResponseUtils;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-
 @RestController
 @RequestMapping("/v1/profil")
 @SecurityRequirement(name = "basic")
 public class ProfilController {
 
-  @Autowired
-  private ConfigService configService;
+  @Autowired private ConfigService configService;
 
-  @GetMapping(value = "/{nom}", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+  @GetMapping(
+      value = "/{nom}",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
   public ResponseEntity<?> getProfil(@PathVariable("nom") String nom) {
     Realm realm = configService.getRealm(nom);
@@ -48,15 +48,18 @@ public class ProfilController {
     return new ResponseEntity<>(profil, HttpStatus.OK);
   }
 
-  @PutMapping(value = "/", consumes = { MediaType.APPLICATION_XML_VALUE,
-      MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
-          MediaType.APPLICATION_JSON_VALUE })
+  @PutMapping(
+      value = "/",
+      consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
   public ResponseEntity<?> createOrModifyProfil(@RequestBody Profil profil) {
     return null;
   }
 
-  @DeleteMapping(value = "/nom", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+  @DeleteMapping(
+      value = "/nom",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
   public ResponseEntity<?> deleteProfil(@PathVariable("nom") String nom) {
     return null;

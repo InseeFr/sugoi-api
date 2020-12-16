@@ -13,6 +13,8 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,18 +24,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 @Tag(name = "V1 - Credentials")
 @RestController
 @RequestMapping("/v1")
 @SecurityRequirement(name = "basic")
 public class CredentialsDomaineController {
 
-  @PostMapping(value = "/{domaine}/credentials/{id}", consumes = { MediaType.TEXT_PLAIN_VALUE })
+  @PostMapping(
+      value = "/{domaine}/credentials/{id}",
+      consumes = {MediaType.TEXT_PLAIN_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-  public ResponseEntity<?> authentifierContact(@PathVariable("domaine") String domaine, @PathVariable("id") String id,
+  public ResponseEntity<?> authentifierContact(
+      @PathVariable("domaine") String domaine,
+      @PathVariable("id") String id,
       @RequestBody String motDePasse) {
     return null;
   }

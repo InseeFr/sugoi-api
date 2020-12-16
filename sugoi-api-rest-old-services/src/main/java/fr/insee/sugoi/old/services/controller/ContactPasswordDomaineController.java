@@ -13,8 +13,10 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
+import fr.insee.sugoi.converter.ouganext.PasswordChangeRequest;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,41 +28,47 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.insee.sugoi.converter.ouganext.PasswordChangeRequest;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 @RestController
 @RequestMapping("/v1")
 @Tag(name = "V1 - Gestion du mot de passe")
 @SecurityRequirement(name = "basic")
 public class ContactPasswordDomaineController {
 
-  @PostMapping(value = "/{domaine}/contact/{id}/password", consumes = { MediaType.APPLICATION_XML_VALUE,
-      MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
-          MediaType.APPLICATION_JSON_VALUE })
+  @PostMapping(
+      value = "/{domaine}/contact/{id}/password",
+      consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-  public ResponseEntity<?> reinitPassword(@PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine, @RequestParam("modeEnvoi") List<String> modeEnvoisString,
+  public ResponseEntity<?> reinitPassword(
+      @PathVariable("id") String identifiant,
+      @PathVariable("domaine") String domaine,
+      @RequestParam("modeEnvoi") List<String> modeEnvoisString,
       @RequestBody PasswordChangeRequest pcr) {
     return null;
   }
 
-  @PostMapping(value = "/{domaine}/contact/{id}/password/first", consumes = { MediaType.APPLICATION_XML_VALUE,
-      MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
-          MediaType.APPLICATION_JSON_VALUE })
+  @PostMapping(
+      value = "/{domaine}/contact/{id}/password/first",
+      consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-  public ResponseEntity<?> initPassword(@PathVariable("id") String identifiant, @PathVariable("domaine") String domaine,
-      @RequestParam("modeEnvoi") List<String> modeEnvoisString, @RequestBody PasswordChangeRequest pcr) {
+  public ResponseEntity<?> initPassword(
+      @PathVariable("id") String identifiant,
+      @PathVariable("domaine") String domaine,
+      @RequestParam("modeEnvoi") List<String> modeEnvoisString,
+      @RequestBody PasswordChangeRequest pcr) {
     return null;
   }
 
-  @PutMapping(value = "/{domaine}/contact/{id}/password", consumes = { MediaType.APPLICATION_XML_VALUE,
-      MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
-          MediaType.APPLICATION_JSON_VALUE })
+  @PutMapping(
+      value = "/{domaine}/contact/{id}/password",
+      consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-  public ResponseEntity<?> changePassword(@PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine, @RequestParam("modeEnvoi") List<String> modeEnvoisString,
+  public ResponseEntity<?> changePassword(
+      @PathVariable("id") String identifiant,
+      @PathVariable("domaine") String domaine,
+      @RequestParam("modeEnvoi") List<String> modeEnvoisString,
       @RequestBody PasswordChangeRequest pcr) {
     return null;
   }
