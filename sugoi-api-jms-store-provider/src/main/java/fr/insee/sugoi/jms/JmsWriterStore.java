@@ -16,6 +16,7 @@ package fr.insee.sugoi.jms;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.jms.writer.JmsWriter;
 import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -81,13 +82,13 @@ public class JmsWriterStore implements WriterStore {
   }
 
   @Override
-  public Group createOrganization(Group group) {
+  public Organization createOrganization(Organization organization) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Group updateOrganization(Group updatedGroup) {
+  public Organization updateOrganization(Organization updatedOrganization) {
     // TODO Auto-generated method stub
     return null;
   }
