@@ -30,6 +30,7 @@ import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
+import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
@@ -161,5 +162,18 @@ public class LdapReaderStore implements ReaderStore {
   public boolean validateCredentials(User user, String credential) {
     // TODO Auto-generated method stub
     return false;
+  }
+
+  @Override
+  public Application getApplication(String applicationName) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Application searchApplications(
+      Map<String, String> searchProperties, PageableResult pageable, String searchOperator) {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

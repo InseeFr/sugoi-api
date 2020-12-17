@@ -15,6 +15,7 @@ package fr.insee.sugoi.core.store;
 
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
+import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
@@ -52,4 +53,9 @@ public interface ReaderStore {
       Map<String, String> searchProperties, PageableResult pageable, String searchOperator);
 
   public boolean validateCredentials(User user, String credential);
+
+  public Application getApplication(String applicationName);
+
+  public Application searchApplications(
+      Map<String, String> searchProperties, PageableResult pageable, String searchOperator);
 }
