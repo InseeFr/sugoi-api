@@ -13,9 +13,13 @@
 */
 package fr.insee.sugoi.old.services.decider;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.text.StrSubstitutor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,55 +40,50 @@ public class AuthorizeMethodDecider {
   @Value("${fr.insee.sugoi.api.old.enable.preauthorize:false}")
   private boolean enable;
 
+  private static final Logger logger = LogManager.getLogger(AuthorizeMethodDecider.class);
+
   public boolean isAtLeastConsultant(String domaine) {
-    System.out.println(enable);
     if (enable) {
-      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-      return authentication.getAuthorities().stream()
-                  .map(authority -> extractRole(authority.getAuthority(), regexpConsult))
-                  .filter(authority -> authority != null)
-                  .collect(Collectors.toList())
-                  .size()
-              > 0
-          || isAtLeastGestionnaire(domaine)
-          || isAdmin();
+      logger.info("Check if user is at least consultant on domaine {}", domaine);
+      Map<String, String> valueMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+      valueMap.put("domaine", domaine.toUpperCase());
+      String searchRole = StrSubstitutor.replace(regexpConsult, valueMap);
+      return checkIfUserGetRoles(searchRole) || isAtLeastGestionnaire(domaine);
     }
+    logger.warn("PreAuthorize on request is disabled, can cause security problem");
     return true;
   }
 
   public boolean isAtLeastGestionnaire(String domaine) {
     if (enable) {
-      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-      return authentication.getAuthorities().stream()
-                  .map(authority -> extractRole(authority.getAuthority(), regexpGest))
-                  .filter(authority -> authority != null)
-                  .collect(Collectors.toList())
-                  .size()
-              > 0
-          || isAdmin();
+      logger.info("Check if user is at least gestionnaire on domaine {}", domaine);
+      Map<String, String> valueMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+      valueMap.put("domaine", domaine.toUpperCase());
+      String searchRole = StrSubstitutor.replace(regexpGest, valueMap);
+      return checkIfUserGetRoles(searchRole) || isAdmin();
     }
+    logger.warn("PreAuthorize on request is disabled, can cause security problem");
     return true;
   }
 
   public boolean isAdmin() {
     if (enable) {
-      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-      return authentication.getAuthorities().stream()
-              .map(authority -> extractRole(authority.getAuthority(), regexpAdmin))
-              .filter(authority -> authority != null)
-              .collect(Collectors.toList())
-              .size()
-          > 0;
+      logger.info("Check if user is at least admin");
+      return checkIfUserGetRoles(regexpAdmin);
     }
+    logger.warn("PreAuthorize on request is disabled, can cause security problem");
     return true;
   }
 
-  private String extractRole(String authority, String regexp) {
-    Pattern pattern = Pattern.compile(regexp);
-    Matcher matcher = pattern.matcher(authority);
-    if (matcher.matches()) {
-      return authority;
+  private boolean checkIfUserGetRoles(String roleSearch) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    List<String> roles =
+        authentication.getAuthorities().stream()
+            .map(authority -> authority.getAuthority())
+            .collect(Collectors.toList());
+    if (roles.contains(roleSearch)) {
+      return true;
     }
-    return null;
+    return false;
   }
 }

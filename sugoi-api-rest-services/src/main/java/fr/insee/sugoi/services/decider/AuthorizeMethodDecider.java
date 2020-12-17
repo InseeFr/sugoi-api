@@ -30,33 +30,32 @@ public class AuthorizeMethodDecider {
 
   @Autowired PermissionService permissionService;
 
-  public boolean gotAtLeastOneSugoiRole() {
-    return permissionService.extractSugoiRole().size() > 0;
-  }
-
   public boolean isAtLeastReader(String realm, String userStorage) {
-    logger.info(
-        "Check if user is at least reader on realm {} and userStorage {}", realm, userStorage);
     if (enable) {
+      logger.info(
+          "Check if user is at least reader on realm {} and userStorage {}", realm, userStorage);
       return permissionService.isAtLeastReader(realm, userStorage);
     }
+    logger.warn("PreAuthorize on request is disabled, can cause security problem");
     return true;
   }
 
   public boolean isAtLeastWriter(String realm, String userStorage) {
-    logger.info(
-        "Check if user is at least writer on realm {} and userStorage {}", realm, userStorage);
     if (enable) {
+      logger.info(
+          "Check if user is at least writer on realm {} and userStorage {}", realm, userStorage);
       return permissionService.isAtLeastWriter(realm, userStorage);
     }
+    logger.warn("PreAuthorize on request is disabled, can cause security problem");
     return true;
   }
 
   public boolean isAdmin() {
-    logger.info("Check if user is admin");
     if (enable) {
-      permissionService.isAdmin();
+      logger.info("Check if user is admin");
+      return permissionService.isAdmin();
     }
+    logger.warn("PreAuthorize on request is disabled, can cause security problem");
     return true;
   }
 }

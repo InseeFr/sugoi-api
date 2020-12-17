@@ -15,13 +15,14 @@ package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.model.Realm;
-import fr.insee.sugoi.services.services.PermissionService;
+import fr.insee.sugoi.services.decider.AuthorizeMethodDecider;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -45,10 +46,11 @@ public class RealmController {
 
   @Autowired ConfigService configService;
 
-  @Autowired PermissionService permissionService;
+  @Autowired
+  @Qualifier("NewAuthorizeMethodDecider")
+  AuthorizeMethodDecider authorizeService;
 
   @GetMapping(value = "/realms")
-  @PreAuthorize("@NewAuthorizeMethodDecider.gotAtLeastOneSugoiRole()")
   public ResponseEntity<List<Realm>> getRealms(
       @RequestParam(name = "id", required = false) String id, Authentication authentication) {
     List<Realm> realms = new ArrayList<>();
@@ -58,14 +60,22 @@ public class RealmController {
       realms.addAll(configService.getRealms());
     }
     // Filter realm before sending if user not admin
-    if (!permissionService.isAdmin()) {
-      List<String> userRealmsAuthorization = permissionService.getMyRealm();
-      realms =
-          realms.stream()
-              .filter(realm -> containsIgnoreCase(userRealmsAuthorization, realm.getName()))
-              .collect(Collectors.toList());
+    if (!authorizeService.isAdmin()) {
+      List<Realm> realmsFiltered = new ArrayList<>();
+      for (Realm realm : realms) {
+        String realmName = realm.getName();
+        realm.setUserStorages(
+            realm.getUserStorages().stream()
+                .filter(us -> authorizeService.isAtLeastReader(realmName, us.getName()))
+                .collect(Collectors.toList()));
+        if (realm.getUserStorages().size() > 0) {
+          realmsFiltered.add(realm);
+        }
+      }
+      return new ResponseEntity<List<Realm>>(realmsFiltered, HttpStatus.OK);
+    } else {
+      return new ResponseEntity<List<Realm>>(realms, HttpStatus.OK);
     }
-    return new ResponseEntity<List<Realm>>(realms, HttpStatus.OK);
   }
 
   @PostMapping(
@@ -96,14 +106,5 @@ public class RealmController {
   @PreAuthorize("@NewAuthorizeMethodDecider.isAdmin()")
   public ResponseEntity<String> deleteRealm(@PathVariable("id") String id) {
     return new ResponseEntity<String>(id, HttpStatus.OK);
-  }
-
-  private boolean containsIgnoreCase(List<String> list, String soughtFor) {
-    for (String current : list) {
-      if (current.equalsIgnoreCase(soughtFor)) {
-        return true;
-      }
-    }
-    return false;
   }
 }
