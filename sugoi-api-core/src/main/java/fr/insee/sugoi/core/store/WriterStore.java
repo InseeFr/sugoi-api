@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.core.store;
 
+import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
@@ -32,6 +33,12 @@ public interface WriterStore {
   Group updateGroup(Group updatedGroup);
 
   void deleteOrganization(String organizationId);
+
+  Application createApplication(Application application);
+
+  Application updateApplication(Application updatedApplication);
+
+  void deleteApplication(String applicationName);
 
   Organization createOrganization(Organization organization);
 

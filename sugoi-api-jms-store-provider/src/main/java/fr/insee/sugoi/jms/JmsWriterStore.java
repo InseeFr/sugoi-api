@@ -15,6 +15,7 @@ package fr.insee.sugoi.jms;
 
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.jms.writer.JmsWriter;
+import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
@@ -119,6 +120,24 @@ public class JmsWriterStore implements WriterStore {
 
   @Override
   public void changePasswordResetStatus(User user, boolean isReset) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public Application createApplication(Application application) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Application updateApplication(Application updatedApplication) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void deleteApplication(String applicationName) {
     // TODO Auto-generated method stub
 
   }
