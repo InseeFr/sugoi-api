@@ -9,9 +9,9 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>fr.insee.sugoi</groupId>
-	<artifactId>sugoi-api-rest-services</artifactId>
+	<artifactId>sugoi-api-rest-old-services</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>sugoi-api-rest-services</name>
+	<name>sugoi-api-rest-old-services</name>
 	<description>Rest Services for Sugoi</description>
 	<packaging>jar</packaging>
 
@@ -39,6 +39,10 @@
 			<artifactId>sugoi-api-core</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>fr.insee.sugoi</groupId>
+			<artifactId>sugoi-api-converter</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>commons-lang</groupId>

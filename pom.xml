@@ -66,6 +66,16 @@
 
       <dependency>
         <groupId>fr.insee.sugoi</groupId>
+        <artifactId>sugoi-api-rest-commons-services</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>fr.insee.sugoi</groupId>
+        <artifactId>sugoi-api-rest-old-services</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>fr.insee.sugoi</groupId>
         <artifactId>sugoi-api-ldap-utils</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -137,6 +147,9 @@
     <module>sugoi-api-model</module>
     <module>sugoi-api-core</module>
     <module>sugoi-api-rest-services</module>
+    <module>sugoi-api-rest-old-services</module>
+    <module>sugoi-api-rest-commons-services</module>
+
     <module>sugoi-api-converter</module>
     <module>sugoi-api-distribution</module>
     <module>sugoi-api-file-config-provider</module>

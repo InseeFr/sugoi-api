@@ -1,0 +1,4 @@
+basic account: 
+admin/admin
+gestionnaire_domaine_2/gestionnaire
+consultant_domaine_1/consultant
