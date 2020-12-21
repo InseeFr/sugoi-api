@@ -18,10 +18,10 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.text.StrSubstitutor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -37,9 +37,10 @@ public class PermissionService {
   @Value("${fr.insee.sugoi.api.regexp.role.admin:}")
   private List<String> adminRoleList;
 
-  private static final Logger logger = LogManager.getLogger(PermissionService.class);
+  public static final Logger logger = org.slf4j.LoggerFactory.getLogger(PermissionService.class);
 
   public boolean isAtLeastReader(String realm, String userStorage) {
+
     Map<String, String> valueMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     valueMap.put("realm", realm.toUpperCase());
     valueMap.put("userStorage", userStorage.toUpperCase());
@@ -47,6 +48,7 @@ public class PermissionService {
         regexpReaderList.stream()
             .map(regexpReader -> StrSubstitutor.replace(regexpReader, valueMap, "$(", ")"))
             .collect(Collectors.toList());
+    logger.debug("Checking if user is in : {}", searchRoleList);
     return checkIfUserGetRoles(searchRoleList) || isAtLeastWriter(realm, userStorage);
   }
 
@@ -56,12 +58,14 @@ public class PermissionService {
     valueMap.put("userStorage", userStorage.toUpperCase());
     List<String> searchRoleList =
         regexpWriterList.stream()
-            .map(regexpReader -> StrSubstitutor.replace(regexpReader, valueMap, "$(", ")"))
+            .map(regexpWriter -> StrSubstitutor.replace(regexpWriter, valueMap, "$(", ")"))
             .collect(Collectors.toList());
+    logger.debug("Checking if user is in : {}", searchRoleList);
     return checkIfUserGetRoles(searchRoleList) || isAdmin();
   }
 
   public boolean isAdmin() {
+    logger.debug("Checking if user is in : {}", adminRoleList);
     return checkIfUserGetRoles(adminRoleList);
   }
 
@@ -69,10 +73,13 @@ public class PermissionService {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     List<String> roles =
         authentication.getAuthorities().stream()
-            .map(authority -> authority.getAuthority())
+            .map(GrantedAuthority::getAuthority)
+            .map(String::toUpperCase)
             .collect(Collectors.toList());
+    logger.debug("User roles: {}", roles);
     for (String roleSearch : rolesSearch) {
-      if (roles.contains(roleSearch)) {
+      logger.trace(roleSearch);
+      if (roles.contains(roleSearch.toUpperCase())) {
         return true;
       }
     }
