@@ -29,12 +29,17 @@ public class CorsConfiguration {
   /** Array of origins allowed to connect */
   private String[] allowedOrigins = {};
 
+  private String[] allowedMethods = {};
+
   @Bean
   public WebMvcConfigurer corsConfigurer() {
     return new WebMvcConfigurer() {
       @Override
       public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping(PATH_PATTERN).allowedOrigins(allowedOrigins);
+        registry
+            .addMapping(PATH_PATTERN)
+            .allowedOrigins(allowedOrigins)
+            .allowedMethods(allowedMethods);
       }
     };
   }
@@ -45,5 +50,13 @@ public class CorsConfiguration {
 
   public void setAllowedOrigins(String[] allowedOrigins) {
     this.allowedOrigins = allowedOrigins;
+  }
+
+  public String[] getAllowedMethods() {
+    return allowedMethods;
+  }
+
+  public void setAllowedMethods(String[] allowedMethods) {
+    this.allowedMethods = allowedMethods;
   }
 }
