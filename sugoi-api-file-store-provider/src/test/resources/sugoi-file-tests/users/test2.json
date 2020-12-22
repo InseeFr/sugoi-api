@@ -1,0 +1,13 @@
+{
+    "lastName": "Test",
+    "firstName": "Testo",
+    "mail": "test2@insee.fr",
+    "username": "test2",
+    "habilitations": [],
+    "address": {},
+    "metadatas": {},
+    "attributes": {
+        "function": "Dev",
+        "company": "Insee"
+    }
+}

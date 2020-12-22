@@ -15,6 +15,7 @@ package fr.insee.sugoi.store.file;
 
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
+import java.util.HashMap;
 import java.util.Map;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,6 +37,16 @@ public class FileStoreBeans {
   }
 
   public Map<String, String> generateConfig(Realm realm, UserStorage userStorage) {
-    return null;
+    Map<String, String> config = new HashMap<>();
+    if (userStorage.getUserSource() != null) {
+      config.put("userSource", userStorage.getUserSource());
+    }
+    if (userStorage.getOrganizationSource() != null) {
+      config.put("organisationSource", userStorage.getOrganizationSource());
+    }
+    if (realm.getAppSource() != null) {
+      config.put("applicationSource", realm.getAppSource());
+    }
+    return config;
   }
 }

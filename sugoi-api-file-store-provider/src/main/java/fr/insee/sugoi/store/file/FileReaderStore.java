@@ -20,18 +20,35 @@ import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class FileReaderStore implements ReaderStore {
+public class FileReaderStore extends AbstractFileStore implements ReaderStore {
 
-  public FileReaderStore(Map<String, String> generateConfig) {}
+  private static Logger logger = LoggerFactory.getLogger(FileReaderStore.class);
 
-  public FileReaderStore() {}
+  public FileReaderStore(Map<String, String> config) {
+    super(config);
+  }
 
   @Override
   public User getUser(String id) {
-    // TODO Auto-generated method stub
+    Path userPath = Paths.get(storeFolder, relativeFolderUsers).resolve(pathEncode(id) + EXTENSION);
+    if (userPath.toFile().exists() && userPath.toFile().canRead()) {
+      try {
+        return mapper.readValue(userPath.toFile(), User.class);
+      } catch (IOException e) {
+        logger.error("Error when getting user " + id, e);
+      }
+    }
     return null;
   }
 
@@ -49,61 +66,82 @@ public class FileReaderStore implements ReaderStore {
       String role,
       String rolePropriete,
       String certificat) {
-    // TODO Auto-generated method stub
-    return null;
+    File userFolder = Paths.get(storeFolder, relativeFolderUsers).toFile();
+    List<User> users =
+        Arrays.asList(userFolder.listFiles(f -> f.getName().endsWith(EXTENSION))).stream()
+            .map(f -> getFromFile(f, User.class))
+            .filter(u -> mail != null ? u.getMail().equalsIgnoreCase(mail) : true)
+            .filter(u -> identifiant != null ? u.getUsername().equalsIgnoreCase(identifiant) : true)
+            .limit(500)
+            .collect(Collectors.toList());
+
+    PageResult<User> pr = new PageResult<>();
+    pr.setResults(users);
+    return pr;
   }
 
   @Override
   public Organization getOrganization(String id) {
-    // TODO Auto-generated method stub
+    Path userPath =
+        Paths.get(storeFolder, relativeFolderOrganizations).resolve(pathEncode(id) + EXTENSION);
+    if (userPath.toFile().exists() && userPath.toFile().canRead()) {
+      try {
+        return mapper.readValue(userPath.toFile(), Organization.class);
+      } catch (IOException e) {
+        logger.error("Error when getting Organization " + id, e);
+      }
+    }
     return null;
   }
 
   @Override
-  public PageResult<User> getUsersInGroup(String appName, String groupName) {
-    // TODO Auto-generated method stub
-    return null;
+  public PageResult<User> getUsersInGroup(String applicationName, String groupName) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public PageResult<Organization> searchOrganizations(
       Map<String, String> searchProperties, PageableResult pageable, String searchOperator) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
-  public Group getGroup(String appName, String groupName) {
-    // TODO Auto-generated method stub
-    return null;
+  public Group getGroup(String applicationName, String name) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public PageResult<Group> searchGroups(
-      String appName,
+      String applicationName,
       Map<String, String> searchProperties,
       PageableResult pageable,
       String searchOperator) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public boolean validateCredentials(User user, String credential) {
-    // TODO Auto-generated method stub
-    return false;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public Application getApplication(String applicationName) {
-    // TODO Auto-generated method stub
+    Path userPath =
+        Paths.get(storeFolder, relativeFolderApplications)
+            .resolve(pathEncode(applicationName) + EXTENSION);
+    if (userPath.toFile().exists() && userPath.toFile().canRead()) {
+      try {
+        return mapper.readValue(userPath.toFile(), Application.class);
+      } catch (IOException e) {
+        logger.error("Error when getting Application " + applicationName, e);
+      }
+    }
     return null;
   }
 
   @Override
   public PageResult<Application> searchApplications(
       Map<String, String> searchProperties, PageableResult pageable, String searchOperator) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException();
   }
 }
