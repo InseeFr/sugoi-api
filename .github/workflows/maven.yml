@@ -34,6 +34,7 @@ jobs:
   docker:
     needs: build
     runs-on: ubuntu-latest
+    if: github.repository == 'inseefrlab/sugoi-api'
     steps:
       - uses: actions/checkout@v2
       - name: Download war
