@@ -19,6 +19,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -37,39 +38,24 @@ public class PermissionService {
   @Value("${fr.insee.sugoi.api.regexp.role.admin:}")
   private List<String> adminRoleList;
 
-  public static final Logger logger = org.slf4j.LoggerFactory.getLogger(PermissionService.class);
+  public static final Logger logger = LoggerFactory.getLogger(PermissionService.class);
 
   public boolean isAtLeastReader(String realm, String userStorage) {
-
-    Map<String, String> valueMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-    valueMap.put("realm", realm.toUpperCase());
-    valueMap.put("userStorage", userStorage.toUpperCase());
-    List<String> searchRoleList =
-        regexpReaderList.stream()
-            .map(regexpReader -> StrSubstitutor.replace(regexpReader, valueMap, "$(", ")"))
-            .collect(Collectors.toList());
-    logger.debug("Checking if user is in : {}", searchRoleList);
+    List<String> searchRoleList = getSearchRoleList(realm, userStorage, regexpReaderList);
     return checkIfUserGetRoles(searchRoleList) || isAtLeastWriter(realm, userStorage);
   }
 
   public boolean isAtLeastWriter(String realm, String userStorage) {
-    Map<String, String> valueMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-    valueMap.put("realm", realm.toUpperCase());
-    valueMap.put("userStorage", userStorage.toUpperCase());
-    List<String> searchRoleList =
-        regexpWriterList.stream()
-            .map(regexpWriter -> StrSubstitutor.replace(regexpWriter, valueMap, "$(", ")"))
-            .collect(Collectors.toList());
-    logger.debug("Checking if user is in : {}", searchRoleList);
+    List<String> searchRoleList = getSearchRoleList(realm, userStorage, regexpWriterList);
     return checkIfUserGetRoles(searchRoleList) || isAdmin();
   }
 
   public boolean isAdmin() {
-    logger.debug("Checking if user is in : {}", adminRoleList);
     return checkIfUserGetRoles(adminRoleList);
   }
 
   private boolean checkIfUserGetRoles(List<String> rolesSearch) {
+    logger.debug("Checking if user is in : {}", rolesSearch);
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     List<String> roles =
         authentication.getAuthorities().stream()
@@ -84,5 +70,17 @@ public class PermissionService {
       }
     }
     return false;
+  }
+
+  private List<String> getSearchRoleList(
+      String realm, String userStorage, List<String> regexpList) {
+    Map<String, String> valueMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    valueMap.put("realm", realm.toUpperCase());
+    if (userStorage != null) {
+      valueMap.put("userStorage", userStorage.toUpperCase());
+    }
+    return regexpList.stream()
+        .map(regexp -> StrSubstitutor.replace(regexp, valueMap, "$(", ")"))
+        .collect(Collectors.toList());
   }
 }
