@@ -15,14 +15,15 @@ package fr.insee.sugoi.config.file;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.model.Realm;
-import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -32,8 +33,10 @@ import org.springframework.stereotype.Component;
     matchIfMissing = true)
 public class LocalFileRealmProviderDAO implements RealmProvider {
 
-  @Value("${fr.insee.sugoi.realm.config.local.path:/realms.json}")
+  @Value("${fr.insee.sugoi.realm.config.local.path:classpath:/realms.json}")
   private String localFilePath;
+
+  @Autowired ResourceLoader resourceLoader;
 
   private List<Realm> realms;
   private ObjectMapper mapper = new ObjectMapper();
@@ -41,12 +44,7 @@ public class LocalFileRealmProviderDAO implements RealmProvider {
   @Override
   public Realm load(String realmName) {
     if (realms == null) {
-      try {
-        URL is = this.getClass().getResource(localFilePath);
-        realms = mapper.readValue(is, new TypeReference<List<Realm>>() {});
-      } catch (IOException e) {
-        throw new RealmNotFoundException(e.getMessage());
-      }
+      realms = findAll();
     }
     return realms.stream()
         .filter(r -> r.getName().equalsIgnoreCase(realmName))
@@ -57,10 +55,14 @@ public class LocalFileRealmProviderDAO implements RealmProvider {
   @Override
   public List<Realm> findAll() {
     try {
-      URL is = this.getClass().getResource(localFilePath);
+      Resource realmsResource = resourceLoader.getResource(localFilePath);
+      if (!realmsResource.exists()) {
+        throw new IllegalArgumentException("No resources found in " + localFilePath);
+      }
+      InputStream is = realmsResource.getInputStream();
       realms = mapper.readValue(is, new TypeReference<List<Realm>>() {});
     } catch (Exception e) {
-      e.printStackTrace();
+      throw new IllegalArgumentException("No resources found in " + localFilePath, e);
     }
     return realms;
   }
