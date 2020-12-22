@@ -59,19 +59,19 @@ public class JmsWriterStore implements WriterStore {
   }
 
   @Override
-  public void deleteGroup(String name) {
+  public void deleteGroup(String appName, String groupName) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public Group createGroup(Group group) {
+  public Group createGroup(String appName, Group group) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Group updateGroup(Group updatedGroup) {
+  public Group updateGroup(String appName, Group updatedGroup) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -95,13 +95,13 @@ public class JmsWriterStore implements WriterStore {
   }
 
   @Override
-  public void deleteUserFromGroup(String groupName, String userId) {
+  public void deleteUserFromGroup(String appName, String groupName, String userId) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void addUserToGroup(String groupName, String userId) {
+  public void addUserToGroup(String appName, String groupName, String userId) {
     // TODO Auto-generated method stub
 
   }
