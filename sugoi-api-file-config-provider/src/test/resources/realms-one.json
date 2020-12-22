@@ -1,0 +1,17 @@
+[
+    {
+        "name": "test",
+        "url": "/test",
+        "appSource": "/applications",
+        "userStorages": [
+            {
+                "name": "default",
+                "userSource": "/users",
+                "organizationSource": "/organizations",
+                "properties": null,
+                "readerType": null,
+                "writerType": null
+            }
+        ]
+    }
+]
