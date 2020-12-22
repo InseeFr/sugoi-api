@@ -26,11 +26,11 @@ public interface WriterStore {
 
   User updateUser(User updatedUser);
 
-  void deleteGroup(String name);
+  void deleteGroup(String appName, String groupName);
 
-  Group createGroup(Group group);
+  Group createGroup(String appName, Group group);
 
-  Group updateGroup(Group updatedGroup);
+  Group updateGroup(String appName, Group updatedGroup);
 
   void deleteOrganization(String organizationId);
 
@@ -44,9 +44,9 @@ public interface WriterStore {
 
   Organization updateOrganization(Organization updatedOrganization);
 
-  void deleteUserFromGroup(String groupName, String userId);
+  void deleteUserFromGroup(String appName, String groupName, String userId);
 
-  void addUserToGroup(String groupName, String userId);
+  void addUserToGroup(String appName, String groupName, String userId);
 
   void reinitPassword(User user);
 

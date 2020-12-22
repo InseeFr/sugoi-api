@@ -60,27 +60,30 @@ public class FileReaderStore implements ReaderStore {
   }
 
   @Override
-  public PageResult<User> getUsersInGroup(String groupName) {
+  public PageResult<User> getUsersInGroup(String appName, String groupName) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Organization searchOrganizations(
+  public PageResult<Organization> searchOrganizations(
       Map<String, String> searchProperties, PageableResult pageable, String searchOperator) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Group getGroup(String name) {
+  public Group getGroup(String appName, String groupName) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public PageResult<Group> searchGroups(
-      Map<String, String> searchProperties, PageableResult pageable, String searchOperator) {
+      String appName,
+      Map<String, String> searchProperties,
+      PageableResult pageable,
+      String searchOperator) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -98,7 +101,7 @@ public class FileReaderStore implements ReaderStore {
   }
 
   @Override
-  public Application searchApplications(
+  public PageResult<Application> searchApplications(
       Map<String, String> searchProperties, PageableResult pageable, String searchOperator) {
     // TODO Auto-generated method stub
     return null;

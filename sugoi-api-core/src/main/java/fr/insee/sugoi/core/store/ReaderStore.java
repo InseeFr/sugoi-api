@@ -40,22 +40,25 @@ public interface ReaderStore {
       String rolePropriete,
       String certificat);
 
-  public PageResult<User> getUsersInGroup(String groupName);
+  public PageResult<User> getUsersInGroup(String appName, String groupName);
 
   public Organization getOrganization(String id);
 
-  public Organization searchOrganizations(
+  public PageResult<Organization> searchOrganizations(
       Map<String, String> searchProperties, PageableResult pageable, String searchOperator);
 
-  public Group getGroup(String name);
+  public Group getGroup(String appName, String groupName);
 
   public PageResult<Group> searchGroups(
-      Map<String, String> searchProperties, PageableResult pageable, String searchOperator);
+      String appName,
+      Map<String, String> searchProperties,
+      PageableResult pageable,
+      String searchOperator);
 
   public boolean validateCredentials(User user, String credential);
 
   public Application getApplication(String applicationName);
 
-  public Application searchApplications(
+  public PageResult<Application> searchApplications(
       Map<String, String> searchProperties, PageableResult pageable, String searchOperator);
 }
