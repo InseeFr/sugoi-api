@@ -13,9 +13,16 @@
 */
 package fr.insee.sugoi.core.service;
 
+import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.model.Organization;
 
 public interface OrganizationService {
 
-  Organization searchOrganization(String realm, String name);
+  Organization create(String realm, String storage, Organization organization);
+
+  void delete(String realm, String id);
+
+  PageResult<Organization> search(String realm, String application, String role, String property);
+
+  void update(String realm, String storage, String id, Organization organization);
 }
