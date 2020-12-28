@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
+import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
@@ -61,6 +62,7 @@ public class LdapWriterStoreTest {
     Realm realm = new Realm();
     realm.setName("domaine1");
     realm.setUrl("localhost");
+    realm.setAppSource(appSource);
     return realm;
   }
 
@@ -147,5 +149,53 @@ public class LdapWriterStoreTest {
     ldapWriterStore.deleteUser("byebye");
     assertThat(
         "testc should have been deleted", ldapReaderStore.getUser("byebye"), is(nullValue()));
+  }
+
+  @Test
+  public void testCreateApplication() {
+    LdapWriterStore ldapWriterStore =
+        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    Application application = new Application();
+    application.setName("MyApplication");
+    application.setOwner("Mine");
+    ldapWriterStore.createApplication(application);
+    assertThat(
+        "MyApplication should have been added",
+        ldapReaderStore.getApplication("MyApplication"),
+        not(nullValue()));
+  }
+
+  @Test
+  public void testUpdateApplicationOwner() {
+    LdapWriterStore ldapWriterStore =
+        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    Application application = ldapReaderStore.getApplication("Applitest");
+    application.setOwner("Mine");
+    ldapWriterStore.updateApplication(application);
+    assertThat(
+        "Applitest should have a new owner",
+        ldapReaderStore.getApplication("Applitest").getOwner(),
+        is("Mine"));
+  }
+
+  @Test
+  public void testDeleteApplication() {
+    LdapWriterStore ldapWriterStore =
+        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    Application application = new Application();
+    application.setName("EmptyApplication");
+    application.setOwner("Mine");
+    ldapWriterStore.createApplication(application);
+    ldapWriterStore.deleteApplication("EmptyApplication");
+    assertThat(
+        "EmptyApplication should have been deleted",
+        ldapReaderStore.getApplication("EmptyApplication"),
+        is(nullValue()));
   }
 }

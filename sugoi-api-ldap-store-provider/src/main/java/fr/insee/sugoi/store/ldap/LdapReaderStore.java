@@ -27,6 +27,7 @@ import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;
+import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
 import fr.insee.sugoi.model.Application;
@@ -190,14 +191,29 @@ public class LdapReaderStore implements ReaderStore {
 
   @Override
   public Application getApplication(String applicationName) {
-    // TODO Auto-generated method stub
-    return null;
+    SearchResultEntry entry =
+        getEntryByDn("ou=" + applicationName + "," + config.get("app_source"));
+    return (entry != null) ? ApplicationLdapMapper.mapFromSearchEntry(entry) : null;
   }
 
   @Override
   public PageResult<Application> searchApplications(
       Map<String, String> searchProperties, PageableResult pageable, String searchOperator) {
-    // TODO Auto-generated method stub
-    return null;
+    Filter filter = LdapUtils.getFilterFromCriteria(searchProperties);
+    try {
+      SearchRequest searchRequest =
+          new SearchRequest(config.get("app_source"), SearchScope.ONE, filter, "*", "+");
+      LdapUtils.setRequestControls(searchRequest, pageable);
+      SearchResult searchResult = ldapPoolConnection.search(searchRequest);
+      List<Application> applications =
+          searchResult.getSearchEntries().stream()
+              .map(e -> ApplicationLdapMapper.mapFromSearchEntry(e))
+              .collect(Collectors.toList());
+      PageResult<Application> page = new PageResult<>();
+      page.setResults(applications);
+      return page;
+    } catch (LDAPSearchException e) {
+      throw new RuntimeException("Fail to search applications in ldap", e);
+    }
   }
 }

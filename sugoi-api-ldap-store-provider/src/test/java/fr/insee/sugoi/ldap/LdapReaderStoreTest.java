@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
 import fr.insee.sugoi.core.model.PageableResult;
+import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
@@ -63,6 +64,7 @@ public class LdapReaderStoreTest {
     Realm realm = new Realm();
     realm.setName("domaine1");
     realm.setUrl("localhost");
+    realm.setAppSource(appSource);
     return realm;
   }
 
@@ -166,5 +168,52 @@ public class LdapReaderStoreTest {
             .getResults();
     assertThat("Should find one result", users.size(), is(1));
     assertThat("First element found should be testc", users.get(0).getUsername(), is("testc"));
+  }
+
+  @Test
+  public void testGetApplication() {
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    assertThat(
+        "Should get applitest",
+        ldapReaderStore.getApplication("Applitest").getName(),
+        is("Applitest"));
+  }
+
+  @Test
+  public void testGetNonexistentApplication() {
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    assertThat("Should get null", ldapReaderStore.getApplication("nottestc"), is(nullValue()));
+  }
+
+  @Test
+  public void testSearchAllApplications() {
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    PageableResult pageableResult = new PageableResult();
+    Map<String, String> searchProperties = new HashMap<>();
+    List<Application> applications =
+        ldapReaderStore.searchApplications(searchProperties, pageableResult, "").getResults();
+    assertThat(
+        "Should contain applitest",
+        applications.stream().anyMatch(appli -> appli.getName().equals("Applitest")));
+    assertThat(
+        "Should contain webservicesldap",
+        applications.stream().anyMatch(appli -> appli.getName().equals("WebServicesLdap")));
+  }
+
+  @Test
+  public void testSearchApplicationWithMatchingDescription() {
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    PageableResult pageableResult = new PageableResult();
+    Map<String, String> searchProperties = new HashMap<>();
+    searchProperties.put("description", "Branche privative de l'application applitest");
+    List<Application> applications =
+        ldapReaderStore.searchApplications(searchProperties, pageableResult, "").getResults();
+    assertThat("Should find one result", applications.size(), is(1));
+    assertThat(
+        "First element found should be Applitest", applications.get(0).getName(), is("Applitest"));
   }
 }
