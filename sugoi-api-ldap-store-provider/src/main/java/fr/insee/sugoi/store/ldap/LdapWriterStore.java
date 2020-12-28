@@ -20,6 +20,7 @@ import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldap.sdk.ModifyRequest;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
+import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
 import fr.insee.sugoi.model.Application;
@@ -178,19 +179,44 @@ public class LdapWriterStore implements WriterStore {
 
   @Override
   public Application createApplication(Application application) {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      AddRequest ar =
+          new AddRequest(
+              "ou=" + application.getName() + "," + config.get("app_source"),
+              ApplicationLdapMapper.mapToAttribute(application));
+      ldapPoolConnection.add(ar);
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to create application" + application.getName(), e);
+    }
+    return application;
   }
 
   @Override
   public Application updateApplication(Application updatedApplication) {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      ModifyRequest mr =
+          new ModifyRequest(
+              "ou=" + updatedApplication.getName() + "," + config.get("app_source"),
+              ApplicationLdapMapper.createMods(updatedApplication));
+      ldapPoolConnection.modify(mr);
+    } catch (LDAPException e) {
+      throw new RuntimeException(
+          "Failed to update application " + updatedApplication.getName() + "while writing to LDAP",
+          e);
+    }
+    return updatedApplication;
   }
 
   @Override
   public void deleteApplication(String applicationName) {
-    // TODO Auto-generated method stub
+    try {
+      // the application must be empty to be deleted
+      DeleteRequest dr =
+          new DeleteRequest("ou=" + applicationName + "," + config.get("app_source"));
+      ldapPoolConnection.delete(dr);
 
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to delete application " + applicationName, e);
+    }
   }
 }
