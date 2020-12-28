@@ -21,7 +21,6 @@ import com.unboundid.ldap.sdk.SearchRequest;
 import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
-import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.store.ReaderStore;
@@ -63,7 +62,11 @@ public class LdapReaderStore implements ReaderStore {
   public User getUser(String id) {
     logger.debug("Searching user {}", id);
     SearchResultEntry entry = getEntryByDn("uid=" + id + "," + config.get("user_source"));
-    return UserLdapMapper.mapFromSearchEntry(entry);
+    if (entry != null) {
+      return UserLdapMapper.mapFromSearchEntry(entry);
+    } else {
+      return null;
+    }
   }
 
   @Override
@@ -128,7 +131,7 @@ public class LdapReaderStore implements ReaderStore {
 
       return entry;
     } catch (LDAPException e) {
-      throw new EntityNotFoundException("Entry not found");
+      throw new RuntimeException("Failed to execute " + dn, e);
     }
   }
 

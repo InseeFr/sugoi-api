@@ -13,14 +13,25 @@
 */
 package fr.insee.sugoi.ldap.utils.mapper;
 
+import com.unboundid.ldap.sdk.Attribute;
+import com.unboundid.ldap.sdk.Modification;
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import fr.insee.sugoi.ldap.utils.mapper.properties.UserLdap;
 import fr.insee.sugoi.model.User;
+import java.util.List;
 
 public class UserLdapMapper {
 
   public static User mapFromSearchEntry(SearchResultEntry searchResultEntry) {
     User user = GenericLdapMapper.transform(searchResultEntry, UserLdap.class, User.class);
     return user;
+  }
+
+  public static List<Attribute> mapToAttribute(User u) {
+    return GenericLdapMapper.toAttribute(u, UserLdap.class, User.class);
+  }
+
+  public static List<Modification> createMods(User updatedUser) {
+    return GenericLdapMapper.createMods(updatedUser, UserLdap.class, User.class);
   }
 }

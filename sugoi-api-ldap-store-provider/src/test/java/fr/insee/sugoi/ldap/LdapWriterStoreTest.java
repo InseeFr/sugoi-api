@@ -13,9 +13,18 @@
 */
 package fr.insee.sugoi.ldap;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+
 import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
+import fr.insee.sugoi.store.ldap.LdapReaderStore;
 import fr.insee.sugoi.store.ldap.LdapStoreBeans;
+import fr.insee.sugoi.store.ldap.LdapWriterStore;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.ldap.embedded.EmbeddedLdapAutoConfiguration;
@@ -55,4 +64,45 @@ public class LdapWriterStoreTest {
   }
 
   @Autowired ApplicationContext context;
+
+  @Test
+  public void testCreateUser() {
+    LdapWriterStore ldapWriterStore =
+        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    User user = new User();
+    user.setUsername("Titi");
+    user.setLastName("Test");
+    user.setFirstName("Petit");
+    user.setMail("petittest@titi.fr");
+    ldapWriterStore.createUser(user);
+    assertThat("Titi should have been added", ldapReaderStore.getUser("Titi"), not(nullValue()));
+  }
+
+  @Test
+  public void testUpdateUserMail() {
+    LdapWriterStore ldapWriterStore =
+        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    User user = ldapReaderStore.getUser("testo");
+    user.setMail("nvtest@insee.fr");
+    ldapWriterStore.updateUser(user);
+    assertThat(
+        "testc should have a new mail",
+        ldapReaderStore.getUser("testo").getMail(),
+        is("nvtest@insee.fr"));
+  }
+
+  @Test
+  public void testDeleteUser() {
+    LdapWriterStore ldapWriterStore =
+        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    ldapWriterStore.deleteUser("byebye");
+    assertThat(
+        "testc should have been deleted", ldapReaderStore.getUser("byebye"), is(nullValue()));
+  }
 }
