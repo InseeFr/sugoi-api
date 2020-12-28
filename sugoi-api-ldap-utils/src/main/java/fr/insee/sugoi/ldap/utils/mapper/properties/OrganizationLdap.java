@@ -17,11 +17,17 @@ import fr.insee.sugoi.ldap.utils.mapper.properties.utils.AttributeLdapName;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToAttribute;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToMapElement;
 
+@LdapObjectClass(
+    values = {
+      "top",
+      "inseeCompte",
+      "inseeOrganisation",
+    })
 public class OrganizationLdap {
 
-  @AttributeLdapName("cn")
+  @AttributeLdapName("uid")
   @MapToAttribute("identifiant")
-  public String cn;
+  public String uid;
 
   @AttributeLdapName("description")
   @MapToMapElement(name = "attributes", key = "description")

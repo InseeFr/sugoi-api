@@ -13,16 +13,28 @@
 */
 package fr.insee.sugoi.ldap.utils.mapper;
 
+import com.unboundid.ldap.sdk.Attribute;
+import com.unboundid.ldap.sdk.Modification;
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import fr.insee.sugoi.ldap.utils.mapper.properties.OrganizationLdap;
 import fr.insee.sugoi.model.Organization;
+import java.util.List;
 
 public class OrganizationLdapMapper {
 
   public static Organization mapFromSearchEntry(SearchResultEntry searchResultEntry) {
     Organization org =
         GenericLdapMapper.transform(searchResultEntry, OrganizationLdap.class, Organization.class);
-    org.setGpgkey(searchResultEntry.getAttribute("inseeClefChiffrement").getValueByteArray());
+    // org.setGpgkey(searchResultEntry.getAttribute("inseeClefChiffrement").getValueByteArray());
     return org;
+  }
+
+  public static List<Attribute> mapToAttribute(Organization organization) {
+    return GenericLdapMapper.toAttribute(organization, OrganizationLdap.class, Organization.class);
+  }
+
+  public static List<Modification> createMods(Organization updatedOrganization) {
+    return GenericLdapMapper.createMods(
+        updatedOrganization, OrganizationLdap.class, Organization.class);
   }
 }

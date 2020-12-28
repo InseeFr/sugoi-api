@@ -18,12 +18,15 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
 import fr.insee.sugoi.core.model.PageableResult;
+import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
 import fr.insee.sugoi.store.ldap.LdapReaderStore;
 import fr.insee.sugoi.store.ldap.LdapStoreBeans;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,6 +67,49 @@ public class LdapReaderStoreTest {
   }
 
   @Autowired ApplicationContext context;
+
+  @Test
+  public void testGetOrganization() {
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    assertThat(
+        "Should get testo", ldapReaderStore.getOrganization("testo").getIdentifiant(), is("testo"));
+  }
+
+  @Test
+  public void testGetNonexistentOrganization() {
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    assertThat("Should get null", ldapReaderStore.getOrganization("nottesto"), is(nullValue()));
+  }
+
+  @Test
+  public void testSearchAllOrganizations() {
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    PageableResult pageableResult = new PageableResult();
+    Map<String, String> searchProperties = new HashMap<>();
+    List<Organization> organizations =
+        ldapReaderStore.searchOrganizations(searchProperties, pageableResult, "").getResults();
+    assertThat(
+        "First element found should be testi", organizations.get(0).getIdentifiant(), is("testi"));
+    assertThat(
+        "Second element found should be testo", organizations.get(1).getIdentifiant(), is("testo"));
+  }
+
+  @Test
+  public void testSearchOrganizationsWithMatchingDescription() {
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    PageableResult pageableResult = new PageableResult();
+    Map<String, String> searchProperties = new HashMap<>();
+    searchProperties.put("description", "Insee");
+    List<Organization> organizations =
+        ldapReaderStore.searchOrganizations(searchProperties, pageableResult, "").getResults();
+    assertThat("Should find one result", organizations.size(), is(1));
+    assertThat(
+        "First element found should be testo", organizations.get(0).getIdentifiant(), is("testo"));
+  }
 
   @Test
   public void testGetUser() {

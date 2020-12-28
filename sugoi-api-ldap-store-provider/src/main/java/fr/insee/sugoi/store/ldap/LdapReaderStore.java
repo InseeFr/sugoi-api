@@ -72,10 +72,13 @@ public class LdapReaderStore implements ReaderStore {
   @Override
   public Organization getOrganization(String id) {
     SearchResultEntry entry = getEntryByDn("uid=" + id + "," + config.get("organization_source"));
-    Organization org = OrganizationLdapMapper.mapFromSearchEntry(entry);
-    if (org.getAttributes().containsKey("adressDn")) {
-      SearchResultEntry result = getEntryByDn(org.getAttributes().get("adressDn").toString());
-      org.setAddress(AddressLdapMapper.mapFromSearchEntry(result));
+    Organization org = (entry != null) ? OrganizationLdapMapper.mapFromSearchEntry(entry) : null;
+    if (org != null
+        && org.getAttributes().containsKey("adressDn")
+        && org.getAttributes().get("adressDn") != null) {
+      SearchResultEntry addressResult =
+          getEntryByDn(org.getAttributes().get("adressDn").toString());
+      org.setAddress(AddressLdapMapper.mapFromSearchEntry(addressResult));
     }
     return org;
   }
@@ -144,8 +147,23 @@ public class LdapReaderStore implements ReaderStore {
   @Override
   public PageResult<Organization> searchOrganizations(
       Map<String, String> searchProperties, PageableResult pageable, String searchOperator) {
-    // TODO Auto-generated method stub
-    return null;
+    Filter filter = LdapUtils.getFilterFromCriteria(searchProperties);
+    try {
+      SearchRequest searchRequest =
+          new SearchRequest(
+              config.get("organization_source"), SearchScope.SUBORDINATE_SUBTREE, filter, "*", "+");
+      LdapUtils.setRequestControls(searchRequest, pageable);
+      SearchResult searchResult = ldapPoolConnection.search(searchRequest);
+      List<Organization> organizations =
+          searchResult.getSearchEntries().stream()
+              .map(e -> OrganizationLdapMapper.mapFromSearchEntry(e))
+              .collect(Collectors.toList());
+      PageResult<Organization> page = new PageResult<>();
+      page.setResults(organizations);
+      return page;
+    } catch (LDAPSearchException e) {
+      throw new RuntimeException("Fail to search organizations in ldap", e);
+    }
   }
 
   @Override

@@ -20,6 +20,7 @@ import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldap.sdk.ModifyRequest;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
+import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
@@ -101,20 +102,48 @@ public class LdapWriterStore implements WriterStore {
 
   @Override
   public void deleteOrganization(String name) {
-    // TODO Auto-generated method stub
-
+    try {
+      DeleteRequest dr = new DeleteRequest("uid=" + name + "," + config.get("organization_source"));
+      ldapPoolConnection.delete(dr);
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to delete organisation " + name, e);
+    }
   }
 
   @Override
   public Organization createOrganization(Organization organization) {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      AddRequest ar =
+          new AddRequest(
+              "uid=" + organization.getIdentifiant() + "," + config.get("organization_source"),
+              OrganizationLdapMapper.mapToAttribute(organization));
+      ldapPoolConnection.add(ar);
+    } catch (LDAPException e) {
+      throw new RuntimeException(
+          "Failed to create organization " + organization.getIdentifiant(), e);
+    }
+    return organization;
   }
 
   @Override
   public Organization updateOrganization(Organization updatedOrganization) {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      ModifyRequest mr =
+          new ModifyRequest(
+              "uid="
+                  + updatedOrganization.getIdentifiant()
+                  + ","
+                  + config.get("organization_source"),
+              OrganizationLdapMapper.createMods(updatedOrganization));
+      ldapPoolConnection.modify(mr);
+    } catch (LDAPException e) {
+      throw new RuntimeException(
+          "Failed to update organization "
+              + updatedOrganization.getIdentifiant()
+              + "while writing to LDAP",
+          e);
+    }
+    return updatedOrganization;
   }
 
   @Override
