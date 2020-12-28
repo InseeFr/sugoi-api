@@ -17,6 +17,15 @@ import fr.insee.sugoi.ldap.utils.mapper.properties.utils.AttributeLdapName;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToAttribute;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToMapElement;
 
+@LdapObjectClass(
+    values = {
+      "top",
+      "inseeCompte",
+      "inseeContact",
+      "inseeAttributsAuthentification",
+      "inseeAttributsHabilitation",
+      "inseeAttributsCommunication"
+    })
 public class UserLdap {
 
   @MapToAttribute("username")

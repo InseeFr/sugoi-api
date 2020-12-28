@@ -13,11 +13,14 @@
 */
 package fr.insee.sugoi.store.ldap;
 
+import com.unboundid.ldap.sdk.AddRequest;
 import com.unboundid.ldap.sdk.DeleteRequest;
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
 import com.unboundid.ldap.sdk.LDAPException;
+import com.unboundid.ldap.sdk.ModifyRequest;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
+import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
@@ -46,20 +49,36 @@ public class LdapWriterStore implements WriterStore {
       DeleteRequest dr = new DeleteRequest("uid=" + id + "," + config.get("user_source"));
       ldapPoolConnection.delete(dr);
     } catch (LDAPException e) {
-      throw new RuntimeException("Impossible de supprimer l'utilisateur");
+      throw new RuntimeException("Failed to delete user " + id, e);
     }
   }
 
   @Override
   public User createUser(User user) {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      AddRequest ar =
+          new AddRequest(
+              "uid=" + user.getUsername() + "," + config.get("user_source"),
+              UserLdapMapper.mapToAttribute(user));
+      ldapPoolConnection.add(ar);
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to create user", e);
+    }
+    return user;
   }
 
   @Override
   public User updateUser(User updatedUser) {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      ModifyRequest mr =
+          new ModifyRequest(
+              "uid=" + updatedUser.getUsername() + "," + config.get("user_source"),
+              UserLdapMapper.createMods(updatedUser));
+      ldapPoolConnection.modify(mr);
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to update user while writing to LDAP", e);
+    }
+    return updatedUser;
   }
 
   @Override

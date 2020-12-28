@@ -13,9 +13,18 @@
 */
 package fr.insee.sugoi.ldap;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+
+import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
+import fr.insee.sugoi.store.ldap.LdapReaderStore;
 import fr.insee.sugoi.store.ldap.LdapStoreBeans;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.ldap.embedded.EmbeddedLdapAutoConfiguration;
@@ -55,4 +64,61 @@ public class LdapReaderStoreTest {
   }
 
   @Autowired ApplicationContext context;
+
+  @Test
+  public void testGetUser() {
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    assertThat("Should get testc", ldapReaderStore.getUser("testc").getUsername(), is("testc"));
+  }
+
+  @Test
+  public void testGetNonexistentUser() {
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    assertThat("Should get null", ldapReaderStore.getUser("nottestc"), is(nullValue()));
+  }
+
+  @Test
+  public void testSearchAllUsers() {
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    PageableResult pageableResult = new PageableResult();
+    List<User> users =
+        ldapReaderStore
+            .searchUsers(
+                null, null, null, null, null, pageableResult, "et", null, null, null, null, null)
+            .getResults();
+    assertThat(
+        "Should contain testo",
+        users.stream().anyMatch(user -> user.getUsername().equals("testo")));
+    assertThat(
+        "Should contain testc",
+        users.stream().anyMatch(user -> user.getUsername().equals("testc")));
+  }
+
+  @Test
+  public void testSearchUserWithMatchingMail() {
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    PageableResult pageableResult = new PageableResult();
+    List<User> users =
+        ldapReaderStore
+            .searchUsers(
+                null,
+                null,
+                null,
+                null,
+                "test@test.fr",
+                pageableResult,
+                "et",
+                null,
+                null,
+                null,
+                null,
+                null)
+            .getResults();
+    assertThat("Should find one result", users.size(), is(1));
+    assertThat("First element found should be testc", users.get(0).getUsername(), is("testc"));
+  }
 }
