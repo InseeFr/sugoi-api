@@ -28,12 +28,15 @@ import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
+import fr.insee.sugoi.ldap.utils.mapper.GroupLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -141,8 +144,17 @@ public class LdapReaderStore implements ReaderStore {
 
   @Override
   public PageResult<User> getUsersInGroup(String appName, String groupName) {
-    // TODO Auto-generated method stub
-    return null;
+    PageResult<User> page = new PageResult<>();
+    SearchResultEntry entry = getGroupResultEntry(appName, groupName);
+    if (entry.hasAttribute("uniqueMember")) {
+      page.setResults(
+          Arrays.stream(entry.getAttribute("uniqueMember").getValues())
+              .map(uniqueMember -> getUser(uniqueMember.split(",")[0].substring(4)))
+              .collect(Collectors.toList()));
+    } else {
+      page.setResults(new ArrayList<>());
+    }
+    return page;
   }
 
   @Override
@@ -168,9 +180,31 @@ public class LdapReaderStore implements ReaderStore {
   }
 
   @Override
-  public Group getGroup(String appName, String name) {
-    // TODO Auto-generated method stub
-    return null;
+  public Group getGroup(String appName, String groupName) {
+    SearchResultEntry entry = getGroupResultEntry(appName, groupName);
+    return (entry != null) ? GroupLdapMapper.mapFromSearchEntry(entry) : null;
+  }
+
+  private SearchResultEntry getGroupResultEntry(String appName, String groupName) {
+    SearchRequest searchRequest =
+        new SearchRequest(
+            "ou=" + appName + "," + config.get("app_source"),
+            SearchScope.SUBORDINATE_SUBTREE,
+            Filter.createEqualityFilter("cn", groupName));
+    try {
+      SearchResult searchResult = ldapPoolConnection.search(searchRequest);
+      if (searchResult.getEntryCount() == 1) {
+        return searchResult.getSearchEntries().get(0);
+      } else if (searchResult.getEntryCount() == 0) {
+        logger.debug("No matching group found for " + groupName);
+        return null;
+      } else {
+        logger.error("Found too many matches");
+        return null;
+      }
+    } catch (LDAPSearchException e) {
+      throw new RuntimeException("Fail to get group " + groupName + " in ldap", e);
+    }
   }
 
   @Override
@@ -179,8 +213,29 @@ public class LdapReaderStore implements ReaderStore {
       Map<String, String> searchProperties,
       PageableResult pageable,
       String searchOperator) {
-    // TODO Auto-generated method stub
-    return null;
+    Filter isGroup = Filter.createSubAnyFilter("objectClass", "groupOfUniqueNames");
+    Filter filter =
+        Filter.createANDFilter(LdapUtils.getFilterFromCriteria(searchProperties), isGroup);
+    try {
+      SearchRequest searchRequest =
+          new SearchRequest(
+              "ou=" + appName + "," + config.get("app_source"),
+              SearchScope.SUBORDINATE_SUBTREE,
+              filter,
+              "*",
+              "+");
+      LdapUtils.setRequestControls(searchRequest, pageable);
+      SearchResult searchResult = ldapPoolConnection.search(searchRequest);
+      List<Group> groups =
+          searchResult.getSearchEntries().stream()
+              .map(e -> GroupLdapMapper.mapFromSearchEntry(e))
+              .collect(Collectors.toList());
+      PageResult<Group> page = new PageResult<>();
+      page.setResults(groups);
+      return page;
+    } catch (LDAPSearchException e) {
+      throw new RuntimeException("Fail to search groups in ldap", e);
+    }
   }
 
   @Override
