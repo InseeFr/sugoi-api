@@ -23,6 +23,8 @@ import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class LdapUtils {
 
@@ -72,6 +74,14 @@ public class LdapUtils {
       return LdapFilter.or(filters);
     }
     throw new RuntimeException("Impossible de determiner le type de la recherche");
+  }
+
+  public static Filter getFilterFromCriteria(Map<String, String> searchProperties) {
+    return LdapFilter.and(
+        searchProperties.keySet().stream()
+            .filter(key -> searchProperties.get(key) != null)
+            .map(key -> LdapFilter.contains(key, searchProperties.get(key)))
+            .collect(Collectors.toList()));
   }
 
   public static <T> void setResponseControls(PageResult<T> page, SearchResult searchResult) {

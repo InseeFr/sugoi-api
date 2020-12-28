@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
+import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
@@ -64,6 +65,48 @@ public class LdapWriterStoreTest {
   }
 
   @Autowired ApplicationContext context;
+
+  @Test
+  public void testCreateOrganization() {
+    LdapWriterStore ldapWriterStore =
+        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    Organization organization = new Organization();
+    organization.setIdentifiant("Titi");
+    organization.addAttributes("description", "titi le test");
+    ldapWriterStore.createOrganization(organization);
+    assertThat(
+        "Titi should have been added", ldapReaderStore.getOrganization("Titi"), not(nullValue()));
+  }
+
+  @Test
+  public void testUpdateOrganizationDescription() {
+    LdapWriterStore ldapWriterStore =
+        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    Organization organization = ldapReaderStore.getOrganization("amodifier");
+    organization.addAttributes("description", "nouvelle description");
+    ldapWriterStore.updateOrganization(organization);
+    assertThat(
+        "amodifier should have a new description",
+        ldapReaderStore.getOrganization("amodifier").getAttributes().get("description"),
+        is("nouvelle description"));
+  }
+
+  @Test
+  public void testDeleteOrganization() {
+    LdapWriterStore ldapWriterStore =
+        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    ldapWriterStore.deleteOrganization("asupprimer");
+    assertThat(
+        "asupprimer should have been deleted",
+        ldapReaderStore.getOrganization("asupprimer"),
+        is(nullValue()));
+  }
 
   @Test
   public void testCreateUser() {
