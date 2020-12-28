@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.nullValue;
 
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.model.Application;
+import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
@@ -94,9 +95,11 @@ public class LdapReaderStoreTest {
     List<Organization> organizations =
         ldapReaderStore.searchOrganizations(searchProperties, pageableResult, "").getResults();
     assertThat(
-        "First element found should be testi", organizations.get(0).getIdentifiant(), is("testi"));
+        "Should contain testi",
+        organizations.stream().anyMatch(orga -> orga.getIdentifiant().equals("testi")));
     assertThat(
-        "Second element found should be testo", organizations.get(1).getIdentifiant(), is("testo"));
+        "Should contain testo",
+        organizations.stream().anyMatch(orga -> orga.getIdentifiant().equals("testo")));
   }
 
   @Test
@@ -215,5 +218,47 @@ public class LdapReaderStoreTest {
     assertThat("Should find one result", applications.size(), is(1));
     assertThat(
         "First element found should be Applitest", applications.get(0).getName(), is("Applitest"));
+  }
+
+  @Test
+  public void testGetGroup() {
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    Group group = ldapReaderStore.getGroup("Applitest", "Utilisateurs_Applitest");
+    assertThat(
+        "Should be Utilisateurs_Applitest group", group.getName(), is("Utilisateurs_Applitest"));
+  }
+
+  @Test
+  public void testSearchAllGroups() {
+    // we should also check if there is more complexe cases like cases with organizationalGroup
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    Map<String, String> searchProperties = new HashMap<>();
+    PageableResult pageableResult = new PageableResult();
+    List<Group> groups =
+        ldapReaderStore
+            .searchGroups("Applitest", searchProperties, pageableResult, "")
+            .getResults();
+    assertThat("Should find 3 elements", groups.size(), is(3));
+    assertThat(
+        "Should contain utilisateurs",
+        groups.stream().anyMatch(group -> group.getName().equals("Utilisateurs_Applitest")));
+    assertThat(
+        "Should contain SuperGroup",
+        groups.stream().anyMatch(group -> group.getName().equals("SuperGroup")));
+  }
+
+  @Test
+  public void testGetUsersInGroup() {
+    LdapReaderStore ldapReaderStore =
+        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    List<User> users =
+        ldapReaderStore.getUsersInGroup("Applitest", "Utilisateurs_Applitest").getResults();
+    assertThat("Should find 2 elements", users.size(), is(2));
+    // for now if a user in a group is not in the current realm, the user is null
+    // TODO : decide what to do
+    assertThat("Is null, may be not the expected behavior", users.get(0), is(nullValue()));
+    assertThat("Should be administrateurs", users.get(1).getUsername(), is("testc"));
   }
 }

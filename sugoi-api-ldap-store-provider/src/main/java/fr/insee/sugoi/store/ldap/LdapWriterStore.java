@@ -17,10 +17,13 @@ import com.unboundid.ldap.sdk.AddRequest;
 import com.unboundid.ldap.sdk.DeleteRequest;
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
 import com.unboundid.ldap.sdk.LDAPException;
+import com.unboundid.ldap.sdk.Modification;
+import com.unboundid.ldap.sdk.ModificationType;
 import com.unboundid.ldap.sdk.ModifyRequest;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
+import fr.insee.sugoi.ldap.utils.mapper.GroupLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
 import fr.insee.sugoi.model.Application;
@@ -85,20 +88,42 @@ public class LdapWriterStore implements WriterStore {
 
   @Override
   public void deleteGroup(String appName, String groupName) {
-    // TODO Auto-generated method stub
-
+    try {
+      DeleteRequest dr =
+          new DeleteRequest("cn=" + groupName + ",ou=" + appName + "," + config.get("app_source"));
+      ldapPoolConnection.delete(dr);
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to delete group " + groupName, e);
+    }
   }
 
   @Override
   public Group createGroup(String appName, Group group) {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      AddRequest ar =
+          new AddRequest(
+              "cn=" + group.getName() + ",ou=" + appName + "," + config.get("app_source"),
+              GroupLdapMapper.mapToAttribute(group));
+      ldapPoolConnection.add(ar);
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to create group " + group.getName(), e);
+    }
+    return group;
   }
 
   @Override
   public Group updateGroup(String appName, Group updatedGroup) {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      ModifyRequest mr =
+          new ModifyRequest(
+              "cn=" + updatedGroup.getName() + ",ou=" + appName + "," + config.get("app_source"),
+              GroupLdapMapper.createMods(updatedGroup));
+      ldapPoolConnection.modify(mr);
+    } catch (LDAPException e) {
+      throw new RuntimeException(
+          "Failed to update group " + updatedGroup.getName() + " while writing to LDAP", e);
+    }
+    return updatedGroup;
   }
 
   @Override
@@ -149,14 +174,34 @@ public class LdapWriterStore implements WriterStore {
 
   @Override
   public void deleteUserFromGroup(String appName, String groupName, String userId) {
-    // TODO Auto-generated method stub
-
+    ModifyRequest mr =
+        new ModifyRequest(
+            "cn=" + groupName + ",ou=" + appName + "," + config.get("app_source"),
+            new Modification(
+                ModificationType.DELETE,
+                "uniqueMember",
+                "uid=" + userId + ",ou=" + appName + "," + config.get("app_source")));
+    try {
+      ldapPoolConnection.modify(mr);
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to delete user from group " + groupName, e);
+    }
   }
 
   @Override
   public void addUserToGroup(String appName, String groupName, String userId) {
-    // TODO Auto-generated method stub
-
+    ModifyRequest mr =
+        new ModifyRequest(
+            "cn=" + groupName + ",ou=" + appName + "," + config.get("app_source"),
+            new Modification(
+                ModificationType.ADD,
+                "uniqueMember",
+                "uid=" + userId + ",ou=" + appName + "," + config.get("app_source")));
+    try {
+      ldapPoolConnection.modify(mr);
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to add user to group " + groupName, e);
+    }
   }
 
   @Override
