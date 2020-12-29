@@ -20,9 +20,9 @@ import fr.insee.sugoi.ldap.utils.mapper.properties.OrganizationLdap;
 import fr.insee.sugoi.model.Organization;
 import java.util.List;
 
-public class OrganizationLdapMapper {
+public class OrganizationLdapMapper implements LdapMapper<Organization> {
 
-  public static Organization mapFromSearchEntry(SearchResultEntry searchResultEntry) {
+  public Organization fromLdapToObject(SearchResultEntry searchResultEntry) {
     Organization org =
         GenericLdapMapper.transform(searchResultEntry, OrganizationLdap.class, Organization.class);
     // org.setGpgkey(searchResultEntry.getAttribute("inseeClefChiffrement").getValueByteArray());

@@ -20,9 +20,9 @@ import fr.insee.sugoi.ldap.utils.mapper.properties.ApplicationLdap;
 import fr.insee.sugoi.model.Application;
 import java.util.List;
 
-public class ApplicationLdapMapper {
+public class ApplicationLdapMapper implements LdapMapper<Application> {
 
-  public static Application mapFromSearchEntry(SearchResultEntry searchResultEntry) {
+  public Application fromLdapToObject(SearchResultEntry searchResultEntry) {
     return GenericLdapMapper.transform(searchResultEntry, ApplicationLdap.class, Application.class);
   }
 

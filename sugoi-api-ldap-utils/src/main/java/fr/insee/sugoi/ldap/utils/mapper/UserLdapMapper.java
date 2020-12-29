@@ -20,11 +20,11 @@ import fr.insee.sugoi.ldap.utils.mapper.properties.UserLdap;
 import fr.insee.sugoi.model.User;
 import java.util.List;
 
-public class UserLdapMapper {
+public class UserLdapMapper implements LdapMapper<User> {
 
-  public static User mapFromSearchEntry(SearchResultEntry searchResultEntry) {
-    User user = GenericLdapMapper.transform(searchResultEntry, UserLdap.class, User.class);
-    return user;
+  @Override
+  public User fromLdapToObject(SearchResultEntry searchResultEntry) {
+    return GenericLdapMapper.transform(searchResultEntry, UserLdap.class, User.class);
   }
 
   public static List<Attribute> mapToAttribute(User u) {
