@@ -89,31 +89,10 @@ public class LdapReaderStore implements ReaderStore {
 
   @Override
   public PageResult<User> searchUsers(
-      String identifiant,
-      String nomCommun,
-      String description,
-      String organisationId,
-      String mail,
-      PageableResult pageable,
-      String typeRecherche,
-      List<String> habilitations,
-      String application,
-      String role,
-      String rolePropriete,
-      String certificat) {
+      Map<String, String> properties, PageableResult pageable, String typeRecherche) {
     try {
       PageResult<User> page = new PageResult<>();
-      Filter filter =
-          LdapUtils.filterRechercher(
-              typeRecherche,
-              identifiant,
-              nomCommun,
-              description,
-              organisationId,
-              mail,
-              pageable,
-              habilitations,
-              certificat);
+      Filter filter = LdapUtils.getFilterFromCriteria(properties);
       SearchRequest searchRequest =
           new SearchRequest(
               config.get("user_source"), SearchScope.SUBORDINATE_SUBTREE, filter, "*", "+");

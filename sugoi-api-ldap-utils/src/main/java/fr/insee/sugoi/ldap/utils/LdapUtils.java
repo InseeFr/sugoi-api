@@ -32,41 +32,8 @@ public class LdapUtils {
     return "uid=" + id + "," + baseDn;
   }
 
-  public static Filter filterRechercher(
-      String typeRecherche,
-      String identifiant,
-      String nomCommun,
-      String description,
-      String organisationId,
-      String mail,
-      PageableResult pageable,
-      List<String> habilitations,
-      String certificat) {
+  public static Filter filterRechercher(String typeRecherche, PageableResult pageable) {
     List<Filter> filters = new ArrayList<>();
-    if (identifiant != null) {
-      filters.add(LdapFilter.contains("uid", identifiant));
-    }
-    if (nomCommun != null) {
-
-      filters.add(LdapFilter.contains("cn", nomCommun));
-    }
-    if (description != null) {
-      filters.add(LdapFilter.contains("description", description));
-    }
-    if (organisationId != null) {
-      filters.add(LdapFilter.likeFilterOrganisation(organisationId));
-    }
-    if (mail != null) {
-      filters.add(LdapFilter.contains("mail", mail));
-    }
-    if (habilitations != null) {
-      for (String habilitation : habilitations) {
-        filters.add(LdapFilter.contains("inseeGroupeDefaut", habilitation));
-      }
-    }
-    if (certificat != null) {
-      filters.add(LdapFilter.contains("inseePropriete", "certificateId$" + certificat));
-    }
     if (typeRecherche.equals(TypeRecherche.ET.getTypeRecherche())) {
       return LdapFilter.and(filters);
     }
