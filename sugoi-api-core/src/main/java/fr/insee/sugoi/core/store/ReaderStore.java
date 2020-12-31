@@ -19,7 +19,6 @@ import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
-import java.util.List;
 import java.util.Map;
 
 public interface ReaderStore {
@@ -27,18 +26,7 @@ public interface ReaderStore {
   public User getUser(String id);
 
   public PageResult<User> searchUsers(
-      String identifiant,
-      String nomCommun,
-      String description,
-      String organisationId,
-      String mail,
-      PageableResult pageable,
-      String typeRecherche,
-      List<String> habilitations,
-      String application,
-      String role,
-      String rolePropriete,
-      String certificat);
+      Map<String, String> searchProperties, PageableResult pageable, String searchOperator);
 
   public PageResult<User> getUsersInGroup(String appName, String groupName);
 

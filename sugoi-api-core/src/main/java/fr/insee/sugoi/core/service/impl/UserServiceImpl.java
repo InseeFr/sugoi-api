@@ -21,7 +21,7 @@ import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
-import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -48,47 +48,13 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public PageResult<User> searchUsers(
-      String identifiant,
-      String nomCommun,
-      String description,
-      String organisationId,
-      String domaineGestion,
-      String mail,
-      String cookie,
-      int size,
-      int offset,
-      String typeRecherche,
-      List<String> habilitations,
-      String application,
-      String role,
-      String rolePropriete,
-      String certificat) {
+  public PageResult<User> findByProperties(
+      String realm, Map<String, String> properties, PageableResult pageable, String storage) {
     try {
-      PageableResult pageable = new PageableResult();
-      pageable.setSize(size);
-      if (cookie != null) {
-        pageable.setCookie(cookie.getBytes());
-      }
-      pageable.setFirst(offset);
-      Realm realm = realmProvider.load(domaineGestion);
-      UserStorage userStorage = realm.getUserStorages().get(0);
       return storeProvider
-          .getStoreForUserStorage(realm.getName(), userStorage.getName())
+          .getStoreForUserStorage(realm, storage)
           .getReader()
-          .searchUsers(
-              identifiant,
-              nomCommun,
-              description,
-              organisationId,
-              mail,
-              pageable,
-              typeRecherche,
-              habilitations,
-              application,
-              role,
-              rolePropriete,
-              certificat);
+          .searchUsers(properties, pageable, "");
     } catch (Exception e) {
       throw new RuntimeException("Erreur lors de la récupération des utilisateurs");
     }

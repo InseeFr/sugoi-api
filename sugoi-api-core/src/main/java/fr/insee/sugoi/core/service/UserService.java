@@ -14,29 +14,16 @@
 package fr.insee.sugoi.core.service;
 
 import fr.insee.sugoi.core.model.PageResult;
+import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.model.User;
-import java.util.List;
+import java.util.Map;
 
 public interface UserService {
 
   User searchUser(String domaine, String idep);
 
-  PageResult<User> searchUsers(
-      String identifiant,
-      String nomCommun,
-      String description,
-      String organisationId,
-      String domaineGestion,
-      String mail,
-      String cookie,
-      int size,
-      int offset,
-      String typeRecherche,
-      List<String> habilitations,
-      String application,
-      String role,
-      String rolePropriete,
-      String certificat);
+  PageResult<User> findByProperties(
+      String realm, Map<String, String> properties, PageableResult pageable, String storageName);
 
   User create(String realm, String storage, User user);
 

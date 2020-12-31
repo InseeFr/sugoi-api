@@ -20,7 +20,6 @@ import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
-import java.util.List;
 import java.util.Map;
 
 public class FileReaderStore implements ReaderStore {
@@ -37,18 +36,7 @@ public class FileReaderStore implements ReaderStore {
 
   @Override
   public PageResult<User> searchUsers(
-      String identifiant,
-      String nomCommun,
-      String description,
-      String organisationId,
-      String mail,
-      PageableResult pageable,
-      String typeRecherche,
-      List<String> habilitations,
-      String application,
-      String role,
-      String rolePropriete,
-      String certificat) {
+      Map<String, String> properties, PageableResult pageable, String typeRecherche) {
     // TODO Auto-generated method stub
     return null;
   }

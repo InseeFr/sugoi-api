@@ -135,11 +135,8 @@ public class LdapReaderStoreTest {
     LdapReaderStore ldapReaderStore =
         (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     PageableResult pageableResult = new PageableResult();
-    List<User> users =
-        ldapReaderStore
-            .searchUsers(
-                null, null, null, null, null, pageableResult, "et", null, null, null, null, null)
-            .getResults();
+    Map<String, String> properties = new HashMap<>();
+    List<User> users = ldapReaderStore.searchUsers(properties, pageableResult, "et").getResults();
     assertThat(
         "Should contain testo",
         users.stream().anyMatch(user -> user.getUsername().equals("testo")));
@@ -153,22 +150,9 @@ public class LdapReaderStoreTest {
     LdapReaderStore ldapReaderStore =
         (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     PageableResult pageableResult = new PageableResult();
-    List<User> users =
-        ldapReaderStore
-            .searchUsers(
-                null,
-                null,
-                null,
-                null,
-                "test@test.fr",
-                pageableResult,
-                "et",
-                null,
-                null,
-                null,
-                null,
-                null)
-            .getResults();
+    Map<String, String> properties = new HashMap<>();
+    properties.put("mail", "test@test.fr");
+    List<User> users = ldapReaderStore.searchUsers(properties, pageableResult, "et").getResults();
     assertThat("Should find one result", users.size(), is(1));
     assertThat("First element found should be testc", users.get(0).getUsername(), is("testc"));
   }
