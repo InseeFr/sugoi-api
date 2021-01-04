@@ -11,21 +11,23 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.ldap.utils.mapper.properties.utils;
+package fr.insee.sugoi.ldap.utils.mapper.properties;
 
-import fr.insee.sugoi.ldap.utils.mapper.ModelType;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import fr.insee.sugoi.ldap.utils.mapper.properties.utils.AttributeLdapName;
+import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToAttribute;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-public @interface MapToMapElement {
-  String name();
+@LdapObjectClass(
+    values = {
+      "top",
+      "organizationalUnit",
+    })
+public class ApplicationLdap {
 
-  String key();
+  @MapToAttribute("name")
+  @AttributeLdapName("ou")
+  public String name;
 
-  /** Type d'objet */
-  ModelType type() default ModelType.STRING;
+  @MapToAttribute("owner")
+  @AttributeLdapName("creatorsName")
+  public String owner;
 }

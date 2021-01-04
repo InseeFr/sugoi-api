@@ -13,12 +13,20 @@
 */
 package fr.insee.sugoi.ldap.utils.mapper;
 
+import com.unboundid.ldap.sdk.Attribute;
+import com.unboundid.ldap.sdk.Modification;
+import com.unboundid.ldap.sdk.ModificationType;
 import com.unboundid.ldap.sdk.SearchResultEntry;
+import fr.insee.sugoi.ldap.utils.mapper.properties.LdapObjectClass;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.AttributeLdapName;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToAttribute;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToMapElement;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -69,5 +77,80 @@ public class GenericLdapMapper {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <O, N> List<Attribute> toAttribute(
+      N entity, Class<O> propertiesClazz, Class<N> clazz) {
+    try {
+      List<Attribute> attributes = new ArrayList<>();
+      Arrays.stream(propertiesClazz.getAnnotations())
+          .forEach(x -> System.out.println(x.annotationType()));
+      LdapObjectClass ldapObjectClass = propertiesClazz.getAnnotation(LdapObjectClass.class);
+      if (ldapObjectClass != null) {
+        attributes.add(new Attribute("objectClass", ldapObjectClass.values()));
+      }
+      for (Field mapperField : propertiesClazz.getDeclaredFields()) {
+        try {
+          mapperField.setAccessible(true);
+          if (mapperField.getDeclaredAnnotationsByType(AttributeLdapName.class).length > 0) {
+            String attributeName = mapperField.getAnnotation(AttributeLdapName.class).value();
+            if (mapperField.getDeclaredAnnotationsByType(MapToAttribute.class).length > 0) {
+              Field entityField =
+                  entity
+                      .getClass()
+                      .getDeclaredField(mapperField.getAnnotation(MapToAttribute.class).value());
+              entityField.setAccessible(true);
+              Object attributeValue = entityField.get(entity);
+              if (attributeValue != null) {
+                ModelType type = mapperField.getAnnotation(MapToAttribute.class).type();
+                switch (type) {
+                    // TODO: manage other types
+                  default:
+                    attributes.add(new Attribute(attributeName, (String) attributeValue));
+                    break;
+                }
+              }
+            }
+
+            if (mapperField.getDeclaredAnnotationsByType(MapToMapElement.class).length > 0) {
+              Field entityField =
+                  entity
+                      .getClass()
+                      .getDeclaredField(mapperField.getAnnotation(MapToMapElement.class).name());
+              entityField.setAccessible(true);
+              Map<String, Object> entityFieldObject = (Map<String, Object>) entityField.get(entity);
+              Object attributeValue =
+                  entityFieldObject.get(mapperField.getAnnotation(MapToMapElement.class).key());
+              if (attributeValue != null) {
+                ModelType type = mapperField.getAnnotation(MapToMapElement.class).type();
+                switch (type) {
+                    // TODO: manage other types
+                  default:
+                    attributes.add(new Attribute(attributeName, (String) attributeValue));
+                    break;
+                }
+              }
+            }
+          }
+
+        } catch (Exception e) {
+          logger.info("Impossible de récuperer le field " + mapperField.getName());
+        }
+      }
+      return attributes;
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public static <O, N> List<Modification> createMods(
+      N entity, Class<O> propertiesClazz, Class<N> clazz) {
+    return toAttribute(entity, propertiesClazz, clazz).stream()
+        .map(
+            attribute ->
+                new Modification(
+                    ModificationType.REPLACE, attribute.getName(), attribute.getValues()))
+        .collect(Collectors.toList());
   }
 }

@@ -14,6 +14,26 @@
 
    <dependencies>
       <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-test</artifactId>
+         <scope>test</scope>
+         <exclusions>
+            <exclusion>
+               <groupId>org.springframework.boot</groupId>
+               <artifactId>spring-boot-starter-logging</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-data-ldap</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>com.unboundid</groupId>
+         <artifactId>unboundid-ldapsdk</artifactId>
+      </dependency>
+      <dependency>
          <groupId>fr.insee.sugoi</groupId>
          <artifactId>sugoi-api-ldap-utils</artifactId>
       </dependency>

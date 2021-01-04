@@ -21,19 +21,22 @@ import com.unboundid.ldap.sdk.SearchRequest;
 import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
-import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;
+import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
+import fr.insee.sugoi.ldap.utils.mapper.GroupLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -63,16 +66,23 @@ public class LdapReaderStore implements ReaderStore {
   public User getUser(String id) {
     logger.debug("Searching user {}", id);
     SearchResultEntry entry = getEntryByDn("uid=" + id + "," + config.get("user_source"));
-    return UserLdapMapper.mapFromSearchEntry(entry);
+    if (entry != null) {
+      return UserLdapMapper.mapFromSearchEntry(entry);
+    } else {
+      return null;
+    }
   }
 
   @Override
   public Organization getOrganization(String id) {
     SearchResultEntry entry = getEntryByDn("uid=" + id + "," + config.get("organization_source"));
-    Organization org = OrganizationLdapMapper.mapFromSearchEntry(entry);
-    if (org.getAttributes().containsKey("adressDn")) {
-      SearchResultEntry result = getEntryByDn(org.getAttributes().get("adressDn").toString());
-      org.setAddress(AddressLdapMapper.mapFromSearchEntry(result));
+    Organization org = (entry != null) ? OrganizationLdapMapper.mapFromSearchEntry(entry) : null;
+    if (org != null
+        && org.getAttributes().containsKey("adressDn")
+        && org.getAttributes().get("adressDn") != null) {
+      SearchResultEntry addressResult =
+          getEntryByDn(org.getAttributes().get("adressDn").toString());
+      org.setAddress(AddressLdapMapper.mapFromSearchEntry(addressResult));
     }
     return org;
   }
@@ -128,27 +138,73 @@ public class LdapReaderStore implements ReaderStore {
 
       return entry;
     } catch (LDAPException e) {
-      throw new EntityNotFoundException("Entry not found");
+      throw new RuntimeException("Failed to execute " + dn, e);
     }
   }
 
   @Override
   public PageResult<User> getUsersInGroup(String appName, String groupName) {
-    // TODO Auto-generated method stub
-    return null;
+    PageResult<User> page = new PageResult<>();
+    SearchResultEntry entry = getGroupResultEntry(appName, groupName);
+    if (entry.hasAttribute("uniqueMember")) {
+      page.setResults(
+          Arrays.stream(entry.getAttribute("uniqueMember").getValues())
+              .map(uniqueMember -> getUser(uniqueMember.split(",")[0].substring(4)))
+              .collect(Collectors.toList()));
+    } else {
+      page.setResults(new ArrayList<>());
+    }
+    return page;
   }
 
   @Override
   public PageResult<Organization> searchOrganizations(
       Map<String, String> searchProperties, PageableResult pageable, String searchOperator) {
-    // TODO Auto-generated method stub
-    return null;
+    Filter filter = LdapUtils.getFilterFromCriteria(searchProperties);
+    try {
+      SearchRequest searchRequest =
+          new SearchRequest(
+              config.get("organization_source"), SearchScope.SUBORDINATE_SUBTREE, filter, "*", "+");
+      LdapUtils.setRequestControls(searchRequest, pageable);
+      SearchResult searchResult = ldapPoolConnection.search(searchRequest);
+      List<Organization> organizations =
+          searchResult.getSearchEntries().stream()
+              .map(e -> OrganizationLdapMapper.mapFromSearchEntry(e))
+              .collect(Collectors.toList());
+      PageResult<Organization> page = new PageResult<>();
+      page.setResults(organizations);
+      return page;
+    } catch (LDAPSearchException e) {
+      throw new RuntimeException("Fail to search organizations in ldap", e);
+    }
   }
 
   @Override
-  public Group getGroup(String appName, String name) {
-    // TODO Auto-generated method stub
-    return null;
+  public Group getGroup(String appName, String groupName) {
+    SearchResultEntry entry = getGroupResultEntry(appName, groupName);
+    return (entry != null) ? GroupLdapMapper.mapFromSearchEntry(entry) : null;
+  }
+
+  private SearchResultEntry getGroupResultEntry(String appName, String groupName) {
+    SearchRequest searchRequest =
+        new SearchRequest(
+            "ou=" + appName + "," + config.get("app_source"),
+            SearchScope.SUBORDINATE_SUBTREE,
+            Filter.createEqualityFilter("cn", groupName));
+    try {
+      SearchResult searchResult = ldapPoolConnection.search(searchRequest);
+      if (searchResult.getEntryCount() == 1) {
+        return searchResult.getSearchEntries().get(0);
+      } else if (searchResult.getEntryCount() == 0) {
+        logger.debug("No matching group found for " + groupName);
+        return null;
+      } else {
+        logger.error("Found too many matches");
+        return null;
+      }
+    } catch (LDAPSearchException e) {
+      throw new RuntimeException("Fail to get group " + groupName + " in ldap", e);
+    }
   }
 
   @Override
@@ -157,8 +213,29 @@ public class LdapReaderStore implements ReaderStore {
       Map<String, String> searchProperties,
       PageableResult pageable,
       String searchOperator) {
-    // TODO Auto-generated method stub
-    return null;
+    Filter isGroup = Filter.createSubAnyFilter("objectClass", "groupOfUniqueNames");
+    Filter filter =
+        Filter.createANDFilter(LdapUtils.getFilterFromCriteria(searchProperties), isGroup);
+    try {
+      SearchRequest searchRequest =
+          new SearchRequest(
+              "ou=" + appName + "," + config.get("app_source"),
+              SearchScope.SUBORDINATE_SUBTREE,
+              filter,
+              "*",
+              "+");
+      LdapUtils.setRequestControls(searchRequest, pageable);
+      SearchResult searchResult = ldapPoolConnection.search(searchRequest);
+      List<Group> groups =
+          searchResult.getSearchEntries().stream()
+              .map(e -> GroupLdapMapper.mapFromSearchEntry(e))
+              .collect(Collectors.toList());
+      PageResult<Group> page = new PageResult<>();
+      page.setResults(groups);
+      return page;
+    } catch (LDAPSearchException e) {
+      throw new RuntimeException("Fail to search groups in ldap", e);
+    }
   }
 
   @Override
@@ -169,14 +246,29 @@ public class LdapReaderStore implements ReaderStore {
 
   @Override
   public Application getApplication(String applicationName) {
-    // TODO Auto-generated method stub
-    return null;
+    SearchResultEntry entry =
+        getEntryByDn("ou=" + applicationName + "," + config.get("app_source"));
+    return (entry != null) ? ApplicationLdapMapper.mapFromSearchEntry(entry) : null;
   }
 
   @Override
   public PageResult<Application> searchApplications(
       Map<String, String> searchProperties, PageableResult pageable, String searchOperator) {
-    // TODO Auto-generated method stub
-    return null;
+    Filter filter = LdapUtils.getFilterFromCriteria(searchProperties);
+    try {
+      SearchRequest searchRequest =
+          new SearchRequest(config.get("app_source"), SearchScope.ONE, filter, "*", "+");
+      LdapUtils.setRequestControls(searchRequest, pageable);
+      SearchResult searchResult = ldapPoolConnection.search(searchRequest);
+      List<Application> applications =
+          searchResult.getSearchEntries().stream()
+              .map(e -> ApplicationLdapMapper.mapFromSearchEntry(e))
+              .collect(Collectors.toList());
+      PageResult<Application> page = new PageResult<>();
+      page.setResults(applications);
+      return page;
+    } catch (LDAPSearchException e) {
+      throw new RuntimeException("Fail to search applications in ldap", e);
+    }
   }
 }

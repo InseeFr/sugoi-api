@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.ldap.utils.mapper.properties.utils;
 
+import fr.insee.sugoi.ldap.utils.mapper.ModelType;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -24,4 +25,7 @@ public @interface MapToAttribute {
 
   /** Nom de l'attributLdap ce field. */
   String value();
+
+  /** Type d'objet */
+  ModelType type() default ModelType.STRING;
 }

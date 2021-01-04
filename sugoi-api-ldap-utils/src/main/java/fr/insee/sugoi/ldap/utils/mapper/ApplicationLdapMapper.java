@@ -16,22 +16,22 @@ package fr.insee.sugoi.ldap.utils.mapper;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import com.unboundid.ldap.sdk.SearchResultEntry;
-import fr.insee.sugoi.ldap.utils.mapper.properties.UserLdap;
-import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.ldap.utils.mapper.properties.ApplicationLdap;
+import fr.insee.sugoi.model.Application;
 import java.util.List;
 
-public class UserLdapMapper {
+public class ApplicationLdapMapper {
 
-  public static User mapFromSearchEntry(SearchResultEntry searchResultEntry) {
-    User user = GenericLdapMapper.transform(searchResultEntry, UserLdap.class, User.class);
-    return user;
+  public static Application mapFromSearchEntry(SearchResultEntry searchResultEntry) {
+    return GenericLdapMapper.transform(searchResultEntry, ApplicationLdap.class, Application.class);
   }
 
-  public static List<Attribute> mapToAttribute(User u) {
-    return GenericLdapMapper.toAttribute(u, UserLdap.class, User.class);
+  public static List<Attribute> mapToAttribute(Application application) {
+    return GenericLdapMapper.toAttribute(application, ApplicationLdap.class, Application.class);
   }
 
-  public static List<Modification> createMods(User updatedUser) {
-    return GenericLdapMapper.createMods(updatedUser, UserLdap.class, User.class);
+  public static List<Modification> createMods(Application updatedApplication) {
+    return GenericLdapMapper.createMods(
+        updatedApplication, ApplicationLdap.class, Application.class);
   }
 }
