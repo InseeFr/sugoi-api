@@ -35,7 +35,7 @@ public class RealmLdapMapper {
         if (property[0].equals("ldapUrl")) {
           realm.setUrl(property[1]);
         }
-        if (property[0].contains("branchesApplicativePossibles")) {
+        if (property[0].contains("branchesApplicativesPossibles")) {
           realm.setAppSource(property[1]);
         }
 
