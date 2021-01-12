@@ -13,9 +13,16 @@
 */
 package fr.insee.sugoi.services.controller;
 
+import fr.insee.sugoi.core.model.PageResult;
+import fr.insee.sugoi.core.model.PageableResult;
+import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.model.Group;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.net.URI;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,65 +36,145 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RequestMapping(value = {"/v2", "/"})
 @RestController
-@Tag(name = "Manage Groupes")
+@Tag(name = "Manage Groups")
 @SecurityRequirement(name = "oAuth")
 public class GroupController {
+
+  @Autowired private GroupService groupService;
 
   @GetMapping(
       path = {"/{realm}/groups", "/{realm}/{storage}/groups"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Search groups")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
   public ResponseEntity<?> getGroups(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
-      @RequestParam(value = "name", required = false) String name) {
-    // TODO: process GET request
+      @RequestParam(value = "application") String applicationName,
+      @RequestParam(value = "description", required = false) String description,
+      @RequestParam(value = "name", required = false) String name,
+      @RequestParam(value = "size", defaultValue = "20") int size,
+      @RequestParam(value = "offset", defaultValue = "0") int offset) {
+    Group filterGroup = new Group();
+    filterGroup.setName(name);
+    filterGroup.setDescription(description);
+    PageableResult pageableResult = new PageableResult(size, offset);
 
-    return null;
+    PageResult<Group> foundGroups =
+        groupService.findByProperties(applicationName, realm, filterGroup, pageableResult, storage);
+
+    if (foundGroups.isHasMoreResult()) {
+      URI location =
+          ServletUriComponentsBuilder.fromCurrentRequest()
+              .replaceQueryParam("offset", offset + size)
+              .build()
+              .toUri();
+      return ResponseEntity.status(HttpStatus.OK)
+          .header(HttpHeaders.LOCATION, location.toString())
+          .body(foundGroups);
+    } else {
+      return ResponseEntity.status(HttpStatus.OK).body(foundGroups);
+    }
   }
 
   @PostMapping(
       value = {"/{realm}/groups", "/{realm}/{storage}/groups"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Add group")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
   public ResponseEntity<?> createGroups(
       @PathVariable("realm") String realm,
-      @PathVariable("storage") String storage,
+      @PathVariable(name = "storage", required = false) String storage,
+      @RequestParam(value = "application") String applicationName,
       @RequestBody Group group) {
-    // TODO: process POST request
 
-    return new ResponseEntity<>(group, HttpStatus.CREATED);
+    if (groupService.findById(applicationName, realm, group.getName(), storage) == null) {
+      groupService.create(applicationName, realm, group, storage);
+
+      URI location =
+          ServletUriComponentsBuilder.fromCurrentRequest()
+              .path("/" + group.getName())
+              .build()
+              .toUri();
+
+      return ResponseEntity.created(location)
+          .body(groupService.findById(applicationName, realm, group.getName(), storage));
+    } else {
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    }
   }
 
   @PutMapping(
       value = {"/{realm}/groups/{id}", "/{realm}/{storage}/groups/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Update group")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
   public ResponseEntity<?> updateGroups(
       @PathVariable("realm") String realm,
-      @PathVariable("storage") String storage,
+      @PathVariable(name = "storage", required = false) String storage,
       @PathVariable("id") String id,
+      @RequestParam("application") String applicationName,
       @RequestBody Group group) {
-    // TODO: process PUT request
 
-    return new ResponseEntity<>(group, HttpStatus.OK);
+    if (!group.getName().equals(id)) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    if (groupService.findById(applicationName, realm, id, storage) != null) {
+      groupService.update(applicationName, realm, group, storage);
+      URI location =
+          ServletUriComponentsBuilder.fromCurrentRequest()
+              .path("/" + group.getName())
+              .build()
+              .toUri();
+      return ResponseEntity.status(HttpStatus.OK)
+          .header(HttpHeaders.LOCATION, location.toString())
+          .body(groupService.findById(applicationName, realm, id, storage));
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
   }
 
   @DeleteMapping(
       value = {"/{realm}/groups/{id}", "/{realm}/{storage}/groups/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Delete group")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
   public ResponseEntity<String> deleteGroups(
       @PathVariable("realm") String realm,
-      @PathVariable("storage") String storage,
+      @PathVariable(name = "storage", required = false) String storage,
+      @RequestParam("application") String applicationName,
       @PathVariable("id") String id) {
-    // TODO: process DELETE request
 
-    return new ResponseEntity<String>(id, HttpStatus.OK);
+    if (groupService.findById(applicationName, realm, id, storage) != null) {
+      groupService.delete(applicationName, realm, id, storage);
+      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+  }
+
+  @GetMapping(
+      path = {"/{realm}/groups/{name}", "/{realm}/{storage}/groups/{name}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Get group by name")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
+  public ResponseEntity<Group> getGroupByGroupname(
+      @PathVariable("realm") String realm,
+      @PathVariable(name = "storage", required = false) String storage,
+      @RequestParam("application") String applicationName,
+      @PathVariable("groupname") String id) {
+    Group group = groupService.findById(applicationName, realm, id, storage);
+    if (group != null) {
+      return ResponseEntity.status(HttpStatus.OK).body(group);
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
   }
 }

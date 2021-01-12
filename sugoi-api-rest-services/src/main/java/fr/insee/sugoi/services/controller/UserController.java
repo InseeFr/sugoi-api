@@ -13,12 +13,19 @@
 */
 package fr.insee.sugoi.services.controller;
 
+import fr.insee.sugoi.core.model.PageResult;
+import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.service.UserService;
+import fr.insee.sugoi.model.Habilitation;
+import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.net.URI;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @Tag(name = "Manage users")
@@ -42,8 +50,9 @@ public class UserController {
   @Autowired private UserService userService;
 
   @GetMapping(
-      path = {"/{realm}/Users", "/{realm}/{storage}/Users"},
+      path = {"/{realm}/users", "/{realm}/{storage}/users"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Search users")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
   public ResponseEntity<?> getUsers(
       @PathVariable("realm") String realm,
@@ -53,63 +62,138 @@ public class UserController {
       @RequestParam(name = "description", required = false) String description,
       @RequestParam(name = "organisationId", required = false) String organisationId,
       @RequestParam(name = "size", defaultValue = "20") int size,
-      @RequestParam(name = "start", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "searchCookie", required = false) String searchCookie,
       @RequestParam(name = "typeRecherche", defaultValue = "et", required = true)
           String typeRecherche,
       @RequestParam(name = "habilitation", required = false) List<String> habilitations,
       @RequestParam(name = "application", required = false) String application) {
-    // TODO: process GET request
 
-    return null;
+    // set the user which will serve as a model to retrieve the matching users
+    User searchUser = new User();
+    searchUser.setUsername(identifiant);
+    searchUser.setLastName(nomCommun);
+    if (organisationId != null) {
+      Organization organizationSearch = new Organization();
+      organizationSearch.setIdentifiant(organisationId);
+      searchUser.setOrganization(organizationSearch);
+    }
+    if (habilitations != null) {
+      habilitations.forEach(
+          habilitationName -> searchUser.addHabilitation(new Habilitation(habilitationName)));
+    }
+
+    // set the page to maintain the search request pagination
+    PageableResult pageable = new PageableResult();
+    if (searchCookie != null) {
+      pageable.setCookie(searchCookie.getBytes());
+    }
+    pageable.setOffset(offset);
+    pageable.setSize(size);
+
+    PageResult<User> foundUsers =
+        userService.findByProperties(realm, searchUser, pageable, storage);
+    if (foundUsers.isHasMoreResult()) {
+      URI location =
+          ServletUriComponentsBuilder.fromCurrentRequest()
+              .replaceQueryParam("offset", offset + size)
+              .build()
+              .toUri();
+      return ResponseEntity.status(HttpStatus.OK)
+          .header(HttpHeaders.LOCATION, location.toString())
+          .body(foundUsers);
+    } else {
+      return ResponseEntity.status(HttpStatus.OK).body(foundUsers);
+    }
   }
 
   @PostMapping(
-      value = {"/{realm}/Users", "/{realm}/{storage}/Users"},
+      value = {"/{realm}/users", "/{realm}/{storage}/users"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Create user")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
   public ResponseEntity<?> createUsers(
       @PathVariable("realm") String realm,
-      @PathVariable("storage") String storage,
+      @PathVariable(name = "storage", required = false) String storage,
       @RequestBody User user) {
-    User createdUser;
-    try {
-      createdUser = userService.create(realm, user, storage);
-      return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-    } catch (Exception e) {
-      return ResponseEntity.status(500).build();
+    if (userService.findById(realm, user.getUsername(), storage) == null) {
+      userService.create(realm, user, storage);
+      URI location =
+          ServletUriComponentsBuilder.fromCurrentRequest()
+              .path("/" + user.getUsername())
+              .build()
+              .toUri();
+      return ResponseEntity.created(location)
+          .body(userService.findById(realm, user.getUsername(), storage));
+    } else {
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
   }
 
   @PutMapping(
-      value = {"/{realm}/Users/{id}", "/{realm}/{storage}/Users/{id}"},
+      value = {"/{realm}/users/{id}", "/{realm}/{storage}/users/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Update user")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
   public ResponseEntity<?> updateUsers(
       @PathVariable("realm") String realm,
-      @PathVariable("storage") String storage,
+      @PathVariable(name = "storage", required = false) String storage,
       @PathVariable("id") String id,
       @RequestBody User user) {
-    // TODO: process PUT request
-    return new ResponseEntity<>(user, HttpStatus.OK);
+
+    if (!user.getUsername().equals(id)) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    if (userService.findById(realm, id, storage) != null) {
+      userService.update(realm, user, storage);
+      URI location =
+          ServletUriComponentsBuilder.fromCurrentRequest()
+              .path("/" + user.getUsername())
+              .build()
+              .toUri();
+      return ResponseEntity.status(HttpStatus.OK)
+          .header(HttpHeaders.LOCATION, location.toString())
+          .body(userService.findById(realm, id, storage));
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
   }
 
   @DeleteMapping(
-      value = {"/{realm}/Users/{id}", "/{realm}/{storage}/Users/{id}"},
+      value = {"/{realm}/users/{id}", "/{realm}/{storage}/users/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Delete user")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
-  public ResponseEntity<User> deleteUsers(
+  public ResponseEntity<String> deleteUsers(
       @PathVariable("realm") String realm,
-      @PathVariable("storage") String storage,
+      @PathVariable(name = "storage", required = false) String storage,
       @PathVariable("id") String id) {
-    // TODO: process DELETE request
-    try {
+
+    if (userService.findById(realm, id, storage) != null) {
       userService.delete(realm, id, storage);
-      return ResponseEntity.status(HttpStatus.CREATED).build();
-    } catch (Exception e) {
-      return ResponseEntity.status(500).build();
+      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+  }
+
+  @GetMapping(
+      path = {"/{realm}/users/{name}", "/{realm}/{storage}/users/{name}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Get user by username")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
+  public ResponseEntity<User> getUserByUsername(
+      @PathVariable("realm") String realm,
+      @PathVariable(name = "storage", required = false) String storage,
+      @PathVariable("username") String id) {
+    User user = userService.findById(realm, id, storage);
+    if (user != null) {
+      return ResponseEntity.status(HttpStatus.OK).body(user);
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 }

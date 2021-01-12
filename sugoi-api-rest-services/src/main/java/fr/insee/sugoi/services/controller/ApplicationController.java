@@ -13,9 +13,16 @@
 */
 package fr.insee.sugoi.services.controller;
 
+import fr.insee.sugoi.core.model.PageResult;
+import fr.insee.sugoi.core.model.PageableResult;
+import fr.insee.sugoi.core.service.ApplicationService;
 import fr.insee.sugoi.model.Application;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.net.URI;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @Tag(name = "Manage applications")
@@ -36,59 +44,135 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "oAuth")
 public class ApplicationController {
 
+  @Autowired private ApplicationService applicationService;
+
   @GetMapping(
       path = {"/{realm}/applications", "/{realm}/{storage}/applications"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Search applications")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
-  public ResponseEntity<?> getApplications(
+  public ResponseEntity<PageResult<Application>> getApplications(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
+      @RequestParam(name = "size", defaultValue = "20") int size,
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(value = "name", required = false) String name,
       @RequestParam(value = "owner", required = false) String owner) {
-    // TODO: process GET request
+    Application applicationFilter = new Application();
+    applicationFilter.setName(name);
+    applicationFilter.setOwner(owner);
 
-    return null;
+    PageableResult pageableResult = new PageableResult(size, offset);
+
+    PageResult<Application> foundApplications =
+        applicationService.findByProperties(realm, applicationFilter, pageableResult, storage);
+
+    if (foundApplications.isHasMoreResult()) {
+      URI location =
+          ServletUriComponentsBuilder.fromCurrentRequest()
+              .replaceQueryParam("offset", offset + size)
+              .build()
+              .toUri();
+      return ResponseEntity.status(HttpStatus.OK)
+          .header(HttpHeaders.LOCATION, location.toString())
+          .body(foundApplications);
+    } else {
+      return ResponseEntity.status(HttpStatus.OK).body(foundApplications);
+    }
   }
 
   @PostMapping(
       value = {"/{realm}/applications", "/{realm}/{storage}/applications"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Create application")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
-  public ResponseEntity<?> createApplication(
+  public ResponseEntity<Application> createApplication(
       @PathVariable("realm") String realm,
-      @PathVariable("storage") String storage,
+      @PathVariable(name = "storage", required = false) String storage,
       @RequestBody Application application) {
-    // TODO: process POST request
 
-    return new ResponseEntity<Application>(application, HttpStatus.CREATED);
+    if (applicationService.findById(realm, application.getName(), storage) == null) {
+      applicationService.create(realm, application, storage);
+
+      URI location =
+          ServletUriComponentsBuilder.fromCurrentRequest()
+              .path("/" + application.getName())
+              .build()
+              .toUri();
+
+      return ResponseEntity.created(location)
+          .body(applicationService.findById(realm, application.getName(), storage));
+    } else {
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    }
   }
 
   @PutMapping(
       value = {"/{realm}/applications/{id}", "/{realm}/{storage}/applications/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Update application")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
-  public ResponseEntity<?> updateApplication(
+  public ResponseEntity<Application> updateApplication(
       @PathVariable("realm") String realm,
-      @PathVariable("storage") String storage,
+      @PathVariable(name = "storage", required = false) String storage,
       @PathVariable("id") String id,
       @RequestBody Application application) {
-    // TODO: process PUT request
 
-    return new ResponseEntity<>(application, HttpStatus.OK);
+    if (!application.getName().equals(id)) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    if (applicationService.findById(realm, id, storage) != null) {
+      applicationService.update(realm, application, storage);
+
+      URI location =
+          ServletUriComponentsBuilder.fromCurrentRequest()
+              .path("/" + application.getName())
+              .build()
+              .toUri();
+
+      return ResponseEntity.status(HttpStatus.OK)
+          .header(HttpHeaders.LOCATION, location.toString())
+          .body(applicationService.findById(realm, id, storage));
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
   }
 
   @DeleteMapping(
       value = {"/{realm}/applications/{id}", "/{realm}/{storage}/applications/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Delete application")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
   public ResponseEntity<String> deleteApplication(
       @PathVariable("realm") String realm,
-      @PathVariable("storage") String storage,
+      @PathVariable(name = "storage", required = false) String storage,
       @PathVariable("id") String id) {
-    // TODO: process DELETE request
 
-    return new ResponseEntity<String>(id, HttpStatus.OK);
+    if (applicationService.findById(realm, id, storage) != null) {
+      applicationService.delete(realm, id, storage);
+      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+  }
+
+  @GetMapping(
+      path = {"/{realm}/applications/{name}", "/{realm}/{storage}/applications/{name}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Get application by name")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
+  public ResponseEntity<Application> getApplicationByName(
+      @PathVariable("realm") String realm,
+      @PathVariable(name = "storage", required = false) String storage,
+      @PathVariable("name") String name) {
+    Application application = applicationService.findById(realm, name, storage);
+    if (application != null) {
+      return ResponseEntity.status(HttpStatus.OK).body(application);
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
   }
 }

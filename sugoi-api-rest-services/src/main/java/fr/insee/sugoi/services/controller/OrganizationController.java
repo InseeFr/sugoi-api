@@ -20,7 +20,9 @@ import fr.insee.sugoi.model.Organization;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping(value = {"/v2", "/"})
@@ -51,16 +54,27 @@ public class OrganizationController {
   public ResponseEntity<?> getOrganizations(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
-      @RequestParam(value = "identifiant", required = false) String identifiant) {
-    try {
-      Organization organizationFilter = new Organization();
-      organizationFilter.setIdentifiant(identifiant);
-      PageResult<Organization> organizations =
-          organizationService.findByProperties(
-              realm, organizationFilter, new PageableResult(), storage);
-      return ResponseEntity.status(HttpStatus.OK).body(organizations);
-    } catch (Exception e) {
-      return ResponseEntity.status(500).build();
+      @RequestParam(value = "identifiant", required = false) String identifiant,
+      @RequestParam(value = "size", defaultValue = "20") int size,
+      @RequestParam(value = "offset", defaultValue = "0") int offset) {
+    Organization filterOrganization = new Organization();
+    filterOrganization.setIdentifiant(identifiant);
+    PageableResult pageableResult = new PageableResult(size, offset);
+
+    PageResult<Organization> foundOrganizations =
+        organizationService.findByProperties(realm, filterOrganization, pageableResult, storage);
+
+    if (foundOrganizations.isHasMoreResult()) {
+      URI location =
+          ServletUriComponentsBuilder.fromCurrentRequest()
+              .replaceQueryParam("offset", offset + size)
+              .build()
+              .toUri();
+      return ResponseEntity.status(HttpStatus.OK)
+          .header(HttpHeaders.LOCATION, location.toString())
+          .body(foundOrganizations);
+    } else {
+      return ResponseEntity.status(HttpStatus.OK).body(foundOrganizations);
     }
   }
 
@@ -72,13 +86,22 @@ public class OrganizationController {
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
   public ResponseEntity<?> createOrganizations(
       @PathVariable("realm") String realm,
-      @PathVariable("storage") String storage,
+      @PathVariable(name = "storage", required = false) String storage,
       @RequestBody Organization organization) {
-    try {
+
+    if (organizationService.findById(realm, organization.getIdentifiant(), storage) == null) {
       organizationService.create(realm, organization, storage);
-      return ResponseEntity.status(HttpStatus.ACCEPTED).body(organization);
-    } catch (Exception e) {
-      return ResponseEntity.status(500).build();
+
+      URI location =
+          ServletUriComponentsBuilder.fromCurrentRequest()
+              .path("/" + organization.getIdentifiant())
+              .build()
+              .toUri();
+
+      return ResponseEntity.created(location)
+          .body(organizationService.findById(realm, organization.getIdentifiant(), storage));
+    } else {
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
   }
 
@@ -90,14 +113,27 @@ public class OrganizationController {
   @Operation(summary = "Update organization")
   public ResponseEntity<?> updateOrganizations(
       @PathVariable("realm") String realm,
-      @PathVariable("storage") String storage,
+      @PathVariable(name = "storage", required = false) String storage,
       @PathVariable("id") String id,
       @RequestBody Organization organization) {
-    try {
+    if (organization.getIdentifiant().equals(id)) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    if (organizationService.findById(realm, id, storage) != null) {
       organizationService.update(realm, organization, storage);
-      return ResponseEntity.status(HttpStatus.ACCEPTED).body(organization);
-    } catch (Exception e) {
-      return ResponseEntity.status(500).build();
+
+      URI location =
+          ServletUriComponentsBuilder.fromCurrentRequest()
+              .path("/" + organization.getIdentifiant())
+              .build()
+              .toUri();
+
+      return ResponseEntity.status(HttpStatus.OK)
+          .header(HttpHeaders.LOCATION, location.toString())
+          .body(organizationService.findById(realm, id, storage));
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
@@ -106,15 +142,33 @@ public class OrganizationController {
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
   @Operation(summary = "Delete organization")
-  public ResponseEntity<Organization> deleteOrganizations(
+  public ResponseEntity<String> deleteOrganizations(
       @PathVariable("realm") String realm,
-      @PathVariable("storage") String storage,
+      @PathVariable(name = "storage", required = false) String storage,
       @PathVariable("id") String id) {
-    try {
+
+    if (organizationService.findById(realm, id, storage) != null) {
       organizationService.delete(realm, id, storage);
-      return ResponseEntity.status(HttpStatus.ACCEPTED).build();
-    } catch (Exception e) {
-      return ResponseEntity.status(500).build();
+      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+  }
+
+  @GetMapping(
+      path = {"/{realm}/organizations/{name}", "/{realm}/{storage}/organizations/{name}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Get organization by identifiant")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
+  public ResponseEntity<Organization> getUserByUsername(
+      @PathVariable("realm") String realm,
+      @PathVariable(name = "storage", required = false) String storage,
+      @PathVariable("username") String id) {
+    Organization organization = organizationService.findById(realm, id, storage);
+    if (organization != null) {
+      return ResponseEntity.status(HttpStatus.OK).body(organization);
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 }
