@@ -20,8 +20,15 @@ public class PageableResult {
   private int estimatedTotalSize = 0;
   private byte[] cookie;
   private String sortKey;
-  private int first = 1;
+  private int offset = 1;
   private boolean pagingDisabled = false;
+
+  public PageableResult() {}
+
+  public PageableResult(int size, int offset) {
+    this.size = size;
+    this.offset = offset;
+  }
 
   public int getSize() {
     return this.size;
@@ -56,11 +63,11 @@ public class PageableResult {
   }
 
   public int getFirst() {
-    return this.first;
+    return this.offset;
   }
 
-  public void setFirst(int first) {
-    this.first = first;
+  public void setOffset(int offset) {
+    this.offset = offset;
   }
 
   public boolean isPagingDisabled() {

@@ -26,6 +26,14 @@ public class Habilitation {
     this.property = property;
   }
 
+  // Habilitation can be defined by a String of type property_role_application
+  public Habilitation(String habilitationID) {
+    String[] splitHabilitation = habilitationID.split("_");
+    this.property = splitHabilitation[0];
+    this.role = splitHabilitation[1];
+    this.application = splitHabilitation[2];
+  }
+
   public String getApplication() {
     return this.application;
   }
