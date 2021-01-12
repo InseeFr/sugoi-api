@@ -65,4 +65,8 @@ public class Realm {
         + userStorages
         + "]";
   }
+
+  public String getDefaultUserStorageName() {
+    return this.getUserStorages().get(0).getName();
+  }
 }

@@ -16,21 +16,21 @@ package fr.insee.sugoi.core.service.impl;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.realm.RealmProvider;
-import fr.insee.sugoi.core.service.OrganizationService;
+import fr.insee.sugoi.core.service.ApplicationService;
 import fr.insee.sugoi.core.store.StoreProvider;
-import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.Application;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OrganizationServiceImpl implements OrganizationService {
+public class ApplicationServiceImpl implements ApplicationService {
 
   @Autowired private RealmProvider realmProvider;
 
   @Autowired private StoreProvider storeProvider;
 
   @Override
-  public Organization create(String realm, Organization organization, String storageName) {
+  public Application create(String realm, Application application, String storageName) {
     return storeProvider
         .getStoreForUserStorage(
             realm,
@@ -38,7 +38,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                 ? storageName
                 : realmProvider.load(realm).getDefaultUserStorageName())
         .getWriter()
-        .createOrganization(organization);
+        .createApplication(application);
   }
 
   @Override
@@ -50,23 +50,35 @@ public class OrganizationServiceImpl implements OrganizationService {
                 ? storageName
                 : realmProvider.load(realm).getDefaultUserStorageName())
         .getWriter()
-        .deleteOrganization(id);
+        .deleteApplication(id);
   }
 
   @Override
-  public Organization findById(String realm, String id, String storage) {
+  public void update(String realm, Application application, String storageName) {
+    storeProvider
+        .getStoreForUserStorage(
+            realm,
+            (storageName != null)
+                ? storageName
+                : realmProvider.load(realm).getDefaultUserStorageName())
+        .getWriter()
+        .updateApplication(application);
+  }
+
+  @Override
+  public Application findById(String realm, String id, String storage) {
     return storeProvider
         .getStoreForUserStorage(
             realm,
             (storage != null) ? storage : realmProvider.load(realm).getDefaultUserStorageName())
         .getReader()
-        .getOrganization(id);
+        .getApplication(id);
   }
 
   @Override
-  public PageResult<Organization> findByProperties(
+  public PageResult<Application> findByProperties(
       String realm,
-      Organization organizationFilter,
+      Application applicationFilter,
       PageableResult pageableResult,
       String storageName) {
     return storeProvider
@@ -76,18 +88,6 @@ public class OrganizationServiceImpl implements OrganizationService {
                 ? storageName
                 : realmProvider.load(realm).getDefaultUserStorageName())
         .getReader()
-        .searchOrganizations(organizationFilter, pageableResult, "AND");
-  }
-
-  @Override
-  public void update(String realm, Organization organization, String storageName) {
-    storeProvider
-        .getStoreForUserStorage(
-            realm,
-            (storageName != null)
-                ? storageName
-                : realmProvider.load(realm).getDefaultUserStorageName())
-        .getWriter()
-        .updateOrganization(organization);
+        .searchApplications(applicationFilter, pageableResult, "AND");
   }
 }
