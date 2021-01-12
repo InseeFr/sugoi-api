@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
       return storeProvider
           .getStoreForUserStorage(realm, storage)
           .getReader()
-          .searchUsers(properties, pageable, "");
+          .searchUsers(new User(), pageable, "");
     } catch (Exception e) {
       throw new RuntimeException("Erreur lors de la récupération des utilisateurs");
     }

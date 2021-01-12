@@ -22,13 +22,13 @@ import fr.insee.sugoi.model.Group;
 import java.util.List;
 
 @LdapObjectClass(values = {"top", "groupOfUniqueNames"})
-public class GroupLdapMapper {
+public class GroupLdapMapper implements LdapMapper<Group> {
 
-  public static Group mapFromSearchEntry(SearchResultEntry searchResultEntry) {
-    return GenericLdapMapper.transform(searchResultEntry, GroupLdap.class, Group.class);
+  public Group mapFromSearchEntry(SearchResultEntry entry) {
+    return GenericLdapMapper.transform(entry, GroupLdap.class, Group.class);
   }
 
-  public static List<Attribute> mapToAttribute(Group group) {
+  public List<Attribute> mapToAttribute(Group group) {
     return GenericLdapMapper.toAttribute(group, GroupLdap.class, Group.class);
   }
 

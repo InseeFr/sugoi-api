@@ -61,7 +61,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     return storeProvider
         .getStoreForUserStorage(realm, userStorage.getName())
         .getReader()
-        .searchOrganizations(properties, pageableResult, "AND");
+        .searchOrganizations(new Organization(), pageableResult, "AND");
   }
 
   @Override
