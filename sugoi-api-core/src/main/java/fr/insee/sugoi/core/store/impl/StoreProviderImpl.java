@@ -14,9 +14,11 @@
 package fr.insee.sugoi.core.store.impl;
 
 import fr.insee.sugoi.core.realm.RealmProvider;
+import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.core.store.Store;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.core.store.StoreStorage;
+import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,5 +36,25 @@ public class StoreProviderImpl implements StoreProvider {
     Realm r = realmProvider.load(realmName);
     UserStorage us = realmProvider.loadUserStorageByUserStorageName(realmName, userStorageName);
     return storeStorage.getStore(r, us);
+  }
+
+  @Override
+  public ReaderStore getReaderStore(String realm, String storage) {
+    return this.getStoreForUserStorage(
+            realm,
+            (storage != null)
+                ? storage
+                : realmProvider.load(realm).getUserStorages().get(0).getName())
+        .getReader();
+  }
+
+  @Override
+  public WriterStore getWriterStore(String realm, String storage) {
+    return this.getStoreForUserStorage(
+            realm,
+            (storage != null)
+                ? storage
+                : realmProvider.load(realm).getUserStorages().get(0).getName())
+        .getWriter();
   }
 }

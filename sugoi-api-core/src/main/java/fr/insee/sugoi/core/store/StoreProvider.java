@@ -16,4 +16,8 @@ package fr.insee.sugoi.core.store;
 public interface StoreProvider {
 
   public Store getStoreForUserStorage(String realmName, String userStorageName);
+
+  public ReaderStore getReaderStore(String realm, String storage);
+
+  public WriterStore getWriterStore(String realm, String storage);
 }

@@ -15,7 +15,6 @@ package fr.insee.sugoi.core.service.impl;
 
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
-import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Group;
@@ -25,42 +24,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class GroupServiceImpl implements GroupService {
 
-  @Autowired private RealmProvider realmProvider;
-
   @Autowired private StoreProvider storeProvider;
 
   @Override
   public Group create(String appName, String realm, Group group, String storageName) {
-    return storeProvider
-        .getStoreForUserStorage(
-            realm,
-            (storageName != null)
-                ? storageName
-                : realmProvider.load(realm).getDefaultUserStorageName())
-        .getWriter()
-        .createGroup(appName, group);
+    return storeProvider.getWriterStore(realm, storageName).createGroup(appName, group);
   }
 
   @Override
   public void delete(String appName, String realm, String id, String storageName) {
-    storeProvider
-        .getStoreForUserStorage(
-            realm,
-            (storageName != null)
-                ? storageName
-                : realmProvider.load(realm).getDefaultUserStorageName())
-        .getWriter()
-        .deleteGroup(appName, id);
+    storeProvider.getWriterStore(realm, storageName).deleteGroup(appName, id);
   }
 
   @Override
   public Group findById(String appName, String realm, String id, String storage) {
-    return storeProvider
-        .getStoreForUserStorage(
-            realm,
-            (storage != null) ? storage : realmProvider.load(realm).getDefaultUserStorageName())
-        .getReader()
-        .getGroup(appName, id);
+    return storeProvider.getReaderStore(realm, storage).getGroup(appName, id);
   }
 
   @Override
@@ -71,24 +49,12 @@ public class GroupServiceImpl implements GroupService {
       PageableResult pageableResult,
       String storageName) {
     return storeProvider
-        .getStoreForUserStorage(
-            realm,
-            (storageName != null)
-                ? storageName
-                : realmProvider.load(realm).getDefaultUserStorageName())
-        .getReader()
+        .getReaderStore(realm, storageName)
         .searchGroups(appName, groupFilter, pageableResult, "AND");
   }
 
   @Override
   public void update(String appName, String realm, Group group, String storageName) {
-    storeProvider
-        .getStoreForUserStorage(
-            realm,
-            (storageName != null)
-                ? storageName
-                : realmProvider.load(realm).getDefaultUserStorageName())
-        .getWriter()
-        .updateGroup(appName, group);
+    storeProvider.getWriterStore(realm, storageName).updateGroup(appName, group);
   }
 }

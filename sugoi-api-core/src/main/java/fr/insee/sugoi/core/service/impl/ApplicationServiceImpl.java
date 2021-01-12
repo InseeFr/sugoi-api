@@ -15,7 +15,6 @@ package fr.insee.sugoi.core.service.impl;
 
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
-import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.ApplicationService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Application;
@@ -25,54 +24,26 @@ import org.springframework.stereotype.Service;
 @Service
 public class ApplicationServiceImpl implements ApplicationService {
 
-  @Autowired private RealmProvider realmProvider;
-
   @Autowired private StoreProvider storeProvider;
 
   @Override
   public Application create(String realm, Application application, String storageName) {
-    return storeProvider
-        .getStoreForUserStorage(
-            realm,
-            (storageName != null)
-                ? storageName
-                : realmProvider.load(realm).getDefaultUserStorageName())
-        .getWriter()
-        .createApplication(application);
+    return storeProvider.getWriterStore(realm, storageName).createApplication(application);
   }
 
   @Override
   public void delete(String realm, String id, String storageName) {
-    storeProvider
-        .getStoreForUserStorage(
-            realm,
-            (storageName != null)
-                ? storageName
-                : realmProvider.load(realm).getDefaultUserStorageName())
-        .getWriter()
-        .deleteApplication(id);
+    storeProvider.getWriterStore(realm, storageName).deleteApplication(id);
   }
 
   @Override
   public void update(String realm, Application application, String storageName) {
-    storeProvider
-        .getStoreForUserStorage(
-            realm,
-            (storageName != null)
-                ? storageName
-                : realmProvider.load(realm).getDefaultUserStorageName())
-        .getWriter()
-        .updateApplication(application);
+    storeProvider.getWriterStore(realm, storageName).updateApplication(application);
   }
 
   @Override
   public Application findById(String realm, String id, String storage) {
-    return storeProvider
-        .getStoreForUserStorage(
-            realm,
-            (storage != null) ? storage : realmProvider.load(realm).getDefaultUserStorageName())
-        .getReader()
-        .getApplication(id);
+    return storeProvider.getReaderStore(realm, storage).getApplication(id);
   }
 
   @Override
@@ -82,12 +53,7 @@ public class ApplicationServiceImpl implements ApplicationService {
       PageableResult pageableResult,
       String storageName) {
     return storeProvider
-        .getStoreForUserStorage(
-            realm,
-            (storageName != null)
-                ? storageName
-                : realmProvider.load(realm).getDefaultUserStorageName())
-        .getReader()
+        .getReaderStore(realm, storageName)
         .searchApplications(applicationFilter, pageableResult, "AND");
   }
 }
