@@ -36,7 +36,7 @@ public class FileReaderStore implements ReaderStore {
 
   @Override
   public PageResult<User> searchUsers(
-      Map<String, String> properties, PageableResult pageable, String typeRecherche) {
+      User searchUser, PageableResult pageable, String searchOperator) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -55,7 +55,7 @@ public class FileReaderStore implements ReaderStore {
 
   @Override
   public PageResult<Organization> searchOrganizations(
-      Map<String, String> searchProperties, PageableResult pageable, String searchOperator) {
+      Organization organizationFilter, PageableResult pageable, String searchOperator) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -68,10 +68,7 @@ public class FileReaderStore implements ReaderStore {
 
   @Override
   public PageResult<Group> searchGroups(
-      String appName,
-      Map<String, String> searchProperties,
-      PageableResult pageable,
-      String searchOperator) {
+      String appName, Group groupFilter, PageableResult pageable, String searchOperator) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -90,7 +87,7 @@ public class FileReaderStore implements ReaderStore {
 
   @Override
   public PageResult<Application> searchApplications(
-      Map<String, String> searchProperties, PageableResult pageable, String searchOperator) {
+      Application applicationFilter, PageableResult pageable, String searchOperator) {
     // TODO Auto-generated method stub
     return null;
   }

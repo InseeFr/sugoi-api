@@ -19,34 +19,30 @@ import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
-import java.util.Map;
 
 public interface ReaderStore {
 
   public User getUser(String id);
 
   public PageResult<User> searchUsers(
-      Map<String, String> searchProperties, PageableResult pageable, String searchOperator);
+      User searchUser, PageableResult pageable, String searchOperator);
 
   public PageResult<User> getUsersInGroup(String appName, String groupName);
 
   public Organization getOrganization(String id);
 
   public PageResult<Organization> searchOrganizations(
-      Map<String, String> searchProperties, PageableResult pageable, String searchOperator);
+      Organization organizationFilter, PageableResult pageable, String searchOperator);
 
   public Group getGroup(String appName, String groupName);
 
   public PageResult<Group> searchGroups(
-      String appName,
-      Map<String, String> searchProperties,
-      PageableResult pageable,
-      String searchOperator);
+      String appName, Group groupFilter, PageableResult pageable, String searchOperator);
 
   public boolean validateCredentials(User user, String credential);
 
   public Application getApplication(String applicationName);
 
   public PageResult<Application> searchApplications(
-      Map<String, String> searchProperties, PageableResult pageable, String searchOperator);
+      Application applicationFilter, PageableResult pageable, String searchOperator);
 }

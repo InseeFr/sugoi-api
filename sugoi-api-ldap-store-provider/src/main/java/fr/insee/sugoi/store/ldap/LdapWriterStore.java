@@ -64,7 +64,7 @@ public class LdapWriterStore implements WriterStore {
       AddRequest ar =
           new AddRequest(
               "uid=" + user.getUsername() + "," + config.get("user_source"),
-              UserLdapMapper.mapToAttribute(user));
+              (new UserLdapMapper()).mapToAttribute(user));
       ldapPoolConnection.add(ar);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to create user", e);
@@ -103,7 +103,7 @@ public class LdapWriterStore implements WriterStore {
       AddRequest ar =
           new AddRequest(
               "cn=" + group.getName() + ",ou=" + appName + "," + config.get("app_source"),
-              GroupLdapMapper.mapToAttribute(group));
+              (new GroupLdapMapper()).mapToAttribute(group));
       ldapPoolConnection.add(ar);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to create group " + group.getName(), e);
@@ -142,7 +142,7 @@ public class LdapWriterStore implements WriterStore {
       AddRequest ar =
           new AddRequest(
               "uid=" + organization.getIdentifiant() + "," + config.get("organization_source"),
-              OrganizationLdapMapper.mapToAttribute(organization));
+              (new OrganizationLdapMapper()).mapToAttribute(organization));
       ldapPoolConnection.add(ar);
     } catch (LDAPException e) {
       throw new RuntimeException(
@@ -228,7 +228,7 @@ public class LdapWriterStore implements WriterStore {
       AddRequest ar =
           new AddRequest(
               "ou=" + application.getName() + "," + config.get("app_source"),
-              ApplicationLdapMapper.mapToAttribute(application));
+              (new ApplicationLdapMapper()).mapToAttribute(application));
       ldapPoolConnection.add(ar);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to create application" + application.getName(), e);

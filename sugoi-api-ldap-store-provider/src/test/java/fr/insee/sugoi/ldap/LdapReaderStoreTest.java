@@ -91,9 +91,8 @@ public class LdapReaderStoreTest {
     LdapReaderStore ldapReaderStore =
         (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     PageableResult pageableResult = new PageableResult();
-    Map<String, String> searchProperties = new HashMap<>();
     List<Organization> organizations =
-        ldapReaderStore.searchOrganizations(searchProperties, pageableResult, "").getResults();
+        ldapReaderStore.searchOrganizations(new Organization(), pageableResult, "").getResults();
     assertThat(
         "Should contain testi",
         organizations.stream().anyMatch(orga -> orga.getIdentifiant().equals("testi")));
@@ -109,8 +108,10 @@ public class LdapReaderStoreTest {
     PageableResult pageableResult = new PageableResult();
     Map<String, String> searchProperties = new HashMap<>();
     searchProperties.put("description", "Insee");
+    Organization organizationFilter = new Organization();
+    organizationFilter.addAttributes("description", "Insee");
     List<Organization> organizations =
-        ldapReaderStore.searchOrganizations(searchProperties, pageableResult, "").getResults();
+        ldapReaderStore.searchOrganizations(organizationFilter, pageableResult, "").getResults();
     assertThat("Should find one result", organizations.size(), is(1));
     assertThat(
         "First element found should be testo", organizations.get(0).getIdentifiant(), is("testo"));
@@ -135,8 +136,7 @@ public class LdapReaderStoreTest {
     LdapReaderStore ldapReaderStore =
         (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     PageableResult pageableResult = new PageableResult();
-    Map<String, String> properties = new HashMap<>();
-    List<User> users = ldapReaderStore.searchUsers(properties, pageableResult, "et").getResults();
+    List<User> users = ldapReaderStore.searchUsers(new User(), pageableResult, "et").getResults();
     assertThat(
         "Should contain testo",
         users.stream().anyMatch(user -> user.getUsername().equals("testo")));
@@ -150,9 +150,9 @@ public class LdapReaderStoreTest {
     LdapReaderStore ldapReaderStore =
         (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     PageableResult pageableResult = new PageableResult();
-    Map<String, String> properties = new HashMap<>();
-    properties.put("mail", "test@test.fr");
-    List<User> users = ldapReaderStore.searchUsers(properties, pageableResult, "et").getResults();
+    User testUser = new User();
+    testUser.setMail("test@test.fr");
+    List<User> users = ldapReaderStore.searchUsers(testUser, pageableResult, "et").getResults();
     assertThat("Should find one result", users.size(), is(1));
     assertThat("First element found should be testc", users.get(0).getUsername(), is("testc"));
   }
@@ -179,9 +179,8 @@ public class LdapReaderStoreTest {
     LdapReaderStore ldapReaderStore =
         (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     PageableResult pageableResult = new PageableResult();
-    Map<String, String> searchProperties = new HashMap<>();
     List<Application> applications =
-        ldapReaderStore.searchApplications(searchProperties, pageableResult, "").getResults();
+        ldapReaderStore.searchApplications(new Application(), pageableResult, "").getResults();
     assertThat(
         "Should contain applitest",
         applications.stream().anyMatch(appli -> appli.getName().equals("Applitest")));
@@ -191,14 +190,14 @@ public class LdapReaderStoreTest {
   }
 
   @Test
-  public void testSearchApplicationWithMatchingDescription() {
+  public void testSearchApplicationWithMatchingName() {
     LdapReaderStore ldapReaderStore =
         (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     PageableResult pageableResult = new PageableResult();
-    Map<String, String> searchProperties = new HashMap<>();
-    searchProperties.put("description", "Branche privative de l'application applitest");
+    Application applicationFilter = new Application();
+    applicationFilter.setName("Applitest");
     List<Application> applications =
-        ldapReaderStore.searchApplications(searchProperties, pageableResult, "").getResults();
+        ldapReaderStore.searchApplications(applicationFilter, pageableResult, "").getResults();
     assertThat("Should find one result", applications.size(), is(1));
     assertThat(
         "First element found should be Applitest", applications.get(0).getName(), is("Applitest"));
@@ -218,12 +217,9 @@ public class LdapReaderStoreTest {
     // we should also check if there is more complexe cases like cases with organizationalGroup
     LdapReaderStore ldapReaderStore =
         (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
-    Map<String, String> searchProperties = new HashMap<>();
     PageableResult pageableResult = new PageableResult();
     List<Group> groups =
-        ldapReaderStore
-            .searchGroups("Applitest", searchProperties, pageableResult, "")
-            .getResults();
+        ldapReaderStore.searchGroups("Applitest", new Group(), pageableResult, "").getResults();
     assertThat("Should find 3 elements", groups.size(), is(3));
     assertThat(
         "Should contain utilisateurs",
