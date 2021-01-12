@@ -15,7 +15,6 @@ package fr.insee.sugoi.core.service.impl;
 
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
-import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.User;
@@ -27,49 +26,25 @@ public class UserServiceImpl implements UserService {
 
   @Autowired private StoreProvider storeProvider;
 
-  @Autowired private RealmProvider realmProvider;
-
   @Override
   public User create(String realm, User user, String storage) {
-    return storeProvider
-        .getStoreForUserStorage(
-            realm,
-            (storage != null) ? storage : realmProvider.load(realm).getDefaultUserStorageName())
-        .getWriter()
-        .createUser(user);
+    return storeProvider.getWriterStore(realm, storage).createUser(user);
   }
 
   @Override
   public void update(String realm, User user, String storage) {
-    storeProvider
-        .getStoreForUserStorage(
-            realm,
-            (storage != null) ? storage : realmProvider.load(realm).getDefaultUserStorageName())
-        .getWriter()
-        .updateUser(user);
+    storeProvider.getWriterStore(realm, storage).updateUser(user);
   }
 
   @Override
   public void delete(String realmName, String id, String storage) {
-    storeProvider
-        .getStoreForUserStorage(
-            realmName,
-            (storage != null) ? storage : realmProvider.load(realmName).getDefaultUserStorageName())
-        .getWriter()
-        .deleteUser(id);
+    storeProvider.getWriterStore(realmName, storage).deleteUser(id);
   }
 
   @Override
   public User findById(String realmName, String id, String storage) {
     try {
-      return storeProvider
-          .getStoreForUserStorage(
-              realmName,
-              (storage != null)
-                  ? storage
-                  : realmProvider.load(realmName).getDefaultUserStorageName())
-          .getReader()
-          .getUser(id);
+      return storeProvider.getReaderStore(realmName, storage).getUser(id);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -79,12 +54,7 @@ public class UserServiceImpl implements UserService {
   public PageResult<User> findByProperties(
       String realm, User userProperties, PageableResult pageable, String storage) {
     try {
-      return storeProvider
-          .getStoreForUserStorage(
-              realm,
-              (storage != null) ? storage : realmProvider.load(realm).getDefaultUserStorageName())
-          .getReader()
-          .searchUsers(userProperties, pageable, "");
+      return storeProvider.getReaderStore(realm, storage).searchUsers(userProperties, pageable, "");
     } catch (Exception e) {
       throw new RuntimeException("Erreur lors de la récupération des utilisateurs");
     }

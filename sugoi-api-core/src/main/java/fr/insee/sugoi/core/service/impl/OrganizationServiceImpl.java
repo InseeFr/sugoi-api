@@ -15,7 +15,6 @@ package fr.insee.sugoi.core.service.impl;
 
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
-import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.OrganizationService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Organization;
@@ -25,42 +24,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class OrganizationServiceImpl implements OrganizationService {
 
-  @Autowired private RealmProvider realmProvider;
-
   @Autowired private StoreProvider storeProvider;
 
   @Override
   public Organization create(String realm, Organization organization, String storageName) {
-    return storeProvider
-        .getStoreForUserStorage(
-            realm,
-            (storageName != null)
-                ? storageName
-                : realmProvider.load(realm).getDefaultUserStorageName())
-        .getWriter()
-        .createOrganization(organization);
+    return storeProvider.getWriterStore(realm, storageName).createOrganization(organization);
   }
 
   @Override
   public void delete(String realm, String id, String storageName) {
-    storeProvider
-        .getStoreForUserStorage(
-            realm,
-            (storageName != null)
-                ? storageName
-                : realmProvider.load(realm).getDefaultUserStorageName())
-        .getWriter()
-        .deleteOrganization(id);
+    storeProvider.getWriterStore(realm, storageName).deleteOrganization(id);
   }
 
   @Override
   public Organization findById(String realm, String id, String storage) {
-    return storeProvider
-        .getStoreForUserStorage(
-            realm,
-            (storage != null) ? storage : realmProvider.load(realm).getDefaultUserStorageName())
-        .getReader()
-        .getOrganization(id);
+    return storeProvider.getReaderStore(realm, storage).getOrganization(id);
   }
 
   @Override
@@ -70,24 +48,12 @@ public class OrganizationServiceImpl implements OrganizationService {
       PageableResult pageableResult,
       String storageName) {
     return storeProvider
-        .getStoreForUserStorage(
-            realm,
-            (storageName != null)
-                ? storageName
-                : realmProvider.load(realm).getDefaultUserStorageName())
-        .getReader()
+        .getReaderStore(realm, storageName)
         .searchOrganizations(organizationFilter, pageableResult, "AND");
   }
 
   @Override
   public void update(String realm, Organization organization, String storageName) {
-    storeProvider
-        .getStoreForUserStorage(
-            realm,
-            (storageName != null)
-                ? storageName
-                : realmProvider.load(realm).getDefaultUserStorageName())
-        .getWriter()
-        .updateOrganization(organization);
+    storeProvider.getWriterStore(realm, storageName).updateOrganization(organization);
   }
 }
