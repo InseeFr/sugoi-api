@@ -16,21 +16,21 @@ package fr.insee.sugoi.core.service.impl;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.realm.RealmProvider;
-import fr.insee.sugoi.core.service.OrganizationService;
+import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.core.store.StoreProvider;
-import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.Group;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OrganizationServiceImpl implements OrganizationService {
+public class GroupServiceImpl implements GroupService {
 
   @Autowired private RealmProvider realmProvider;
 
   @Autowired private StoreProvider storeProvider;
 
   @Override
-  public Organization create(String realm, Organization organization, String storageName) {
+  public Group create(String appName, String realm, Group group, String storageName) {
     return storeProvider
         .getStoreForUserStorage(
             realm,
@@ -38,11 +38,11 @@ public class OrganizationServiceImpl implements OrganizationService {
                 ? storageName
                 : realmProvider.load(realm).getDefaultUserStorageName())
         .getWriter()
-        .createOrganization(organization);
+        .createGroup(appName, group);
   }
 
   @Override
-  public void delete(String realm, String id, String storageName) {
+  public void delete(String appName, String realm, String id, String storageName) {
     storeProvider
         .getStoreForUserStorage(
             realm,
@@ -50,23 +50,24 @@ public class OrganizationServiceImpl implements OrganizationService {
                 ? storageName
                 : realmProvider.load(realm).getDefaultUserStorageName())
         .getWriter()
-        .deleteOrganization(id);
+        .deleteGroup(appName, id);
   }
 
   @Override
-  public Organization findById(String realm, String id, String storage) {
+  public Group findById(String appName, String realm, String id, String storage) {
     return storeProvider
         .getStoreForUserStorage(
             realm,
             (storage != null) ? storage : realmProvider.load(realm).getDefaultUserStorageName())
         .getReader()
-        .getOrganization(id);
+        .getGroup(appName, id);
   }
 
   @Override
-  public PageResult<Organization> findByProperties(
+  public PageResult<Group> findByProperties(
+      String appName,
       String realm,
-      Organization organizationFilter,
+      Group groupFilter,
       PageableResult pageableResult,
       String storageName) {
     return storeProvider
@@ -76,11 +77,11 @@ public class OrganizationServiceImpl implements OrganizationService {
                 ? storageName
                 : realmProvider.load(realm).getDefaultUserStorageName())
         .getReader()
-        .searchOrganizations(organizationFilter, pageableResult, "AND");
+        .searchGroups(appName, groupFilter, pageableResult, "AND");
   }
 
   @Override
-  public void update(String realm, Organization organization, String storageName) {
+  public void update(String appName, String realm, Group group, String storageName) {
     storeProvider
         .getStoreForUserStorage(
             realm,
@@ -88,6 +89,6 @@ public class OrganizationServiceImpl implements OrganizationService {
                 ? storageName
                 : realmProvider.load(realm).getDefaultUserStorageName())
         .getWriter()
-        .updateOrganization(organization);
+        .updateGroup(appName, group);
   }
 }

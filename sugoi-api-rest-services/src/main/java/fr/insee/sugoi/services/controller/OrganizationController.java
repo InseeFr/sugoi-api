@@ -14,6 +14,7 @@
 package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.model.PageResult;
+import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.service.OrganizationService;
 import fr.insee.sugoi.model.Organization;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,12 +51,13 @@ public class OrganizationController {
   public ResponseEntity<?> getOrganizations(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
-      @RequestParam(value = "application", required = false) String application,
-      @RequestParam(value = "role", required = false) String role,
-      @RequestParam(value = "property", required = false) String property) {
+      @RequestParam(value = "identifiant", required = false) String identifiant) {
     try {
+      Organization organizationFilter = new Organization();
+      organizationFilter.setIdentifiant(identifiant);
       PageResult<Organization> organizations =
-          organizationService.search(realm, application, role, property);
+          organizationService.findByProperties(
+              realm, organizationFilter, new PageableResult(), storage);
       return ResponseEntity.status(HttpStatus.OK).body(organizations);
     } catch (Exception e) {
       return ResponseEntity.status(500).build();
@@ -73,7 +75,7 @@ public class OrganizationController {
       @PathVariable("storage") String storage,
       @RequestBody Organization organization) {
     try {
-      organizationService.create(realm, storage, organization);
+      organizationService.create(realm, organization, storage);
       return ResponseEntity.status(HttpStatus.ACCEPTED).body(organization);
     } catch (Exception e) {
       return ResponseEntity.status(500).build();
@@ -92,7 +94,7 @@ public class OrganizationController {
       @PathVariable("id") String id,
       @RequestBody Organization organization) {
     try {
-      organizationService.update(realm, storage, id, organization);
+      organizationService.update(realm, organization, storage);
       return ResponseEntity.status(HttpStatus.ACCEPTED).body(organization);
     } catch (Exception e) {
       return ResponseEntity.status(500).build();
@@ -109,7 +111,7 @@ public class OrganizationController {
       @PathVariable("storage") String storage,
       @PathVariable("id") String id) {
     try {
-      organizationService.delete(realm, id);
+      organizationService.delete(realm, id, storage);
       return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     } catch (Exception e) {
       return ResponseEntity.status(500).build();

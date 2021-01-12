@@ -75,7 +75,7 @@ public class UserController {
       @RequestBody User user) {
     User createdUser;
     try {
-      createdUser = userService.create(realm, storage, user);
+      createdUser = userService.create(realm, user, storage);
       return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     } catch (Exception e) {
       return ResponseEntity.status(500).build();
@@ -105,10 +105,9 @@ public class UserController {
       @PathVariable("storage") String storage,
       @PathVariable("id") String id) {
     // TODO: process DELETE request
-    User deletedUser;
     try {
-      deletedUser = userService.delete(realm, id);
-      return ResponseEntity.status(HttpStatus.CREATED).body(deletedUser);
+      userService.delete(realm, id, storage);
+      return ResponseEntity.status(HttpStatus.CREATED).build();
     } catch (Exception e) {
       return ResponseEntity.status(500).build();
     }

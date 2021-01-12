@@ -15,18 +15,22 @@ package fr.insee.sugoi.core.service;
 
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
-import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.Group;
 
-public interface OrganizationService {
+public interface GroupService {
 
-  Organization create(String realm, Organization organization, String storage);
+  Group create(String appName, String realm, Group group, String storage);
 
-  void delete(String realm, String id, String storage);
+  void update(String appName, String realm, Group group, String storage);
 
-  Organization findById(String realm, String id, String storage);
+  void delete(String appName, String realm, String id, String storage);
 
-  PageResult<Organization> findByProperties(
-      String realm, Organization organizationFilter, PageableResult pageableResult, String storage);
+  Group findById(String appName, String realm, String id, String storage);
 
-  void update(String realm, Organization organization, String storage);
+  PageResult<Group> findByProperties(
+      String appName,
+      String realm,
+      Group groupFilter,
+      PageableResult pageableResult,
+      String storage);
 }

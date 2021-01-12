@@ -16,16 +16,17 @@ package fr.insee.sugoi.core.service;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.model.User;
-import java.util.Map;
 
 public interface UserService {
 
-  User searchUser(String domaine, String idep);
+  User create(String realm, User user, String storage);
+
+  void update(String realm, User user, String storage);
+
+  void delete(String realm, String id, String storage);
+
+  User findById(String realm, String idep, String storageName);
 
   PageResult<User> findByProperties(
-      String realm, Map<String, String> properties, PageableResult pageable, String storageName);
-
-  User create(String realm, String storage, User user);
-
-  User delete(String realm, String id);
+      String realm, User userProperties, PageableResult pageable, String storageName);
 }

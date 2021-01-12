@@ -15,18 +15,18 @@ package fr.insee.sugoi.core.service;
 
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
-import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.Application;
 
-public interface OrganizationService {
+public interface ApplicationService {
 
-  Organization create(String realm, Organization organization, String storage);
+  Application create(String realm, Application application, String storage);
+
+  void update(String realm, Application application, String storage);
 
   void delete(String realm, String id, String storage);
 
-  Organization findById(String realm, String id, String storage);
+  Application findById(String realm, String id, String storage);
 
-  PageResult<Organization> findByProperties(
-      String realm, Organization organizationFilter, PageableResult pageableResult, String storage);
-
-  void update(String realm, Organization organization, String storage);
+  PageResult<Application> findByProperties(
+      String realm, Application applicationFilter, PageableResult pageableResult, String storage);
 }
