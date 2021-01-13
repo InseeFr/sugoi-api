@@ -37,6 +37,11 @@ public class LdapWriterStore implements WriterStore {
   private LDAPConnectionPool ldapPoolConnection;
   private Map<String, String> config;
 
+  private UserLdapMapper userLdapMapper = new UserLdapMapper();
+  private OrganizationLdapMapper organizationLdapMapper = new OrganizationLdapMapper();
+  private GroupLdapMapper groupLdapMapper = new GroupLdapMapper();
+  private ApplicationLdapMapper applicationLdapMapper = new ApplicationLdapMapper();
+
   public LdapWriterStore(Map<String, String> config) {
     try {
       LdapFactory.getSingleConnection(config);
@@ -64,7 +69,7 @@ public class LdapWriterStore implements WriterStore {
       AddRequest ar =
           new AddRequest(
               "uid=" + user.getUsername() + "," + config.get("user_source"),
-              (new UserLdapMapper()).mapToAttribute(user));
+              userLdapMapper.mapToAttribute(user));
       ldapPoolConnection.add(ar);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to create user", e);
@@ -103,7 +108,7 @@ public class LdapWriterStore implements WriterStore {
       AddRequest ar =
           new AddRequest(
               "cn=" + group.getName() + ",ou=" + appName + "," + config.get("app_source"),
-              (new GroupLdapMapper()).mapToAttribute(group));
+              groupLdapMapper.mapToAttribute(group));
       ldapPoolConnection.add(ar);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to create group " + group.getName(), e);
@@ -142,7 +147,7 @@ public class LdapWriterStore implements WriterStore {
       AddRequest ar =
           new AddRequest(
               "uid=" + organization.getIdentifiant() + "," + config.get("organization_source"),
-              (new OrganizationLdapMapper()).mapToAttribute(organization));
+              organizationLdapMapper.mapToAttribute(organization));
       ldapPoolConnection.add(ar);
     } catch (LDAPException e) {
       throw new RuntimeException(
@@ -228,7 +233,7 @@ public class LdapWriterStore implements WriterStore {
       AddRequest ar =
           new AddRequest(
               "ou=" + application.getName() + "," + config.get("app_source"),
-              (new ApplicationLdapMapper()).mapToAttribute(application));
+              applicationLdapMapper.mapToAttribute(application));
       ldapPoolConnection.add(ar);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to create application" + application.getName(), e);
