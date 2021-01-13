@@ -22,8 +22,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.core.model.PageResult;
-import fr.insee.sugoi.core.service.ApplicationService;
-import fr.insee.sugoi.model.Application;
+import fr.insee.sugoi.core.service.UserService;
+import fr.insee.sugoi.model.User;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,75 +43,71 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @SpringBootTest(
-    classes = ApplicationController.class,
+    classes = UserController.class,
     properties = "spring.config.location=classpath:/controller/application.properties")
 @AutoConfigureMockMvc
 @EnableWebMvc
-public class ApplicationControllerTest {
+public class UserControllerTest {
 
   @Autowired MockMvc mockMvc;
 
-  @MockBean private ApplicationService applicationService;
+  @MockBean private UserService userService;
 
   ObjectMapper objectMapper = new ObjectMapper();
-  Application application1, application2, application1Updated;
-  PageResult<Application> pageResult;
+  User user1, user2, user1Updated;
+  PageResult<User> pageResult;
 
   @BeforeEach
   public void setup() {
-    application1 = new Application();
-    application1.setName("SuperAppli");
-    application1.setOwner("Amoi");
+    user1 = new User();
+    user1.setUsername("Toto");
+    user1.setMail("toto@insee.fr");
 
-    application2 = new Application();
-    application2.setName("SuperAppli2");
-    application2.setOwner("Amoi2");
+    user2 = new User();
+    user2.setUsername("Tata");
+    user2.setMail("tata@insee.fr");
 
-    application1Updated = new Application();
-    application1Updated.setName("SuperAppli");
-    application1Updated.setOwner("NewOwner");
+    user1Updated = new User();
+    user1Updated.setUsername("Toto");
+    user1Updated.setMail("new.toto@insee.fr");
 
-    List<Application> applications = new ArrayList<>();
-    applications.add(application1);
-    applications.add(application2);
-    pageResult = new PageResult<Application>();
-    pageResult.setResults(applications);
+    List<User> users = new ArrayList<>();
+    users.add(user1);
+    users.add(user2);
+    pageResult = new PageResult<User>();
+    pageResult.setResults(users);
   }
 
   // Test read requests on good query
 
   @Test
   @WithMockUser
-  public void retrieveAllApplications() {
+  public void retrieveAllUsers() {
     try {
 
       Mockito.when(
-              applicationService.findByProperties(
+              userService.findByProperties(
                   Mockito.anyString(), Mockito.isNull(), Mockito.any(), Mockito.any()))
           .thenReturn(pageResult);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/applications").accept(MediaType.APPLICATION_JSON);
+          MockMvcRequestBuilders.get("/domaine1/users").accept(MediaType.APPLICATION_JSON);
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-      TypeReference<PageResult<Application>> mapType =
-          new TypeReference<PageResult<Application>>() {};
-      PageResult<Application> appRes =
-          objectMapper.readValue(response.getContentAsString(), mapType);
+      TypeReference<PageResult<User>> mapType = new TypeReference<PageResult<User>>() {};
+      PageResult<User> appRes = objectMapper.readValue(response.getContentAsString(), mapType);
 
       assertThat(
-          "First element should be SuperAppli",
-          appRes.getResults().get(0).getName(),
-          is("SuperAppli"));
+          "First element should be Toto", appRes.getResults().get(0).getUsername(), is("Toto"));
       assertThat(
-          "SuperAppli should have owner Amoi", appRes.getResults().get(0).getOwner(), is("Amoi"));
+          "Toto should have mail toto@insee.fr",
+          appRes.getResults().get(0).getMail(),
+          is("toto@insee.fr"));
       assertThat(
-          "Second element should be SuperAppli2",
-          appRes.getResults().get(1).getName(),
-          is("SuperAppli2"));
+          "Second element should be Tata", appRes.getResults().get(1).getUsername(), is("Tata"));
       assertThat(
-          "SuperAppli2 should have owner Amoi2",
-          appRes.getResults().get(1).getOwner(),
-          is("Amoi2"));
+          "Tata should have mail tata@insee.fr",
+          appRes.getResults().get(1).getMail(),
+          is("tata@insee.fr"));
       assertThat("Response code should be 200", response.getStatus(), is(200));
 
     } catch (Exception e) {
@@ -123,26 +119,25 @@ public class ApplicationControllerTest {
   @Disabled
   @Test
   @WithMockUser
-  public void shouldRetrieveSomeApplications() {}
+  public void shouldRetrieveSomeUsers() {}
 
   @Test
   @WithMockUser
-  public void shouldGetApplicationByID() {
+  public void shouldGetUserByID() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "SuperAppli"))
-          .thenReturn(application1);
+      Mockito.when(userService.findById("domaine1", null, "Toto")).thenReturn(user1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/applications/SuperAppli")
-              .accept(MediaType.APPLICATION_JSON);
+          MockMvcRequestBuilders.get("/domaine1/users/Toto").accept(MediaType.APPLICATION_JSON);
 
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-      Application res = objectMapper.readValue(response.getContentAsString(), Application.class);
+      User res = objectMapper.readValue(response.getContentAsString(), User.class);
 
-      verify(applicationService).findById("domaine1", null, "SuperAppli");
-      assertThat("Application returned should be SuperAppli", res.getName(), is("SuperAppli"));
-      assertThat("Application returned should be owned by Amoi", res.getOwner(), is("Amoi"));
+      verify(userService).findById("domaine1", null, "Toto");
+      assertThat("User returned should be Toto", res.getUsername(), is("Toto"));
+      assertThat(
+          "User returned should have toto@insee.fr as mail", res.getMail(), is("toto@insee.fr"));
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -157,16 +152,16 @@ public class ApplicationControllerTest {
   public void deleteShouldCallDeleteService() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "supprimemoi"))
-          .thenReturn(application1);
+      Mockito.when(userService.findById(Mockito.anyString(), Mockito.isNull(), Mockito.anyString()))
+          .thenReturn(user1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/domaine1/applications/supprimemoi")
+          MockMvcRequestBuilders.delete("/domaine1/users/supprimemoi")
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
       mockMvc.perform(requestBuilder).andReturn();
-      verify(applicationService).delete("domaine1", null, "supprimemoi");
+      verify(userService).delete("domaine1", null, "supprimemoi");
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -179,24 +174,24 @@ public class ApplicationControllerTest {
   public void updateShouldCallUpdateServiceAndReturnNewApp() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "SuperAppli"))
-          .thenReturn(application1)
-          .thenReturn(application1Updated);
+      Mockito.when(userService.findById("domaine1", null, "Toto"))
+          .thenReturn(user1)
+          .thenReturn(user1Updated);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/applications/SuperAppli")
+          MockMvcRequestBuilders.put("/domaine1/users/Toto")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(application1Updated))
+              .content(objectMapper.writeValueAsString(user1Updated))
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
-      verify(applicationService).update(Mockito.anyString(), Mockito.isNull(), Mockito.any());
+      verify(userService).update(Mockito.anyString(), Mockito.isNull(), Mockito.any());
       assertThat(
-          "Should get updated application",
-          objectMapper.readValue(response.getContentAsString(), Application.class).getOwner(),
-          is("NewOwner"));
+          "Should get updated user",
+          objectMapper.readValue(response.getContentAsString(), User.class).getMail(),
+          is("new.toto@insee.fr"));
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -209,23 +204,23 @@ public class ApplicationControllerTest {
   public void postShouldCallPostServiceAndReturnNewApp() {
 
     try {
-      Mockito.when(applicationService.findById("domaine1", null, "SuperAppli"))
+      Mockito.when(userService.findById("domaine1", null, "Toto"))
           .thenReturn(null)
-          .thenReturn(application1);
+          .thenReturn(user1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/applications")
+          MockMvcRequestBuilders.post("/domaine1/users")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(application1))
+              .content(objectMapper.writeValueAsString(user1))
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-      verify(applicationService).create(Mockito.anyString(), Mockito.isNull(), Mockito.any());
+      verify(userService).create(Mockito.anyString(), Mockito.isNull(), Mockito.any());
       assertThat(
-          "Should get new application",
-          objectMapper.readValue(response.getContentAsString(), Application.class).getName(),
-          is("SuperAppli"));
+          "Should get new user",
+          objectMapper.readValue(response.getContentAsString(), User.class).getUsername(),
+          is("Toto"));
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -242,17 +237,16 @@ public class ApplicationControllerTest {
       pageResult.setHasMoreResult(true);
 
       Mockito.when(
-              applicationService.findByProperties(
+              userService.findByProperties(
                   Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any()))
           .thenReturn(pageResult);
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/applications?size=2")
-              .accept(MediaType.APPLICATION_JSON);
+          MockMvcRequestBuilders.get("/domaine1/users?size=2").accept(MediaType.APPLICATION_JSON);
 
       assertThat(
           "Location header gives next page",
           mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
-          is("http://localhost/domaine1/applications?size=2&offset=2"));
+          is("http://localhost/domaine1/users?size=2&offset=2"));
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -262,24 +256,25 @@ public class ApplicationControllerTest {
 
   @Test
   @WithMockUser
-  public void getObjectLocationInApplicationCreationResponse() {
+  public void getObjectLocationInUserCreationResponse() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "SuperAppli")).thenReturn(null);
-      Mockito.when(applicationService.create(Mockito.anyString(), Mockito.isNull(), Mockito.any()))
-          .thenReturn(application1);
+      Mockito.when(userService.findById(Mockito.anyString(), Mockito.isNull(), Mockito.anyString()))
+          .thenReturn(null);
+      Mockito.when(userService.create(Mockito.anyString(), Mockito.isNull(), Mockito.any()))
+          .thenReturn(user1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/applications")
+          MockMvcRequestBuilders.post("/domaine1/users")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(application1))
+              .content(objectMapper.writeValueAsString(user1))
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
       assertThat(
           "Location header gives get uri",
           mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
-          is("http://localhost/domaine1/applications/SuperAppli"));
+          is("http://localhost/domaine1/users/Toto"));
 
     } catch (Exception e1) {
       e1.printStackTrace();
@@ -289,13 +284,13 @@ public class ApplicationControllerTest {
 
   // Test response codes on error
   @Test
-  public void get401OnCreateApplicationWhenNotAuhtenticated() {
+  public void get401OnCreateUserWhenNotAuhtenticated() {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/applications")
+          MockMvcRequestBuilders.post("/domaine1/users")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(application1))
+              .content(objectMapper.writeValueAsString(user1))
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
@@ -311,11 +306,11 @@ public class ApplicationControllerTest {
   }
 
   @Test
-  public void get401OnDeleteApplicationWhenNotAuhtenticated() {
+  public void get401OnDeleteUserWhenNotAuhtenticated() {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/domaine1/applications/supprimemoi")
+          MockMvcRequestBuilders.delete("/domaine1/users/supprimemoi")
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
@@ -331,13 +326,13 @@ public class ApplicationControllerTest {
   }
 
   @Test
-  public void get401OnUpdateApplicationWhenNotAuhtenticated() {
+  public void get401OnUpdateUserWhenNotAuhtenticated() {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/applications/SuperAppli")
+          MockMvcRequestBuilders.put("/domaine1/users/Toto")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(application1))
+              .content(objectMapper.writeValueAsString(user1))
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
@@ -354,16 +349,16 @@ public class ApplicationControllerTest {
 
   @Test
   @WithMockUser
-  public void get409WhenCreatingAlreadyExistingApplication() {
+  public void get409WhenCreatingAlreadyExistingUser() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "SuperAppli"))
-          .thenReturn(application1);
+      Mockito.when(userService.findById(Mockito.anyString(), Mockito.isNull(), Mockito.anyString()))
+          .thenReturn(user1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/applications")
+          MockMvcRequestBuilders.post("/domaine1/users")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(application1))
+              .content(objectMapper.writeValueAsString(user1))
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
@@ -380,13 +375,14 @@ public class ApplicationControllerTest {
 
   @Test
   @WithMockUser
-  public void get404WhenNoApplicationIsFoundWhenGetById() {
+  public void get404WhenNoUserIsFoundWhenGetById() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "dontexist")).thenReturn(null);
+      Mockito.when(userService.findById(Mockito.anyString(), Mockito.isNull(), Mockito.anyString()))
+          .thenReturn(null);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/applications/dontexist")
+          MockMvcRequestBuilders.get("/domaine1/users/dontexist")
               .accept(MediaType.APPLICATION_JSON);
 
       assertThat(
@@ -402,13 +398,13 @@ public class ApplicationControllerTest {
 
   @Test
   @WithMockUser
-  public void get400WhenNoApplicationIdDoesntMatchBody() {
+  public void get400WhenNoUserIdDoesntMatchBody() {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/applications/dontexist")
+          MockMvcRequestBuilders.put("/domaine1/users/dontexist")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(application1))
+              .content(objectMapper.writeValueAsString(user1))
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
@@ -425,15 +421,16 @@ public class ApplicationControllerTest {
 
   @Test
   @WithMockUser
-  public void get404WhenNoApplicationIsFoundWhenUpdate() {
+  public void get404WhenNoUserIsFoundWhenUpdate() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "SuperAppli")).thenReturn(null);
+      Mockito.when(userService.findById(Mockito.anyString(), Mockito.isNull(), Mockito.anyString()))
+          .thenReturn(null);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/applications/SuperAppli")
+          MockMvcRequestBuilders.put("/domaine1/users/Toto")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(application1))
+              .content(objectMapper.writeValueAsString(user1))
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
@@ -450,13 +447,14 @@ public class ApplicationControllerTest {
 
   @Test
   @WithMockUser
-  public void get404WhenNoApplicationIsFoundWhenDelete() {
+  public void get404WhenNoUserIsFoundWhenDelete() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "dontexist")).thenReturn(null);
+      Mockito.when(userService.findById(Mockito.anyString(), Mockito.isNull(), Mockito.anyString()))
+          .thenReturn(null);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/domaine1/applications/dontexist")
+          MockMvcRequestBuilders.delete("/domaine1/users/dontexist")
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 

@@ -116,7 +116,7 @@ public class OrganizationController {
       @PathVariable(name = "storage", required = false) String storage,
       @PathVariable("id") String id,
       @RequestBody Organization organization) {
-    if (organization.getIdentifiant().equals(id)) {
+    if (!organization.getIdentifiant().equals(id)) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -156,14 +156,14 @@ public class OrganizationController {
   }
 
   @GetMapping(
-      path = {"/{realm}/organizations/{name}", "/{realm}/{storage}/organizations/{name}"},
+      path = {"/{realm}/organizations/{orgId}", "/{realm}/{storage}/organizations/{orgId}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get organization by identifiant")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
   public ResponseEntity<Organization> getUserByUsername(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
-      @PathVariable("username") String id) {
+      @PathVariable("orgId") String id) {
     Organization organization = organizationService.findById(realm, storage, id);
     if (organization != null) {
       return ResponseEntity.status(HttpStatus.OK).body(organization);

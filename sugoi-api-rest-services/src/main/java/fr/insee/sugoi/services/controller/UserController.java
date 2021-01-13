@@ -181,7 +181,7 @@ public class UserController {
   }
 
   @GetMapping(
-      path = {"/{realm}/users/{name}", "/{realm}/{storage}/users/{name}"},
+      path = {"/{realm}/users/{username}", "/{realm}/{storage}/users/{username}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get user by username")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
