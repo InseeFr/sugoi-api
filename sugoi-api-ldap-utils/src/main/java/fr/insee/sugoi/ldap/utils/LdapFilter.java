@@ -24,7 +24,9 @@ public class LdapFilter {
   }
 
   public static Filter contains(String property, String value) {
-    return Filter.createSubAnyFilter(property, value);
+    return property.equalsIgnoreCase("objectclass")
+        ? Filter.createEqualityFilter("objectclass", value)
+        : Filter.createSubAnyFilter(property, value);
   }
 
   public static Filter equalsProperty(String property, String value) {

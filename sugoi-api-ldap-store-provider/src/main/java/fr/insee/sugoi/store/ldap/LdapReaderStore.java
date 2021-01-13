@@ -204,7 +204,7 @@ public class LdapReaderStore implements ReaderStore {
   @Override
   public PageResult<Group> searchGroups(
       String appName, Group groupFilter, PageableResult pageable, String searchOperator) {
-    Filter isGroup = Filter.createSubAnyFilter("objectClass", "groupOfUniqueNames");
+    Filter isGroup = Filter.createEqualityFilter("objectClass", "groupOfUniqueNames");
     try {
       return searchOnLdap(
           "ou=" + appName + "," + config.get("app_source"),
