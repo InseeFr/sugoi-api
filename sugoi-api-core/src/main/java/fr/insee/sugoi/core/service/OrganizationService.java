@@ -19,14 +19,14 @@ import fr.insee.sugoi.model.Organization;
 
 public interface OrganizationService {
 
-  Organization create(String realm, Organization organization, String storage);
+  Organization create(String realm, String storage, Organization organization);
 
-  void delete(String realm, String id, String storage);
+  void delete(String realm, String storage, String id);
 
-  Organization findById(String realm, String id, String storage);
+  Organization findById(String realm, String storage, String id);
 
   PageResult<Organization> findByProperties(
-      String realm, Organization organizationFilter, PageableResult pageableResult, String storage);
+      String realm, String storage, Organization organizationFilter, PageableResult pageableResult);
 
-  void update(String realm, Organization organization, String storage);
+  void update(String realm, String storage, Organization organization);
 }

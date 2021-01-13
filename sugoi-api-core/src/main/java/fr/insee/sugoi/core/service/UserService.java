@@ -19,14 +19,14 @@ import fr.insee.sugoi.model.User;
 
 public interface UserService {
 
-  User create(String realm, User user, String storage);
+  User create(String realm, String storage, User user);
 
-  void update(String realm, User user, String storage);
+  void update(String realm, String storage, User user);
 
-  void delete(String realm, String id, String storage);
+  void delete(String realm, String storage, String id);
 
-  User findById(String realm, String idep, String storageName);
+  User findById(String realm, String storageName, String idep);
 
   PageResult<User> findByProperties(
-      String realm, User userProperties, PageableResult pageable, String storageName);
+      String realm, String storageName, User userProperties, PageableResult pageable);
 }

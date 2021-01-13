@@ -65,7 +65,7 @@ public class ApplicationController {
     PageableResult pageableResult = new PageableResult(size, offset);
 
     PageResult<Application> foundApplications =
-        applicationService.findByProperties(realm, applicationFilter, pageableResult, storage);
+        applicationService.findByProperties(realm, storage, applicationFilter, pageableResult);
 
     if (foundApplications.isHasMoreResult()) {
       URI location =
@@ -92,8 +92,8 @@ public class ApplicationController {
       @PathVariable(name = "storage", required = false) String storage,
       @RequestBody Application application) {
 
-    if (applicationService.findById(realm, application.getName(), storage) == null) {
-      applicationService.create(realm, application, storage);
+    if (applicationService.findById(realm, storage, application.getName()) == null) {
+      applicationService.create(realm, storage, application);
 
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()
@@ -102,7 +102,7 @@ public class ApplicationController {
               .toUri();
 
       return ResponseEntity.created(location)
-          .body(applicationService.findById(realm, application.getName(), storage));
+          .body(applicationService.findById(realm, storage, application.getName()));
     } else {
       return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
@@ -124,8 +124,8 @@ public class ApplicationController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
-    if (applicationService.findById(realm, id, storage) != null) {
-      applicationService.update(realm, application, storage);
+    if (applicationService.findById(realm, storage, id) != null) {
+      applicationService.update(realm, storage, application);
 
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()
@@ -135,7 +135,7 @@ public class ApplicationController {
 
       return ResponseEntity.status(HttpStatus.OK)
           .header(HttpHeaders.LOCATION, location.toString())
-          .body(applicationService.findById(realm, id, storage));
+          .body(applicationService.findById(realm, storage, id));
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
@@ -151,8 +151,8 @@ public class ApplicationController {
       @PathVariable(name = "storage", required = false) String storage,
       @PathVariable("id") String id) {
 
-    if (applicationService.findById(realm, id, storage) != null) {
-      applicationService.delete(realm, id, storage);
+    if (applicationService.findById(realm, storage, id) != null) {
+      applicationService.delete(realm, storage, id);
       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -168,7 +168,7 @@ public class ApplicationController {
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
       @PathVariable("name") String name) {
-    Application application = applicationService.findById(realm, name, storage);
+    Application application = applicationService.findById(realm, storage, name);
     if (application != null) {
       return ResponseEntity.status(HttpStatus.OK).body(application);
     } else {

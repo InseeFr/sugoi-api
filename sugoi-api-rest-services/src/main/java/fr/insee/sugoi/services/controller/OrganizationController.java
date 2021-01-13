@@ -62,7 +62,7 @@ public class OrganizationController {
     PageableResult pageableResult = new PageableResult(size, offset);
 
     PageResult<Organization> foundOrganizations =
-        organizationService.findByProperties(realm, filterOrganization, pageableResult, storage);
+        organizationService.findByProperties(realm, storage, filterOrganization, pageableResult);
 
     if (foundOrganizations.isHasMoreResult()) {
       URI location =
@@ -89,8 +89,8 @@ public class OrganizationController {
       @PathVariable(name = "storage", required = false) String storage,
       @RequestBody Organization organization) {
 
-    if (organizationService.findById(realm, organization.getIdentifiant(), storage) == null) {
-      organizationService.create(realm, organization, storage);
+    if (organizationService.findById(realm, storage, organization.getIdentifiant()) == null) {
+      organizationService.create(realm, storage, organization);
 
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()
@@ -99,7 +99,7 @@ public class OrganizationController {
               .toUri();
 
       return ResponseEntity.created(location)
-          .body(organizationService.findById(realm, organization.getIdentifiant(), storage));
+          .body(organizationService.findById(realm, storage, organization.getIdentifiant()));
     } else {
       return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
@@ -120,8 +120,8 @@ public class OrganizationController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
-    if (organizationService.findById(realm, id, storage) != null) {
-      organizationService.update(realm, organization, storage);
+    if (organizationService.findById(realm, storage, id) != null) {
+      organizationService.update(realm, storage, organization);
 
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()
@@ -131,7 +131,7 @@ public class OrganizationController {
 
       return ResponseEntity.status(HttpStatus.OK)
           .header(HttpHeaders.LOCATION, location.toString())
-          .body(organizationService.findById(realm, id, storage));
+          .body(organizationService.findById(realm, storage, id));
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
@@ -147,8 +147,8 @@ public class OrganizationController {
       @PathVariable(name = "storage", required = false) String storage,
       @PathVariable("id") String id) {
 
-    if (organizationService.findById(realm, id, storage) != null) {
-      organizationService.delete(realm, id, storage);
+    if (organizationService.findById(realm, storage, id) != null) {
+      organizationService.delete(realm, storage, id);
       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -164,7 +164,7 @@ public class OrganizationController {
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
       @PathVariable("username") String id) {
-    Organization organization = organizationService.findById(realm, id, storage);
+    Organization organization = organizationService.findById(realm, storage, id);
     if (organization != null) {
       return ResponseEntity.status(HttpStatus.OK).body(organization);
     } else {

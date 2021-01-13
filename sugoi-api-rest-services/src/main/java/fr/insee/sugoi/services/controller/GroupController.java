@@ -65,7 +65,7 @@ public class GroupController {
     PageableResult pageableResult = new PageableResult(size, offset);
 
     PageResult<Group> foundGroups =
-        groupService.findByProperties(applicationName, realm, filterGroup, pageableResult, storage);
+        groupService.findByProperties(realm, storage, applicationName, filterGroup, pageableResult);
 
     if (foundGroups.isHasMoreResult()) {
       URI location =
@@ -93,8 +93,8 @@ public class GroupController {
       @RequestParam(value = "application") String applicationName,
       @RequestBody Group group) {
 
-    if (groupService.findById(applicationName, realm, group.getName(), storage) == null) {
-      groupService.create(applicationName, realm, group, storage);
+    if (groupService.findById(realm, storage, applicationName, group.getName()) == null) {
+      groupService.create(realm, storage, applicationName, group);
 
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()
@@ -103,7 +103,7 @@ public class GroupController {
               .toUri();
 
       return ResponseEntity.created(location)
-          .body(groupService.findById(applicationName, realm, group.getName(), storage));
+          .body(groupService.findById(realm, storage, applicationName, group.getName()));
     } else {
       return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
@@ -126,8 +126,8 @@ public class GroupController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
-    if (groupService.findById(applicationName, realm, id, storage) != null) {
-      groupService.update(applicationName, realm, group, storage);
+    if (groupService.findById(realm, storage, applicationName, id) != null) {
+      groupService.update(realm, storage, applicationName, group);
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()
               .path("/" + group.getName())
@@ -135,7 +135,7 @@ public class GroupController {
               .toUri();
       return ResponseEntity.status(HttpStatus.OK)
           .header(HttpHeaders.LOCATION, location.toString())
-          .body(groupService.findById(applicationName, realm, id, storage));
+          .body(groupService.findById(realm, storage, applicationName, id));
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
@@ -152,8 +152,8 @@ public class GroupController {
       @RequestParam("application") String applicationName,
       @PathVariable("id") String id) {
 
-    if (groupService.findById(applicationName, realm, id, storage) != null) {
-      groupService.delete(applicationName, realm, id, storage);
+    if (groupService.findById(realm, storage, applicationName, id) != null) {
+      groupService.delete(realm, storage, applicationName, id);
       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -170,7 +170,7 @@ public class GroupController {
       @PathVariable(name = "storage", required = false) String storage,
       @RequestParam("application") String applicationName,
       @PathVariable("groupname") String id) {
-    Group group = groupService.findById(applicationName, realm, id, storage);
+    Group group = groupService.findById(realm, storage, applicationName, id);
     if (group != null) {
       return ResponseEntity.status(HttpStatus.OK).body(group);
     } else {

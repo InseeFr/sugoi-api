@@ -27,31 +27,31 @@ public class ApplicationServiceImpl implements ApplicationService {
   @Autowired private StoreProvider storeProvider;
 
   @Override
-  public Application create(String realm, Application application, String storageName) {
+  public Application create(String realm, String storageName, Application application) {
     return storeProvider.getWriterStore(realm, storageName).createApplication(application);
   }
 
   @Override
-  public void delete(String realm, String id, String storageName) {
+  public void delete(String realm, String storageName, String id) {
     storeProvider.getWriterStore(realm, storageName).deleteApplication(id);
   }
 
   @Override
-  public void update(String realm, Application application, String storageName) {
+  public void update(String realm, String storageName, Application application) {
     storeProvider.getWriterStore(realm, storageName).updateApplication(application);
   }
 
   @Override
-  public Application findById(String realm, String id, String storage) {
+  public Application findById(String realm, String storage, String id) {
     return storeProvider.getReaderStore(realm, storage).getApplication(id);
   }
 
   @Override
   public PageResult<Application> findByProperties(
       String realm,
+      String storageName,
       Application applicationFilter,
-      PageableResult pageableResult,
-      String storageName) {
+      PageableResult pageableResult) {
     return storeProvider
         .getReaderStore(realm, storageName)
         .searchApplications(applicationFilter, pageableResult, "AND");
