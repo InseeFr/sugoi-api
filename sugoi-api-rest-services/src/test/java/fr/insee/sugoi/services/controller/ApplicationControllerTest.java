@@ -140,7 +140,7 @@ public class ApplicationControllerTest {
             applicationService.findById(
                 Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
         .thenReturn(null);
-    Mockito.when(applicationService.create(Mockito.anyString(), Mockito.any(), Mockito.anyString()))
+    Mockito.when(applicationService.create(Mockito.anyString(), Mockito.anyString(), Mockito.any()))
         .thenReturn(application1);
     RequestBuilder requestBuilder;
     try {

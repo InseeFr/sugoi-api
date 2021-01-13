@@ -92,7 +92,7 @@ public class UserController {
     pageable.setSize(size);
 
     PageResult<User> foundUsers =
-        userService.findByProperties(realm, searchUser, pageable, storage);
+        userService.findByProperties(realm, storage, searchUser, pageable);
     if (foundUsers.isHasMoreResult()) {
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()
@@ -117,15 +117,15 @@ public class UserController {
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
       @RequestBody User user) {
-    if (userService.findById(realm, user.getUsername(), storage) == null) {
-      userService.create(realm, user, storage);
+    if (userService.findById(realm, storage, user.getUsername()) == null) {
+      userService.create(realm, storage, user);
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()
               .path("/" + user.getUsername())
               .build()
               .toUri();
       return ResponseEntity.created(location)
-          .body(userService.findById(realm, user.getUsername(), storage));
+          .body(userService.findById(realm, storage, user.getUsername()));
     } else {
       return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
@@ -147,8 +147,8 @@ public class UserController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
-    if (userService.findById(realm, id, storage) != null) {
-      userService.update(realm, user, storage);
+    if (userService.findById(realm, storage, id) != null) {
+      userService.update(realm, storage, user);
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()
               .path("/" + user.getUsername())
@@ -156,7 +156,7 @@ public class UserController {
               .toUri();
       return ResponseEntity.status(HttpStatus.OK)
           .header(HttpHeaders.LOCATION, location.toString())
-          .body(userService.findById(realm, id, storage));
+          .body(userService.findById(realm, storage, id));
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
@@ -172,8 +172,8 @@ public class UserController {
       @PathVariable(name = "storage", required = false) String storage,
       @PathVariable("id") String id) {
 
-    if (userService.findById(realm, id, storage) != null) {
-      userService.delete(realm, id, storage);
+    if (userService.findById(realm, storage, id) != null) {
+      userService.delete(realm, storage, id);
       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -189,7 +189,7 @@ public class UserController {
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
       @PathVariable("username") String id) {
-    User user = userService.findById(realm, id, storage);
+    User user = userService.findById(realm, storage, id);
     if (user != null) {
       return ResponseEntity.status(HttpStatus.OK).body(user);
     } else {

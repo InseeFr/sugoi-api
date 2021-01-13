@@ -27,22 +27,22 @@ public class UserServiceImpl implements UserService {
   @Autowired private StoreProvider storeProvider;
 
   @Override
-  public User create(String realm, User user, String storage) {
+  public User create(String realm, String storage, User user) {
     return storeProvider.getWriterStore(realm, storage).createUser(user);
   }
 
   @Override
-  public void update(String realm, User user, String storage) {
+  public void update(String realm, String storage, User user) {
     storeProvider.getWriterStore(realm, storage).updateUser(user);
   }
 
   @Override
-  public void delete(String realmName, String id, String storage) {
+  public void delete(String realmName, String storage, String id) {
     storeProvider.getWriterStore(realmName, storage).deleteUser(id);
   }
 
   @Override
-  public User findById(String realmName, String id, String storage) {
+  public User findById(String realmName, String storage, String id) {
     try {
       return storeProvider.getReaderStore(realmName, storage).getUser(id);
     } catch (Exception e) {
@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public PageResult<User> findByProperties(
-      String realm, User userProperties, PageableResult pageable, String storage) {
+      String realm, String storage, User userProperties, PageableResult pageable) {
     try {
       return storeProvider.getReaderStore(realm, storage).searchUsers(userProperties, pageable, "");
     } catch (Exception e) {

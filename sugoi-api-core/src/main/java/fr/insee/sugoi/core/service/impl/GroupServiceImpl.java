@@ -27,34 +27,34 @@ public class GroupServiceImpl implements GroupService {
   @Autowired private StoreProvider storeProvider;
 
   @Override
-  public Group create(String appName, String realm, Group group, String storageName) {
+  public Group create(String realm, String storageName, String appName, Group group) {
     return storeProvider.getWriterStore(realm, storageName).createGroup(appName, group);
   }
 
   @Override
-  public void delete(String appName, String realm, String id, String storageName) {
+  public void delete(String realm, String storageName, String appName, String id) {
     storeProvider.getWriterStore(realm, storageName).deleteGroup(appName, id);
   }
 
   @Override
-  public Group findById(String appName, String realm, String id, String storage) {
+  public Group findById(String realm, String storage, String appName, String id) {
     return storeProvider.getReaderStore(realm, storage).getGroup(appName, id);
   }
 
   @Override
   public PageResult<Group> findByProperties(
-      String appName,
       String realm,
+      String storageName,
+      String appName,
       Group groupFilter,
-      PageableResult pageableResult,
-      String storageName) {
+      PageableResult pageableResult) {
     return storeProvider
         .getReaderStore(realm, storageName)
         .searchGroups(appName, groupFilter, pageableResult, "AND");
   }
 
   @Override
-  public void update(String appName, String realm, Group group, String storageName) {
+  public void update(String realm, String storageName, String appName, Group group) {
     storeProvider.getWriterStore(realm, storageName).updateGroup(appName, group);
   }
 }

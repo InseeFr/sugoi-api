@@ -19,18 +19,18 @@ import fr.insee.sugoi.model.Group;
 
 public interface GroupService {
 
-  Group create(String appName, String realm, Group group, String storage);
+  Group create(String realm, String storage, String appName, Group group);
 
-  void update(String appName, String realm, Group group, String storage);
+  void update(String realm, String storage, String appName, Group group);
 
-  void delete(String appName, String realm, String id, String storage);
+  void delete(String realm, String storage, String appName, String id);
 
-  Group findById(String appName, String realm, String id, String storage);
+  Group findById(String realm, String storage, String appName, String id);
 
   PageResult<Group> findByProperties(
-      String appName,
       String realm,
+      String storage,
+      String appName,
       Group groupFilter,
-      PageableResult pageableResult,
-      String storage);
+      PageableResult pageableResult);
 }

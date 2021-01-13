@@ -27,33 +27,33 @@ public class OrganizationServiceImpl implements OrganizationService {
   @Autowired private StoreProvider storeProvider;
 
   @Override
-  public Organization create(String realm, Organization organization, String storageName) {
+  public Organization create(String realm, String storageName, Organization organization) {
     return storeProvider.getWriterStore(realm, storageName).createOrganization(organization);
   }
 
   @Override
-  public void delete(String realm, String id, String storageName) {
+  public void delete(String realm, String storageName, String id) {
     storeProvider.getWriterStore(realm, storageName).deleteOrganization(id);
   }
 
   @Override
-  public Organization findById(String realm, String id, String storage) {
+  public Organization findById(String realm, String storage, String id) {
     return storeProvider.getReaderStore(realm, storage).getOrganization(id);
   }
 
   @Override
   public PageResult<Organization> findByProperties(
       String realm,
+      String storageName,
       Organization organizationFilter,
-      PageableResult pageableResult,
-      String storageName) {
+      PageableResult pageableResult) {
     return storeProvider
         .getReaderStore(realm, storageName)
         .searchOrganizations(organizationFilter, pageableResult, "AND");
   }
 
   @Override
-  public void update(String realm, Organization organization, String storageName) {
+  public void update(String realm, String storageName, Organization organization) {
     storeProvider.getWriterStore(realm, storageName).updateOrganization(organization);
   }
 }
