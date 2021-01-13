@@ -161,7 +161,7 @@ public class GroupController {
   }
 
   @GetMapping(
-      path = {"/{realm}/groups/{name}", "/{realm}/{storage}/groups/{name}"},
+      path = {"/{realm}/groups/{groupname}", "/{realm}/{storage}/groups/{groupname}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get group by name")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")

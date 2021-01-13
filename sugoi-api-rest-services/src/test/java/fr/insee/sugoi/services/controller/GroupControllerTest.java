@@ -22,8 +22,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.core.model.PageResult;
-import fr.insee.sugoi.core.service.ApplicationService;
-import fr.insee.sugoi.model.Application;
+import fr.insee.sugoi.core.service.GroupService;
+import fr.insee.sugoi.model.Group;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,75 +43,69 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @SpringBootTest(
-    classes = ApplicationController.class,
+    classes = GroupController.class,
     properties = "spring.config.location=classpath:/controller/application.properties")
 @AutoConfigureMockMvc
 @EnableWebMvc
-public class ApplicationControllerTest {
+public class GroupControllerTest {
 
   @Autowired MockMvc mockMvc;
 
-  @MockBean private ApplicationService applicationService;
+  @MockBean private GroupService groupService;
 
   ObjectMapper objectMapper = new ObjectMapper();
-  Application application1, application2, application1Updated;
-  PageResult<Application> pageResult;
+  Group group1, group2, group2Updated;
+  PageResult<Group> pageResult;
 
   @BeforeEach
   public void setup() {
-    application1 = new Application();
-    application1.setName("SuperAppli");
-    application1.setOwner("Amoi");
+    group1 = new Group();
+    group1.setName("Group1");
+    group1.setDescription("super groupe");
 
-    application2 = new Application();
-    application2.setName("SuperAppli2");
-    application2.setOwner("Amoi2");
+    group2 = new Group();
+    group2.setName("Group2");
+    group2.setDescription("groupe moyen");
 
-    application1Updated = new Application();
-    application1Updated.setName("SuperAppli");
-    application1Updated.setOwner("NewOwner");
+    group2Updated = new Group();
+    group2Updated.setName("Group2");
+    group2Updated.setDescription("groupe pas fou");
 
-    List<Application> applications = new ArrayList<>();
-    applications.add(application1);
-    applications.add(application2);
-    pageResult = new PageResult<Application>();
-    pageResult.setResults(applications);
+    List<Group> groups = new ArrayList<>();
+    groups.add(group1);
+    groups.add(group2);
+    pageResult = new PageResult<Group>();
+    pageResult.setResults(groups);
   }
 
   // Test read requests on good query
 
   @Test
   @WithMockUser
-  public void retrieveAllApplications() {
+  public void retrieveAllGroups() {
     try {
 
       Mockito.when(
-              applicationService.findByProperties(
-                  Mockito.anyString(), Mockito.isNull(), Mockito.any(), Mockito.any()))
+              groupService.findByProperties(
+                  Mockito.anyString(),
+                  Mockito.isNull(),
+                  Mockito.anyString(),
+                  Mockito.any(),
+                  Mockito.any()))
           .thenReturn(pageResult);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/applications").accept(MediaType.APPLICATION_JSON);
+          MockMvcRequestBuilders.get("/domaine1/groups")
+              .param("application", "monApplication")
+              .accept(MediaType.APPLICATION_JSON);
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-      TypeReference<PageResult<Application>> mapType =
-          new TypeReference<PageResult<Application>>() {};
-      PageResult<Application> appRes =
-          objectMapper.readValue(response.getContentAsString(), mapType);
+      TypeReference<PageResult<Group>> mapType = new TypeReference<PageResult<Group>>() {};
+      PageResult<Group> appRes = objectMapper.readValue(response.getContentAsString(), mapType);
 
       assertThat(
-          "First element should be SuperAppli",
-          appRes.getResults().get(0).getName(),
-          is("SuperAppli"));
+          "First element should be Group1", appRes.getResults().get(0).getName(), is("Group1"));
       assertThat(
-          "SuperAppli should have owner Amoi", appRes.getResults().get(0).getOwner(), is("Amoi"));
-      assertThat(
-          "Second element should be SuperAppli2",
-          appRes.getResults().get(1).getName(),
-          is("SuperAppli2"));
-      assertThat(
-          "SuperAppli2 should have owner Amoi2",
-          appRes.getResults().get(1).getOwner(),
-          is("Amoi2"));
+          "Second element should be Group2", appRes.getResults().get(1).getName(), is("Group2"));
       assertThat("Response code should be 200", response.getStatus(), is(200));
 
     } catch (Exception e) {
@@ -123,26 +117,26 @@ public class ApplicationControllerTest {
   @Disabled
   @Test
   @WithMockUser
-  public void shouldRetrieveSomeApplications() {}
+  public void shouldRetrieveSomeGroups() {}
 
   @Test
   @WithMockUser
-  public void shouldGetApplicationByID() {
+  public void shouldGetGroupByID() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "SuperAppli"))
-          .thenReturn(application1);
+      Mockito.when(groupService.findById("domaine1", null, "monApplication", "Group1"))
+          .thenReturn(group1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/applications/SuperAppli")
+          MockMvcRequestBuilders.get("/domaine1/groups/Group1")
+              .param("application", "monApplication")
               .accept(MediaType.APPLICATION_JSON);
 
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-      Application res = objectMapper.readValue(response.getContentAsString(), Application.class);
+      Group res = objectMapper.readValue(response.getContentAsString(), Group.class);
 
-      verify(applicationService).findById("domaine1", null, "SuperAppli");
-      assertThat("Application returned should be SuperAppli", res.getName(), is("SuperAppli"));
-      assertThat("Application returned should be owned by Amoi", res.getOwner(), is("Amoi"));
+      verify(groupService).findById("domaine1", null, "monApplication", "Group1");
+      assertThat("Group returned should be Group1", res.getName(), is("Group1"));
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -157,16 +151,17 @@ public class ApplicationControllerTest {
   public void deleteShouldCallDeleteService() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "supprimemoi"))
-          .thenReturn(application1);
+      Mockito.when(groupService.findById("domaine1", null, "monApplication", "supprimemoi"))
+          .thenReturn(group1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/domaine1/applications/supprimemoi")
+          MockMvcRequestBuilders.delete("/domaine1/groups/supprimemoi")
               .accept(MediaType.APPLICATION_JSON)
+              .param("application", "monApplication")
               .with(csrf());
 
       mockMvc.perform(requestBuilder).andReturn();
-      verify(applicationService).delete("domaine1", null, "supprimemoi");
+      verify(groupService).delete("domaine1", null, "monApplication", "supprimemoi");
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -179,24 +174,26 @@ public class ApplicationControllerTest {
   public void updateShouldCallUpdateServiceAndReturnNewApp() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "SuperAppli"))
-          .thenReturn(application1)
-          .thenReturn(application1Updated);
+      Mockito.when(groupService.findById("domaine1", null, "monApplication", "Group2"))
+          .thenReturn(group2)
+          .thenReturn(group2Updated);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/applications/SuperAppli")
+          MockMvcRequestBuilders.put("/domaine1/groups/Group2")
+              .param("application", "monApplication")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(application1Updated))
+              .content(objectMapper.writeValueAsString(group2Updated))
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
-      verify(applicationService).update(Mockito.anyString(), Mockito.isNull(), Mockito.any());
+      verify(groupService)
+          .update(Mockito.anyString(), Mockito.isNull(), Mockito.anyString(), Mockito.any());
       assertThat(
-          "Should get updated application",
-          objectMapper.readValue(response.getContentAsString(), Application.class).getOwner(),
-          is("NewOwner"));
+          "Should get updated group",
+          objectMapper.readValue(response.getContentAsString(), Group.class).getDescription(),
+          is("groupe pas fou"));
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -209,23 +206,25 @@ public class ApplicationControllerTest {
   public void postShouldCallPostServiceAndReturnNewApp() {
 
     try {
-      Mockito.when(applicationService.findById("domaine1", null, "SuperAppli"))
+      Mockito.when(groupService.findById("domaine1", null, "monApplication", "Group1"))
           .thenReturn(null)
-          .thenReturn(application1);
+          .thenReturn(group1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/applications")
+          MockMvcRequestBuilders.post("/domaine1/groups")
+              .param("application", "monApplication")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(application1))
+              .content(objectMapper.writeValueAsString(group1))
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-      verify(applicationService).create(Mockito.anyString(), Mockito.isNull(), Mockito.any());
+      verify(groupService)
+          .create(Mockito.anyString(), Mockito.isNull(), Mockito.anyString(), Mockito.any());
       assertThat(
-          "Should get new application",
-          objectMapper.readValue(response.getContentAsString(), Application.class).getName(),
-          is("SuperAppli"));
+          "Should get new group",
+          objectMapper.readValue(response.getContentAsString(), Group.class).getName(),
+          is("Group1"));
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -242,17 +241,22 @@ public class ApplicationControllerTest {
       pageResult.setHasMoreResult(true);
 
       Mockito.when(
-              applicationService.findByProperties(
-                  Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any()))
+              groupService.findByProperties(
+                  Mockito.anyString(),
+                  Mockito.any(),
+                  Mockito.anyString(),
+                  Mockito.any(),
+                  Mockito.any()))
           .thenReturn(pageResult);
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/applications?size=2")
+          MockMvcRequestBuilders.get("/domaine1/groups?size=2")
+              .param("application", "monApplication")
               .accept(MediaType.APPLICATION_JSON);
 
       assertThat(
           "Location header gives next page",
           mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
-          is("http://localhost/domaine1/applications?size=2&offset=2"));
+          is("http://localhost/domaine1/groups?size=2&offset=2"));
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -262,24 +266,28 @@ public class ApplicationControllerTest {
 
   @Test
   @WithMockUser
-  public void getObjectLocationInApplicationCreationResponse() {
+  public void getObjectLocationInGroupCreationResponse() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "SuperAppli")).thenReturn(null);
-      Mockito.when(applicationService.create(Mockito.anyString(), Mockito.isNull(), Mockito.any()))
-          .thenReturn(application1);
+      Mockito.when(groupService.findById("domaine1", null, "monApplication", "Group1"))
+          .thenReturn(null);
+      Mockito.when(
+              groupService.create(
+                  Mockito.anyString(), Mockito.isNull(), Mockito.anyString(), Mockito.any()))
+          .thenReturn(group1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/applications")
+          MockMvcRequestBuilders.post("/domaine1/groups")
+              .param("application", "monApplication")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(application1))
+              .content(objectMapper.writeValueAsString(group1))
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
       assertThat(
           "Location header gives get uri",
           mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
-          is("http://localhost/domaine1/applications/SuperAppli"));
+          is("http://localhost/domaine1/groups/Group1"));
 
     } catch (Exception e1) {
       e1.printStackTrace();
@@ -289,13 +297,14 @@ public class ApplicationControllerTest {
 
   // Test response codes on error
   @Test
-  public void get401OnCreateApplicationWhenNotAuhtenticated() {
+  public void get401OnCreateGroupWhenNotAuhtenticated() {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/applications")
+          MockMvcRequestBuilders.post("/domaine1/groups")
+              .param("application", "monApplication")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(application1))
+              .content(objectMapper.writeValueAsString(group1))
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
@@ -311,11 +320,12 @@ public class ApplicationControllerTest {
   }
 
   @Test
-  public void get401OnDeleteApplicationWhenNotAuhtenticated() {
+  public void get401OnDeleteGroupWhenNotAuhtenticated() {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/domaine1/applications/supprimemoi")
+          MockMvcRequestBuilders.delete("/domaine1/groups/supprimemoi")
+              .param("application", "monApplication")
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
@@ -331,13 +341,14 @@ public class ApplicationControllerTest {
   }
 
   @Test
-  public void get401OnUpdateApplicationWhenNotAuhtenticated() {
+  public void get401OnUpdateGroupWhenNotAuhtenticated() {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/applications/SuperAppli")
+          MockMvcRequestBuilders.put("/domaine1/groups/Group1")
+              .param("application", "monApplication")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(application1))
+              .content(objectMapper.writeValueAsString(group1))
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
@@ -354,16 +365,17 @@ public class ApplicationControllerTest {
 
   @Test
   @WithMockUser
-  public void get409WhenCreatingAlreadyExistingApplication() {
+  public void get409WhenCreatingAlreadyExistingGroup() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "SuperAppli"))
-          .thenReturn(application1);
+      Mockito.when(groupService.findById("domaine1", null, "monApplication", "Group1"))
+          .thenReturn(group1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/applications")
+          MockMvcRequestBuilders.post("/domaine1/groups")
+              .param("application", "monApplication")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(application1))
+              .content(objectMapper.writeValueAsString(group1))
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
@@ -380,13 +392,15 @@ public class ApplicationControllerTest {
 
   @Test
   @WithMockUser
-  public void get404WhenNoApplicationIsFoundWhenGetById() {
+  public void get404WhenNoGroupIsFoundWhenGetById() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "dontexist")).thenReturn(null);
+      Mockito.when(groupService.findById("domaine1", null, "monApplication", "dontexist"))
+          .thenReturn(null);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/applications/dontexist")
+          MockMvcRequestBuilders.get("/domaine1/groups/dontexist")
+              .param("application", "monApplication")
               .accept(MediaType.APPLICATION_JSON);
 
       assertThat(
@@ -402,13 +416,14 @@ public class ApplicationControllerTest {
 
   @Test
   @WithMockUser
-  public void get400WhenNoApplicationIdDoesntMatchBody() {
+  public void get400WhenNoGroupIdDoesntMatchBody() {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/applications/dontexist")
+          MockMvcRequestBuilders.put("/domaine1/groups/dontexist")
+              .param("application", "monApplication")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(application1))
+              .content(objectMapper.writeValueAsString(group1))
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
@@ -425,15 +440,17 @@ public class ApplicationControllerTest {
 
   @Test
   @WithMockUser
-  public void get404WhenNoApplicationIsFoundWhenUpdate() {
+  public void get404WhenNoGroupIsFoundWhenUpdate() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "SuperAppli")).thenReturn(null);
+      Mockito.when(groupService.findById("domaine1", null, "monApplication", "Group1"))
+          .thenReturn(null);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/applications/SuperAppli")
+          MockMvcRequestBuilders.put("/domaine1/groups/Group1")
+              .param("application", "monApplication")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(application1))
+              .content(objectMapper.writeValueAsString(group1))
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
@@ -450,13 +467,15 @@ public class ApplicationControllerTest {
 
   @Test
   @WithMockUser
-  public void get404WhenNoApplicationIsFoundWhenDelete() {
+  public void get404WhenNoGroupIsFoundWhenDelete() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "dontexist")).thenReturn(null);
+      Mockito.when(groupService.findById("domaine1", null, "monApplication", "Group1"))
+          .thenReturn(null);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/domaine1/applications/dontexist")
+          MockMvcRequestBuilders.delete("/domaine1/groups/dontexist")
+              .param("application", "monApplication")
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
