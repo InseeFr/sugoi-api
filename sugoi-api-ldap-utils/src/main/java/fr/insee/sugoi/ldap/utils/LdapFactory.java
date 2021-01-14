@@ -39,23 +39,24 @@ public class LdapFactory {
       throws LDAPException {
     // Check if a ldap connection pool already exist for this userStorage and create
     // it if it doesn't exist
-    if (!openLdapPoolConnection.containsKey(config.get("name"))) {
+    String key = config.get("realm_name") + "_" + config.get("name");
+    if (!openLdapPoolConnection.containsKey(key)) {
       openLdapPoolConnection.put(
-          config.get("name"),
+          key,
           new LDAPConnectionPool(
               new LDAPConnection(config.get("url"), Integer.valueOf(config.get("port"))),
               Integer.valueOf(config.get("pool_size"))));
     }
-    return openLdapPoolConnection.get(config.get("name"));
+    return openLdapPoolConnection.get(key);
   }
 
   public static LDAPConnection getSingleConnection(Map<String, String> config)
       throws LDAPException {
-    if (!openLdapMonoConnection.containsKey(config.get("name"))) {
+    String key = config.get("realm_name") + "_" + config.get("name");
+    if (!openLdapMonoConnection.containsKey(key)) {
       openLdapMonoConnection.put(
-          config.get("name"),
-          new LDAPConnection(config.get("url"), Integer.valueOf(config.get("port"))));
+          key, new LDAPConnection(config.get("url"), Integer.valueOf(config.get("port"))));
     }
-    return openLdapMonoConnection.get(config.get("name"));
+    return openLdapMonoConnection.get(key);
   }
 }
