@@ -30,7 +30,10 @@ import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
 
 /** ConsumerConfiguration */
-@ConditionalOnProperty(name = "fr.insee.sugoi.jms.broker.url", havingValue = "", matchIfMissing = false)
+@ConditionalOnProperty(
+    name = "fr.insee.sugoi.jms.broker.url",
+    havingValue = "",
+    matchIfMissing = false)
 @Configuration
 public class JmsConfiguration {
 
@@ -69,7 +72,8 @@ public class JmsConfiguration {
   }
 
   @Bean
-  public JmsListenerContainerFactory<?> myFactory(ConnectionFactory connectionFactory,
+  public JmsListenerContainerFactory<?> myFactory(
+      ConnectionFactory connectionFactory,
       DefaultJmsListenerContainerFactoryConfigurer configurer) {
     DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
     factory.setMessageConverter(messageConverter());
