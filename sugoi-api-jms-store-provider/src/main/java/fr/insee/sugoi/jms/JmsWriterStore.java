@@ -13,9 +13,6 @@
 */
 package fr.insee.sugoi.jms;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.jms.writer.JmsWriter;
 import fr.insee.sugoi.model.Application;
@@ -24,6 +21,8 @@ import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
+import java.util.HashMap;
+import java.util.Map;
 
 public class JmsWriterStore implements WriterStore {
 
@@ -41,8 +40,14 @@ public class JmsWriterStore implements WriterStore {
 
   private UserStorage userStorage;
 
-  public JmsWriterStore(JmsWriter jmsWriter, String queueRequestName, String queueResponseName,
-      String queueUrgentRequestName, String queueUrgentResponseName, Realm realm, UserStorage userStorage) {
+  public JmsWriterStore(
+      JmsWriter jmsWriter,
+      String queueRequestName,
+      String queueResponseName,
+      String queueUrgentRequestName,
+      String queueUrgentResponseName,
+      Realm realm,
+      UserStorage userStorage) {
     this.realm = realm;
     this.userStorage = userStorage;
     this.jmsWriter = jmsWriter;
@@ -89,7 +94,6 @@ public class JmsWriterStore implements WriterStore {
     params.put("realm", realm.getName());
     params.put("userStorage", userStorage.getName());
     jmsWriter.writeRequestInQueue(queueRequestName, "deleteGroup", params);
-
   }
 
   @Override

@@ -41,7 +41,11 @@ public class JmsWriter {
     }
     try {
       jmsTemplate.convertAndSend(queueName, request);
-      logger.debug("Send request {} in queue {}", request, queueName);
+      logger.debug(
+          "Send request with uuid: {}, request: {} in queue {}",
+          request.getUuid(),
+          request,
+          queueName);
     } catch (JmsException e) {
       logger.debug("Error when sending message {} to broker in queue {}", request, queueName);
       throw new BrokerException(e.getMessage());

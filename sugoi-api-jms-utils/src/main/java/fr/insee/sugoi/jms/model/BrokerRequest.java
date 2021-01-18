@@ -33,7 +33,9 @@ public class BrokerRequest implements Serializable {
     this.methodParams = methodParams;
   }
 
-  public BrokerRequest() {}
+  public BrokerRequest() {
+    uuid = UUID.randomUUID();
+  }
 
   public String getMethod() {
     return this.method;

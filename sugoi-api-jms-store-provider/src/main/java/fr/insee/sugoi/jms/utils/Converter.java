@@ -1,0 +1,92 @@
+/*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+package fr.insee.sugoi.jms.utils;
+
+import fr.insee.sugoi.model.Application;
+import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.User;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import org.springframework.stereotype.Component;
+
+@Component
+public class Converter {
+
+  public User toUser(Object object) {
+    LinkedHashMap linkedHashMap = (LinkedHashMap) object;
+    if (linkedHashMap != null) {
+      User user = new User();
+      user.setUsername((String) linkedHashMap.get("username"));
+      user.setFirstName((String) linkedHashMap.get("firstName"));
+      user.setLastName((String) linkedHashMap.get("lastName"));
+      user.setMail((String) linkedHashMap.get("mail"));
+      user.setCertificate((byte[]) linkedHashMap.get("certificate"));
+      user.setOrganization(toOrganization(linkedHashMap.get("organization")));
+      user.setMetadatas((Map<String, Object>) linkedHashMap.get("metadatas"));
+      user.setAddress((Map<String, String>) linkedHashMap.get("address"));
+      user.setAttributes((Map<String, Object>) linkedHashMap.get("attributes"));
+      return user;
+    }
+    return null;
+  }
+
+  public Organization toOrganization(Object object) {
+    LinkedHashMap linkedHashMap = (LinkedHashMap) object;
+    if (linkedHashMap != null) {
+      Organization organization = new Organization();
+      organization.setIdentifiant((String) linkedHashMap.get("identifiant"));
+      organization.setGpgkey((byte[]) linkedHashMap.get("gpgkey"));
+      organization.setAddress((Map<String, String>) linkedHashMap.get("address"));
+      organization.setAttributes((Map<String, Object>) linkedHashMap.get("attributes"));
+      organization.setMetadatas((Map<String, Object>) linkedHashMap.get("metadatas"));
+      organization.setOrganization(toOrganization(object));
+      return organization;
+    }
+    return null;
+  }
+
+  public Application toApplication(Object object) {
+    LinkedHashMap linkedHashMap = (LinkedHashMap) object;
+    if (linkedHashMap != null) {
+      Application application = new Application();
+      application.setName((String) linkedHashMap.get("name"));
+      application.setOwner((String) linkedHashMap.get("owner"));
+      List<Object> listGroup = (List<Object>) linkedHashMap.get("groups");
+      application.setGroups(
+          (List<Group>)
+              listGroup.stream()
+                  .map(groupObject -> toGroup(groupObject))
+                  .collect(Collectors.toList()));
+      return application;
+    }
+    return null;
+  }
+
+  public Group toGroup(Object object) {
+    LinkedHashMap linkedHashMap = (LinkedHashMap) object;
+    if (linkedHashMap != null) {
+      Group group = new Group();
+      group.setDescription((String) linkedHashMap.get("description"));
+      group.setName((String) linkedHashMap.get("name"));
+      List<Object> usersList = ((List<Object>) linkedHashMap.get("users"));
+      group.setUsers(
+          usersList.stream().map((userObject) -> toUser(object)).collect(Collectors.toList()));
+      return group;
+    }
+    return null;
+  }
+}
