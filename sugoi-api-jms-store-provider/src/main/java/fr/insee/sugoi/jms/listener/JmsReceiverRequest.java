@@ -23,13 +23,11 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(
-    name = "fr.insee.sugoi.jms.receiver.request.enabled",
-    havingValue = "true",
-    matchIfMissing = false)
+@ConditionalOnProperty(name = "fr.insee.sugoi.jms.receiver.request.enabled", havingValue = "true", matchIfMissing = false)
 public class JmsReceiverRequest {
 
-  @Autowired JmsRequestRouter router;
+  @Autowired
+  JmsRequestRouter router;
 
   private static final Logger logger = LogManager.getLogger(JmsReceiverRequest.class);
 
@@ -40,13 +38,13 @@ public class JmsReceiverRequest {
   private String queueUrgentRequestName;
 
   @JmsListener(destination = "${fr.insee.sugoi.jms.queue.requests.name:}")
-  public void onRequest(BrokerRequest request) {
-    logger.debug("New message on queue {} mesage: {}", queueRequestName, request);
+  public void onRequest(BrokerRequest request) throws Exception {
+    logger.debug("New message on queue {} message: {}", queueRequestName, request);
     router.exec(request);
   }
 
   @JmsListener(destination = "${fr.insee.sugoi.jms.priority.queue.request.name:}")
-  public void onUrgentRequest(BrokerRequest request) {
+  public void onUrgentRequest(BrokerRequest request) throws Exception {
     logger.debug("New message on queue {} message: {}", queueUrgentRequestName, request);
     router.exec(request);
   }

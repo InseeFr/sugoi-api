@@ -13,21 +13,38 @@
 */
 package fr.insee.sugoi.jms;
 
-import fr.insee.sugoi.model.Realm;
-import fr.insee.sugoi.model.UserStorage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 
+import fr.insee.sugoi.jms.writer.JmsWriter;
+import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.UserStorage;
+
 @Configuration
 public class JmsStoreBeans {
 
-  @Autowired JmsWriterStore JmsWriterStore;
+  @Autowired
+  JmsWriter jmsWriter;
+
+  @Value("${fr.insee.sugoi.jms.queue.requests.name:}")
+  private String queueRequestName;
+
+  @Value("${fr.insee.sugoi.jms.queue.requests.name:}")
+  private String queueResponseName;
+
+  @Value("${fr.insee.sugoi.jms.queue.requests.name:}")
+  private String queueUrgentRequestName;
+
+  @Value("${fr.insee.sugoi.jms.queue.requests.name:}")
+  private String queueUrgentResponseName;
 
   @Bean
   @Lazy
   public JmsWriterStore JmsWriterStore(Realm realm, UserStorage userStorage) {
-    return JmsWriterStore;
+    return new JmsWriterStore(jmsWriter, queueRequestName, queueResponseName, queueUrgentRequestName,
+        queueUrgentResponseName, realm, userStorage);
   }
 }
