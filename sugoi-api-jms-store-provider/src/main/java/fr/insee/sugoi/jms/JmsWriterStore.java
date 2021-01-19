@@ -14,6 +14,8 @@
 package fr.insee.sugoi.jms;
 
 import fr.insee.sugoi.core.store.WriterStore;
+import fr.insee.sugoi.jms.utils.JmsAtttributes;
+import fr.insee.sugoi.jms.utils.Method;
 import fr.insee.sugoi.jms.writer.JmsWriter;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
@@ -60,170 +62,170 @@ public class JmsWriterStore implements WriterStore {
   @Override
   public void deleteUser(String id) {
     Map<String, Object> params = new HashMap<>();
-    params.put("id", id);
-    params.put("realm", realm.getName());
-    params.put("userStorage", userStorage.getName());
-    jmsWriter.writeRequestInQueue(queueRequestName, "deleteUser", params);
+    params.put(JmsAtttributes.USER_ID, id);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.DELETE_USER, params);
   }
 
   @Override
   public User createUser(User user) {
     Map<String, Object> params = new HashMap<>();
-    params.put("user", user);
-    params.put("realm", realm.getName());
-    params.put("userStorage", userStorage.getName());
-    jmsWriter.writeRequestInQueue(queueRequestName, "createUser", params);
+    params.put(JmsAtttributes.USER, user);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.CREATE_USER, params);
     return user;
   }
 
   @Override
   public User updateUser(User updatedUser) {
     Map<String, Object> params = new HashMap<>();
-    params.put("updatedUser", updatedUser);
-    params.put("realm", realm.getName());
-    params.put("userStorage", userStorage.getName());
-    jmsWriter.writeRequestInQueue(queueRequestName, "updateUser", params);
+    params.put(JmsAtttributes.USER, updatedUser);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.UPDATE_USER, params);
     return updatedUser;
   }
 
   @Override
   public void deleteGroup(String appName, String groupName) {
     Map<String, Object> params = new HashMap<>();
-    params.put("appName", appName);
-    params.put("groupName", groupName);
-    params.put("realm", realm.getName());
-    params.put("userStorage", userStorage.getName());
-    jmsWriter.writeRequestInQueue(queueRequestName, "deleteGroup", params);
+    params.put(JmsAtttributes.APP_NAME, appName);
+    params.put(JmsAtttributes.GROUP_NAME, groupName);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.DELETE_GROUP, params);
   }
 
   @Override
   public Group createGroup(String appName, Group group) {
     Map<String, Object> params = new HashMap<>();
-    params.put("appName", appName);
-    params.put("group", group);
-    params.put("realm", realm.getName());
-    params.put("userStorage", userStorage.getName());
-    jmsWriter.writeRequestInQueue(queueRequestName, "createGroup", params);
+    params.put(JmsAtttributes.APP_NAME, appName);
+    params.put(JmsAtttributes.GROUP, group);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.CREATE_GROUP, params);
     return group;
   }
 
   @Override
   public Group updateGroup(String appName, Group updatedGroup) {
     Map<String, Object> params = new HashMap<>();
-    params.put("appName", appName);
-    params.put("updatedGroup", updatedGroup);
-    params.put("realm", realm.getName());
-    params.put("userStorage", userStorage.getName());
-    jmsWriter.writeRequestInQueue(queueRequestName, "updateGroup", params);
+    params.put(JmsAtttributes.APPLICATION, appName);
+    params.put(JmsAtttributes.GROUP, updatedGroup);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.UPDATE_GROUP, params);
     return updatedGroup;
   }
 
   @Override
   public void deleteOrganization(String name) {
     Map<String, Object> params = new HashMap<>();
-    params.put("name", name);
-    params.put("realm", realm.getName());
-    params.put("userStorage", userStorage.getName());
-    jmsWriter.writeRequestInQueue(queueRequestName, "deleteOrganization", params);
+    params.put(JmsAtttributes.ORGANIZATION_NAME, name);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.DELETE_ORGANIZATION, params);
   }
 
   @Override
   public Organization createOrganization(Organization organization) {
     Map<String, Object> params = new HashMap<>();
-    params.put("organization", organization);
-    params.put("realm", realm.getName());
-    params.put("userStorage", userStorage.getName());
-    jmsWriter.writeRequestInQueue(queueRequestName, "createOrganization", params);
+    params.put(JmsAtttributes.ORGANIZATION, organization);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.CREATE_ORGANIZATION, params);
     return organization;
   }
 
   @Override
   public Organization updateOrganization(Organization updatedOrganization) {
     Map<String, Object> params = new HashMap<>();
-    params.put("updatedOrganization", updatedOrganization);
-    params.put("realm", realm.getName());
-    params.put("userStorage", userStorage.getName());
-    jmsWriter.writeRequestInQueue(queueRequestName, "updateOrganization", params);
+    params.put(JmsAtttributes.ORGANIZATION, updatedOrganization);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.UPDATE_ORGANIZATION, params);
     return updatedOrganization;
   }
 
   @Override
   public void deleteUserFromGroup(String appName, String groupName, String userId) {
     Map<String, Object> params = new HashMap<>();
-    params.put("appName", appName);
-    params.put("groupName", groupName);
-    params.put("userId", userId);
-    params.put("realm", realm.getName());
-    params.put("userStorage", userStorage.getName());
-    jmsWriter.writeRequestInQueue(queueRequestName, "deleteUserFromGroup", params);
+    params.put(JmsAtttributes.APP_NAME, appName);
+    params.put(JmsAtttributes.GROUP_NAME, groupName);
+    params.put(JmsAtttributes.USER_ID, userId);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.DELETE_USER_FROM_GROUP, params);
   }
 
   @Override
   public void addUserToGroup(String appName, String groupName, String userId) {
     Map<String, Object> params = new HashMap<>();
-    params.put("appName", appName);
-    params.put("groupName", groupName);
-    params.put("userId", userId);
-    params.put("realm", realm.getName());
-    params.put("userStorage", userStorage.getName());
-    jmsWriter.writeRequestInQueue(queueRequestName, "addUserToGroup", params);
+    params.put(JmsAtttributes.APP_NAME, appName);
+    params.put(JmsAtttributes.GROUP_NAME, groupName);
+    params.put(JmsAtttributes.USER_ID, userId);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.ADD_USER_TO_GROUP, params);
   }
 
   @Override
   public void reinitPassword(User user) {
     Map<String, Object> params = new HashMap<>();
-    params.put("user", user);
-    params.put("realm", realm.getName());
-    params.put("userStorage", userStorage.getName());
-    jmsWriter.writeRequestInQueue(queueRequestName, "reinitPassword", params);
+    params.put(JmsAtttributes.USER, user);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.REINIT_PASSWORD, params);
   }
 
   @Override
   public void initPassword(User user, String password) {
     Map<String, Object> params = new HashMap<>();
-    params.put("user", user);
-    params.put("password", password);
-    params.put("realm", realm.getName());
-    params.put("userStorage", userStorage.getName());
-    jmsWriter.writeRequestInQueue(queueRequestName, "initPassword", params);
+    params.put(JmsAtttributes.USER, user);
+    params.put(JmsAtttributes.PASSWORD, password);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.INIT_PASSWORD, params);
   }
 
   @Override
   public void changePasswordResetStatus(User user, boolean isReset) {
     Map<String, Object> params = new HashMap<>();
-    params.put("user", user);
-    params.put("isReset", isReset);
-    params.put("realm", realm.getName());
-    params.put("userStorage", userStorage.getName());
-    jmsWriter.writeRequestInQueue(queueRequestName, "changePasswordResetStatus", params);
+    params.put(JmsAtttributes.USER, user);
+    params.put(JmsAtttributes.IS_RESET, isReset);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.CHANGE_PASSWORD_RESET_STATUS, params);
   }
 
   @Override
   public Application createApplication(Application application) {
     Map<String, Object> params = new HashMap<>();
-    params.put("application", application);
-    params.put("realm", realm.getName());
-    params.put("userStorage", userStorage.getName());
-    jmsWriter.writeRequestInQueue(queueRequestName, "createApplication", params);
+    params.put(JmsAtttributes.APPLICATION, application);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.CREATE_APPLICATION, params);
     return application;
   }
 
   @Override
   public Application updateApplication(Application updatedApplication) {
     Map<String, Object> params = new HashMap<>();
-    params.put("updatedApplication", updatedApplication);
-    params.put("realm", realm.getName());
-    params.put("userStorage", userStorage.getName());
-    jmsWriter.writeRequestInQueue(queueRequestName, "updateApplication", params);
+    params.put(JmsAtttributes.APPLICATION, updatedApplication);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.UPDATE_APPLICATION, params);
     return updatedApplication;
   }
 
   @Override
   public void deleteApplication(String applicationName) {
     Map<String, Object> params = new HashMap<>();
-    params.put("applicationName", applicationName);
-    params.put("realm", realm.getName());
-    params.put("userStorage", userStorage.getName());
-    jmsWriter.writeRequestInQueue(queueRequestName, "deleteApplication", params);
+    params.put(JmsAtttributes.APP_NAME, applicationName);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.DELETE_APPLICATION, params);
   }
 }

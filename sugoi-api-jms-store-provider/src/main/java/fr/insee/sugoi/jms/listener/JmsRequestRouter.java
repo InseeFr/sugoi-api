@@ -17,6 +17,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.jms.model.BrokerRequest;
 import fr.insee.sugoi.jms.utils.Converter;
+import fr.insee.sugoi.jms.utils.JmsAtttributes;
+import fr.insee.sugoi.jms.utils.Method;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
@@ -46,87 +48,87 @@ public class JmsRequestRouter {
         userStorage,
         operation);
     switch (operation) {
-      case "deleteUser":
-        String id = (String) request.getmethodParams().get("id");
+      case Method.DELETE_USER:
+        String id = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
         storeProvider.getWriterStore(realm, userStorage).deleteUser(id);
         break;
-      case "createUser":
-        User user = converter.toUser(request.getmethodParams().get("user"));
+      case Method.CREATE_USER:
+        User user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
         storeProvider.getWriterStore(realm, userStorage).createUser(user);
         break;
-      case "updateUser":
-        User updatedUser = converter.toUser(request.getmethodParams().get("updatedUser"));
+      case Method.UPDATE_USER:
+        User updatedUser = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
         storeProvider.getWriterStore(realm, userStorage).updateUser(updatedUser);
         break;
-      case "deleteGroup":
-        String appName = (String) request.getmethodParams().get("appName");
-        String groupName = (String) request.getmethodParams().get("groupName");
+      case Method.DELETE_GROUP:
+        String appName = (String) request.getmethodParams().get(JmsAtttributes.APP_NAME);
+        String groupName = (String) request.getmethodParams().get(JmsAtttributes.GROUP_NAME);
         storeProvider.getWriterStore(realm, userStorage).deleteGroup(appName, groupName);
         break;
-      case "createGroup":
-        appName = (String) request.getmethodParams().get("appName");
-        Group group = converter.toGroup(request.getmethodParams().get("group"));
+      case Method.CREATE_GROUP:
+        appName = (String) request.getmethodParams().get(JmsAtttributes.APP_NAME);
+        Group group = converter.toGroup(request.getmethodParams().get(JmsAtttributes.GROUP));
         storeProvider.getWriterStore(realm, userStorage).createGroup(appName, group);
         break;
-      case "updateGroup":
-        appName = (String) request.getmethodParams().get("appName");
-        Group updatedGroup = converter.toGroup(request.getmethodParams().get("updatedGroup"));
+      case Method.UPDATE_GROUP:
+        appName = (String) request.getmethodParams().get(JmsAtttributes.APP_NAME);
+        Group updatedGroup = converter.toGroup(request.getmethodParams().get(JmsAtttributes.GROUP));
         storeProvider.getWriterStore(realm, userStorage).createGroup(appName, updatedGroup);
         break;
-      case "deleteOrganization":
-        String name = (String) request.getmethodParams().get("name");
+      case Method.DELETE_ORGANIZATION:
+        String name = (String) request.getmethodParams().get(JmsAtttributes.ORGANIZATION_NAME);
         storeProvider.getWriterStore(realm, userStorage).deleteOrganization(name);
         break;
-      case "createOrganization":
+      case Method.CREATE_ORGANIZATION:
         Organization organization =
-            converter.toOrganization(request.getmethodParams().get("organization"));
+            converter.toOrganization(request.getmethodParams().get(JmsAtttributes.ORGANIZATION));
         storeProvider.getWriterStore(realm, userStorage).createOrganization(organization);
         break;
-      case "updateOrganization":
+      case Method.UPDATE_ORGANIZATION:
         Organization updatedOrganization =
-            converter.toOrganization(request.getmethodParams().get("updatedOrganization"));
+            converter.toOrganization(request.getmethodParams().get(JmsAtttributes.ORGANIZATION));
         storeProvider.getWriterStore(realm, userStorage).updateOrganization(updatedOrganization);
         break;
-      case "deleteUserFromGroup":
-        appName = (String) request.getmethodParams().get("appName");
-        groupName = (String) request.getmethodParams().get("groupName");
-        String userId = (String) request.getmethodParams().get("userId");
+      case Method.DELETE_USER_FROM_GROUP:
+        appName = (String) request.getmethodParams().get(JmsAtttributes.APP_NAME);
+        groupName = (String) request.getmethodParams().get(JmsAtttributes.GROUP_NAME);
+        String userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
         storeProvider
             .getWriterStore(realm, userStorage)
             .deleteUserFromGroup(appName, groupName, userId);
         break;
-      case "addUserToGroup":
-        appName = (String) request.getmethodParams().get("appName");
-        groupName = (String) request.getmethodParams().get("groupName");
-        userId = (String) request.getmethodParams().get("userId");
+      case Method.ADD_USER_TO_GROUP:
+        appName = (String) request.getmethodParams().get(JmsAtttributes.APP_NAME);
+        groupName = (String) request.getmethodParams().get(JmsAtttributes.GROUP_NAME);
+        userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
         storeProvider.getWriterStore(realm, userStorage).addUserToGroup(appName, groupName, userId);
         break;
-      case "reinitPassword":
-        user = converter.toUser(request.getmethodParams().get("user"));
+      case Method.REINIT_PASSWORD:
+        user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
         storeProvider.getWriterStore(realm, userStorage).reinitPassword(user);
         break;
-      case "initPassword":
-        user = converter.toUser(request.getmethodParams().get("user"));
-        String password = (String) request.getmethodParams().get("password");
+      case Method.INIT_PASSWORD:
+        user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
+        String password = (String) request.getmethodParams().get(JmsAtttributes.PASSWORD);
         storeProvider.getWriterStore(realm, userStorage).initPassword(user, password);
         break;
-      case "changePasswordResetStatus":
-        user = converter.toUser(request.getmethodParams().get("user"));
-        Boolean isReset = (Boolean) request.getmethodParams().get("isReset");
+      case Method.CHANGE_PASSWORD_RESET_STATUS:
+        user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
+        Boolean isReset = (Boolean) request.getmethodParams().get(JmsAtttributes.IS_RESET);
         storeProvider.getWriterStore(realm, userStorage).changePasswordResetStatus(user, isReset);
         break;
-      case "createApplication":
+      case Method.CREATE_APPLICATION:
         Application application =
-            converter.toApplication(request.getmethodParams().get("application"));
+            converter.toApplication(request.getmethodParams().get(JmsAtttributes.APPLICATION));
         storeProvider.getWriterStore(realm, userStorage).createApplication(application);
         break;
-      case "updateApplication":
+      case Method.UPDATE_APPLICATION:
         Application updatedApplication =
-            converter.toApplication(request.getmethodParams().get("updatedApplication"));
+            converter.toApplication(request.getmethodParams().get(JmsAtttributes.APPLICATION));
         storeProvider.getWriterStore(realm, userStorage).updateApplication(updatedApplication);
         break;
-      case "deleteApplication":
-        String applicationName = (String) request.getmethodParams().get("applicationName");
+      case Method.DELETE_APPLICATION:
+        String applicationName = (String) request.getmethodParams().get(JmsAtttributes.APP_NAME);
         storeProvider.getWriterStore(realm, userStorage).deleteApplication(applicationName);
         break;
       default:
