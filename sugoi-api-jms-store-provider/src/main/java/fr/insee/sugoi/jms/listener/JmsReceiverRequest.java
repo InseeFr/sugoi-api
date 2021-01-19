@@ -39,14 +39,20 @@ public class JmsReceiverRequest {
   @Value("${fr.insee.sugoi.jms.queue.requests.name:}")
   private String queueUrgentRequestName;
 
-  @JmsListener(destination = "${fr.insee.sugoi.jms.queue.requests.name:}")
-  public void onRequest(BrokerRequest request) {
-    logger.debug("New message on queue {} mesage: {}", queueRequestName, request);
+  @JmsListener(
+      destination = "${fr.insee.sugoi.jms.queue.requests.name:}",
+      containerFactory = "myFactory")
+  public void onRequest(BrokerRequest request) throws Exception {
+    logger.debug(
+        "New message with uuid {} on queue {} message: {}",
+        request.getUuid(),
+        queueRequestName,
+        request);
     router.exec(request);
   }
 
   @JmsListener(destination = "${fr.insee.sugoi.jms.priority.queue.request.name:}")
-  public void onUrgentRequest(BrokerRequest request) {
+  public void onUrgentRequest(BrokerRequest request) throws Exception {
     logger.debug("New message on queue {} message: {}", queueUrgentRequestName, request);
     router.exec(request);
   }

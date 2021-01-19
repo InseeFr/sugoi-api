@@ -76,4 +76,12 @@ public class Organization {
   public void setIdentifiant(String identifiant) {
     this.identifiant = identifiant;
   }
+
+  public void setAttributes(Map<String, Object> attributes) {
+    this.attributes = attributes;
+  }
+
+  public void setMetadatas(Map<String, Object> metadatas) {
+    this.metadatas = metadatas;
+  }
 }

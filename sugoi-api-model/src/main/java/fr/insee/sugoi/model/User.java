@@ -137,4 +137,12 @@ public class User {
   public void setOrganization(Organization organization) {
     this.organization = organization;
   }
+
+  public void setAttributes(Map<String, Object> attributes) {
+    this.attributes = attributes;
+  }
+
+  public void setMetadatas(Map<String, Object> metadatas) {
+    this.metadatas = metadatas;
+  }
 }

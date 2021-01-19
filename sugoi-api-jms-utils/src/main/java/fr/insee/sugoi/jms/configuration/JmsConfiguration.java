@@ -76,6 +76,7 @@ public class JmsConfiguration {
       ConnectionFactory connectionFactory,
       DefaultJmsListenerContainerFactoryConfigurer configurer) {
     DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+    factory.setMessageConverter(messageConverter());
     configurer.configure(factory, connectionFactory);
     return factory;
   }
