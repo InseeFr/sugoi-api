@@ -44,7 +44,7 @@ public class LdapWriterStore implements WriterStore {
 
   public LdapWriterStore(Map<String, String> config) {
     try {
-      this.ldapPoolConnection = LdapFactory.getConnectionPool(config);
+      this.ldapPoolConnection = LdapFactory.getConnectionPoolAuthenticated(config);
       this.config = config;
       userLdapMapper = new UserLdapMapper(config);
       organizationLdapMapper = new OrganizationLdapMapper(config);
