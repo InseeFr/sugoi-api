@@ -16,14 +16,19 @@ package fr.insee.sugoi.ldap.utils.mapper;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import com.unboundid.ldap.sdk.ModificationType;
-import com.unboundid.ldap.sdk.SearchResultEntry;
 import fr.insee.sugoi.ldap.utils.mapper.properties.LdapObjectClass;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.AttributeLdapName;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToAttribute;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToMapElement;
+import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.Habilitation;
+import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.User;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,123 +39,281 @@ public class GenericLdapMapper {
 
   private static final Logger logger = LogManager.getLogger(GenericLdapMapper.class);
 
-  @SuppressWarnings("unchecked")
-  public static <O, N> N transform(
-      SearchResultEntry result, Class<O> propertiesClazz, Class<N> clazz) {
+  public static <LdapType, ReturnType> ReturnType mapLdapAttributesToObject(
+      Collection<Attribute> attributes, Class<LdapType> ldapClazz, Class<ReturnType> returnClazz) {
     try {
-      N object = clazz.getDeclaredConstructor().newInstance();
-      for (Field field : propertiesClazz.getDeclaredFields()) {
-        try {
-          field.setAccessible(true);
-          if (field.getDeclaredAnnotationsByType(AttributeLdapName.class).length > 0) {
+      ReturnType mappedEntity = returnClazz.getDeclaredConstructor().newInstance();
 
-            if (field.getDeclaredAnnotationsByType(MapToAttribute.class).length > 0) {
-              Field userField =
-                  object
-                      .getClass()
-                      .getDeclaredField(field.getAnnotation(MapToAttribute.class).value());
-              userField.setAccessible(true);
-              userField.set(
-                  object,
-                  result.getAttributeValue(field.getAnnotation(AttributeLdapName.class).value()));
-            }
+      Arrays.stream(ldapClazz.getDeclaredFields())
+          .filter(
+              ldapField ->
+                  ldapField.getDeclaredAnnotationsByType(AttributeLdapName.class).length > 0
+                      && ldapField.getDeclaredAnnotationsByType(MapToAttribute.class).length > 0)
+          .forEach(
+              ldapField -> setFieldFromAttributeAnnotation(mappedEntity, ldapField, attributes));
 
-            if (field.getDeclaredAnnotationsByType(MapToMapElement.class).length > 0) {
-              Field userField =
-                  object
-                      .getClass()
-                      .getDeclaredField(field.getAnnotation(MapToMapElement.class).name());
-              userField.setAccessible(true);
-              Map<String, Object> userFieldObject = (Map<String, Object>) userField.get(object);
-              userFieldObject.put(
-                  field.getAnnotation(MapToMapElement.class).key(),
-                  result.getAttributeValue(field.getAnnotation(AttributeLdapName.class).value()));
-              userField.set(object, userFieldObject);
-            }
-          }
+      Arrays.stream(ldapClazz.getDeclaredFields())
+          .filter(
+              ldapField ->
+                  ldapField.getDeclaredAnnotationsByType(AttributeLdapName.class).length > 0
+                      && ldapField.getDeclaredAnnotationsByType(MapToMapElement.class).length > 0)
+          .forEach(ldapField -> setFieldFromMapAnnotation(mappedEntity, ldapField, attributes));
 
-        } catch (Exception e) {
-          logger.info("Impossible de récuperer le field " + field.getName());
-        }
-      }
-      return object;
+      return mappedEntity;
+
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public static <O, N> List<Attribute> toAttribute(
-      N entity, Class<O> propertiesClazz, Class<N> clazz) {
+  public static <LdapType, ObjectType> List<Attribute> mapObjectToLdapAttributes(
+      ObjectType entity,
+      Class<LdapType> ldapClazz,
+      Class<ObjectType> entityClazz,
+      Map<String, String> config) {
     try {
       List<Attribute> attributes = new ArrayList<>();
-      Arrays.stream(propertiesClazz.getAnnotations())
-          .forEach(x -> System.out.println(x.annotationType()));
-      LdapObjectClass ldapObjectClass = propertiesClazz.getAnnotation(LdapObjectClass.class);
+      LdapObjectClass ldapObjectClass = ldapClazz.getAnnotation(LdapObjectClass.class);
+
       if (ldapObjectClass != null) {
         attributes.add(new Attribute("objectClass", ldapObjectClass.values()));
       }
-      for (Field mapperField : propertiesClazz.getDeclaredFields()) {
-        try {
-          mapperField.setAccessible(true);
-          if (mapperField.getDeclaredAnnotationsByType(AttributeLdapName.class).length > 0) {
-            String attributeName = mapperField.getAnnotation(AttributeLdapName.class).value();
-            if (mapperField.getDeclaredAnnotationsByType(MapToAttribute.class).length > 0) {
-              Field entityField =
-                  entity
-                      .getClass()
-                      .getDeclaredField(mapperField.getAnnotation(MapToAttribute.class).value());
-              entityField.setAccessible(true);
-              Object attributeValue = entityField.get(entity);
-              if (attributeValue != null) {
-                ModelType type = mapperField.getAnnotation(MapToAttribute.class).type();
-                switch (type) {
-                    // TODO: manage other types
-                  default:
-                    attributes.add(new Attribute(attributeName, (String) attributeValue));
-                    break;
-                }
-              }
-            }
 
-            if (mapperField.getDeclaredAnnotationsByType(MapToMapElement.class).length > 0) {
-              Field entityField =
-                  entity
-                      .getClass()
-                      .getDeclaredField(mapperField.getAnnotation(MapToMapElement.class).name());
-              entityField.setAccessible(true);
-              Map<String, Object> entityFieldObject = (Map<String, Object>) entityField.get(entity);
-              Object attributeValue =
-                  entityFieldObject.get(mapperField.getAnnotation(MapToMapElement.class).key());
-              if (attributeValue != null) {
-                ModelType type = mapperField.getAnnotation(MapToMapElement.class).type();
-                switch (type) {
-                    // TODO: manage other types
-                  default:
-                    attributes.add(new Attribute(attributeName, (String) attributeValue));
-                    break;
+      Arrays.stream(ldapClazz.getDeclaredFields())
+          .filter(
+              ldapField ->
+                  ldapField.getDeclaredAnnotationsByType(AttributeLdapName.class).length > 0
+                      && ldapField.getDeclaredAnnotationsByType(MapToAttribute.class).length > 0)
+          .forEach(
+              ldapField -> {
+                List<Attribute> createdAttributeList =
+                    createAttributesFromAttributeAnnotation(entity, ldapField, config);
+                if (createdAttributeList != null) {
+                  attributes.addAll(createdAttributeList);
                 }
-              }
-            }
-          }
+              });
 
-        } catch (Exception e) {
-          logger.info("Impossible de récuperer le field " + mapperField.getName());
-        }
-      }
+      Arrays.stream(ldapClazz.getDeclaredFields())
+          .filter(
+              ldapField ->
+                  ldapField.getDeclaredAnnotationsByType(AttributeLdapName.class).length > 0
+                      && ldapField.getDeclaredAnnotationsByType(MapToMapElement.class).length > 0)
+          .forEach(
+              ldapField -> {
+                Attribute mappedAttribute = createAttributesFromMapAnnotation(entity, ldapField);
+                if (mappedAttribute != null) {
+                  attributes.add(mappedAttribute);
+                }
+              });
+
       return attributes;
+
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
 
   public static <O, N> List<Modification> createMods(
-      N entity, Class<O> propertiesClazz, Class<N> clazz) {
-    return toAttribute(entity, propertiesClazz, clazz).stream()
+      N entity, Class<O> propertiesClazz, Class<N> clazz, Map<String, String> config) {
+
+    return mapObjectToLdapAttributes(entity, propertiesClazz, clazz, config).stream()
         .map(
             attribute ->
                 new Modification(
                     ModificationType.REPLACE, attribute.getName(), attribute.getValues()))
         .collect(Collectors.toList());
+  }
+
+  private static <ObjectType> void setFieldFromAttributeAnnotation(
+      ObjectType mappedEntity, Field ldapField, Collection<Attribute> attributes) {
+    try {
+      Field entityField =
+          mappedEntity
+              .getClass()
+              .getDeclaredField(ldapField.getAnnotation(MapToAttribute.class).value());
+      entityField.setAccessible(true);
+      ModelType type = ldapField.getAnnotation(MapToAttribute.class).type();
+      List<String> attributeValues = getAttributeValuesFromField(attributes, ldapField);
+      if (attributeValues.size() > 0) {
+        switch (type) {
+          case ORGANIZATION:
+            Organization orga = new Organization();
+            orga.setIdentifiant(attributeValues.get(0).split(",")[0].substring(4));
+            entityField.set(mappedEntity, orga);
+            break;
+          case ADDRESS:
+            Map<String, String> address = new HashMap<>();
+            address.put("id", attributeValues.get(0).split(",")[0].substring(2));
+            entityField.set(mappedEntity, address);
+            break;
+          case LIST_HABILITATION:
+            entityField.set(
+                mappedEntity,
+                attributeValues.stream()
+                    .map(attributeValue -> new Habilitation(attributeValue))
+                    .collect(Collectors.toList()));
+            break;
+          case LIST_USER:
+            entityField.set(
+                mappedEntity,
+                attributeValues.stream()
+                    .map(attributeValue -> new User(attributeValue))
+                    .collect(Collectors.toList()));
+            break;
+          case LIST_GROUP:
+            entityField.set(
+                mappedEntity,
+                attributeValues.stream()
+                    .map(attributeValue -> new Group(attributeValue.split(",")[0].substring(3)))
+                    .collect(Collectors.toList()));
+            break;
+          default:
+            entityField.set(mappedEntity, attributeValues.get(0));
+        }
+      }
+    } catch (NoSuchFieldException | SecurityException | IllegalAccessException e) {
+      logger.info("Unable to map field " + ldapField.getName());
+      throw new RuntimeException(e);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <ObjectType> void setFieldFromMapAnnotation(
+      ObjectType mappedEntity, Field ldapField, Collection<Attribute> attributes) {
+    try {
+      Field entityField =
+          mappedEntity
+              .getClass()
+              .getDeclaredField(ldapField.getAnnotation(MapToMapElement.class).name());
+      entityField.setAccessible(true);
+      List<String> attributeValue = getAttributeValuesFromField(attributes, ldapField);
+      if (attributeValue.size() > 0) {
+        Map<String, Object> entityFieldMap = (Map<String, Object>) entityField.get(mappedEntity);
+        entityFieldMap.put(
+            ldapField.getAnnotation(MapToMapElement.class).key(),
+            getAttributeValuesFromField(attributes, ldapField).get(0));
+        entityField.set(mappedEntity, entityFieldMap);
+      }
+    } catch (NoSuchFieldException | SecurityException | IllegalAccessException e) {
+      logger.info("Unable to map field " + ldapField.getName());
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static List<String> getAttributeValuesFromField(
+      Collection<Attribute> attributes, Field ldapField) {
+    return attributes.stream()
+        .filter(
+            attribute ->
+                ldapField
+                    .getAnnotation(AttributeLdapName.class)
+                    .value()
+                    .equals(attribute.getName()))
+        .map(attribute -> attribute.getValue())
+        .collect(Collectors.toList());
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <ObjectType> List<Attribute> createAttributesFromAttributeAnnotation(
+      ObjectType entity, Field ldapField, Map<String, String> config) {
+    try {
+      Field entityField =
+          entity.getClass().getDeclaredField(ldapField.getAnnotation(MapToAttribute.class).value());
+      entityField.setAccessible(true);
+      Object attributeValue = entityField.get(entity);
+      String attributeName = ldapField.getAnnotation(AttributeLdapName.class).value();
+      if (attributeValue != null) {
+        ModelType type = ldapField.getAnnotation(MapToAttribute.class).type();
+        switch (type) {
+          case ORGANIZATION:
+            Attribute organizationAttribute =
+                new Attribute(
+                    attributeName,
+                    String.format(
+                        "uid=%s,%s",
+                        ((Organization) attributeValue).getIdentifiant(),
+                        config.get("organization_source")));
+            List<Attribute> organizationAttributeList = new ArrayList<>();
+            organizationAttributeList.add(organizationAttribute);
+            return organizationAttributeList;
+          case LIST_HABILITATION:
+            return ((List<Habilitation>) attributeValue)
+                .stream()
+                    .map(habilitation -> new Attribute(attributeName, habilitation.getId()))
+                    .collect(Collectors.toList());
+          case LIST_USER:
+            return ((List<User>) attributeValue)
+                .stream()
+                    .map(
+                        user ->
+                            new Attribute(
+                                attributeName,
+                                String.format(
+                                    "uid=%s,%s", user.getUsername(), config.get("user_source"))))
+                    .collect(Collectors.toList());
+          case LIST_GROUP:
+            return ((List<Group>) attributeValue)
+                .stream()
+                    .map(
+                        group ->
+                            new Attribute(
+                                attributeName,
+                                String.format(
+                                    "cn=%s,%s", group.getName(), config.get("appli_source"))))
+                    .collect(Collectors.toList());
+          case ADDRESS:
+            List<Attribute> addressAttributeList = new ArrayList<>();
+            if (((Map<String, String>) attributeValue).containsKey("id")
+                && config.get("address_source") != null) {
+              Attribute addressAttribute =
+                  new Attribute(
+                      attributeName,
+                      String.format(
+                          "l=%s,%s",
+                          ((Map<String, String>) attributeValue).get("id"),
+                          config.get("address_source")));
+              addressAttributeList.add(addressAttribute);
+            }
+            return addressAttributeList;
+          default:
+            List<Attribute> attributeList = new ArrayList<>();
+            Attribute attribute =
+                new Attribute(
+                    ldapField.getAnnotation(AttributeLdapName.class).value(),
+                    (String) attributeValue);
+            attributeList.add(attribute);
+            return attributeList;
+        }
+      }
+      return null;
+    } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException e) {
+      logger.info("Unable to map field " + ldapField.getName());
+      throw new RuntimeException(e);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <ObjectType> Attribute createAttributesFromMapAnnotation(
+      ObjectType entity, Field ldapField) {
+    try {
+      Field entityField =
+          entity.getClass().getDeclaredField(ldapField.getAnnotation(MapToMapElement.class).name());
+      entityField.setAccessible(true);
+      Map<String, Object> entityFieldObject = (Map<String, Object>) entityField.get(entity);
+      Object attributeValue =
+          entityFieldObject.get(ldapField.getAnnotation(MapToMapElement.class).key());
+      if (attributeValue != null) {
+        ModelType type = ldapField.getAnnotation(MapToMapElement.class).type();
+        switch (type) {
+          default:
+            return new Attribute(
+                ldapField.getAnnotation(AttributeLdapName.class).value(), (String) attributeValue);
+        }
+      }
+      return null;
+    } catch (IllegalAccessException | NoSuchFieldException e) {
+      logger.info("Unable to map field " + ldapField.getName());
+      throw new RuntimeException(e);
+    }
   }
 }

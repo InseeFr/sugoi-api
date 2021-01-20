@@ -15,24 +15,32 @@ package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
-import com.unboundid.ldap.sdk.SearchResultEntry;
 import fr.insee.sugoi.ldap.utils.mapper.properties.UserLdap;
 import fr.insee.sugoi.model.User;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class UserLdapMapper implements LdapMapper<User> {
 
-  @Override
-  public User mapFromSearchEntry(SearchResultEntry searchResultEntry) {
-    return GenericLdapMapper.transform(searchResultEntry, UserLdap.class, User.class);
+  Map<String, String> config;
+
+  public UserLdapMapper(Map<String, String> config) {
+    this.config = config;
   }
 
   @Override
-  public List<Attribute> mapToAttribute(User u) {
-    return GenericLdapMapper.toAttribute(u, UserLdap.class, User.class);
+  public User mapFromAttributes(Collection<Attribute> attributes) {
+    return GenericLdapMapper.mapLdapAttributesToObject(attributes, UserLdap.class, User.class);
   }
 
-  public static List<Modification> createMods(User updatedUser) {
-    return GenericLdapMapper.createMods(updatedUser, UserLdap.class, User.class);
+  @Override
+  public List<Attribute> mapToAttributes(User u) {
+    return GenericLdapMapper.mapObjectToLdapAttributes(u, UserLdap.class, User.class, config);
+  }
+
+  @Override
+  public List<Modification> createMods(User updatedUser) {
+    return GenericLdapMapper.createMods(updatedUser, UserLdap.class, User.class, config);
   }
 }

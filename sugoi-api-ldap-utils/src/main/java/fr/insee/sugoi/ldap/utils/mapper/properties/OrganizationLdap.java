@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.ldap.utils.mapper.properties;
 
+import fr.insee.sugoi.ldap.utils.mapper.ModelType;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.AttributeLdapName;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToAttribute;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToMapElement;
@@ -33,8 +34,8 @@ public class OrganizationLdap {
   @MapToMapElement(name = "attributes", key = "description")
   public String description;
 
-  @AttributeLdapName("inseeAdressePostaleDn")
-  @MapToMapElement(name = "attributes", key = "adressDn")
+  @AttributeLdapName("inseeAdressePostaleDN")
+  @MapToAttribute(value = "address", type = ModelType.ADDRESS)
   public String adresseDn;
 
   @AttributeLdapName("inseeClefChiffrement")
@@ -44,4 +45,8 @@ public class OrganizationLdap {
   @AttributeLdapName("mail")
   @MapToMapElement(name = "attributes", key = "mail")
   public String mail;
+
+  @AttributeLdapName("inseeOrganisationDN")
+  @MapToAttribute(value = "organization", type = ModelType.ORGANIZATION)
+  public String organisationDeRattachementDN;
 }

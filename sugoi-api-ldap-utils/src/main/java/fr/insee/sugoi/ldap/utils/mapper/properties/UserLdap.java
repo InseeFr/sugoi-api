@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.ldap.utils.mapper.properties;
 
+import fr.insee.sugoi.ldap.utils.mapper.ModelType;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.AttributeLdapName;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToAttribute;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToMapElement;
@@ -56,12 +57,12 @@ public class UserLdap {
   @MapToMapElement(name = "attributes", key = "description")
   public String description;
 
-  @AttributeLdapName("inseeAdressePostaleDn")
-  @MapToMapElement(name = "attributes", key = "address_dn")
+  @AttributeLdapName("inseeAdressePostaleDN")
+  @MapToAttribute(value = "address", type = ModelType.ADDRESS)
   public String adresseDN;
 
-  @AttributeLdapName("adresse")
-  @MapToMapElement(name = "attributes", key = "organisationDn")
+  @AttributeLdapName("inseeOrganisationDN")
+  @MapToAttribute(value = "organization", type = ModelType.ORGANIZATION)
   public String organisationDeRattachementDN;
 
   @AttributeLdapName("personalTitle")
@@ -119,4 +120,12 @@ public class UserLdap {
   @MapToMapElement(name = "metadatas", key = "modifyTimestamp")
   @AttributeLdapName("modifyTimestamp")
   private String dateModification;
+
+  @AttributeLdapName("inseeGroupeDefaut")
+  @MapToAttribute(value = "habilitations", type = ModelType.LIST_HABILITATION)
+  private String habilitations;
+
+  @AttributeLdapName("memberOf")
+  @MapToAttribute(value = "groups", type = ModelType.LIST_GROUP)
+  private String groups;
 }

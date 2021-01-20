@@ -15,24 +15,34 @@ package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
-import com.unboundid.ldap.sdk.SearchResultEntry;
 import fr.insee.sugoi.ldap.utils.mapper.properties.GroupLdap;
 import fr.insee.sugoi.ldap.utils.mapper.properties.LdapObjectClass;
 import fr.insee.sugoi.model.Group;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @LdapObjectClass(values = {"top", "groupOfUniqueNames"})
 public class GroupLdapMapper implements LdapMapper<Group> {
 
-  public Group mapFromSearchEntry(SearchResultEntry entry) {
-    return GenericLdapMapper.transform(entry, GroupLdap.class, Group.class);
+  Map<String, String> config;
+
+  public GroupLdapMapper(Map<String, String> config) {
+    this.config = config;
   }
 
-  public List<Attribute> mapToAttribute(Group group) {
-    return GenericLdapMapper.toAttribute(group, GroupLdap.class, Group.class);
+  @Override
+  public Group mapFromAttributes(Collection<Attribute> attributes) {
+    return GenericLdapMapper.mapLdapAttributesToObject(attributes, GroupLdap.class, Group.class);
   }
 
-  public static List<Modification> createMods(Group updatedGroup) {
-    return GenericLdapMapper.createMods(updatedGroup, GroupLdap.class, Group.class);
+  @Override
+  public List<Attribute> mapToAttributes(Group group) {
+    return GenericLdapMapper.mapObjectToLdapAttributes(group, GroupLdap.class, Group.class, config);
+  }
+
+  @Override
+  public List<Modification> createMods(Group updatedGroup) {
+    return GenericLdapMapper.createMods(updatedGroup, GroupLdap.class, Group.class, config);
   }
 }
