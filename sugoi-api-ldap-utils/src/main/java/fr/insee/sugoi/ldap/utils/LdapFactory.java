@@ -29,7 +29,7 @@ public class LdapFactory {
   private static final Map<String, LDAPConnection> openLdapMonoConnection = new HashMap<>();
 
   /**
-   * Give a Ldap Connection Pool
+   * Give an unauthenticated Ldap Connection Pool
    *
    * @param url
    * @return
@@ -39,7 +39,7 @@ public class LdapFactory {
       throws LDAPException {
     // Check if a ldap connection pool already exist for this userStorage and create
     // it if it doesn't exist
-    String key = config.get("realm_name") + "_" + config.get("name");
+    String key = config.get("realm_name") + "_" + config.get("name") + "_R";
     if (!openLdapPoolConnection.containsKey(key)) {
       openLdapPoolConnection.put(
           key,
@@ -52,10 +52,51 @@ public class LdapFactory {
 
   public static LDAPConnection getSingleConnection(Map<String, String> config)
       throws LDAPException {
-    String key = config.get("realm_name") + "_" + config.get("name");
+    String key = config.get("realm_name") + "_" + config.get("name") + "_R";
     if (!openLdapMonoConnection.containsKey(key)) {
       openLdapMonoConnection.put(
           key, new LDAPConnection(config.get("url"), Integer.valueOf(config.get("port"))));
+    }
+    return openLdapMonoConnection.get(key);
+  }
+
+  /**
+   * Give a Ldap Connection Pool
+   *
+   * @param url
+   * @return
+   * @throws LDAPException
+   */
+  public static LDAPConnectionPool getConnectionPoolAuthenticated(Map<String, String> config)
+      throws LDAPException {
+    // Check if a ldap connection pool already exist for this userStorage and create
+    // it if it doesn't exist
+    String key = config.get("realm_name") + "_" + config.get("name") + "_RW";
+    if (!openLdapPoolConnection.containsKey(key)) {
+      openLdapPoolConnection.put(
+          key,
+          new LDAPConnectionPool(
+              new LDAPConnection(
+                  config.get("url"),
+                  Integer.valueOf(config.get("port")),
+                  config.get("username"),
+                  config.get("password")),
+              Integer.valueOf(config.get("pool_size"))));
+    }
+    return openLdapPoolConnection.get(key);
+  }
+
+  public static LDAPConnection getSingleConnectionAuthenticated(Map<String, String> config)
+      throws LDAPException {
+    String key = config.get("realm_name") + "_" + config.get("name") + "_RW";
+    if (!openLdapMonoConnection.containsKey(key)) {
+      openLdapMonoConnection.put(
+          key,
+          new LDAPConnection(
+              config.get("url"),
+              Integer.valueOf(config.get("port")),
+              config.get("username"),
+              config.get("password")));
     }
     return openLdapMonoConnection.get(key);
   }
