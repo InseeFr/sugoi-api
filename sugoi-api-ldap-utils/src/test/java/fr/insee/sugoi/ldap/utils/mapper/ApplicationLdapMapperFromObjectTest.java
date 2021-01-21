@@ -17,8 +17,6 @@ import static org.hamcrest.MatcherAssert.*;
 
 import com.unboundid.ldap.sdk.Attribute;
 import fr.insee.sugoi.model.Application;
-import fr.insee.sugoi.model.Group;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,36 +55,5 @@ public class ApplicationLdapMapperFromObjectTest {
                 attribute ->
                     attribute.getName().equals("ou")
                         && attribute.getValue().equals("application")));
-  }
-
-  @Test
-  public void getApplicationGroupsAttributesFromJavaObject() {
-
-    Group adminGroup = new Group("admin");
-    Group readerGroup = new Group("reader");
-    List<Group> groups = new ArrayList<>();
-    groups.add(adminGroup);
-    groups.add(readerGroup);
-    application.setGroups(groups);
-    List<Attribute> mappedAttributes = applicationLdapMapper.mapToAttributes(application);
-
-    assertThat(
-        "Should have group admin",
-        mappedAttributes.stream()
-            .anyMatch(
-                attribute ->
-                    attribute.getName().equals("groupDN")
-                        && attribute
-                            .getValue()
-                            .equals("cn=admin,ou=monappli,ou=Applications,o=insee,c=fr")));
-    assertThat(
-        "Should have group reader",
-        mappedAttributes.stream()
-            .anyMatch(
-                attribute ->
-                    attribute.getName().equals("groupDN")
-                        && attribute
-                            .getValue()
-                            .equals("cn=reader,ou=monappli,ou=Applications,o=insee,c=fr")));
   }
 }

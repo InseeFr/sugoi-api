@@ -50,24 +50,4 @@ public class ApplicationLdapMapperFromAttributesTest {
 
     assertThat("Should have a name", mappedApplication.getName(), is("appli"));
   }
-
-  @Test
-  public void getUsersInApplicationFromAttributes() {
-
-    Attribute groupAttribute1 =
-        new Attribute("groupDN", "cn=admin,ou=monappli,ou=Applications,o=insee,c=fr");
-    Attribute groupAttribute2 =
-        new Attribute("groupDN", "cn=reader,ou=monappli,ou=Applications,o=insee,c=fr");
-    Collection<Attribute> attributes = new ArrayList<>();
-    attributes.add(groupAttribute1);
-    attributes.add(groupAttribute2);
-    Application mappedApplication = applicationLdapMapper.mapFromAttributes(attributes);
-
-    assertThat(
-        "Should have reader group",
-        mappedApplication.getGroups().stream().anyMatch(group -> group.getName().equals("reader")));
-    assertThat(
-        "Should have admin group",
-        mappedApplication.getGroups().stream().anyMatch(user -> user.getName().equals("admin")));
-  }
 }
