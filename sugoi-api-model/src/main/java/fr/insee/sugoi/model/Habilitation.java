@@ -29,9 +29,11 @@ public class Habilitation {
   // Habilitation can be defined by a String of type property_role_application
   public Habilitation(String habilitationID) {
     String[] splitHabilitation = habilitationID.split("_");
-    this.property = splitHabilitation[0];
-    this.role = splitHabilitation[1];
-    this.application = splitHabilitation[2];
+    if (splitHabilitation.length == 3) {
+      this.property = splitHabilitation[0];
+      this.role = splitHabilitation[1];
+      this.application = splitHabilitation[2];
+    }
   }
 
   public String getApplication() {
@@ -56,5 +58,9 @@ public class Habilitation {
 
   public void setProperty(String property) {
     this.property = property;
+  }
+
+  public String getId() {
+    return this.property + "_" + this.role + "_" + this.application;
   }
 }

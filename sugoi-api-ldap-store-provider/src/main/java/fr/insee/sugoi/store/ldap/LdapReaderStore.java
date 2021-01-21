@@ -53,17 +53,20 @@ public class LdapReaderStore implements ReaderStore {
 
   private Map<String, String> config;
 
-  private UserLdapMapper userLdapMapper = new UserLdapMapper();
-  private OrganizationLdapMapper organizationLdapMapper = new OrganizationLdapMapper();
-  private GroupLdapMapper groupLdapMapper = new GroupLdapMapper();
-  private ApplicationLdapMapper applicationLdapMapper = new ApplicationLdapMapper();
+  private UserLdapMapper userLdapMapper;
+  private OrganizationLdapMapper organizationLdapMapper;
+  private GroupLdapMapper groupLdapMapper;
+  private ApplicationLdapMapper applicationLdapMapper;
 
   public LdapReaderStore(Map<String, String> config) {
     logger.debug("Configuring LdapReaderStore with config : {}", config);
     try {
-      LdapFactory.getSingleConnection(config);
       this.ldapPoolConnection = LdapFactory.getConnectionPool(config);
       this.config = config;
+      userLdapMapper = new UserLdapMapper(config);
+      organizationLdapMapper = new OrganizationLdapMapper(config);
+      groupLdapMapper = new GroupLdapMapper(config);
+      applicationLdapMapper = new ApplicationLdapMapper(config);
     } catch (LDAPException e) {
       throw new RuntimeException(e);
     }
@@ -73,13 +76,14 @@ public class LdapReaderStore implements ReaderStore {
   public User getUser(String id) {
     logger.debug("Searching user {}", id);
     SearchResultEntry entry = getEntryByDn("uid=" + id + "," + config.get("user_source"));
-    return (entry != null) ? userLdapMapper.mapFromSearchEntry(entry) : null;
+    return (entry != null) ? userLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
   }
 
   @Override
   public Organization getOrganization(String id) {
     SearchResultEntry entry = getEntryByDn("uid=" + id + "," + config.get("organization_source"));
-    Organization org = (entry != null) ? organizationLdapMapper.mapFromSearchEntry(entry) : null;
+    Organization org =
+        (entry != null) ? organizationLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
     if (org != null
         && org.getAttributes().containsKey("adressDn")
         && org.getAttributes().get("adressDn") != null) {
@@ -93,7 +97,7 @@ public class LdapReaderStore implements ReaderStore {
   private <MapperType> Filter getFilterFromObject(
       MapperType object, LdapMapper<MapperType> mapper) {
     return LdapFilter.and(
-        mapper.mapToAttribute(object).stream()
+        mapper.mapToAttributes(object).stream()
             .map(attribute -> LdapFilter.contains(attribute.getName(), attribute.getValue()))
             .collect(Collectors.toList()));
   }
@@ -152,7 +156,7 @@ public class LdapReaderStore implements ReaderStore {
     PageResult<ResultType> pageResult = new PageResult<>();
     List<ResultType> results =
         searchResult.getSearchEntries().stream()
-            .map(e -> mapper.mapFromSearchEntry(e))
+            .map(e -> mapper.mapFromAttributes(e.getAttributes()))
             .collect(Collectors.toList());
     pageResult.setResults(results);
     return pageResult;
@@ -176,7 +180,7 @@ public class LdapReaderStore implements ReaderStore {
   @Override
   public Group getGroup(String appName, String groupName) {
     SearchResultEntry entry = getGroupResultEntry(appName, groupName);
-    return (entry != null) ? groupLdapMapper.mapFromSearchEntry(entry) : null;
+    return (entry != null) ? groupLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
   }
 
   private SearchResultEntry getGroupResultEntry(String appName, String groupName) {
@@ -227,7 +231,7 @@ public class LdapReaderStore implements ReaderStore {
   public Application getApplication(String applicationName) {
     SearchResultEntry entry =
         getEntryByDn("ou=" + applicationName + "," + config.get("app_source"));
-    return (entry != null) ? applicationLdapMapper.mapFromSearchEntry(entry) : null;
+    return (entry != null) ? applicationLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
   }
 
   @Override

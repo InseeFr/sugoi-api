@@ -15,26 +15,38 @@ package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
-import com.unboundid.ldap.sdk.SearchResultEntry;
 import fr.insee.sugoi.ldap.utils.mapper.properties.OrganizationLdap;
 import fr.insee.sugoi.model.Organization;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class OrganizationLdapMapper implements LdapMapper<Organization> {
 
-  public Organization mapFromSearchEntry(SearchResultEntry searchResultEntry) {
+  Map<String, String> config;
+
+  public OrganizationLdapMapper(Map<String, String> config) {
+    this.config = config;
+  }
+
+  @Override
+  public Organization mapFromAttributes(Collection<Attribute> attributes) {
     Organization org =
-        GenericLdapMapper.transform(searchResultEntry, OrganizationLdap.class, Organization.class);
+        GenericLdapMapper.mapLdapAttributesToObject(
+            attributes, OrganizationLdap.class, Organization.class);
     // org.setGpgkey(searchResultEntry.getAttribute("inseeClefChiffrement").getValueByteArray());
     return org;
   }
 
-  public List<Attribute> mapToAttribute(Organization organization) {
-    return GenericLdapMapper.toAttribute(organization, OrganizationLdap.class, Organization.class);
+  @Override
+  public List<Attribute> mapToAttributes(Organization organization) {
+    return GenericLdapMapper.mapObjectToLdapAttributes(
+        organization, OrganizationLdap.class, Organization.class, config);
   }
 
-  public static List<Modification> createMods(Organization updatedOrganization) {
+  @Override
+  public List<Modification> createMods(Organization updatedOrganization) {
     return GenericLdapMapper.createMods(
-        updatedOrganization, OrganizationLdap.class, Organization.class);
+        updatedOrganization, OrganizationLdap.class, Organization.class, config);
   }
 }

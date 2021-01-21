@@ -15,23 +15,32 @@ package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
-import com.unboundid.ldap.sdk.SearchResultEntry;
 import fr.insee.sugoi.ldap.utils.mapper.properties.ApplicationLdap;
 import fr.insee.sugoi.model.Application;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class ApplicationLdapMapper implements LdapMapper<Application> {
 
-  public Application mapFromSearchEntry(SearchResultEntry searchResultEntry) {
-    return GenericLdapMapper.transform(searchResultEntry, ApplicationLdap.class, Application.class);
+  Map<String, String> config;
+
+  public ApplicationLdapMapper(Map<String, String> config) {
+    this.config = config;
   }
 
-  public List<Attribute> mapToAttribute(Application application) {
-    return GenericLdapMapper.toAttribute(application, ApplicationLdap.class, Application.class);
+  public Application mapFromAttributes(Collection<Attribute> attributes) {
+    return GenericLdapMapper.mapLdapAttributesToObject(
+        attributes, ApplicationLdap.class, Application.class);
   }
 
-  public static List<Modification> createMods(Application updatedApplication) {
+  public List<Attribute> mapToAttributes(Application application) {
+    return GenericLdapMapper.mapObjectToLdapAttributes(
+        application, ApplicationLdap.class, Application.class, config);
+  }
+
+  public List<Modification> createMods(Application updatedApplication) {
     return GenericLdapMapper.createMods(
-        updatedApplication, ApplicationLdap.class, Application.class);
+        updatedApplication, ApplicationLdap.class, Application.class, config);
   }
 }

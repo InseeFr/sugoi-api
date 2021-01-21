@@ -14,12 +14,15 @@
 package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.Attribute;
-import com.unboundid.ldap.sdk.SearchResultEntry;
+import com.unboundid.ldap.sdk.Modification;
+import java.util.Collection;
 import java.util.List;
 
 public interface LdapMapper<ResultType> {
 
-  public ResultType mapFromSearchEntry(SearchResultEntry entry);
+  public ResultType mapFromAttributes(Collection<Attribute> attributes);
 
-  public List<Attribute> mapToAttribute(ResultType object);
+  public List<Attribute> mapToAttributes(ResultType object);
+
+  public List<Modification> createMods(ResultType object);
 }

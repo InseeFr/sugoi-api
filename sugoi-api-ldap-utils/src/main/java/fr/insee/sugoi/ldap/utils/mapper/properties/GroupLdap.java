@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.ldap.utils.mapper.properties;
 
+import fr.insee.sugoi.ldap.utils.mapper.ModelType;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.AttributeLdapName;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToAttribute;
 
@@ -25,4 +26,8 @@ public class GroupLdap {
   @MapToAttribute("description")
   @AttributeLdapName("description")
   public String description;
+
+  @MapToAttribute(value = "users", type = ModelType.LIST_USER)
+  @AttributeLdapName("uniqueMember")
+  public String users;
 }
