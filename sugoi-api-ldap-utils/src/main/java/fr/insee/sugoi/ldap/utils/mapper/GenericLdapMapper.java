@@ -14,6 +14,8 @@
 package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.Attribute;
+import com.unboundid.ldap.sdk.DN;
+import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldap.sdk.Modification;
 import com.unboundid.ldap.sdk.ModificationType;
 import fr.insee.sugoi.ldap.utils.mapper.properties.LdapObjectClass;
@@ -38,6 +40,11 @@ import org.apache.logging.log4j.Logger;
 public class GenericLdapMapper {
 
   private static final Logger logger = LogManager.getLogger(GenericLdapMapper.class);
+
+  private static final String USER_RDN_BASE = "uid";
+  private static final String ORGANIZATION_RDN_BASE = "uid";
+  private static final String GROUP_RDN_BASE = "cn";
+  private static final String ADDRESS_RDN_BASE = "l";
 
   public static <LdapType, ReturnType> ReturnType mapLdapAttributesToObject(
       Collection<Attribute> attributes, Class<LdapType> ldapClazz, Class<ReturnType> returnClazz) {
@@ -138,12 +145,12 @@ public class GenericLdapMapper {
         switch (type) {
           case ORGANIZATION:
             Organization orga = new Organization();
-            orga.setIdentifiant(attributeValues.get(0).split(",")[0].substring(4));
+            orga.setIdentifiant(getNodeValueFromDN(attributeValues.get(0)));
             entityField.set(mappedEntity, orga);
             break;
           case ADDRESS:
             Map<String, String> address = new HashMap<>();
-            address.put("id", attributeValues.get(0).split(",")[0].substring(2));
+            address.put("id", getNodeValueFromDN(attributeValues.get(0)));
             entityField.set(mappedEntity, address);
             break;
           case LIST_HABILITATION:
@@ -164,7 +171,10 @@ public class GenericLdapMapper {
             entityField.set(
                 mappedEntity,
                 attributeValues.stream()
-                    .map(attributeValue -> new Group(attributeValue.split(",")[0].substring(3)))
+                    .map(
+                        attributeValue -> {
+                          return new Group(getNodeValueFromDN(attributeValue));
+                        })
                     .collect(Collectors.toList()));
             break;
           default:
@@ -174,6 +184,15 @@ public class GenericLdapMapper {
     } catch (NoSuchFieldException | SecurityException | IllegalAccessException e) {
       logger.info("Unable to map field " + ldapField.getName());
       throw new RuntimeException(e);
+    }
+  }
+
+  private static String getNodeValueFromDN(String dn) {
+    try {
+      return (new DN(dn)).getRDN().getAttributeValues()[0];
+    } catch (LDAPException e) {
+      logger.info(String.format("%s is not a DN", dn));
+      return null;
     }
   }
 
@@ -230,7 +249,8 @@ public class GenericLdapMapper {
                 new Attribute(
                     attributeName,
                     String.format(
-                        "uid=%s,%s",
+                        "%s=%s,%s",
+                        ORGANIZATION_RDN_BASE,
                         ((Organization) attributeValue).getIdentifiant(),
                         config.get("organization_source")));
             List<Attribute> organizationAttributeList = new ArrayList<>();
@@ -249,7 +269,8 @@ public class GenericLdapMapper {
                             new Attribute(
                                 attributeName,
                                 String.format(
-                                    "uid=%s,%s", user.getUsername(), config.get("user_source"))))
+                                    "%s=%s,%s",
+                                    USER_RDN_BASE, user.getUsername(), config.get("user_source"))))
                     .collect(Collectors.toList());
           case LIST_GROUP:
             return ((List<Group>) attributeValue)
@@ -259,7 +280,8 @@ public class GenericLdapMapper {
                             new Attribute(
                                 attributeName,
                                 String.format(
-                                    "cn=%s,%s", group.getName(), config.get("appli_source"))))
+                                    "%s=%s,%s",
+                                    GROUP_RDN_BASE, group.getName(), config.get("appli_source"))))
                     .collect(Collectors.toList());
           case ADDRESS:
             List<Attribute> addressAttributeList = new ArrayList<>();
@@ -269,7 +291,8 @@ public class GenericLdapMapper {
                   new Attribute(
                       attributeName,
                       String.format(
-                          "l=%s,%s",
+                          "%s=%s,%s",
+                          ADDRESS_RDN_BASE,
                           ((Map<String, String>) attributeValue).get("id"),
                           config.get("address_source")));
               addressAttributeList.add(addressAttribute);
