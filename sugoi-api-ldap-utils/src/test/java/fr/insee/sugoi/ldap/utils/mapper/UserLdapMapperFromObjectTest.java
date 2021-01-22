@@ -190,4 +190,16 @@ public class UserLdapMapperFromObjectTest {
                             .getValue()
                             .equals("uid=SuperOrga,ou=organisations,o=insee,c=fr")));
   }
+
+  @Test
+  public void dontGetUserModifyTimestampFromJavaObject() {
+
+    user.addMetadatas("modifyTimestamp", "toto");
+    List<Attribute> mappedAttributes = userLdapMapper.mapToAttributes(user);
+
+    assertThat(
+        "Shouldn't have a modifyTimestamp",
+        mappedAttributes.stream()
+            .allMatch(attribute -> !attribute.getName().equals("modifyTimestamp")));
+  }
 }
