@@ -18,9 +18,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/** Describe Ldap Object structural properties */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface LdapObjectClass {
 
+  /** @return ObjectClass attributes of the ldap object */
   String[] values() default "top";
+
+  /** @return The relative distinguished name of the ldap description of a ressource */
+  String rdnAttributeName();
 }

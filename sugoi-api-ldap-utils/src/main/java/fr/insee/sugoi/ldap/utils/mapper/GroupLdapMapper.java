@@ -16,13 +16,11 @@ package fr.insee.sugoi.ldap.utils.mapper;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import fr.insee.sugoi.ldap.utils.mapper.properties.GroupLdap;
-import fr.insee.sugoi.ldap.utils.mapper.properties.LdapObjectClass;
 import fr.insee.sugoi.model.Group;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-@LdapObjectClass(values = {"top", "groupOfUniqueNames"})
 public class GroupLdapMapper implements LdapMapper<Group> {
 
   Map<String, String> config;

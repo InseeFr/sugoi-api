@@ -51,12 +51,20 @@ public class LdapWriterStoreTest {
   @Value("${fr.insee.sugoi.ldap.default.usersource:}")
   private String userSource;
 
+  @Value("${fr.insee.sugoi.ldap.default.groupsourcepattern:}")
+  private String groupSourcePattern;
+
+  @Value("${fr.insee.sugoi.ldap.default.groupfilterpattern:}")
+  private String groupFilterPattern;
+
   @Bean
   public UserStorage userStorage() {
     UserStorage us = new UserStorage();
     us.setOrganizationSource(organizationSource);
     us.setUserSource(userSource);
     us.setName("default");
+    us.addProperty("group_filter_pattern", groupFilterPattern);
+    us.addProperty("group_source_pattern", groupSourcePattern);
     return us;
   }
 
@@ -204,14 +212,12 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testCreateGroup() {
-    // for now groups are not created with their users
-    // plus they are always created at the route of app_source
     LdapWriterStore ldapWriterStore =
         (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
     LdapReaderStore ldapReaderStore =
         (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     Group group = new Group();
-    group.setName("Groupy");
+    group.setName("Groupy_Applitest");
     group.setDescription("Super groupy de test");
     User user = new User();
     user.setUsername("usery");
@@ -221,62 +227,65 @@ public class LdapWriterStoreTest {
     ldapWriterStore.createGroup("Applitest", group);
     assertThat(
         "Should retrieve Groupy",
-        ldapReaderStore.getGroup("Applitest", "Groupy").getName(),
-        is("Groupy"));
+        ldapReaderStore.getGroup("Applitest", "Groupy_Applitest").getName(),
+        is("Groupy_Applitest"));
   }
 
   @Test
   public void testDeleteGroup() {
-    // can only delete first sub tree groups
-    // TODO
     LdapWriterStore ldapWriterStore =
         (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
     LdapReaderStore ldapReaderStore =
         (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     Group group = new Group();
-    group.setName("Asupprimer");
+    group.setName("Asupprimer_WebServicesLdap");
     group.setDescription("supprime ce groupe");
-    ldapWriterStore.createGroup("Applitest", group);
-    ldapWriterStore.deleteGroup("Applitest", "Asupprimer");
+    ldapWriterStore.createGroup("WebServicesLdap", group);
+    ldapWriterStore.deleteGroup("WebServicesLdap", "Asupprimer_WebServicesLdap");
     assertThat(
         "Should have been deleted",
-        ldapReaderStore.getGroup("Applitest", "Asupprimer"),
+        ldapReaderStore.getGroup("WebServicesLdap", "Asupprimer_WebServicesLdap"),
         is(nullValue()));
   }
 
   @Test
   public void testAddUserInGroup() {
-    // we can only update first sub tree group
-    // TODO
     LdapWriterStore ldapWriterStore =
         (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
     LdapReaderStore ldapReaderStore =
         (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
-    ldapWriterStore.addUserToGroup("Applitest", "SuperGroup", "testc");
+    ldapWriterStore.addUserToGroup("Applitest", "Administrateurs_Applitest", "testc");
     assertThat(
         "Group should contain testc",
-        ldapReaderStore.getUsersInGroup("Applitest", "SuperGroup").getResults().stream()
+        ldapReaderStore
+            .getUsersInGroup("Applitest", "Administrateurs_Applitest")
+            .getResults()
+            .stream()
             .anyMatch(user -> user.getUsername().equals("testc")));
   }
 
   @Test
   public void testDeleteUserInGroup() {
-    // we can only update first sub tree group
-    // TODO
     LdapWriterStore ldapWriterStore =
         (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
     LdapReaderStore ldapReaderStore =
         (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     assertThat(
         "Group should be empty",
-        ldapReaderStore.getUsersInGroup("Applitest", "SuperGroup").getResults().size(),
+        ldapReaderStore
+            .getUsersInGroup("Applitest", "Administrateurs_Applitest")
+            .getResults()
+            .size(),
         is(0));
-    ldapWriterStore.addUserToGroup("Applitest", "SuperGroup", "agarder");
-    ldapWriterStore.addUserToGroup("Applitest", "SuperGroup", "asupprimer");
-    ldapWriterStore.deleteUserFromGroup("Applitest", "SuperGroup", "asupprimer");
+    ldapWriterStore.addUserToGroup("Applitest", "Administrateurs_Applitest", "agarder");
+    ldapWriterStore.addUserToGroup("Applitest", "Administrateurs_Applitest", "asupprimer");
+    ldapWriterStore.deleteUserFromGroup("Applitest", "Administrateurs_Applitest", "asupprimer");
     assertThat(
         "Group should not contain asupprimer",
-        ldapReaderStore.getUsersInGroup("Applitest", "SuperGroup").getResults().stream()
+        ldapReaderStore
+            .getUsersInGroup("Applitest", "Administrateurs_Applitest")
+            .getResults()
+            .stream()
             .allMatch(
                 user ->
                     user == null
@@ -284,7 +293,10 @@ public class LdapWriterStoreTest {
                         || !user.getUsername().equals("asupprimer")));
     assertThat(
         "Group should contain agarder",
-        ldapReaderStore.getUsersInGroup("Applitest", "SuperGroup").getResults().stream()
+        ldapReaderStore
+            .getUsersInGroup("Applitest", "Administrateurs_Applitest")
+            .getResults()
+            .stream()
             .anyMatch(
                 user ->
                     user != null
@@ -298,12 +310,12 @@ public class LdapWriterStoreTest {
         (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
     LdapReaderStore ldapReaderStore =
         (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
-    Group group = ldapReaderStore.getGroup("Applitest", "SuperGroup");
+    Group group = ldapReaderStore.getGroup("Applitest", "Administrateurs_Applitest");
     group.setDescription("new description");
     ldapWriterStore.updateGroup("Applitest", group);
     assertThat(
         "SuperGroup description should be new description",
-        ldapReaderStore.getGroup("Applitest", "SuperGroup").getDescription(),
+        ldapReaderStore.getGroup("Applitest", "Administrateurs_Applitest").getDescription(),
         is("new description"));
   }
 }

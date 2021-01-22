@@ -45,6 +45,15 @@ public class RealmLdapMapper {
         if (property[0].equals("brancheOrganisation")) {
           userStorage.setOrganizationSource(property[1]);
         }
+        if (property[0].equals("brancheAdresse")) {
+          userStorage.setAddressSource(property[1]);
+        }
+        if (property[0].equals("groupSourcePattern")) {
+          userStorage.addProperty("group_source_pattern", property[1]);
+        }
+        if (property[0].equals("groupFilterPattern")) {
+          userStorage.addProperty("group_filter_pattern", property[1]);
+        }
       }
     }
     userStorage.setName("default");

@@ -17,6 +17,9 @@ import fr.insee.sugoi.ldap.utils.mapper.ModelType;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.AttributeLdapName;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToAttribute;
 
+@LdapObjectClass(
+    values = {"groupOfUniqueNames"},
+    rdnAttributeName = "cn")
 public class GroupLdap {
 
   @MapToAttribute("name")

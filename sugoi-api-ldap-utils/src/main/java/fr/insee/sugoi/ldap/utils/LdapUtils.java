@@ -15,7 +15,9 @@ package fr.insee.sugoi.ldap.utils;
 
 import com.unboundid.asn1.ASN1OctetString;
 import com.unboundid.ldap.sdk.Control;
+import com.unboundid.ldap.sdk.DN;
 import com.unboundid.ldap.sdk.Filter;
+import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldap.sdk.SearchRequest;
 import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.controls.SimplePagedResultsControl;
@@ -23,8 +25,12 @@ import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class LdapUtils {
+
+  private static final Logger logger = LogManager.getLogger(LdapUtils.class);
 
   public static String buildDn(String id, String baseDn) {
     return "uid=" + id + "," + baseDn;
@@ -58,6 +64,15 @@ public class LdapUtils {
           page.setTotalElements(prc.getSize() == 0 ? -1 : prc.getSize());
         }
       }
+    }
+  }
+
+  public static String getNodeValueFromDN(String dn) {
+    try {
+      return (new DN(dn)).getRDN().getAttributeValues()[0];
+    } catch (LDAPException e) {
+      logger.info(String.format("%s is not a DN", dn));
+      return null;
     }
   }
 

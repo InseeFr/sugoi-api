@@ -51,12 +51,24 @@ public class LdapReaderStoreTest {
   @Value("${fr.insee.sugoi.ldap.default.usersource:}")
   private String userSource;
 
+  @Value("${fr.insee.sugoi.ldap.default.addresssource:}")
+  private String addressSource;
+
+  @Value("${fr.insee.sugoi.ldap.default.groupsourcepattern:}")
+  private String groupSourcePattern;
+
+  @Value("${fr.insee.sugoi.ldap.default.groupfilterpattern:}")
+  private String groupFilterPattern;
+
   @Bean
   public UserStorage userStorage() {
     UserStorage us = new UserStorage();
     us.setOrganizationSource(organizationSource);
     us.setUserSource(userSource);
+    us.setAddressSource(addressSource);
     us.setName("default");
+    us.addProperty("group_filter_pattern", groupFilterPattern);
+    us.addProperty("group_source_pattern", groupSourcePattern);
     return us;
   }
 
@@ -214,19 +226,17 @@ public class LdapReaderStoreTest {
 
   @Test
   public void testSearchAllGroups() {
-    // we should also check if there is more complexe cases like cases with organizationalGroup
     LdapReaderStore ldapReaderStore =
         (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     PageableResult pageableResult = new PageableResult();
     List<Group> groups =
         ldapReaderStore.searchGroups("Applitest", new Group(), pageableResult, "").getResults();
-    assertThat("Should find 3 elements", groups.size(), is(3));
     assertThat(
         "Should contain utilisateurs",
         groups.stream().anyMatch(group -> group.getName().equals("Utilisateurs_Applitest")));
     assertThat(
-        "Should contain SuperGroup",
-        groups.stream().anyMatch(group -> group.getName().equals("SuperGroup")));
+        "Should contain administrateur",
+        groups.stream().anyMatch(group -> group.getName().equals("Administrateurs_Applitest")));
   }
 
   @Test
@@ -238,7 +248,7 @@ public class LdapReaderStoreTest {
     assertThat("Should find 2 elements", users.size(), is(2));
     // for now if a user in a group is not in the current realm, the user is null
     // TODO : decide what to do
-    assertThat("Is null, may be not the expected behavior", users.get(0), is(nullValue()));
+    assertThat("Is null, maybe not the expected behavior", users.get(0), is(nullValue()));
     assertThat("Should be administrateurs", users.get(1).getUsername(), is("testc"));
   }
 }
