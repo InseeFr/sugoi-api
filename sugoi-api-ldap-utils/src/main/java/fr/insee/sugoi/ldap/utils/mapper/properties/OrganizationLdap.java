@@ -23,7 +23,8 @@ import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToMapElement;
       "top",
       "inseeCompte",
       "inseeOrganisation",
-    })
+    },
+    rdnAttributeName = "uid")
 public class OrganizationLdap {
 
   @AttributeLdapName("uid")

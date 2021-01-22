@@ -98,6 +98,8 @@ inseepropriete: brancheContact$ou=contacts,ou=clients_domaine2,o=insee,c=fr
 inseepropriete: brancheAdresse$ou=adresses,ou=clients_domaine2,o=insee,c=fr
 inseepropriete: brancheOrganisation$ou=organisations,ou=clients_domaine2,o=in
  see,c=fr
+inseepropriete: groupSourcePattern$ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr
+inseepropriete: groupFilterPattern$(cn={group}_{appliname})
 description: domaine2
 
 dn: cn=Profil_domaine1_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We
@@ -112,6 +114,8 @@ inseepropriete: brancheOrganisation$ou=organisations,ou=clients_domaine1,o=in
  see,c=fr
 inseepropriete: habilitationsPossibles$propriete_role_appli
 inseepropriete: branchesApplicativesPossibles$ou=Applications,o=insee,c=fr
+inseepropriete: groupSourcePattern$ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr
+inseepropriete: groupFilterPattern$(cn={group}_{appliname})
 description: domaine1
 
 dn: cn=Utilisateurs_contacts_domaine1_WebServicesLdap,ou=WebServicesLdap_Obje
@@ -233,6 +237,8 @@ objectclass: inseeOrganizationalRole
 inseepropriete: ldapUrl$localhost
 inseepropriete: ldapPort$10389
 inseepropriete: brancheContact$ou=SSM,o=insee,c=fr
+inseepropriete: groupSourcePattern$ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr
+inseepropriete: groupFilterPattern$(cn={group}_{appliname})
 inseepropriete: objectclasscontact$top,person,organizationalPerson,inetOrgPerson,inseeAuthenticatedUser
 inseepropriete: branchesApplicativesPossibles$applitest
 description: SSM

@@ -26,7 +26,8 @@ import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToMapElement;
       "inseeAttributsAuthentification",
       "inseeAttributsHabilitation",
       "inseeAttributsCommunication"
-    })
+    },
+    rdnAttributeName = "uid")
 public class UserLdap {
 
   @MapToAttribute("username")

@@ -63,6 +63,9 @@ public class LdapStoreBeans {
     config.put("user_source", userStorage.getUserSource());
     config.put("app_source", realm.getAppSource());
     config.put("organization_source", userStorage.getOrganizationSource());
+    config.put("address_source", userStorage.getAddressSource());
+    config.put("group_source_pattern", userStorage.getProperties().get("group_source_pattern"));
+    config.put("group_filter_pattern", userStorage.getProperties().get("group_filter_pattern"));
     config.put("realm_name", realm.getName());
     config.put("type", "ldap");
     return config;
