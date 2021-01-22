@@ -323,14 +323,17 @@ public class GenericLdapMapper {
           entity.getClass().getDeclaredField(ldapField.getAnnotation(MapToMapElement.class).name());
       entityField.setAccessible(true);
       Map<String, Object> entityFieldObject = (Map<String, Object>) entityField.get(entity);
-      Object attributeValue =
-          entityFieldObject.get(ldapField.getAnnotation(MapToMapElement.class).key());
-      if (attributeValue != null) {
-        ModelType type = ldapField.getAnnotation(MapToMapElement.class).type();
-        switch (type) {
-          default:
-            return new Attribute(
-                ldapField.getAnnotation(AttributeLdapName.class).value(), (String) attributeValue);
+      if (!ldapField.getAnnotation(MapToMapElement.class).readonly()) {
+        Object attributeValue =
+            entityFieldObject.get(ldapField.getAnnotation(MapToMapElement.class).key());
+        if (attributeValue != null) {
+          ModelType type = ldapField.getAnnotation(MapToMapElement.class).type();
+          switch (type) {
+            default:
+              return new Attribute(
+                  ldapField.getAnnotation(AttributeLdapName.class).value(),
+                  (String) attributeValue);
+          }
         }
       }
       return null;

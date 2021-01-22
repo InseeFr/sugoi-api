@@ -117,7 +117,7 @@ public class UserLdap {
   @AttributeLdapName("inseetelephonenumbercorrespondant")
   private String inseeTelephoneNumberCorrespondant;
 
-  @MapToMapElement(name = "metadatas", key = "modifyTimestamp")
+  @MapToMapElement(name = "metadatas", key = "modifyTimestamp", readonly = true)
   @AttributeLdapName("modifyTimestamp")
   private String dateModification;
 
