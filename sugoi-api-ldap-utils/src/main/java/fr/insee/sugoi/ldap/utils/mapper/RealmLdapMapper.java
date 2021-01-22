@@ -45,6 +45,9 @@ public class RealmLdapMapper {
         if (property[0].equals("brancheOrganisation")) {
           userStorage.setOrganizationSource(property[1]);
         }
+        if (property[0].equals("brancheAdresse")) {
+          userStorage.setAddressSource(property[1]);
+        }
       }
     }
     userStorage.setName("default");

@@ -63,6 +63,32 @@ public class LdapStoreBeans {
     config.put("user_source", userStorage.getUserSource());
     config.put("app_source", realm.getAppSource());
     config.put("organization_source", userStorage.getOrganizationSource());
+    config.put("address_source", userStorage.getAddressSource());
+    config.put(
+        "user_RDN_base",
+        userStorage.getProperties().containsKey("userRDNBase")
+            ? userStorage.getProperties().get("userRDNBase")
+            : "uid");
+    config.put(
+        "organization_RDN_base",
+        userStorage.getProperties().containsKey("organizationRDNBase")
+            ? userStorage.getProperties().get("organizationRDNBase")
+            : "uid");
+    config.put(
+        "address_RDN_base",
+        userStorage.getProperties().containsKey("addressRDNBase")
+            ? userStorage.getProperties().get("addressRDNBase")
+            : "l");
+    config.put(
+        "appli_RDN_base",
+        userStorage.getProperties().containsKey("appliRDNBase")
+            ? userStorage.getProperties().get("appliRDNBase")
+            : "ou");
+    config.put(
+        "group_regex",
+        userStorage.getProperties().containsKey("groupRegex")
+            ? userStorage.getProperties().get("groupRegex")
+            : "cn=*_%s");
     config.put("realm_name", realm.getName());
     config.put("type", "ldap");
     return config;

@@ -13,13 +13,15 @@
 */
 package fr.insee.sugoi.model;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class UserStorage {
   private String name;
   private String userSource;
   private String organizationSource;
-  private Map<String, String> properties;
+  private String addressSource;
+  private Map<String, String> properties = new HashMap<>();
   private String readerType;
   private String writerType;
 
@@ -45,6 +47,14 @@ public class UserStorage {
 
   public void setOrganizationSource(String organizationSource) {
     this.organizationSource = organizationSource;
+  }
+
+  public String getAddressSource() {
+    return addressSource;
+  }
+
+  public void setAddressSource(String addressSource) {
+    this.addressSource = addressSource;
   }
 
   public Map<String, String> getProperties() {

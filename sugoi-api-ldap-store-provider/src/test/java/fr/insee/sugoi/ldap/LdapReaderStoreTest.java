@@ -51,11 +51,15 @@ public class LdapReaderStoreTest {
   @Value("${fr.insee.sugoi.ldap.default.usersource:}")
   private String userSource;
 
+  @Value("${fr.insee.sugoi.ldap.default.addresssource:}")
+  private String addressSource;
+
   @Bean
   public UserStorage userStorage() {
     UserStorage us = new UserStorage();
     us.setOrganizationSource(organizationSource);
     us.setUserSource(userSource);
+    us.setAddressSource(addressSource);
     us.setName("default");
     return us;
   }
