@@ -51,7 +51,6 @@
             <artifactId>activemq-kahadb-store</artifactId>
         </dependency>
 
-
         <dependency>
             <groupId>com.unboundid</groupId>
             <artifactId>unboundid-ldapsdk</artifactId>
@@ -66,6 +65,32 @@
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jasper</artifactId>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-util -->
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-util</artifactId>
+            <version>9.0.41</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-core -->
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>9.0.41</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-coyote</artifactId>
+            <version>9.0.41</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-juli</artifactId>
+            <version>9.0.41</version>
         </dependency>
 
 
@@ -102,12 +127,12 @@
             <version>6.9.1</version>
             <scope>test</scope>
         </dependency>
-
+        <!-- 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <scope>test</scope>
-        </dependency>
+        </dependency> -->
 
         <dependency>
             <groupId>de.monochromata.cucumber</groupId>
@@ -116,20 +141,26 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+        </dependency>
+
     </dependencies>
 
     <build>
 
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-
-
         <plugins>
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -170,62 +201,42 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.0.0</version>
-                <configuration>
-                    <mainClass>fr.insee.sugoi.app.SugoiTestService</mainClass>
-                    <classpathScope>compile</classpathScope>
-                    <arguments></arguments>
-                    <asyncDestroyOnShutdown>true</asyncDestroyOnShutdown>
-
-                </configuration>
                 <executions>
                     <execution>
                         <id>start-local-server</id>
                         <phase>pre-integration-test</phase>
                         <goals>
-                            <goal>java</goal>
+                            <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <cleanupDaemonThreads>false</cleanupDaemonThreads>
-                            <systemProperties>
-                                <systemProperty>
-                                    <key>VERSION</key>
-                                    <value>${project.version}</value>
-                                </systemProperty>
-                            </systemProperties>
-                            <arguments>
-                                <argument>start</argument>
-
-                                <argument>fork</argument>
-                            </arguments>
-                            <skip>${maven.test.skip}</skip>
-
+                            <async>true</async>
+                            <classpathScope>compile</classpathScope>
+                            <longClasspath>true</longClasspath>
+                            <executable>java</executable>
+                            <addResourcesToClasspath>true</addResourcesToClasspath>
+                            <commandlineArgs>-cp %classpath fr.insee.sugoi.app.SugoiTestService start fork</commandlineArgs>
                         </configuration>
                     </execution>
                     <execution>
                         <id>stop-local-server</id>
                         <phase>post-integration-test</phase>
                         <goals>
-                            <goal>java</goal>
+                            <goal>exec</goal>
                         </goals>
                         <configuration>
+                            <classpathScope>compile</classpathScope>
+                            <executable>java</executable>
                             <arguments>
+                                <argument>-classpath</argument>
+                                <!-- automatically creates the classpath using all project dependencies,
+                                   also adding the project build directory -->
+                                <classpath />
+                                <argument>fr.insee.sugoi.app.SugoiTestService</argument>
                                 <argument>stop</argument>
                             </arguments>
-                            <skip>${maven.test.skip}</skip>
-
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <nonFilteredFileExtensions>
-                        <nonFilteredFileExtension>p12</nonFilteredFileExtension>
-                    </nonFilteredFileExtensions>
-                </configuration>
             </plugin>
 
         </plugins>

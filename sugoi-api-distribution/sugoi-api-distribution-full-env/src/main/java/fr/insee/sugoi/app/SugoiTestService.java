@@ -145,6 +145,10 @@ public class SugoiTestService {
 
     if (!fork) {
       execs.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+    } else {
+      System.out.println("sleeping ...");
+      Thread.sleep(60000);
+      System.out.println("continue");
     }
   }
 

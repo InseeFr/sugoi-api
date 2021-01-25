@@ -25,8 +25,7 @@ public class PageResult<T> {
   private int pageSize = TAILLE_RECHERCHE_DEFAUT;
   private byte[] searchCookie;
 
-  public PageResult() {
-  }
+  public PageResult() {}
 
   public List<T> getResults() {
     return this.results;
