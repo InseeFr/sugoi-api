@@ -78,6 +78,13 @@ objectclass: top
 objectclass: groupOfUniqueNames
 uniquemember: uid=appli_webservicesldap,ou=Webservicesldap,ou=Applications,o=insee,c=fr
 
+dn: cn=SUGOI_ADMIN,ou=WebServicesLdap_Objets,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
+description: Administrateurs généraux de sugoi
+cn: SUGOI_ADMIN
+objectclass: top
+objectclass: groupOfUniqueNames
+uniquemember: uid=appli_sugoi,ou=Applitest,ou=Applications,o=insee,c=fr
+
 dn: cn=Utilisateurs_contacts_domaine2_WebServicesLdap,ou=WebServicesLdap_Obje
  ts,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
 description: Utilisateur du webservices contact(champ de gestion SERV2010)
@@ -316,3 +323,15 @@ sn: gestionnaire_domaine_2
 givenname: gestionnaire_domaine_2
 uid: gestionnaire_domaine_2
 userpassword: gestionnaire
+
+dn: uid=appli_sugoi,ou=Applitest,ou=Applications,o=insee,c=fr
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: inseeApplication
+cn: appli_sugoi
+sn: appli_sugoi
+givenname: appli_sugoi
+uid: appli_sugoi
+userpassword: sugoi
