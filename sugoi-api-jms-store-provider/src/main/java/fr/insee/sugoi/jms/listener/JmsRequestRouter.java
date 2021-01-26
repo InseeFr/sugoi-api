@@ -105,11 +105,12 @@ public class JmsRequestRouter {
         break;
       case Method.REINIT_PASSWORD:
         user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
-        storeProvider.getWriterStore(realm, userStorage).reinitPassword(user);
+        String password = (String) request.getmethodParams().get(JmsAtttributes.PASSWORD);
+        storeProvider.getWriterStore(realm, userStorage).reinitPassword(user, password);
         break;
       case Method.INIT_PASSWORD:
         user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
-        String password = (String) request.getmethodParams().get(JmsAtttributes.PASSWORD);
+        password = (String) request.getmethodParams().get(JmsAtttributes.PASSWORD);
         storeProvider.getWriterStore(realm, userStorage).initPassword(user, password);
         break;
       case Method.CHANGE_PASSWORD_RESET_STATUS:
@@ -131,6 +132,13 @@ public class JmsRequestRouter {
         String applicationName = (String) request.getmethodParams().get(JmsAtttributes.APP_NAME);
         storeProvider.getWriterStore(realm, userStorage).deleteApplication(applicationName);
         break;
+      case Method.CHANGE_PASSWORD:
+        String oldPassword = (String) request.getmethodParams().get(JmsAtttributes.OLD_PASSWORD);
+        String newPassword = (String) request.getmethodParams().get(JmsAtttributes.NEW_PASSWORD);
+        user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
+        storeProvider
+            .getWriterStore(realm, userStorage)
+            .changePassword(user, oldPassword, newPassword);
       default:
         throw new Exception("Invalid Operation");
     }

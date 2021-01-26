@@ -13,11 +13,13 @@
 */
 package fr.insee.sugoi.core.service;
 
-public interface PasswordService {
+import fr.insee.sugoi.core.model.PasswordChangeRequest;
 
-  String generatePassword();
+public interface CredentialsService {
 
-  String generatePassword(int length);
+  void reinitPassword(String realm, String userStorage, String userId, PasswordChangeRequest pcr);
 
-  boolean validatePassword(String password);
+  void changePassword(String realm, String userStorage, String userId, PasswordChangeRequest pcr);
+
+  void initPassword(String realm, String userStorage, String userId, PasswordChangeRequest pcr);
 }

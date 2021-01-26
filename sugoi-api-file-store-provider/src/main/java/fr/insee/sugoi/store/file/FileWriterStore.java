@@ -90,7 +90,7 @@ public class FileWriterStore implements WriterStore {
   }
 
   @Override
-  public void reinitPassword(User user) {
+  public void reinitPassword(User user, String generatedPassword) {
     // TODO Auto-generated method stub
 
   }
@@ -121,6 +121,12 @@ public class FileWriterStore implements WriterStore {
 
   @Override
   public void deleteApplication(String applicationName) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void changePassword(User user, String oldPassword, String newPassword) {
     // TODO Auto-generated method stub
 
   }

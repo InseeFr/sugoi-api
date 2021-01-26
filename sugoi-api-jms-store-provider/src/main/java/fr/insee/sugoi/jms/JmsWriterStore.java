@@ -172,11 +172,12 @@ public class JmsWriterStore implements WriterStore {
   }
 
   @Override
-  public void reinitPassword(User user) {
+  public void reinitPassword(User user, String password) {
     Map<String, Object> params = new HashMap<>();
     params.put(JmsAtttributes.USER, user);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    params.put(JmsAtttributes.PASSWORD, password);
     jmsWriter.writeRequestInQueue(queueRequestName, Method.REINIT_PASSWORD, params);
   }
 
@@ -227,5 +228,16 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
     jmsWriter.writeRequestInQueue(queueRequestName, Method.DELETE_APPLICATION, params);
+  }
+
+  @Override
+  public void changePassword(User user, String oldPassword, String newPassword) {
+    Map<String, Object> params = new HashMap<>();
+    params.put(JmsAtttributes.USER, user);
+    params.put(JmsAtttributes.NEW_PASSWORD, newPassword);
+    params.put(JmsAtttributes.OLD_PASSWORD, oldPassword);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.CHANGE_PASSWORD, params);
   }
 }

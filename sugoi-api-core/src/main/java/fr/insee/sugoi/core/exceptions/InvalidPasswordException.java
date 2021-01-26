@@ -11,13 +11,24 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.core.service;
+package fr.insee.sugoi.core.exceptions;
 
-public interface PasswordService {
+public class InvalidPasswordException extends RuntimeException {
 
-  String generatePassword();
+  /** */
+  private static final long serialVersionUID = 1L;
 
-  String generatePassword(int length);
+  private String message;
 
-  boolean validatePassword(String password);
+  public InvalidPasswordException(String message) {
+    this.message = message;
+  }
+
+  public String getMessage() {
+    return this.message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
+  }
 }

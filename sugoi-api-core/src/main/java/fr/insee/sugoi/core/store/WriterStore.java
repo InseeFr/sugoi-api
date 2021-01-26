@@ -48,9 +48,11 @@ public interface WriterStore {
 
   void addUserToGroup(String appName, String groupName, String userId);
 
-  void reinitPassword(User user);
+  void reinitPassword(User user, String generatedPassword);
 
-  void initPassword(User user, String password);
+  void initPassword(User user, String initPassword);
+
+  void changePassword(User user, String oldPassword, String newPassword);
 
   void changePasswordResetStatus(User user, boolean isReset);
 }
