@@ -37,4 +37,8 @@ public class JmsAtttributes {
   public static final String IS_RESET = "isReset";
 
   public static final String APPLICATION = "application";
+
+  public static final String OLD_PASSWORD = "oldPassword";
+
+  public static final String NEW_PASSWORD = "newPassword";
 }

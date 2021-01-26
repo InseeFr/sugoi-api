@@ -46,4 +46,6 @@ public class Method {
   public static final String UPDATE_APPLICATION = "updateApplication";
 
   public static final String DELETE_APPLICATION = "deleteApplication";
+
+  public static final String CHANGE_PASSWORD = "changePassword";
 }

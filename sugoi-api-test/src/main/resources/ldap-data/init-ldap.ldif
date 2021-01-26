@@ -84,6 +84,8 @@ cn: SUGOI_ADMIN
 objectclass: top
 objectclass: groupOfUniqueNames
 uniquemember: uid=appli_sugoi,ou=Applitest,ou=Applications,o=insee,c=fr
+uniqueMember: uid=test_password,ou=Applitest,ou=Applications,o=insee,c=fr
+
 
 dn: cn=Utilisateurs_contacts_domaine2_WebServicesLdap,ou=WebServicesLdap_Obje
  ts,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
@@ -335,3 +337,14 @@ sn: appli_sugoi
 givenname: appli_sugoi
 uid: appli_sugoi
 userpassword: sugoi
+
+dn: uid=test_password,ou=Applitest,ou=Applications,o=insee,c=fr
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: inseeApplication
+cn: test_password
+sn: test_password
+givenname: test_password
+uid: test_password
