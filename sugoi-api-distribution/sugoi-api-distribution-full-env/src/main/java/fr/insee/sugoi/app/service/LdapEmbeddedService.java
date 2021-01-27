@@ -20,10 +20,10 @@ import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldap.sdk.schema.Schema;
 import com.unboundid.ldif.LDIFException;
 import fr.insee.sugoi.app.service.utils.PropertiesLoaderService;
+import fr.insee.sugoi.app.service.utils.UserDirService;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.URLDecoder;
 import java.util.logging.ConsoleHandler;
 
 public class LdapEmbeddedService {
@@ -53,15 +53,13 @@ public class LdapEmbeddedService {
     System.out.println("BaseDn used " + baseDn);
     System.out.println("Ldap username: " + username);
     System.out.println("Ldap password: " + password);
-    System.out.println("Schema used: " + schemaPath);
-    System.out.println("Ldif used: " + ldifPath);
+    System.out.println("Schema used: " + UserDirService.getUserDir() + schemaPath);
+    System.out.println("Ldif used: " + UserDirService.getUserDir() + ldifPath);
 
     InMemoryDirectoryServerConfig config = new InMemoryDirectoryServerConfig(baseDn);
     config.setAccessLogHandler(new ConsoleHandler());
     config.addAdditionalBindCredentials(username, password);
-    File file =
-        new File(
-            URLDecoder.decode(LdapEmbeddedService.class.getResource(schemaPath).getFile(), "UTF8"));
+    File file = new File(UserDirService.getUserDir() + schemaPath);
     config.setSchema(Schema.getSchema(file));
     config.setEnforceSingleStructuralObjectClass(false);
     config.setEnforceAttributeSyntaxCompliance(false);
@@ -73,8 +71,7 @@ public class LdapEmbeddedService {
     config.setListenerConfigs(listenerConfig);
 
     ds = new InMemoryDirectoryServer(config);
-    ds.importFromLDIF(
-        true, URLDecoder.decode(LdapEmbeddedService.class.getResource(ldifPath).getFile(), "UTF8"));
+    ds.importFromLDIF(true, UserDirService.getUserDir() + ldifPath);
 
     System.out.println("Started Ldap Server (localhost:" + port + ")");
     ds.startListening();
