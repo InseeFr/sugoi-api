@@ -18,6 +18,7 @@ import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.GroupLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
+import fr.insee.sugoi.ldap.utils.mapper.properties.AddressLdap;
 import fr.insee.sugoi.ldap.utils.mapper.properties.ApplicationLdap;
 import fr.insee.sugoi.ldap.utils.mapper.properties.GroupLdap;
 import fr.insee.sugoi.ldap.utils.mapper.properties.LdapObjectClass;
@@ -81,5 +82,13 @@ public class LdapStore {
         UserLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
         username,
         config.get("user_source"));
+  }
+
+  protected String getAddressDN(String addressId) {
+    return String.format(
+        "%s=%s,%s",
+        AddressLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
+        addressId,
+        config.get("address_source"));
   }
 }

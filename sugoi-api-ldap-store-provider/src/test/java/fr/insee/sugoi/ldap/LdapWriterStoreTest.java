@@ -28,7 +28,10 @@ import fr.insee.sugoi.store.ldap.LdapReaderStore;
 import fr.insee.sugoi.store.ldap.LdapStoreBeans;
 import fr.insee.sugoi.store.ldap.LdapWriterStore;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,11 +60,15 @@ public class LdapWriterStoreTest {
   @Value("${fr.insee.sugoi.ldap.default.groupfilterpattern:}")
   private String groupFilterPattern;
 
+  @Value("${fr.insee.sugoi.ldap.default.addresssource:}")
+  private String addressSource;
+
   @Bean
   public UserStorage userStorage() {
     UserStorage us = new UserStorage();
     us.setOrganizationSource(organizationSource);
     us.setUserSource(userSource);
+    us.setAddressSource(addressSource);
     us.setName("default");
     us.addProperty("group_filter_pattern", groupFilterPattern);
     us.addProperty("group_source_pattern", groupSourcePattern);
@@ -79,41 +86,51 @@ public class LdapWriterStoreTest {
 
   @Autowired ApplicationContext context;
 
-  @Test
-  public void testCreateOrganization() {
-    LdapWriterStore ldapWriterStore =
-        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
-    Organization organization = new Organization();
-    organization.setIdentifiant("Titi");
-    organization.addAttributes("description", "titi le test");
-    ldapWriterStore.createOrganization(organization);
-    assertThat(
-        "Titi should have been added", ldapReaderStore.getOrganization("Titi"), not(nullValue()));
+  LdapReaderStore ldapReaderStore;
+  LdapWriterStore ldapWriterStore;
+
+  @BeforeEach
+  public void setup() {
+    ldapWriterStore = (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
+    ldapReaderStore = (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
   }
 
   @Test
-  public void testUpdateOrganizationDescription() {
-    LdapWriterStore ldapWriterStore =
-        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+  public void testCreateOrganization() {
+    Organization organization = new Organization();
+    organization.setIdentifiant("Titi");
+    organization.addAttributes("description", "titi le test");
+    Map<String, String> address = new HashMap<>();
+    address.put("Ligne1", "Orga");
+    address.put("Ligne2", "Chez orga");
+    organization.setAddress(address);
+    ldapWriterStore.createOrganization(organization);
+    Organization retrievedOrga = ldapReaderStore.getOrganization("Titi");
+
+    assertThat("Titi should have been added", retrievedOrga, not(nullValue()));
+    assertThat("Titi should have an address", retrievedOrga.getAddress().get("Ligne1"), is("Orga"));
+  }
+
+  @Test
+  public void testUpdateOrganization() {
     Organization organization = ldapReaderStore.getOrganization("amodifier");
     organization.addAttributes("description", "nouvelle description");
+    Map<String, String> address = new HashMap<>();
+    address.put("Ligne1", "Orga");
+    address.put("Ligne2", "Chez orga");
+    organization.setAddress(address);
     ldapWriterStore.updateOrganization(organization);
+    Organization retrievedOrga = ldapReaderStore.getOrganization("amodifier");
     assertThat(
         "amodifier should have a new description",
-        ldapReaderStore.getOrganization("amodifier").getAttributes().get("description"),
+        retrievedOrga.getAttributes().get("description"),
         is("nouvelle description"));
+    assertThat(
+        "amodifier should have an address", retrievedOrga.getAddress().get("Ligne1"), is("Orga"));
   }
 
   @Test
   public void testDeleteOrganization() {
-    LdapWriterStore ldapWriterStore =
-        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     ldapWriterStore.deleteOrganization("asupprimer");
     assertThat(
         "asupprimer should have been deleted",
@@ -123,40 +140,37 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testCreateUser() {
-    LdapWriterStore ldapWriterStore =
-        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     User user = new User();
     user.setUsername("Titi");
     user.setLastName("Test");
     user.setFirstName("Petit");
     user.setMail("petittest@titi.fr");
+    Map<String, String> address = new HashMap<>();
+    address.put("Ligne1", "Toto");
+    address.put("Ligne2", "Chez Toto");
+    user.setAddress(address);
     ldapWriterStore.createUser(user);
-    assertThat("Titi should have been added", ldapReaderStore.getUser("Titi"), not(nullValue()));
+    User retrievedUser = ldapReaderStore.getUser("Titi");
+    assertThat("Titi should have been added", retrievedUser, not(nullValue()));
+    assertThat("Titi should have an address", retrievedUser.getAddress().get("Ligne1"), is("Toto"));
   }
 
   @Test
-  public void testUpdateUserMail() {
-    LdapWriterStore ldapWriterStore =
-        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+  public void testUpdateUser() {
     User user = ldapReaderStore.getUser("testo");
     user.setMail("nvtest@insee.fr");
+    Map<String, String> address = new HashMap<>();
+    address.put("Ligne1", "Toto");
+    address.put("Ligne2", "Chez Toto");
+    user.setAddress(address);
     ldapWriterStore.updateUser(user);
-    assertThat(
-        "testc should have a new mail",
-        ldapReaderStore.getUser("testo").getMail(),
-        is("nvtest@insee.fr"));
+    User modifiedUser = ldapReaderStore.getUser("testo");
+    assertThat("testo should have a new mail", modifiedUser.getMail(), is("nvtest@insee.fr"));
+    assertThat("testo should have an address", modifiedUser.getAddress().get("Ligne1"), is("Toto"));
   }
 
   @Test
   public void testDeleteUser() {
-    LdapWriterStore ldapWriterStore =
-        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     ldapWriterStore.deleteUser("byebye");
     assertThat(
         "testc should have been deleted", ldapReaderStore.getUser("byebye"), is(nullValue()));
@@ -164,58 +178,67 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testCreateApplication() {
-    LdapWriterStore ldapWriterStore =
-        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     Application application = new Application();
     application.setName("MyApplication");
     application.setOwner("Mine");
+    List<Group> groups = new ArrayList<>();
+    Group group1 = new Group();
+    group1.setName("Group1_MyApplication");
+    Group group2 = new Group();
+    group2.setName("Group2_MyApplication");
+    groups.add(group1);
+    groups.add(group2);
+    application.setGroups(groups);
     ldapWriterStore.createApplication(application);
+    Application retrievedApp = ldapReaderStore.getApplication("MyApplication");
+    assertThat("MyApplication should have been added", retrievedApp, not(nullValue()));
     assertThat(
-        "MyApplication should have been added",
-        ldapReaderStore.getApplication("MyApplication"),
-        not(nullValue()));
+        "My application should have groups",
+        retrievedApp.getGroups().get(0).getName(),
+        is("Group1_MyApplication"));
   }
 
   @Test
-  public void testUpdateApplicationOwner() {
-    LdapWriterStore ldapWriterStore =
-        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+  public void testUpdateApplication() {
     Application application = ldapReaderStore.getApplication("Applitest");
     application.setOwner("Mine");
+    List<Group> groups = new ArrayList<>();
+    Group group1 = new Group();
+    group1.setName("Group1_Applitest");
+    groups.add(group1);
+    application.setGroups(groups);
     ldapWriterStore.updateApplication(application);
+    Application retrievedApplication = ldapReaderStore.getApplication("Applitest");
+    assertThat("Applitest should have a new owner", retrievedApplication.getOwner(), is("Mine"));
     assertThat(
-        "Applitest should have a new owner",
-        ldapReaderStore.getApplication("Applitest").getOwner(),
-        is("Mine"));
+        "Applitest should have group1",
+        retrievedApplication.getGroups().stream()
+            .anyMatch(group -> group.getName().equals("Group1_Applitest")));
   }
 
   @Test
   public void testDeleteApplication() {
-    LdapWriterStore ldapWriterStore =
-        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     Application application = new Application();
-    application.setName("EmptyApplication");
+    application.setName("NotEmptyApplication");
     application.setOwner("Mine");
+    List<Group> groups = new ArrayList<>();
+    Group group1 = new Group();
+    group1.setName("Group1_NotEmptyApplication");
+    application.setGroups(groups);
     ldapWriterStore.createApplication(application);
-    ldapWriterStore.deleteApplication("EmptyApplication");
+    ldapWriterStore.deleteApplication("NotEmptyApplication");
     assertThat(
-        "EmptyApplication should have been deleted",
-        ldapReaderStore.getApplication("EmptyApplication"),
+        "NotEmptyApplication should have been deleted",
+        ldapReaderStore.getApplication("NotEmptyApplication"),
+        is(nullValue()));
+    assertThat(
+        "Group1 should not exist in NotEmptyApplication",
+        ldapReaderStore.getGroup("NotEmptyApplication", "Group1_NotEmptyApplication"),
         is(nullValue()));
   }
 
   @Test
   public void testCreateGroup() {
-    LdapWriterStore ldapWriterStore =
-        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     Group group = new Group();
     group.setName("Groupy_Applitest");
     group.setDescription("Super groupy de test");
@@ -233,10 +256,6 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testDeleteGroup() {
-    LdapWriterStore ldapWriterStore =
-        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     Group group = new Group();
     group.setName("Asupprimer_WebServicesLdap");
     group.setDescription("supprime ce groupe");
@@ -250,10 +269,6 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testAddUserInGroup() {
-    LdapWriterStore ldapWriterStore =
-        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     ldapWriterStore.addUserToGroup("Applitest", "Administrateurs_Applitest", "testc");
     assertThat(
         "Group should contain testc",
@@ -266,10 +281,6 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testDeleteUserInGroup() {
-    LdapWriterStore ldapWriterStore =
-        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     assertThat(
         "Group should be empty",
         ldapReaderStore
@@ -306,16 +317,12 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testUpdateGroup() {
-    LdapWriterStore ldapWriterStore =
-        (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
-    Group group = ldapReaderStore.getGroup("Applitest", "Administrateurs_Applitest");
+    Group group = ldapReaderStore.getGroup("Applitest", "Amodifier_Applitest");
     group.setDescription("new description");
     ldapWriterStore.updateGroup("Applitest", group);
     assertThat(
         "SuperGroup description should be new description",
-        ldapReaderStore.getGroup("Applitest", "Administrateurs_Applitest").getDescription(),
+        ldapReaderStore.getGroup("Applitest", "Amodifier_Applitest").getDescription(),
         is("new description"));
   }
 }

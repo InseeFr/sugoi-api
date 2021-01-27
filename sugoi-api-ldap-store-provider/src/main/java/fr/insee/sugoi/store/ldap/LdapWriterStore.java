@@ -14,14 +14,17 @@
 package fr.insee.sugoi.store.ldap;
 
 import com.unboundid.ldap.sdk.AddRequest;
+import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.DeleteRequest;
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
 import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldap.sdk.Modification;
 import com.unboundid.ldap.sdk.ModificationType;
 import com.unboundid.ldap.sdk.ModifyRequest;
+import com.unboundid.util.SubtreeDeleter;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
+import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.GroupLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
@@ -30,7 +33,9 @@ import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class LdapWriterStore extends LdapStore implements WriterStore {
 
@@ -57,9 +62,14 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     }
   }
 
+  /** Delete a user and its address */
   @Override
   public void deleteUser(String id) {
     try {
+      User currentUser = ldapReaderStore.getUser(id);
+      if (currentUser.getAddress().get("id") != null) {
+        deleteAddress(currentUser.getAddress().get("id"));
+      }
       DeleteRequest dr = new DeleteRequest(getUserDN(id));
       ldapPoolConnection.delete(dr);
     } catch (LDAPException e) {
@@ -67,21 +77,41 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     }
   }
 
+  /**
+   * Create a user in ldap. If the user has an address, a ldap resource address is generated with a
+   * random value as id An organization link can be created but may not exist
+   */
   @Override
   public User createUser(User user) {
     try {
-      AddRequest ar =
+      if (user.getAddress() != null) {
+        UUID addressUuid = createAddress(user.getAddress());
+        user.addAddress("id", addressUuid.toString());
+      }
+      AddRequest userAddRequest =
           new AddRequest(getUserDN(user.getUsername()), userLdapMapper.mapToAttributes(user));
-      ldapPoolConnection.add(ar);
+      ldapPoolConnection.add(userAddRequest);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to create user", e);
     }
     return user;
   }
 
+  /** Update the ldap properties of a user. Current user is read to retrieve user address link */
   @Override
   public User updateUser(User updatedUser) {
     try {
+      User currentUser = ldapReaderStore.getUser(updatedUser.getUsername());
+      if (updatedUser.getAddress() != null) {
+        if (currentUser.getAddress().containsKey("id")) {
+          updateAddress(currentUser.getAddress().get("id"), updatedUser.getAddress());
+        } else {
+          Map<String, String> newAddress = new HashMap<>();
+          newAddress.put("id", createAddress(updatedUser.getAddress()).toString());
+          updatedUser.setAddress(newAddress);
+          createAddress(updatedUser.getAddress());
+        }
+      }
       ModifyRequest mr =
           new ModifyRequest(
               getUserDN(updatedUser.getUsername()), userLdapMapper.createMods(updatedUser));
@@ -138,9 +168,14 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     return updatedGroup;
   }
 
+  /** Delete an organization and its address */
   @Override
   public void deleteOrganization(String name) {
     try {
+      Organization currentOrganization = ldapReaderStore.getOrganization(name);
+      if (currentOrganization.getAddress().get("id") != null) {
+        deleteAddress(currentOrganization.getAddress().get("id"));
+      }
       DeleteRequest dr = new DeleteRequest(getOrganizationDN(name));
       ldapPoolConnection.delete(dr);
     } catch (LDAPException e) {
@@ -148,9 +183,17 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     }
   }
 
+  /**
+   * Create an organization in ldap. If the organization has an address, a ldap resource address is
+   * generated with a random value as id An organization link can be created but may not exist
+   */
   @Override
   public Organization createOrganization(Organization organization) {
     try {
+      if (organization.getAddress() != null) {
+        UUID addressUuid = createAddress(organization.getAddress());
+        organization.addAddress("id", addressUuid.toString());
+      }
       AddRequest ar =
           new AddRequest(
               getOrganizationDN(organization.getIdentifiant()),
@@ -163,9 +206,25 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     return organization;
   }
 
+  /**
+   * Update the ldap properties of a organization. Current organization is read to retrieve address
+   * link
+   */
   @Override
   public Organization updateOrganization(Organization updatedOrganization) {
     try {
+      Organization currentOrganization =
+          ldapReaderStore.getOrganization(updatedOrganization.getIdentifiant());
+      if (updatedOrganization.getAddress() != null) {
+        if (currentOrganization.getAddress().containsKey("id")) {
+          updateAddress(
+              currentOrganization.getAddress().get("id"), updatedOrganization.getAddress());
+        } else {
+          Map<String, String> newAddress = new HashMap<>();
+          newAddress.put("id", createAddress(updatedOrganization.getAddress()).toString());
+          updatedOrganization.setAddress(newAddress);
+        }
+      }
       ModifyRequest mr =
           new ModifyRequest(
               getOrganizationDN(updatedOrganization.getIdentifiant()),
@@ -225,6 +284,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
 
   }
 
+  /** Create a ldap ressource application and all the depending groups */
   @Override
   public Application createApplication(Application application) {
     try {
@@ -233,6 +293,13 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
               getApplicationDN(application.getName()),
               applicationLdapMapper.mapToAttributes(application));
       ldapPoolConnection.add(ar);
+      AddRequest groupsAR =
+          new AddRequest(
+              getGroupSource(application.getName()),
+              new Attribute("objectClass", "top"),
+              new Attribute("objectClass", "organizationalUnit"));
+      ldapPoolConnection.add(groupsAR);
+      application.getGroups().stream().forEach(group -> createGroup(application.getName(), group));
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to create application" + application.getName(), e);
     }
@@ -247,6 +314,8 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
               getApplicationDN(updatedApplication.getName()),
               applicationLdapMapper.createMods(updatedApplication));
       ldapPoolConnection.modify(mr);
+      updatedApplication.getGroups().stream()
+          .forEach(group -> createGroup(updatedApplication.getName(), group));
     } catch (LDAPException e) {
       throw new RuntimeException(
           "Failed to update application " + updatedApplication.getName() + "while writing to LDAP",
@@ -255,14 +324,42 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     return updatedApplication;
   }
 
+  /** Delete application branch */
   @Override
   public void deleteApplication(String applicationName) {
     try {
-      // the application must be empty to be deleted
-      DeleteRequest dr = new DeleteRequest(getApplicationDN(applicationName));
-      ldapPoolConnection.delete(dr);
+      // DeleteRequest dr = new DeleteRequest(getApplicationDN(applicationName));
+      // ldapPoolConnection.delete(dr);
+      (new SubtreeDeleter()).delete(ldapPoolConnection, getApplicationDN(applicationName));
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to delete application " + applicationName, e);
     }
+  }
+
+  /**
+   * create an ldap object address with a random id
+   *
+   * @param address
+   * @return chosen id
+   * @throws LDAPException
+   */
+  private UUID createAddress(Map<String, String> address) throws LDAPException {
+    UUID addressUUID = UUID.randomUUID();
+    AddRequest addressAddRequest =
+        new AddRequest(
+            getAddressDN(addressUUID.toString()), AddressLdapMapper.mapToAttributes(address));
+    ldapPoolConnection.add(addressAddRequest);
+    return addressUUID;
+  }
+
+  private void updateAddress(String id, Map<String, String> newAddress) throws LDAPException {
+    ModifyRequest modifyRequest =
+        new ModifyRequest(getAddressDN(id), AddressLdapMapper.createMods(newAddress));
+    ldapPoolConnection.modify(modifyRequest);
+  }
+
+  private void deleteAddress(String id) throws LDAPException {
+    DeleteRequest deleteRequest = new DeleteRequest(getAddressDN(id));
+    ldapPoolConnection.delete(deleteRequest);
   }
 }

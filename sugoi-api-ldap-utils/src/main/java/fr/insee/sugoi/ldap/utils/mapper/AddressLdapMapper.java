@@ -13,9 +13,18 @@
 */
 package fr.insee.sugoi.ldap.utils.mapper;
 
+import com.unboundid.ldap.sdk.Attribute;
+import com.unboundid.ldap.sdk.Modification;
+import com.unboundid.ldap.sdk.ModificationType;
 import com.unboundid.ldap.sdk.SearchResultEntry;
+import fr.insee.sugoi.ldap.utils.mapper.properties.AddressLdap;
+import fr.insee.sugoi.ldap.utils.mapper.properties.LdapObjectClass;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class AddressLdapMapper {
 
@@ -36,5 +45,49 @@ public class AddressLdapMapper {
     address.put(
         "Ligne7", searchResultEntry.getAttributeValue("inseeAdressePostaleCorrespondantLigne7"));
     return address;
+  }
+
+  public static List<Attribute> mapToAttributes(Map<String, String> address) {
+    List<Attribute> attributes = new ArrayList<>();
+    if (address.containsKey("Ligne1")) {
+      attributes.add(
+          new Attribute("inseeAdressePostaleCorrespondantLigne1", address.get("Ligne1")));
+    }
+    if (address.containsKey("Ligne2")) {
+      attributes.add(
+          new Attribute("inseeAdressePostaleCorrespondantLigne2", address.get("Ligne2")));
+    }
+    if (address.containsKey("Ligne3")) {
+      attributes.add(
+          new Attribute("inseeAdressePostaleCorrespondantLigne3", address.get("Ligne3")));
+    }
+    if (address.containsKey("Ligne4")) {
+      attributes.add(
+          new Attribute("inseeAdressePostaleCorrespondantLigne4", address.get("Ligne4")));
+    }
+    if (address.containsKey("Ligne5")) {
+      attributes.add(
+          new Attribute("inseeAdressePostaleCorrespondantLigne5", address.get("Ligne5")));
+    }
+    if (address.containsKey("Ligne6")) {
+      attributes.add(
+          new Attribute("inseeAdressePostaleCorrespondantLigne6", address.get("Ligne6")));
+    }
+    if (address.containsKey("Ligne7")) {
+      attributes.add(
+          new Attribute("inseeAdressePostaleCorrespondantLigne7", address.get("Ligne7")));
+    }
+    Arrays.stream(AddressLdap.class.getAnnotation(LdapObjectClass.class).values())
+        .forEach(objectClass -> attributes.add(new Attribute("objectClass", objectClass)));
+    return attributes;
+  }
+
+  public static List<Modification> createMods(Map<String, String> address) {
+    return mapToAttributes(address).stream()
+        .map(
+            attribute ->
+                new Modification(
+                    ModificationType.REPLACE, attribute.getName(), attribute.getValues()))
+        .collect(Collectors.toList());
   }
 }
