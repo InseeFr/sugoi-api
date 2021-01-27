@@ -29,6 +29,7 @@ import fr.insee.sugoi.store.ldap.LdapStoreBeans;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -83,25 +84,39 @@ public class LdapReaderStoreTest {
 
   @Autowired ApplicationContext context;
 
+  LdapReaderStore ldapReaderStore;
+
+  @BeforeEach
+  public void setup() {
+    ldapReaderStore = (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+  }
+
   @Test
   public void testGetOrganization() {
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    Organization organization = ldapReaderStore.getOrganization("testo");
+    assertThat("Should get testo", organization.getIdentifiant(), is("testo"));
     assertThat(
-        "Should get testo", ldapReaderStore.getOrganization("testo").getIdentifiant(), is("testo"));
+        "Should get address first line", organization.getAddress().get("Ligne1"), is("Insee"));
+    assertThat(
+        "Should get address second line",
+        organization.getAddress().get("Ligne4"),
+        is("88 AVE VERDIER"));
+    assertThat(
+        "Should have description Insee",
+        organization.getAttributes().get("description"),
+        is("Insee"));
+    Organization suborga = organization.getOrganization();
+    assertThat("Should have sub organization testi", suborga.getIdentifiant(), is("testi"));
+    assertThat("Suborga must have address", suborga.getAddress().get("Ligne1"), is("Insee"));
   }
 
   @Test
   public void testGetNonexistentOrganization() {
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     assertThat("Should get null", ldapReaderStore.getOrganization("nottesto"), is(nullValue()));
   }
 
   @Test
   public void testSearchAllOrganizations() {
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     PageableResult pageableResult = new PageableResult();
     List<Organization> organizations =
         ldapReaderStore.searchOrganizations(new Organization(), pageableResult, "").getResults();
@@ -115,8 +130,6 @@ public class LdapReaderStoreTest {
 
   @Test
   public void testSearchOrganizationsWithMatchingDescription() {
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     PageableResult pageableResult = new PageableResult();
     Map<String, String> searchProperties = new HashMap<>();
     searchProperties.put("description", "Insee");
@@ -131,22 +144,26 @@ public class LdapReaderStoreTest {
 
   @Test
   public void testGetUser() {
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
-    assertThat("Should get testc", ldapReaderStore.getUser("testc").getUsername(), is("testc"));
+    User user = ldapReaderStore.getUser("testc");
+    assertThat("Should get testc", user.getUsername(), is("testc"));
+    assertThat("Should get address first line", user.getAddress().get("Ligne1"), is("Insee"));
+    assertThat(
+        "Should get address second line", user.getAddress().get("Ligne4"), is("88 AVE VERDIER"));
+    assertThat(
+        "Should have organization testo", user.getOrganization().getIdentifiant(), is("testo"));
+    assertThat(
+        "testo should have address",
+        user.getOrganization().getAddress().get("Ligne1"),
+        is("Insee"));
   }
 
   @Test
   public void testGetNonexistentUser() {
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     assertThat("Should get null", ldapReaderStore.getUser("nottestc"), is(nullValue()));
   }
 
   @Test
   public void testSearchAllUsers() {
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     PageableResult pageableResult = new PageableResult();
     List<User> users = ldapReaderStore.searchUsers(new User(), pageableResult, "et").getResults();
     assertThat(
@@ -159,8 +176,6 @@ public class LdapReaderStoreTest {
 
   @Test
   public void testSearchUserWithMatchingMail() {
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     PageableResult pageableResult = new PageableResult();
     User testUser = new User();
     testUser.setMail("test@test.fr");
@@ -171,25 +186,32 @@ public class LdapReaderStoreTest {
 
   @Test
   public void testGetApplication() {
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
+    Application application = ldapReaderStore.getApplication("Applitest");
+    assertThat("Should get applitest", application.getName(), is("Applitest"));
+    List<Group> groups = application.getGroups();
     assertThat(
-        "Should get applitest",
-        ldapReaderStore.getApplication("Applitest").getName(),
-        is("Applitest"));
+        "Should have group named Administrateurs_Applitest with description toto",
+        groups.stream()
+            .anyMatch(
+                group ->
+                    group.getName().equals("Administrateurs_Applitest")
+                        && group.getDescription().equals("toto")));
+    assertThat(
+        "Should have group named Utilisateurs_Applitest with description tata",
+        groups.stream()
+            .anyMatch(
+                group ->
+                    group.getName().equals("Utilisateurs_Applitest")
+                        && group.getDescription().equals("tata")));
   }
 
   @Test
   public void testGetNonexistentApplication() {
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     assertThat("Should get null", ldapReaderStore.getApplication("nottestc"), is(nullValue()));
   }
 
   @Test
   public void testSearchAllApplications() {
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     PageableResult pageableResult = new PageableResult();
     List<Application> applications =
         ldapReaderStore.searchApplications(new Application(), pageableResult, "").getResults();
@@ -203,8 +225,6 @@ public class LdapReaderStoreTest {
 
   @Test
   public void testSearchApplicationWithMatchingName() {
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     PageableResult pageableResult = new PageableResult();
     Application applicationFilter = new Application();
     applicationFilter.setName("Applitest");
@@ -217,8 +237,6 @@ public class LdapReaderStoreTest {
 
   @Test
   public void testGetGroup() {
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     Group group = ldapReaderStore.getGroup("Applitest", "Utilisateurs_Applitest");
     assertThat(
         "Should be Utilisateurs_Applitest group", group.getName(), is("Utilisateurs_Applitest"));
@@ -226,8 +244,6 @@ public class LdapReaderStoreTest {
 
   @Test
   public void testSearchAllGroups() {
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     PageableResult pageableResult = new PageableResult();
     List<Group> groups =
         ldapReaderStore.searchGroups("Applitest", new Group(), pageableResult, "").getResults();
@@ -241,8 +257,6 @@ public class LdapReaderStoreTest {
 
   @Test
   public void testGetUsersInGroup() {
-    LdapReaderStore ldapReaderStore =
-        (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     List<User> users =
         ldapReaderStore.getUsersInGroup("Applitest", "Utilisateurs_Applitest").getResults();
     assertThat("Should find 2 elements", users.size(), is(2));

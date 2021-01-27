@@ -58,29 +58,47 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     }
   }
 
+  /**
+   * Retrieve the user ldap resource then complete it by retrieving the address ldap resource and
+   * the organization ldap resource
+   */
   @Override
   public User getUser(String id) {
     logger.debug("Searching user {}", id);
     SearchResultEntry entry = getEntryByDn(getUserDN(id));
     User user = (entry != null) ? userLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
+    if (user != null && user.getAddress() != null && user.getAddress().containsKey("id")) {
+      Map<String, String> address = getAddress(user.getAddress().get("id"));
+      address.put("id", user.getAddress().get("id"));
+      user.setAddress(address);
+    }
+    if (user != null && user.getOrganization() != null) {
+      user.setOrganization(getOrganization(user.getOrganization().getIdentifiant()));
+    }
     return user;
   }
 
+  /**
+   * Retrieve the organization ldap resource then complete it by retrieving the address ldap
+   * resource and the sub organization ldap resource
+   */
   @Override
   public Organization getOrganization(String id) {
     SearchResultEntry entry = getEntryByDn(getOrganizationDN(id));
     Organization org =
         (entry != null) ? organizationLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
-    if (org != null
-        && org.getAttributes().containsKey("adressDn")
-        && org.getAttributes().get("adressDn") != null) {
-      SearchResultEntry addressResult =
-          getEntryByDn(org.getAttributes().get("adressDn").toString());
-      org.setAddress(AddressLdapMapper.mapFromSearchEntry(addressResult));
+    if (org != null && org.getAddress() != null && org.getAddress().containsKey("id")) {
+      Map<String, String> address = getAddress(org.getAddress().get("id"));
+      address.put("id", org.getAddress().get("id"));
+      org.setAddress(address);
+    }
+    if (org != null && org.getOrganization() != null) {
+      org.setOrganization(getOrganization(org.getOrganization().getIdentifiant()));
     }
     return org;
   }
 
+  /** Search users matching userFilter set properties under the user_source */
   @Override
   public PageResult<User> searchUsers(
       User userFilter, PageableResult pageable, String typeRecherche) {
@@ -96,6 +114,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     }
   }
 
+  /** Retrieve all the users with their data in the specified group */
   @Override
   public PageResult<User> getUsersInGroup(String appName, String groupName) {
     PageResult<User> page = new PageResult<>();
@@ -111,6 +130,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     return page;
   }
 
+  /** Search users matching organizationFilter set properties under the organization_source */
   @Override
   public PageResult<Organization> searchOrganizations(
       Organization organizationFilter, PageableResult pageable, String searchOperator) {
@@ -126,6 +146,10 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     }
   }
 
+  /**
+   * Retrieve the specified group with the members' username. A check is made ex post to verify that
+   * the retrieve object is a group as defined in the group_filter_pattern
+   */
   @Override
   public Group getGroup(String appName, String groupName) {
     try {
@@ -139,12 +163,13 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     }
   }
 
+  /** Search groups with the group_filter under the group source */
   @Override
   public PageResult<Group> searchGroups(
       String appName, Group groupFilter, PageableResult pageable, String searchOperator) {
     try {
       return searchOnLdap(
-          getApplicationDN(appName),
+          getGroupSource(appName),
           SearchScope.SUBORDINATE_SUBTREE,
           Filter.createANDFilter(
               Filter.create(getGroupWildcardFilter(appName)),
@@ -162,14 +187,22 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     return false;
   }
 
+  /** Retrieve the specified application with all its groups */
   @Override
   public Application getApplication(String applicationName) {
     SearchResultEntry entry = getEntryByDn(getApplicationDN(applicationName));
     Application application =
         (entry != null) ? applicationLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
+    if (application != null) {
+      application.setGroups(
+          searchGroups(applicationName, new Group(), new PageableResult(), "AND").getResults());
+    }
     return application;
   }
 
+  /**
+   * Search applications matching applicationFilter set properties juste under application source
+   */
   @Override
   public PageResult<Application> searchApplications(
       Application applicationFilter, PageableResult pageable, String searchOperator) {
@@ -185,6 +218,15 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     }
   }
 
+  /**
+   * Create a filter from an object using a mapper class. Each set field of the object is
+   * transformed to a filter.
+   *
+   * @param <MapperType> the type of object we need to create a filter from
+   * @param object the object to create a filter from, only set properties are taken into account
+   * @param mapper a mapper used to transform object to filter
+   * @return a filter corresponding to the properties of object
+   */
   private <MapperType> Filter getFilterFromObject(
       MapperType object, LdapMapper<MapperType> mapper) {
     return LdapFilter.and(
@@ -204,6 +246,16 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     }
   }
 
+  /**
+   * @param <ResultType> the type of the resource searched
+   * @param baseDn DN where to make the search
+   * @param scope search scope value
+   * @param filter filter to apply on the search
+   * @param pageableResult
+   * @param mapper mapper to convert the attributes found to a ResultType
+   * @return
+   * @throws LDAPSearchException
+   */
   private <ResultType> PageResult<ResultType> searchOnLdap(
       String baseDn,
       SearchScope scope,
@@ -221,5 +273,10 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
             .collect(Collectors.toList());
     pageResult.setResults(results);
     return pageResult;
+  }
+
+  private Map<String, String> getAddress(String addressId) {
+    SearchResultEntry addressResult = getEntryByDn(getAddressDN(addressId));
+    return addressResult != null ? AddressLdapMapper.mapFromSearchEntry(addressResult) : null;
   }
 }

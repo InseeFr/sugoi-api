@@ -43,12 +43,21 @@ ou: Applitest_Objets
 dn: cn=Administrateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
 cn: Administrateurs_Applitest
 objectclass: groupOfUniqueNames
+description: toto
 
 dn: cn=Utilisateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
 cn: Utilisateurs_Applitest
 objectclass: groupOfUniqueNames
 uniquemember: uid=Testd,ou=SSM,o=insee,c=fr
 uniquemember: uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+description: tata
+
+dn: cn=Amodifier_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
+cn: Amodifier_Applitest
+objectclass: groupOfUniqueNames
+uniquemember: uid=Testd,ou=SSM,o=insee,c=fr
+uniquemember: uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+description: tata
 
 # BRANCHE APPLICATIVE WEB SERVICE
 dn: ou=WebServicesLdap,ou=Applications,o=insee,c=fr
@@ -179,7 +188,7 @@ objectClass: inseeAttributsCommunication
 inseeOrganisationDN: uid=testo,ou=organisations,ou=clients_domaine1,o=insee,c=fr
 mail: test@test.fr
 uid: testc
-inseeAdressePostaleDN: l=testa,ou=adresses,ou=clients_domaine1,o=insee,c=fr
+inseeAdressePostaleDN: l=testc,ou=adresses,ou=clients_domaine1,o=insee,c=fr
 telephoneNumber: 1209883940
 cn: Testy Test
 inseegroupedefaut: prop_role_applitest
@@ -196,6 +205,7 @@ objectClass: inseeAttributsHabilitation
 objectClass: inseeAttributsCommunication
 uid: byebye
 cn: byebye
+inseeAdressePostaleDN: l=supprime, ou=adresses,ou=clients_domaine1,o=insee,c=fr
 
 dn: uid=asupprimer,ou=contacts,ou=clients_domaine1,o=insee,c=fr
 objectClass: top
@@ -243,25 +253,28 @@ objectClass: inseeAttributsCommunication
 inseeOrganisationDN: uid=testo,ou=organisations,ou=clients_domaine1,o=insee,c=fr
 mail: testo@test.fr
 uid: testo
-inseeAdressePostaleDN: l=testa,ou=adresses,ou=clients_domaine1,o=insee,c=fr
 telephoneNumber: 1209883940
 cn: Testy Test
 inseegroupedefaut: prop_role_applitest
 inseegroupedefaut: role2_applitest
 inseegroupedefaut: prop1_TestIgnoreCase_applitest
 inseegroupedefaut: Prop2_TestIgnoreCase_applitest
+inseeAdressePostaleDN: l=testu,ou=adresses,ou=clients_domaine1,o=insee,c=fr
 
 dn: uid=testo,ou=organisations,ou=clients_domaine1,o=insee,c=fr
 objectClass: top
 objectClass: inseeOrganisation
 uid: testo
 description: Insee
+inseeOrganisationDN: uid=testi,ou=organisations,ou=clients_domaine1,o=insee,c=fr
+inseeAdressePostaleDN: l=testa,ou=adresses,ou=clients_domaine1,o=insee,c=fr
 
 dn: uid=testi,ou=organisations,ou=clients_domaine1,o=insee,c=fr
 objectClass: top
 objectClass: inseeOrganisation
 uid: testi
 description: Autre
+inseeAdressePostaleDN: l=testa,ou=adresses,ou=clients_domaine1,o=insee,c=fr
 
 dn: uid=asupprimer,ou=organisations,ou=clients_domaine1,o=insee,c=fr
 objectClass: top
@@ -274,6 +287,33 @@ objectClass: top
 objectClass: inseeOrganisation
 uid: amodifier
 description: Autre
+dn: l=nvaddresse, ou=adresses,ou=clients_domaine1,o=insee,c=fr
+
+dn: l=amodifier, ou=adresses,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: locality
+objectClass: inseeAdressePostale
+l: amodifier
+inseeAdressePostaleCorrespondantLigne4: 88 AVE VERDIER
+inseeAdressePostaleCorrespondantLigne3: _
+inseeAdressePostaleCorrespondantLigne2: _
+inseeAdressePostaleCorrespondantLigne1: Insee
+inseeAdressePostaleCorrespondantLigne7: _
+inseeAdressePostaleCorrespondantLigne6: 92120 MONTROUGE
+inseeAdressePostaleCorrespondantLigne5: _
+
+dn: l=nvaddresse, ou=adresses,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: locality
+objectClass: inseeAdressePostale
+l: nvaddresse
+inseeAdressePostaleCorrespondantLigne4: 88 AVE VERDIER
+inseeAdressePostaleCorrespondantLigne3: _
+inseeAdressePostaleCorrespondantLigne2: _
+inseeAdressePostaleCorrespondantLigne1: Insee
+inseeAdressePostaleCorrespondantLigne7: _
+inseeAdressePostaleCorrespondantLigne6: 92120 MONTROUGE
+inseeAdressePostaleCorrespondantLigne5: _
 
 dn: l=testa, ou=adresses,ou=clients_domaine1,o=insee,c=fr
 objectClass: top
@@ -288,6 +328,44 @@ inseeAdressePostaleCorrespondantLigne7: _
 inseeAdressePostaleCorrespondantLigne6: 92120 MONTROUGE
 inseeAdressePostaleCorrespondantLigne5: _
 
+dn: l=testu,ou=adresses,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: locality
+objectClass: inseeAdressePostale
+l: testa
+inseeAdressePostaleCorrespondantLigne4: 88 AVE VERDIER
+inseeAdressePostaleCorrespondantLigne3: _
+inseeAdressePostaleCorrespondantLigne2: _
+inseeAdressePostaleCorrespondantLigne1: Insee
+inseeAdressePostaleCorrespondantLigne7: _
+inseeAdressePostaleCorrespondantLigne6: 92120 MONTROUGE
+inseeAdressePostaleCorrespondantLigne5: _
+
+dn: l=supprime,ou=adresses,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: locality
+objectClass: inseeAdressePostale
+l: supprime
+inseeAdressePostaleCorrespondantLigne4: 88 AVE VERDIER
+inseeAdressePostaleCorrespondantLigne3: _
+inseeAdressePostaleCorrespondantLigne2: _
+inseeAdressePostaleCorrespondantLigne1: Insee
+inseeAdressePostaleCorrespondantLigne7: _
+inseeAdressePostaleCorrespondantLigne6: 92120 MONTROUGE
+inseeAdressePostaleCorrespondantLigne5: _
+
+dn: l=testc,ou=adresses,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: locality
+objectClass: inseeAdressePostale
+l: testc
+inseeAdressePostaleCorrespondantLigne4: 88 AVE VERDIER
+inseeAdressePostaleCorrespondantLigne3: _
+inseeAdressePostaleCorrespondantLigne2: _
+inseeAdressePostaleCorrespondantLigne1: Insee
+inseeAdressePostaleCorrespondantLigne7: _
+inseeAdressePostaleCorrespondantLigne6: 92120 MONTROUGE
+inseeAdressePostaleCorrespondantLigne5: _
 
 # DOMAINE DE GESTION 2
 dn: ou=clients_domaine2,o=insee,c=fr
@@ -379,6 +457,7 @@ objectclass: inetOrgPerson
 objectclass: inseeApplication
 cn: admin
 sn: admin
+description: toto
 givenname: admin
 uid: admin
 userpassword: admin
@@ -393,6 +472,7 @@ objectclass: inseeApplication
 cn: consultant_domaine_1
 sn: consultant_domaine_1
 givenname: consultant_domaine_1
+description: tata
 uid: consultant_domaine_1
 userpassword: consultant
 
