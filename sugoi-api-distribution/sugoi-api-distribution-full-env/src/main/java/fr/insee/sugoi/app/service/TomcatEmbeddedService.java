@@ -13,13 +13,11 @@
 */
 package fr.insee.sugoi.app.service;
 
-import fr.insee.sugoi.app.SugoiTestService;
+import fr.insee.sugoi.app.service.utils.PropertiesLoaderService;
 import fr.insee.sugoi.app.service.utils.UserDirService;
 import java.io.File;
 import java.io.IOException;
-import java.net.URLDecoder;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +29,9 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.valves.RemoteIpValve;
 import org.apache.commons.io.FileUtils;
+import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.util.net.SSLHostConfig;
+import org.apache.tomcat.util.scan.StandardJarScanFilter;
 
 public class TomcatEmbeddedService {
 
@@ -76,9 +76,7 @@ public class TomcatEmbeddedService {
     SSLHostConfig sslHostConfig = new SSLHostConfig();
     sslHostConfig.setSslProtocol("TLS");
     File keystoreFile =
-        new File(
-            URLDecoder.decode(
-                SugoiTestService.class.getResource("/ssl/server.p12").getFile(), "UTF8"));
+        new File(UserDirService.getUserDir() + "/src/main/resources/ssl/server.p12");
     sslHostConfig.setCertificateKeystoreFile(keystoreFile.getAbsolutePath());
     sslHostConfig.setCertificateKeystorePassword("changeit");
     sslHostConfig.setCertificateKeystoreType("PKCS12");
@@ -92,7 +90,39 @@ public class TomcatEmbeddedService {
 
     Context ctx = tomcat.addWebapp("/" + name, new File(warURL).getAbsolutePath());
     Context ctx2 = tomcat.addWebapp("/" + name2, new File(warURL).getAbsolutePath());
-
+    ctx.getJarScanner()
+        .setJarScanFilter(
+            new StandardJarScanFilter() {
+              @Override
+              public boolean check(JarScanType jarScanType, String jarName) {
+                /**/
+                if (jarName.contains("xalan")
+                    || jarName.contains("xml")
+                    || jarName.contains("jaxb") | jarName.contains("asm")
+                    || jarName.contains("hk2")
+                    || jarName.contains("class")) {
+                  return false;
+                }
+                return super.check(jarScanType, jarName);
+              }
+            });
+    ctx2.getJarScanner()
+        .setJarScanFilter(
+            new StandardJarScanFilter() {
+              @Override
+              public boolean check(JarScanType jarScanType, String jarName) {
+                /**/
+                if (jarName.contains("xalan")
+                    || jarName.contains("xml")
+                    || jarName.contains("jaxb")
+                    || jarName.contains("asm")
+                    || jarName.contains("hk2")
+                    || jarName.contains("class")) {
+                  return false;
+                }
+                return super.check(jarScanType, jarName);
+              }
+            });
     try {
       tomcat.start();
     } catch (LifecycleException e1) {
@@ -110,14 +140,14 @@ public class TomcatEmbeddedService {
 
     // Copy properties on tomcat and reload
     FileUtils.copyFile(
-        new File(workUri + "/../src/main/resources" + configFile),
+        new File(UserDirService.getUserDir() + configFile),
         new File(
             workUri + "/tomcatit/webapps/" + name + "/WEB-INF/classes/application.properties"));
+    ctx.reload();
     FileUtils.copyFile(
-        new File(workUri + "/../src/main/resources" + configFile2),
+        new File(UserDirService.getUserDir() + configFile2),
         new File(
             workUri + "/tomcatit/webapps/" + name2 + "/WEB-INF/classes/application.properties"));
-    ctx.reload();
     ctx2.reload();
 
     while (tomcat.getServer().getState() != LifecycleState.STARTED) {
@@ -133,21 +163,7 @@ public class TomcatEmbeddedService {
   }
 
   private static String getWorkUri() {
-    File folder =
-        new File(
-            Paths.get(System.getProperty("user.dir")).toAbsolutePath()
-                + "/sugoi-api-distribution/sugoi-api-distribution-war/target/");
-    String workUri;
-    if (folder.exists()) {
-      workUri =
-          Paths.get(System.getProperty("user.dir")).toAbsolutePath()
-              + "/sugoi-api-distribution/sugoi-api-distribution-full-env/target/";
-    } else {
-      workUri =
-          Paths.get(System.getProperty("user.dir")).toAbsolutePath()
-              + "/../../sugoi-api-distribution/sugoi-api-distribution-full-env/target/";
-    }
-    return workUri;
+    return UserDirService.getUserDir() + "/target/";
   }
 
   public static Boolean start(
@@ -176,24 +192,11 @@ public class TomcatEmbeddedService {
   }
 
   public static String getWarUri() throws Exception {
+    String warRelativePath =
+        PropertiesLoaderService.load(
+            "fr.insee.sugoi.full.env.war.relative.path",
+            "/sugoi-api-distribution/sugoi-api-distribution-war/target/");
     Path userDir = UserDirService.getUserDir();
-    String warUri;
-    File folder =
-        new File(
-            userDir.toAbsolutePath()
-                + "/sugoi-api-distribution/sugoi-api-distribution-war/target/");
-    if (folder.exists()) {
-      warUri =
-          userDir.toAbsolutePath()
-              + "/sugoi-api-distribution/sugoi-api-distribution-war/target/sugoi-api.war";
-    } else {
-      warUri =
-          userDir.toAbsolutePath()
-              + "/../../sugoi-api-distribution/sugoi-api-distribution-war/target/sugoi-api.war";
-    }
-    if (!new File(warUri).exists()) {
-      throw new Exception("War not present");
-    }
-    return warUri;
+    return userDir + warRelativePath;
   }
 }

@@ -45,6 +45,17 @@
         <scope>import</scope>
       </dependency>
 
+      <dependency>
+        <groupId>fr.insee.sugoi</groupId>
+        <artifactId>sugoi-api-distribution-full-env</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>fr.insee.sugoi</groupId>
+        <artifactId>sugoi-api-model</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>fr.insee.sugoi</groupId>
@@ -135,10 +146,67 @@
       </dependency>
 
       <dependency>
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>tomcat-util</artifactId>
+        <version>9.0.41</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.tomcat.embed</groupId>
+        <artifactId>tomcat-embed-core</artifactId>
+        <version>9.0.41</version>
+      </dependency>
+
+
+      <dependency>
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>tomcat-coyote</artifactId>
+        <version>9.0.41</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>tomcat-juli</artifactId>
+        <version>9.0.41</version>
+      </dependency>
+
+      <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.6</version>
+        <version>2.8.0</version>
       </dependency>
+
+      <dependency>
+        <groupId>io.cucumber</groupId>
+        <artifactId>cucumber-core</artifactId>
+        <version>6.9.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.cucumber</groupId>
+        <artifactId>cucumber-java</artifactId>
+        <version>6.9.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.cucumber</groupId>
+        <artifactId>cucumber-junit</artifactId>
+        <version>6.9.1</version>
+      </dependency>
+
+
+      <dependency>
+        <groupId>io.cucumber</groupId>
+        <artifactId>cucumber-picocontainer</artifactId>
+        <version>6.9.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>de.monochromata.cucumber</groupId>
+        <artifactId>reporting-plugin</artifactId>
+        <version>4.0.94</version>
+      </dependency>
+
 
     </dependencies>
   </dependencyManagement>
@@ -149,7 +217,7 @@
     <module>sugoi-api-rest-services</module>
     <module>sugoi-api-rest-old-services</module>
     <module>sugoi-api-rest-commons-services</module>
-
+    <module>sugoi-api-test</module>
     <module>sugoi-api-converter</module>
     <module>sugoi-api-distribution</module>
     <module>sugoi-api-file-config-provider</module>

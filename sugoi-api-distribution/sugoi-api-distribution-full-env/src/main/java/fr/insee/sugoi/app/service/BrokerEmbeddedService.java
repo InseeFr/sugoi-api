@@ -27,12 +27,11 @@ public class BrokerEmbeddedService {
           PropertiesLoaderService.load("fr.insee.sugoi.full.env.broker.embedded.port", "61616"));
   private static String dataBase =
       PropertiesLoaderService.load(
-          "fr.insee.sugoi.full.env.broker.embedded.database", "/broker-data");
+          "fr.insee.sugoi.full.env.broker.embedded.database", "/target/broker-data");
 
   public static void start() throws Exception {
     System.out.println("Start Broker on port " + port);
-    System.out.println(
-        "Created broker database in " + UserDirService.getUserDir() + "/target" + dataBase);
+    System.out.println("Created broker database in " + UserDirService.getUserDir() + dataBase);
     broker = new BrokerService();
     // configure the broker
     TransportConnector connector = new TransportConnector();
@@ -41,11 +40,9 @@ public class BrokerEmbeddedService {
     broker.setBrokerName("localhost");
     broker.setUseJmx(false);
     broker.setDataDirectory(UserDirService.getUserDir() + "/target" + dataBase);
-    // broker.setStartAsync(true);
     broker.setNetworkConnectorStartAsync(true);
     broker.start();
     System.out.println("Started Broker (localhost:" + port + ")");
-    // broker.setWaitForSlave(false);
     broker.toString();
   }
 
