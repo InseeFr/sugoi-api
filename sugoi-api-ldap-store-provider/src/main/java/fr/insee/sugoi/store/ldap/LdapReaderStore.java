@@ -14,7 +14,6 @@
 package fr.insee.sugoi.store.ldap;
 
 import com.unboundid.ldap.sdk.Filter;
-import com.unboundid.ldap.sdk.LDAPConnectionPool;
 import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldap.sdk.LDAPSearchException;
 import com.unboundid.ldap.sdk.SearchRequest;
@@ -33,11 +32,6 @@ import fr.insee.sugoi.ldap.utils.mapper.GroupLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.LdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
-import fr.insee.sugoi.ldap.utils.mapper.properties.ApplicationLdap;
-import fr.insee.sugoi.ldap.utils.mapper.properties.GroupLdap;
-import fr.insee.sugoi.ldap.utils.mapper.properties.LdapObjectClass;
-import fr.insee.sugoi.ldap.utils.mapper.properties.OrganizationLdap;
-import fr.insee.sugoi.ldap.utils.mapper.properties.UserLdap;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
@@ -47,21 +41,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-public class LdapReaderStore implements ReaderStore {
-
-  private LDAPConnectionPool ldapPoolConnection;
-
-  private static final Logger logger = LogManager.getLogger(LdapReaderStore.class);
-
-  private Map<String, String> config;
-
-  private UserLdapMapper userLdapMapper;
-  private OrganizationLdapMapper organizationLdapMapper;
-  private GroupLdapMapper groupLdapMapper;
-  private ApplicationLdapMapper applicationLdapMapper;
+public class LdapReaderStore extends LdapStore implements ReaderStore {
 
   public LdapReaderStore(Map<String, String> config) {
     logger.debug("Configuring LdapReaderStore with config : {}", config);
@@ -80,26 +61,14 @@ public class LdapReaderStore implements ReaderStore {
   @Override
   public User getUser(String id) {
     logger.debug("Searching user {}", id);
-    SearchResultEntry entry =
-        getEntryByDn(
-            String.format(
-                "%s=%s,%s",
-                UserLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                id,
-                config.get("user_source")));
+    SearchResultEntry entry = getEntryByDn(getUserDN(id));
     User user = (entry != null) ? userLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
     return user;
   }
 
   @Override
   public Organization getOrganization(String id) {
-    SearchResultEntry entry =
-        getEntryByDn(
-            String.format(
-                "%s=%s,%s",
-                OrganizationLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                id,
-                config.get("organization_source")));
+    SearchResultEntry entry = getEntryByDn(getOrganizationDN(id));
     Organization org =
         (entry != null) ? organizationLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
     if (org != null
@@ -110,14 +79,6 @@ public class LdapReaderStore implements ReaderStore {
       org.setAddress(AddressLdapMapper.mapFromSearchEntry(addressResult));
     }
     return org;
-  }
-
-  private <MapperType> Filter getFilterFromObject(
-      MapperType object, LdapMapper<MapperType> mapper) {
-    return LdapFilter.and(
-        mapper.mapToAttributes(object).stream()
-            .map(attribute -> LdapFilter.contains(attribute.getName(), attribute.getValue()))
-            .collect(Collectors.toList()));
   }
 
   @Override
@@ -135,27 +96,10 @@ public class LdapReaderStore implements ReaderStore {
     }
   }
 
-  public SearchResultEntry getEntryByDn(String dn) {
-    try {
-      logger.debug("Fetching {}", dn);
-      SearchResultEntry entry = ldapPoolConnection.getEntry(dn, "+", "*");
-
-      return entry;
-    } catch (LDAPException e) {
-      throw new RuntimeException("Failed to execute " + dn, e);
-    }
-  }
-
   @Override
   public PageResult<User> getUsersInGroup(String appName, String groupName) {
     PageResult<User> page = new PageResult<>();
-    SearchResultEntry entry =
-        getEntryByDn(
-            String.format(
-                "%s=%s,%s",
-                GroupLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                groupName,
-                config.get("group_source_pattern").replace("{appliname}", appName)));
+    SearchResultEntry entry = getEntryByDn(getGroupDN(appName, groupName));
     if (entry.hasAttribute("uniqueMember")) {
       page.setResults(
           Arrays.stream(entry.getAttribute("uniqueMember").getValues())
@@ -165,25 +109,6 @@ public class LdapReaderStore implements ReaderStore {
       page.setResults(new ArrayList<>());
     }
     return page;
-  }
-
-  private <ResultType> PageResult<ResultType> searchOnLdap(
-      String baseDn,
-      SearchScope scope,
-      Filter filter,
-      PageableResult pageableResult,
-      LdapMapper<ResultType> mapper)
-      throws LDAPSearchException {
-    SearchRequest searchRequest = new SearchRequest(baseDn, scope, filter, "*", "+");
-    LdapUtils.setRequestControls(searchRequest, pageableResult);
-    SearchResult searchResult = ldapPoolConnection.search(searchRequest);
-    PageResult<ResultType> pageResult = new PageResult<>();
-    List<ResultType> results =
-        searchResult.getSearchEntries().stream()
-            .map(e -> mapper.mapFromAttributes(e.getAttributes()))
-            .collect(Collectors.toList());
-    pageResult.setResults(results);
-    return pageResult;
   }
 
   @Override
@@ -204,20 +129,9 @@ public class LdapReaderStore implements ReaderStore {
   @Override
   public Group getGroup(String appName, String groupName) {
     try {
-      SearchResultEntry entry =
-          getEntryByDn(
-              String.format(
-                  "%s=%s,%s",
-                  GroupLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                  groupName,
-                  config.get("group_source_pattern").replace("{appliname}", appName)));
+      SearchResultEntry entry = getEntryByDn(getGroupDN(appName, groupName));
       return ((entry != null)
-              && (Filter.create(
-                      config
-                          .get("group_filter_pattern")
-                          .replace("{appliname}", appName)
-                          .replace("{group}", "*"))
-                  .matchesEntry(entry)))
+              && (Filter.create(getGroupWildcardFilter(appName)).matchesEntry(entry)))
           ? groupLdapMapper.mapFromAttributes(entry.getAttributes())
           : null;
     } catch (LDAPException e) {
@@ -230,18 +144,10 @@ public class LdapReaderStore implements ReaderStore {
       String appName, Group groupFilter, PageableResult pageable, String searchOperator) {
     try {
       return searchOnLdap(
-          String.format(
-              "%s=%s,%s",
-              ApplicationLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-              appName,
-              config.get("app_source")),
+          getApplicationDN(appName),
           SearchScope.SUBORDINATE_SUBTREE,
           Filter.createANDFilter(
-              Filter.create(
-                  config
-                      .get("group_filter_pattern")
-                      .replace("{appliname}", appName)
-                      .replace("{group}", "*")),
+              Filter.create(getGroupWildcardFilter(appName)),
               getFilterFromObject(groupFilter, groupLdapMapper)),
           pageable,
           groupLdapMapper);
@@ -258,13 +164,7 @@ public class LdapReaderStore implements ReaderStore {
 
   @Override
   public Application getApplication(String applicationName) {
-    SearchResultEntry entry =
-        getEntryByDn(
-            String.format(
-                "%s=%s,%s",
-                ApplicationLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                applicationName,
-                config.get("app_source")));
+    SearchResultEntry entry = getEntryByDn(getApplicationDN(applicationName));
     Application application =
         (entry != null) ? applicationLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
     return application;
@@ -283,5 +183,43 @@ public class LdapReaderStore implements ReaderStore {
     } catch (LDAPSearchException e) {
       throw new RuntimeException("Fail to search applications in ldap", e);
     }
+  }
+
+  private <MapperType> Filter getFilterFromObject(
+      MapperType object, LdapMapper<MapperType> mapper) {
+    return LdapFilter.and(
+        mapper.mapToAttributes(object).stream()
+            .map(attribute -> LdapFilter.contains(attribute.getName(), attribute.getValue()))
+            .collect(Collectors.toList()));
+  }
+
+  private SearchResultEntry getEntryByDn(String dn) {
+    try {
+      logger.debug("Fetching {}", dn);
+      SearchResultEntry entry = ldapPoolConnection.getEntry(dn, "+", "*");
+
+      return entry;
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to execute " + dn, e);
+    }
+  }
+
+  private <ResultType> PageResult<ResultType> searchOnLdap(
+      String baseDn,
+      SearchScope scope,
+      Filter filter,
+      PageableResult pageableResult,
+      LdapMapper<ResultType> mapper)
+      throws LDAPSearchException {
+    SearchRequest searchRequest = new SearchRequest(baseDn, scope, filter, "*", "+");
+    LdapUtils.setRequestControls(searchRequest, pageableResult);
+    SearchResult searchResult = ldapPoolConnection.search(searchRequest);
+    PageResult<ResultType> pageResult = new PageResult<>();
+    List<ResultType> results =
+        searchResult.getSearchEntries().stream()
+            .map(e -> mapper.mapFromAttributes(e.getAttributes()))
+            .collect(Collectors.toList());
+    pageResult.setResults(results);
+    return pageResult;
   }
 }

@@ -26,21 +26,15 @@ import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.GroupLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
-import fr.insee.sugoi.ldap.utils.mapper.properties.ApplicationLdap;
-import fr.insee.sugoi.ldap.utils.mapper.properties.GroupLdap;
-import fr.insee.sugoi.ldap.utils.mapper.properties.LdapObjectClass;
-import fr.insee.sugoi.ldap.utils.mapper.properties.OrganizationLdap;
-import fr.insee.sugoi.ldap.utils.mapper.properties.UserLdap;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import java.util.Map;
 
-public class LdapWriterStore implements WriterStore {
+public class LdapWriterStore extends LdapStore implements WriterStore {
 
   private LDAPConnectionPool ldapPoolConnection;
-  private Map<String, String> config;
 
   private UserLdapMapper userLdapMapper;
   private OrganizationLdapMapper organizationLdapMapper;
@@ -66,13 +60,7 @@ public class LdapWriterStore implements WriterStore {
   @Override
   public void deleteUser(String id) {
     try {
-      DeleteRequest dr =
-          new DeleteRequest(
-              String.format(
-                  "%s=%s,%s",
-                  UserLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                  id,
-                  config.get("user_source")));
+      DeleteRequest dr = new DeleteRequest(getUserDN(id));
       ldapPoolConnection.delete(dr);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to delete user " + id, e);
@@ -83,13 +71,7 @@ public class LdapWriterStore implements WriterStore {
   public User createUser(User user) {
     try {
       AddRequest ar =
-          new AddRequest(
-              String.format(
-                  "%s=%s,%s",
-                  UserLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                  user.getUsername(),
-                  config.get("user_source")),
-              userLdapMapper.mapToAttributes(user));
+          new AddRequest(getUserDN(user.getUsername()), userLdapMapper.mapToAttributes(user));
       ldapPoolConnection.add(ar);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to create user", e);
@@ -102,12 +84,7 @@ public class LdapWriterStore implements WriterStore {
     try {
       ModifyRequest mr =
           new ModifyRequest(
-              String.format(
-                  "%s=%s,%s",
-                  UserLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                  updatedUser.getUsername(),
-                  config.get("user_source")),
-              userLdapMapper.createMods(updatedUser));
+              getUserDN(updatedUser.getUsername()), userLdapMapper.createMods(updatedUser));
       ldapPoolConnection.modify(mr);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to update user while writing to LDAP", e);
@@ -119,13 +96,7 @@ public class LdapWriterStore implements WriterStore {
   public void deleteGroup(String appName, String groupName) {
     try {
       if (ldapReaderStore.getGroup(appName, groupName) != null) {
-        DeleteRequest dr =
-            new DeleteRequest(
-                String.format(
-                    "%s=%s,%s",
-                    GroupLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                    groupName,
-                    config.get("group_source_pattern").replace("{appliname}", appName)));
+        DeleteRequest dr = new DeleteRequest(getGroupDN(appName, groupName));
         ldapPoolConnection.delete(dr);
       } else {
         throw new RuntimeException(groupName + "is not a group");
@@ -138,15 +109,9 @@ public class LdapWriterStore implements WriterStore {
   @Override
   public Group createGroup(String appName, Group group) {
     try {
-
       AddRequest ar =
           new AddRequest(
-              String.format(
-                  "%s=%s,%s",
-                  GroupLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                  group.getName(),
-                  config.get("group_source_pattern").replace("{appliname}", appName)),
-              groupLdapMapper.mapToAttributes(group));
+              getGroupDN(appName, group.getName()), groupLdapMapper.mapToAttributes(group));
       ldapPoolConnection.add(ar);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to create group " + group.getName(), e);
@@ -160,11 +125,7 @@ public class LdapWriterStore implements WriterStore {
       if (ldapReaderStore.getGroup(appName, updatedGroup.getName()) != null) {
         ModifyRequest mr =
             new ModifyRequest(
-                String.format(
-                    "%s=%s,%s",
-                    GroupLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                    updatedGroup.getName(),
-                    config.get("group_source_pattern").replace("{appliname}", appName)),
+                getGroupDN(appName, updatedGroup.getName()),
                 groupLdapMapper.createMods(updatedGroup));
         ldapPoolConnection.modify(mr);
       } else {
@@ -180,13 +141,7 @@ public class LdapWriterStore implements WriterStore {
   @Override
   public void deleteOrganization(String name) {
     try {
-      DeleteRequest dr =
-          new DeleteRequest(
-              String.format(
-                  "%s=%s,%s",
-                  OrganizationLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                  name,
-                  config.get("organization_source")));
+      DeleteRequest dr = new DeleteRequest(getOrganizationDN(name));
       ldapPoolConnection.delete(dr);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to delete organisation " + name, e);
@@ -198,11 +153,7 @@ public class LdapWriterStore implements WriterStore {
     try {
       AddRequest ar =
           new AddRequest(
-              String.format(
-                  "%s=%s,%s",
-                  OrganizationLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                  organization.getIdentifiant(),
-                  config.get("organization_source")),
+              getOrganizationDN(organization.getIdentifiant()),
               organizationLdapMapper.mapToAttributes(organization));
       ldapPoolConnection.add(ar);
     } catch (LDAPException e) {
@@ -217,11 +168,7 @@ public class LdapWriterStore implements WriterStore {
     try {
       ModifyRequest mr =
           new ModifyRequest(
-              String.format(
-                  "%s=%s,%s",
-                  OrganizationLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                  updatedOrganization.getIdentifiant(),
-                  config.get("organization_source")),
+              getOrganizationDN(updatedOrganization.getIdentifiant()),
               organizationLdapMapper.createMods(updatedOrganization));
       ldapPoolConnection.modify(mr);
     } catch (LDAPException e) {
@@ -236,22 +183,11 @@ public class LdapWriterStore implements WriterStore {
 
   @Override
   public void deleteUserFromGroup(String appName, String groupName, String userId) {
-    ModifyRequest mr =
-        new ModifyRequest(
-            String.format(
-                "%s=%s,%s",
-                GroupLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                groupName,
-                config.get("group_source_pattern").replace("{appliname}", appName)),
-            new Modification(
-                ModificationType.DELETE,
-                "uniqueMember",
-                String.format(
-                    "%s=%s,%s",
-                    UserLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                    userId,
-                    config.get("user_source"))));
     try {
+      ModifyRequest mr =
+          new ModifyRequest(
+              getGroupDN(appName, groupName),
+              new Modification(ModificationType.DELETE, "uniqueMember", getUserDN(userId)));
       ldapPoolConnection.modify(mr);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to delete user from group " + groupName, e);
@@ -260,22 +196,11 @@ public class LdapWriterStore implements WriterStore {
 
   @Override
   public void addUserToGroup(String appName, String groupName, String userId) {
-    ModifyRequest mr =
-        new ModifyRequest(
-            String.format(
-                "%s=%s,%s",
-                GroupLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                groupName,
-                config.get("group_source_pattern").replace("{appliname}", appName)),
-            new Modification(
-                ModificationType.ADD,
-                "uniqueMember",
-                String.format(
-                    "%s=%s,%s",
-                    UserLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                    userId,
-                    config.get("user_source"))));
     try {
+      ModifyRequest mr =
+          new ModifyRequest(
+              getGroupDN(appName, groupName),
+              new Modification(ModificationType.ADD, "uniqueMember", getUserDN(userId)));
       ldapPoolConnection.modify(mr);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to add user to group " + groupName, e);
@@ -305,11 +230,7 @@ public class LdapWriterStore implements WriterStore {
     try {
       AddRequest ar =
           new AddRequest(
-              String.format(
-                  "%s=%s,%s",
-                  ApplicationLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                  application.getName(),
-                  config.get("app_source")),
+              getApplicationDN(application.getName()),
               applicationLdapMapper.mapToAttributes(application));
       ldapPoolConnection.add(ar);
     } catch (LDAPException e) {
@@ -323,11 +244,7 @@ public class LdapWriterStore implements WriterStore {
     try {
       ModifyRequest mr =
           new ModifyRequest(
-              String.format(
-                  "%s=%s,%s",
-                  ApplicationLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                  updatedApplication.getName(),
-                  config.get("app_source")),
+              getApplicationDN(updatedApplication.getName()),
               applicationLdapMapper.createMods(updatedApplication));
       ldapPoolConnection.modify(mr);
     } catch (LDAPException e) {
@@ -342,15 +259,8 @@ public class LdapWriterStore implements WriterStore {
   public void deleteApplication(String applicationName) {
     try {
       // the application must be empty to be deleted
-      DeleteRequest dr =
-          new DeleteRequest(
-              String.format(
-                  "%s=%s,%s",
-                  ApplicationLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-                  applicationName,
-                  config.get("app_source")));
+      DeleteRequest dr = new DeleteRequest(getApplicationDN(applicationName));
       ldapPoolConnection.delete(dr);
-
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to delete application " + applicationName, e);
     }
