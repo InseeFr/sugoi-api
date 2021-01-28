@@ -13,6 +13,8 @@
 */
 package fr.insee.sugoi.core.service.impl;
 
+import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
+import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.model.Realm;
@@ -26,13 +28,17 @@ public class ConfigServiceImpl implements ConfigService {
 
   @Autowired private RealmProvider realmProvider;
 
+  @Autowired private SugoiEventPublisher sugoiEventPublisher;
+
   @Override
   public Realm getRealm(String name) {
+    sugoiEventPublisher.publishCustomEvent(null, null, SugoiEventTypeEnum.FIND_REALM_BY_ID, name);
     return realmProvider.load(name);
   }
 
   @Override
   public List<Realm> getRealms() {
+    sugoiEventPublisher.publishCustomEvent(null, null, SugoiEventTypeEnum.FIND_REALMS, null);
     return realmProvider.findAll();
   }
 }

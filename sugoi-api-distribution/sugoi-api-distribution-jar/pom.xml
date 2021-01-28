@@ -98,6 +98,11 @@
 
     <dependency>
       <groupId>fr.insee.sugoi</groupId>
+      <artifactId>sugoi-api-event-listener</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>fr.insee.sugoi</groupId>
       <artifactId>sugoi-api-rest-services</artifactId>
     </dependency>
 
