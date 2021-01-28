@@ -13,6 +13,8 @@
 */
 package fr.insee.sugoi.core.service.impl;
 
+import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
+import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
 import fr.insee.sugoi.core.model.PasswordChangeRequest;
 import fr.insee.sugoi.core.service.CredentialsService;
@@ -20,6 +22,7 @@ import fr.insee.sugoi.core.service.PasswordService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.model.User;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,9 +33,17 @@ public class CredentialsServiceImpl implements CredentialsService {
 
   @Autowired private PasswordService passwordService;
 
+  @Autowired private SugoiEventPublisher sugoiEventPublisher;
+
   @Override
   public void reinitPassword(
       String realm, String userStorage, String userId, PasswordChangeRequest pcr) {
+    sugoiEventPublisher.publishCustomEvent(
+        realm,
+        userStorage,
+        SugoiEventTypeEnum.RESET_PASSWORD,
+        userId,
+        Map.ofEntries(Map.entry("pcr", pcr)));
     User user = storeProvider.getReaderStore(realm, userStorage).getUser(userId);
     String password = passwordService.generatePassword();
     WriterStore writerStore = storeProvider.getWriterStore(realm, userStorage);
@@ -43,6 +54,12 @@ public class CredentialsServiceImpl implements CredentialsService {
   @Override
   public void changePassword(
       String realm, String userStorage, String userId, PasswordChangeRequest pcr) {
+    sugoiEventPublisher.publishCustomEvent(
+        realm,
+        userStorage,
+        SugoiEventTypeEnum.CHANGE_PASSWORD,
+        userId,
+        Map.ofEntries(Map.entry("pcr", pcr)));
     User user = storeProvider.getReaderStore(realm, userStorage).getUser(userId);
     boolean newPasswordIsValid = passwordService.validatePassword(pcr.getNewPassword());
     if (newPasswordIsValid) {
@@ -57,6 +74,12 @@ public class CredentialsServiceImpl implements CredentialsService {
   @Override
   public void initPassword(
       String realm, String userStorage, String userId, PasswordChangeRequest pcr) {
+    sugoiEventPublisher.publishCustomEvent(
+        realm,
+        userStorage,
+        SugoiEventTypeEnum.INIT_PASSWORD,
+        userId,
+        Map.ofEntries(Map.entry("pcr", pcr)));
     User user = storeProvider.getReaderStore(realm, userStorage).getUser(userId);
     storeProvider.getWriterStore(realm, userStorage).initPassword(user, pcr.getNewPassword());
   }

@@ -13,6 +13,8 @@
 */
 package fr.insee.sugoi.core.service.impl;
 
+import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
+import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.service.OrganizationService;
@@ -26,18 +28,27 @@ public class OrganizationServiceImpl implements OrganizationService {
 
   @Autowired private StoreProvider storeProvider;
 
+  @Autowired private SugoiEventPublisher sugoiEventPublisher;
+
   @Override
   public Organization create(String realm, String storageName, Organization organization) {
+    sugoiEventPublisher.publishCustomEvent(
+        realm, storageName, SugoiEventTypeEnum.CREATE_ORGANIZATION, organization);
     return storeProvider.getWriterStore(realm, storageName).createOrganization(organization);
   }
 
   @Override
   public void delete(String realm, String storageName, String id) {
+    sugoiEventPublisher.publishCustomEvent(
+        realm, storageName, SugoiEventTypeEnum.DELETE_ORGANIZATION, id);
+
     storeProvider.getWriterStore(realm, storageName).deleteOrganization(id);
   }
 
   @Override
   public Organization findById(String realm, String storage, String id) {
+    sugoiEventPublisher.publishCustomEvent(
+        realm, storage, SugoiEventTypeEnum.FIND_ORGANIZATION_BY_ID, id);
     return storeProvider.getReaderStore(realm, storage).getOrganization(id);
   }
 
@@ -47,6 +58,8 @@ public class OrganizationServiceImpl implements OrganizationService {
       String storageName,
       Organization organizationFilter,
       PageableResult pageableResult) {
+    sugoiEventPublisher.publishCustomEvent(
+        realm, storageName, SugoiEventTypeEnum.FIND_ORGANIZATIONS, organizationFilter);
     return storeProvider
         .getReaderStore(realm, storageName)
         .searchOrganizations(organizationFilter, pageableResult, "AND");
@@ -54,6 +67,8 @@ public class OrganizationServiceImpl implements OrganizationService {
 
   @Override
   public void update(String realm, String storageName, Organization organization) {
+    sugoiEventPublisher.publishCustomEvent(
+        realm, storageName, SugoiEventTypeEnum.UPDATE_ORGANIZATION, organization);
     storeProvider.getWriterStore(realm, storageName).updateOrganization(organization);
   }
 }

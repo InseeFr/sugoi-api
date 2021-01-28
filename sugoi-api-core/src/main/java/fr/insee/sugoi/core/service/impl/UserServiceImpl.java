@@ -13,6 +13,8 @@
 */
 package fr.insee.sugoi.core.service.impl;
 
+import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
+import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.service.UserService;
@@ -26,23 +28,30 @@ public class UserServiceImpl implements UserService {
 
   @Autowired private StoreProvider storeProvider;
 
+  @Autowired private SugoiEventPublisher sugoiEventPublisher;
+
   @Override
   public User create(String realm, String storage, User user) {
+    sugoiEventPublisher.publishCustomEvent(realm, storage, SugoiEventTypeEnum.CREATE_USER, user);
     return storeProvider.getWriterStore(realm, storage).createUser(user);
   }
 
   @Override
   public void update(String realm, String storage, User user) {
+    sugoiEventPublisher.publishCustomEvent(realm, storage, SugoiEventTypeEnum.UPDATE_USER, user);
     storeProvider.getWriterStore(realm, storage).updateUser(user);
   }
 
   @Override
   public void delete(String realmName, String storage, String id) {
+    sugoiEventPublisher.publishCustomEvent(realmName, storage, SugoiEventTypeEnum.DELETE_USER, id);
     storeProvider.getWriterStore(realmName, storage).deleteUser(id);
   }
 
   @Override
   public User findById(String realmName, String storage, String id) {
+    sugoiEventPublisher.publishCustomEvent(
+        realmName, storage, SugoiEventTypeEnum.FIND_USER_BY_ID, id);
     try {
       return storeProvider.getReaderStore(realmName, storage).getUser(id);
     } catch (Exception e) {
@@ -53,6 +62,8 @@ public class UserServiceImpl implements UserService {
   @Override
   public PageResult<User> findByProperties(
       String realm, String storage, User userProperties, PageableResult pageable) {
+    sugoiEventPublisher.publishCustomEvent(
+        realm, storage, SugoiEventTypeEnum.FIND_USERS, userProperties);
     try {
       return storeProvider.getReaderStore(realm, storage).searchUsers(userProperties, pageable, "");
     } catch (Exception e) {
