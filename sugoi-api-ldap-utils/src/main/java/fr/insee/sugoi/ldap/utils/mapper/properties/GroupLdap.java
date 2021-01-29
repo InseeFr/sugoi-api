@@ -31,6 +31,6 @@ public class GroupLdap {
   public String description;
 
   @MapToAttribute(value = "users", type = ModelType.LIST_USER)
-  @AttributeLdapName("uniqueMember")
+  @AttributeLdapName("uniquemember")
   public String users;
 }

@@ -82,14 +82,14 @@ public class GroupLdapMapperFromObjectTest {
         mappedAttributes.stream()
             .anyMatch(
                 attribute ->
-                    attribute.getName().equals("uniqueMember")
+                    attribute.getName().equals("uniquemember")
                         && attribute.getValue().equals("uid=user1,ou=contacts,o=insee,c=fr")));
     assertThat(
         "Should have user user2",
         mappedAttributes.stream()
             .anyMatch(
                 attribute ->
-                    attribute.getName().equals("uniqueMember")
+                    attribute.getName().equals("uniquemember")
                         && attribute.getValue().equals("uid=user2,ou=contacts,o=insee,c=fr")));
   }
 }

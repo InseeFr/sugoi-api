@@ -240,6 +240,12 @@ public class LdapReaderStoreTest {
     Group group = ldapReaderStore.getGroup("Applitest", "Utilisateurs_Applitest");
     assertThat(
         "Should be Utilisateurs_Applitest group", group.getName(), is("Utilisateurs_Applitest"));
+    assertThat(
+        "Should have user Testd",
+        group.getUsers().stream().anyMatch(user -> user.getUsername().equals("Testd")));
+    assertThat(
+        "Should have user testc",
+        group.getUsers().stream().anyMatch(user -> user.getUsername().equals("testc")));
   }
 
   @Test

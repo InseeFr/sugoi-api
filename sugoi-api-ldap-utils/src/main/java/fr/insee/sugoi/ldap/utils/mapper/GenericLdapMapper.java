@@ -162,7 +162,7 @@ public class GenericLdapMapper {
             entityField.set(
                 mappedEntity,
                 attributeValues.stream()
-                    .map(attributeValue -> new User(attributeValue))
+                    .map(attributeValue -> new User(LdapUtils.getNodeValueFromDN(attributeValue)))
                     .collect(Collectors.toList()));
             break;
           case LIST_GROUP:
@@ -210,15 +210,16 @@ public class GenericLdapMapper {
 
   private static List<String> getAttributeValuesFromField(
       Collection<Attribute> attributes, Field ldapField) {
-    return attributes.stream()
+    List<String> attributeValueStrings = new ArrayList<>();
+    attributes.stream()
         .filter(
             attribute ->
                 ldapField
                     .getAnnotation(AttributeLdapName.class)
                     .value()
                     .equals(attribute.getName()))
-        .map(attribute -> attribute.getValue())
-        .collect(Collectors.toList());
+        .forEach(attribute -> attributeValueStrings.addAll(Arrays.asList(attribute.getValues())));
+    return attributeValueStrings;
   }
 
   @SuppressWarnings("unchecked")
