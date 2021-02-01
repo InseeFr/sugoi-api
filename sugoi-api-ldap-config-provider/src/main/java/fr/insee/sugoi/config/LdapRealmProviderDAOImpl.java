@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.config;
 
+import com.unboundid.ldap.sdk.Filter;
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
 import com.unboundid.ldap.sdk.SearchRequest;
@@ -23,12 +24,13 @@ import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.ldap.utils.LdapFilter;
 import fr.insee.sugoi.ldap.utils.mapper.RealmLdapMapper;
+import fr.insee.sugoi.ldap.utils.mapper.UserStorageLdapMapper;
 import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.UserStorage;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -42,8 +44,6 @@ import org.springframework.stereotype.Component;
     havingValue = "ldap",
     matchIfMissing = false)
 public class LdapRealmProviderDAOImpl implements RealmProvider {
-
-  @Autowired private RealmLdapMapper realmMapper;
 
   @Value("${fr.insee.sugoi.config.ldap.profils.url:}")
   private String url;
@@ -61,12 +61,13 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
     logger.info("Loading configuration from ldap://{}:{}/{}", url, port, baseDn);
     try (LDAPConnectionPool ldapConnection =
         new LDAPConnectionPool(new LDAPConnection(url, port), 1)) {
-      SearchResultEntry entry =
+      SearchResultEntry realmEntry =
           ldapConnection.getEntry("cn=Profil_" + realmName + "_WebServiceLdap," + baseDn);
-      logger.debug("Found entry {}", entry.getDN());
-      Realm r = realmMapper.mapFromSearchEntry(entry);
-      logger.debug("Parsing as realm {}", r);
-      return r;
+      logger.debug("Found entry {}", realmEntry.getDN());
+      Realm realm = RealmLdapMapper.mapFromSearchEntry(realmEntry);
+      logger.debug("Parsing as realm {}", realm);
+      realm.setUserStorages(loadUserStorages(realmEntry, ldapConnection));
+      return realm;
     } catch (Exception e) {
       e.printStackTrace();
       throw new RealmNotFoundException("Erreur lors du chargement du realm " + realmName);
@@ -83,11 +84,38 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
               baseDn, SearchScope.ONE, LdapFilter.create("(objectClass=*)"), "*", "+");
       SearchResult searchResult = ldapConnection.search(searchRequest);
       return searchResult.getSearchEntries().stream()
-          .map(e -> realmMapper.mapFromSearchEntry(e))
+          .map(
+              e -> {
+                Realm realm = RealmLdapMapper.mapFromSearchEntry(e);
+                realm.setUserStorages(loadUserStorages(e, ldapConnection));
+                return realm;
+              })
           .collect(Collectors.toList());
     } catch (Exception e) {
       e.printStackTrace();
       throw new RealmNotFoundException("Impossible de charger les realms");
+    }
+  }
+
+  private List<UserStorage> loadUserStorages(
+      SearchResultEntry realmEntry, LDAPConnectionPool ldapConnection) {
+    try {
+      String baseName = realmEntry.getAttribute("cn").getValue();
+      SearchResult userStoragesResult =
+          ldapConnection.search(
+              "cn=" + baseName + "," + baseDn,
+              SearchScope.SUBORDINATE_SUBTREE,
+              Filter.create("objectClass=*"));
+      if (userStoragesResult.getEntryCount() > 0) {
+        return userStoragesResult.getSearchEntries().stream()
+            .map(
+                searchEntry -> UserStorageLdapMapper.mapFromAttributes(searchEntry.getAttributes()))
+            .collect(Collectors.toList());
+      } else {
+        return List.of(UserStorageLdapMapper.mapFromAttributes(realmEntry.getAttributes()));
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
 }
