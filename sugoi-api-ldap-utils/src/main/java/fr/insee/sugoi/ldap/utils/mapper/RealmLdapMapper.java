@@ -15,17 +15,12 @@ package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import fr.insee.sugoi.model.Realm;
-import fr.insee.sugoi.model.UserStorage;
-import java.util.List;
-import org.springframework.stereotype.Component;
 
 /** ProfilContextMapper */
-@Component
 public class RealmLdapMapper {
 
-  public Realm mapFromSearchEntry(SearchResultEntry searchResultEntry) {
+  public static Realm mapFromSearchEntry(SearchResultEntry searchResultEntry) {
     Realm realm = new Realm();
-    UserStorage userStorage = new UserStorage();
     realm.setName(searchResultEntry.getAttributeValue("cn").split("_")[1]);
     String[] inseeProperties = searchResultEntry.getAttributeValues("inseepropriete");
     for (String inseeProperty : inseeProperties) {
@@ -38,26 +33,8 @@ public class RealmLdapMapper {
         if (property[0].contains("branchesApplicativesPossibles")) {
           realm.setAppSource(property[1]);
         }
-
-        if (property[0].contains("brancheContact")) {
-          userStorage.setUserSource(property[1]);
-        }
-        if (property[0].equals("brancheOrganisation")) {
-          userStorage.setOrganizationSource(property[1]);
-        }
-        if (property[0].equals("brancheAdresse")) {
-          userStorage.setAddressSource(property[1]);
-        }
-        if (property[0].equals("groupSourcePattern")) {
-          userStorage.addProperty("group_source_pattern", property[1]);
-        }
-        if (property[0].equals("groupFilterPattern")) {
-          userStorage.addProperty("group_filter_pattern", property[1]);
-        }
       }
     }
-    userStorage.setName("default");
-    realm.setUserStorages(List.of(userStorage));
     return realm;
   }
 }

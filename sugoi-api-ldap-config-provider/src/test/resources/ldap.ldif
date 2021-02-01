@@ -105,13 +105,13 @@ dn: cn=Profil_domaine2_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We
  bServicesLdap_Objets,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
 cn: Profil_domaine2_WebServiceLdap
 objectclass: inseeOrganizationalRole
+inseepropriete: ldapUrl$localhost
+inseepropriete: ldapPort$10389
 
 dn: cn=monUserStorage,cn=Profil_domaine2_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We
  bServicesLdap_Objets,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
 cn: monUserStorage
 objectclass: inseeOrganizationalRole
-inseepropriete: ldapUrl$localhost
-inseepropriete: ldapPort$10389
 inseepropriete: brancheContact$ou=contacts,ou=clients_domaine2,o=insee,c=fr
 inseepropriete: brancheAdresse$ou=adresses,ou=clients_domaine2,o=insee,c=fr
 inseepropriete: brancheOrganisation$ou=organisations,ou=clients_domaine2,o=in
@@ -124,8 +124,6 @@ dn: cn=autreUserStorage,cn=Profil_domaine2_WebServiceLdap,cn=profil-contact-WebS
  bServicesLdap_Objets,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
 cn: autreUserStorage
 objectclass: inseeOrganizationalRole
-inseepropriete: ldapUrl$localhost
-inseepropriete: ldapPort$10389
 inseepropriete: brancheContact$ou=contacts,ou=clients_domaine2,o=insee,c=fr
 inseepropriete: brancheAdresse$ou=adresses,ou=clients_domaine2,o=insee,c=fr
 inseepropriete: brancheOrganisation$ou=organisations,ou=clients_domaine2,o=in
