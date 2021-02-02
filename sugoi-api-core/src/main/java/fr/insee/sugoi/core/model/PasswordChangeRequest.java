@@ -23,8 +23,7 @@ public class PasswordChangeRequest {
   private String newPassword;
   private Map<String, String> properties;
 
-  public PasswordChangeRequest() {
-  }
+  public PasswordChangeRequest() {}
 
   public Map<String, String> getAddress() {
     return address;

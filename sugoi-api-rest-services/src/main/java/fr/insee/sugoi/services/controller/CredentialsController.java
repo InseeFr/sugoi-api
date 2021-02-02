@@ -29,34 +29,45 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Manage credentials")
-@RequestMapping(value = { "/v2", "/" })
+@RequestMapping(value = {"/v2", "/"})
 @SecurityRequirement(name = "oAuth")
 public class CredentialsController {
 
-  @Autowired
-  private CredentialsService credentialsService;
+  @Autowired private CredentialsService credentialsService;
 
-  @PostMapping(path = { "/{realm}/users/{id}/reinitPassword", "/{realm}/{storage}/users/{id}/reinitPassword" })
+  @PostMapping(
+      path = {"/{realm}/users/{id}/reinitPassword", "/{realm}/{storage}/users/{id}/reinitPassword"})
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void reinitPassword(@RequestBody PasswordChangeRequest pcr, @PathVariable("realm") String realm,
-      @PathVariable("storage") String userStorage, @PathVariable("id") String id) {
+  public void reinitPassword(
+      @RequestBody PasswordChangeRequest pcr,
+      @PathVariable("realm") String realm,
+      @PathVariable(value = "storage", required = false) String userStorage,
+      @PathVariable("id") String id) {
     credentialsService.reinitPassword(realm, userStorage, id, pcr);
   }
 
-  @PostMapping(path = { "/{realm}/users/{id}/changePassword", "/{realm}/{storage}/users/{id}/changePassword" })
+  @PostMapping(
+      path = {"/{realm}/users/{id}/changePassword", "/{realm}/{storage}/users/{id}/changePassword"})
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void changePassword(@RequestBody PasswordChangeRequest pcr, @PathVariable("realm") String realm,
-      @PathVariable("storage") String userStorage, @PathVariable("id") String id) {
+  public void changePassword(
+      @RequestBody PasswordChangeRequest pcr,
+      @PathVariable("realm") String realm,
+      @PathVariable(value = "storage", required = false) String userStorage,
+      @PathVariable("id") String id) {
     credentialsService.changePassword(realm, userStorage, id, pcr);
   }
 
-  @PostMapping(path = { "/{realm}/users/{id}/initPassword", "/{realm}/{storage}/users/{id}/initPassword" })
+  @PostMapping(
+      path = {"/{realm}/users/{id}/initPassword", "/{realm}/{storage}/users/{id}/initPassword"})
   @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void initPassword(@PathVariable("realm") String realm, @PathVariable("storage") String userStorage,
-      @PathVariable("id") String id, @RequestBody PasswordChangeRequest pcr) {
+  public void initPassword(
+      @PathVariable("realm") String realm,
+      @PathVariable(value = "storage", required = false) String userStorage,
+      @PathVariable("id") String id,
+      @RequestBody PasswordChangeRequest pcr) {
     credentialsService.initPassword(realm, userStorage, id, pcr);
   }
 }

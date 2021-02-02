@@ -45,6 +45,7 @@ cn: Utilisateurs_Applitest
 objectclass: groupOfUniqueNames
 uniquemember: uid=Testd,ou=SSM,o=insee,c=fr
 uniquemember: uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+uniqueMember: uid=test_password,ou=contacts,ou=clients_domaine1,o=insee,c=fr
 
 # BRANCHE APPLICATIVE WEB SERVICE
 dn: ou=WebServicesLdap,ou=Applications,o=insee,c=fr
@@ -84,7 +85,7 @@ cn: SUGOI_ADMIN
 objectclass: top
 objectclass: groupOfUniqueNames
 uniquemember: uid=appli_sugoi,ou=Applitest,ou=Applications,o=insee,c=fr
-uniqueMember: uid=test_password,ou=Applitest,ou=Applications,o=insee,c=fr
+uniqueMember: uid=test_password,ou=contacts,ou=clients_domaine1,o=insee,c=fr
 
 
 dn: cn=Utilisateurs_contacts_domaine2_WebServicesLdap,ou=WebServicesLdap_Obje
@@ -129,7 +130,7 @@ description: Utilisateur du webservices contact
 cn: Utilisateurs_contacts_domaine1_WebServicesLdap
 objectclass: groupOfUniqueNames
 uniqueMember: uid=consultant_domaine_1,ou=Applitest,ou=Applications,o=insee,c=fr
-
+uniqueMember: uid=test_password,ou=contacts,ou=clients_domaine1,o=insee,c=fr
 
 dn: cn=Admin_WebServicesLdap,ou=WebServicesLdap_Obje
  ts,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
@@ -338,7 +339,7 @@ givenname: appli_sugoi
 uid: appli_sugoi
 userpassword: sugoi
 
-dn: uid=test_password,ou=Applitest,ou=Applications,o=insee,c=fr
+dn: uid=test_password,ou=contacts,ou=clients_domaine1,o=insee,c=fr
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson

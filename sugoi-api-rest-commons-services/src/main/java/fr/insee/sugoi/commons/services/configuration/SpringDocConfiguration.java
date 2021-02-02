@@ -20,9 +20,11 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.OAuthFlow;
 import io.swagger.v3.oas.models.security.OAuthFlows;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -99,5 +101,14 @@ public class SpringDocConfiguration {
                     .contact(contact));
 
     return openapi;
+  }
+
+  @Bean
+  public OperationCustomizer addAuth() {
+    return (operation, handlerMethod) -> {
+      return operation
+          .addSecurityItem(new SecurityRequirement().addList(SCHEMEBASIC))
+          .addSecurityItem(new SecurityRequirement().addList(OAUTHSCHEME));
+    };
   }
 }
