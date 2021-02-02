@@ -17,6 +17,7 @@ import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
 import fr.insee.sugoi.core.realm.RealmProvider;
+import fr.insee.sugoi.model.Realm;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,5 +47,18 @@ public class LocalFileRealmProviderDAO_realmsOneTest {
   public void shouldFetchTestRealm() {
     assertThat("We should have a realm test", localFileConfig.load("test").getName(), is("test"));
     assertThat("We should have a realm TeSt", localFileConfig.load("TeSt").getName(), is("test"));
+  }
+
+  @Test
+  public void shouldHaveTwoUserstorages() {
+    Realm realm = localFileConfig.load("test");
+    assertThat(
+        "We should have a userstorage default",
+        realm.getUserStorages().stream()
+            .anyMatch(userstorage -> userstorage.getName().equals("default")));
+    assertThat(
+        "We should have a userstorage other",
+        realm.getUserStorages().stream()
+            .anyMatch(userstorage -> userstorage.getName().equals("other")));
   }
 }
