@@ -14,7 +14,6 @@
 package fr.insee.sugoi.core.service.impl;
 
 import fr.insee.sugoi.core.service.PasswordService;
-import org.passay.AllowedRegexRule;
 import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
 import org.passay.LengthRule;
@@ -28,7 +27,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class PasswordServiceImpl implements PasswordService {
 
-  @Value("${fr.insee.sugoi.password.length:10}")
+  @Value("${fr.insee.sugoi.password.length:5}")
   private String passwordLength;
 
   @Value("${fr.insee.sugoi.password.allowed.regexp:}")
@@ -42,8 +41,7 @@ public class PasswordServiceImpl implements PasswordService {
   @Override
   public boolean validatePassword(String password) {
     PasswordValidator passwordValidator =
-        new PasswordValidator(
-            new LengthRule(Integer.valueOf(passwordLength)), new AllowedRegexRule(allowedRegexp));
+        new PasswordValidator(new LengthRule(Integer.valueOf(passwordLength), Integer.MAX_VALUE));
     PasswordData passwordData = new PasswordData(password);
     RuleResult validate = passwordValidator.validate(passwordData);
     return validate.isValid();

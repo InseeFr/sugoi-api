@@ -16,13 +16,16 @@ package fr.insee.sugoi.store.ldap;
 import com.unboundid.ldap.sdk.AddRequest;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.DeleteRequest;
+import com.unboundid.ldap.sdk.ExtendedResult;
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
 import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldap.sdk.Modification;
 import com.unboundid.ldap.sdk.ModificationType;
 import com.unboundid.ldap.sdk.ModifyRequest;
-import com.unboundid.util.SubtreeDeleter;
+import com.unboundid.ldap.sdk.ResultCode;
 import com.unboundid.ldap.sdk.extensions.PasswordModifyExtendedRequest;
+import com.unboundid.util.SubtreeDeleter;
+import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;
@@ -79,9 +82,8 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   }
 
   /**
-   * Create a user in ldap. If the user has an address, a ldap resource address is
-   * generated with a random value as id An organization link can be created but
-   * may not exist
+   * Create a user in ldap. If the user has an address, a ldap resource address is generated with a
+   * random value as id An organization link can be created but may not exist
    */
   @Override
   public User createUser(User user) {
@@ -90,7 +92,8 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
         UUID addressUuid = createAddress(user.getAddress());
         user.addAddress("id", addressUuid.toString());
       }
-      AddRequest userAddRequest = new AddRequest(getUserDN(user.getUsername()), userLdapMapper.mapToAttributes(user));
+      AddRequest userAddRequest =
+          new AddRequest(getUserDN(user.getUsername()), userLdapMapper.mapToAttributes(user));
       ldapPoolConnection.add(userAddRequest);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to create user", e);
@@ -98,10 +101,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     return user;
   }
 
-  /**
-   * Update the ldap properties of a user. Current user is read to retrieve user
-   * address link
-   */
+  /** Update the ldap properties of a user. Current user is read to retrieve user address link */
   @Override
   public User updateUser(User updatedUser) {
     try {
@@ -116,8 +116,9 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
           createAddress(updatedUser.getAddress());
         }
       }
-      ModifyRequest mr = new ModifyRequest(getUserDN(updatedUser.getUsername()),
-          userLdapMapper.createMods(updatedUser));
+      ModifyRequest mr =
+          new ModifyRequest(
+              getUserDN(updatedUser.getUsername()), userLdapMapper.createMods(updatedUser));
       ldapPoolConnection.modify(mr);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to update user while writing to LDAP", e);
@@ -142,7 +143,9 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public Group createGroup(String appName, Group group) {
     try {
-      AddRequest ar = new AddRequest(getGroupDN(appName, group.getName()), groupLdapMapper.mapToAttributes(group));
+      AddRequest ar =
+          new AddRequest(
+              getGroupDN(appName, group.getName()), groupLdapMapper.mapToAttributes(group));
       ldapPoolConnection.add(ar);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to create group " + group.getName(), e);
@@ -154,14 +157,17 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   public Group updateGroup(String appName, Group updatedGroup) {
     try {
       if (ldapReaderStore.getGroup(appName, updatedGroup.getName()) != null) {
-        ModifyRequest mr = new ModifyRequest(getGroupDN(appName, updatedGroup.getName()),
-            groupLdapMapper.createMods(updatedGroup));
+        ModifyRequest mr =
+            new ModifyRequest(
+                getGroupDN(appName, updatedGroup.getName()),
+                groupLdapMapper.createMods(updatedGroup));
         ldapPoolConnection.modify(mr);
       } else {
         throw new RuntimeException(updatedGroup.getName() + "is not a group");
       }
     } catch (LDAPException e) {
-      throw new RuntimeException("Failed to update group " + updatedGroup.getName() + " while writing to LDAP", e);
+      throw new RuntimeException(
+          "Failed to update group " + updatedGroup.getName() + " while writing to LDAP", e);
     }
     return updatedGroup;
   }
@@ -182,9 +188,8 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   }
 
   /**
-   * Create an organization in ldap. If the organization has an address, a ldap
-   * resource address is generated with a random value as id An organization link
-   * can be created but may not exist
+   * Create an organization in ldap. If the organization has an address, a ldap resource address is
+   * generated with a random value as id An organization link can be created but may not exist
    */
   @Override
   public Organization createOrganization(Organization organization) {
@@ -193,38 +198,48 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
         UUID addressUuid = createAddress(organization.getAddress());
         organization.addAddress("id", addressUuid.toString());
       }
-      AddRequest ar = new AddRequest(getOrganizationDN(organization.getIdentifiant()),
-          organizationLdapMapper.mapToAttributes(organization));
+      AddRequest ar =
+          new AddRequest(
+              getOrganizationDN(organization.getIdentifiant()),
+              organizationLdapMapper.mapToAttributes(organization));
       ldapPoolConnection.add(ar);
     } catch (LDAPException e) {
-      throw new RuntimeException("Failed to create organization " + organization.getIdentifiant(), e);
+      throw new RuntimeException(
+          "Failed to create organization " + organization.getIdentifiant(), e);
     }
     return organization;
   }
 
   /**
-   * Update the ldap properties of a organization. Current organization is read to
-   * retrieve address link
+   * Update the ldap properties of a organization. Current organization is read to retrieve address
+   * link
    */
   @Override
   public Organization updateOrganization(Organization updatedOrganization) {
     try {
-      Organization currentOrganization = ldapReaderStore.getOrganization(updatedOrganization.getIdentifiant());
+      Organization currentOrganization =
+          ldapReaderStore.getOrganization(updatedOrganization.getIdentifiant());
       if (updatedOrganization.getAddress() != null) {
         if (currentOrganization.getAddress().containsKey("id")) {
-          updateAddress(currentOrganization.getAddress().get("id"), updatedOrganization.getAddress());
+          updateAddress(
+              currentOrganization.getAddress().get("id"), updatedOrganization.getAddress());
         } else {
           Map<String, String> newAddress = new HashMap<>();
           newAddress.put("id", createAddress(updatedOrganization.getAddress()).toString());
           updatedOrganization.setAddress(newAddress);
         }
       }
-      ModifyRequest mr = new ModifyRequest(getOrganizationDN(updatedOrganization.getIdentifiant()),
-          organizationLdapMapper.createMods(updatedOrganization));
+      ModifyRequest mr =
+          new ModifyRequest(
+              getOrganizationDN(updatedOrganization.getIdentifiant()),
+              organizationLdapMapper.createMods(updatedOrganization));
       ldapPoolConnection.modify(mr);
     } catch (LDAPException e) {
       throw new RuntimeException(
-          "Failed to update organization " + updatedOrganization.getIdentifiant() + "while writing to LDAP", e);
+          "Failed to update organization "
+              + updatedOrganization.getIdentifiant()
+              + "while writing to LDAP",
+          e);
     }
     return updatedOrganization;
   }
@@ -232,8 +247,10 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public void deleteUserFromGroup(String appName, String groupName, String userId) {
     try {
-      ModifyRequest mr = new ModifyRequest(getGroupDN(appName, groupName),
-          new Modification(ModificationType.DELETE, "uniqueMember", getUserDN(userId)));
+      ModifyRequest mr =
+          new ModifyRequest(
+              getGroupDN(appName, groupName),
+              new Modification(ModificationType.DELETE, "uniqueMember", getUserDN(userId)));
       ldapPoolConnection.modify(mr);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to delete user from group " + groupName, e);
@@ -243,8 +260,10 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public void addUserToGroup(String appName, String groupName, String userId) {
     try {
-      ModifyRequest mr = new ModifyRequest(getGroupDN(appName, groupName),
-          new Modification(ModificationType.ADD, "uniqueMember", getUserDN(userId)));
+      ModifyRequest mr =
+          new ModifyRequest(
+              getGroupDN(appName, groupName),
+              new Modification(ModificationType.ADD, "uniqueMember", getUserDN(userId)));
       ldapPoolConnection.modify(mr);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to add user to group " + groupName, e);
@@ -253,7 +272,8 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
 
   @Override
   public void reinitPassword(User user, String generatedPassword) {
-    Modification mod = new Modification(ModificationType.REPLACE, "userPassword", generatedPassword);
+    Modification mod =
+        new Modification(ModificationType.REPLACE, "userPassword", generatedPassword);
     try {
       ldapPoolConnection.modify("uid=" + user.getUsername() + "," + config.get("user_source"), mod);
     } catch (LDAPException e) {
@@ -274,9 +294,17 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public void changePassword(User user, String oldPassword, String newPassword) {
     try {
-      PasswordModifyExtendedRequest pmer = new PasswordModifyExtendedRequest(
-          "uid=" + user.getUsername() + "," + config.get("user_source"), oldPassword, newPassword);
-      ldapPoolConnection.processExtendedOperation(pmer);
+      PasswordModifyExtendedRequest pmer =
+          new PasswordModifyExtendedRequest(
+              "uid=" + user.getUsername() + "," + config.get("user_source"),
+              oldPassword,
+              newPassword);
+      ExtendedResult result = ldapPoolConnection.processExtendedOperation(pmer);
+      if (result.getResultCode().intValue() == ResultCode.INVALID_CREDENTIALS_INT_VALUE) {
+        throw new InvalidPasswordException("Old password is not correct");
+      } else if (result.getResultCode().intValue() != 0) {
+        throw new RuntimeException("Unexpected error when changing password");
+      }
     } catch (NumberFormatException | LDAPException e) {
       e.printStackTrace();
     }
@@ -284,7 +312,8 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
 
   @Override
   public void changePasswordResetStatus(User user, boolean isReset) {
-    Modification mod = new Modification(ModificationType.REPLACE, "pwdReset", Boolean.toString(isReset));
+    Modification mod =
+        new Modification(ModificationType.REPLACE, "pwdReset", Boolean.toString(isReset));
     try {
       ldapPoolConnection.modify("uid=" + user.getUsername() + "," + config.get("user_source"), mod);
     } catch (LDAPException e) {
@@ -296,11 +325,16 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public Application createApplication(Application application) {
     try {
-      AddRequest ar = new AddRequest(getApplicationDN(application.getName()),
-          applicationLdapMapper.mapToAttributes(application));
+      AddRequest ar =
+          new AddRequest(
+              getApplicationDN(application.getName()),
+              applicationLdapMapper.mapToAttributes(application));
       ldapPoolConnection.add(ar);
-      AddRequest groupsAR = new AddRequest(getGroupSource(application.getName()), new Attribute("objectClass", "top"),
-          new Attribute("objectClass", "organizationalUnit"));
+      AddRequest groupsAR =
+          new AddRequest(
+              getGroupSource(application.getName()),
+              new Attribute("objectClass", "top"),
+              new Attribute("objectClass", "organizationalUnit"));
       ldapPoolConnection.add(groupsAR);
       application.getGroups().stream().forEach(group -> createGroup(application.getName(), group));
     } catch (LDAPException e) {
@@ -312,13 +346,17 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public Application updateApplication(Application updatedApplication) {
     try {
-      ModifyRequest mr = new ModifyRequest(getApplicationDN(updatedApplication.getName()),
-          applicationLdapMapper.createMods(updatedApplication));
+      ModifyRequest mr =
+          new ModifyRequest(
+              getApplicationDN(updatedApplication.getName()),
+              applicationLdapMapper.createMods(updatedApplication));
       ldapPoolConnection.modify(mr);
-      updatedApplication.getGroups().stream().forEach(group -> createGroup(updatedApplication.getName(), group));
+      updatedApplication.getGroups().stream()
+          .forEach(group -> createGroup(updatedApplication.getName(), group));
     } catch (LDAPException e) {
       throw new RuntimeException(
-          "Failed to update application " + updatedApplication.getName() + "while writing to LDAP", e);
+          "Failed to update application " + updatedApplication.getName() + "while writing to LDAP",
+          e);
     }
     return updatedApplication;
   }
@@ -344,14 +382,16 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
    */
   private UUID createAddress(Map<String, String> address) throws LDAPException {
     UUID addressUUID = UUID.randomUUID();
-    AddRequest addressAddRequest = new AddRequest(getAddressDN(addressUUID.toString()),
-        AddressLdapMapper.mapToAttributes(address));
+    AddRequest addressAddRequest =
+        new AddRequest(
+            getAddressDN(addressUUID.toString()), AddressLdapMapper.mapToAttributes(address));
     ldapPoolConnection.add(addressAddRequest);
     return addressUUID;
   }
 
   private void updateAddress(String id, Map<String, String> newAddress) throws LDAPException {
-    ModifyRequest modifyRequest = new ModifyRequest(getAddressDN(id), AddressLdapMapper.createMods(newAddress));
+    ModifyRequest modifyRequest =
+        new ModifyRequest(getAddressDN(id), AddressLdapMapper.createMods(newAddress));
     ldapPoolConnection.modify(modifyRequest);
   }
 

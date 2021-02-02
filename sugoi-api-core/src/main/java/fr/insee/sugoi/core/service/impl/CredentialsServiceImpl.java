@@ -26,14 +26,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class CredentialsServiceImpl implements CredentialsService {
 
-  @Autowired
-  private StoreProvider storeProvider;
+  @Autowired private StoreProvider storeProvider;
 
-  @Autowired
-  private PasswordService passwordService;
+  @Autowired private PasswordService passwordService;
 
   @Override
-  public void reinitPassword(String realm, String userStorage, String userId, PasswordChangeRequest pcr) {
+  public void reinitPassword(
+      String realm, String userStorage, String userId, PasswordChangeRequest pcr) {
     User user = storeProvider.getReaderStore(realm, userStorage).getUser(userId);
     String password = passwordService.generatePassword();
     WriterStore writerStore = storeProvider.getWriterStore(realm, userStorage);
@@ -42,17 +41,22 @@ public class CredentialsServiceImpl implements CredentialsService {
   }
 
   @Override
-  public void changePassword(String realm, String userStorage, String userId, PasswordChangeRequest pcr) {
+  public void changePassword(
+      String realm, String userStorage, String userId, PasswordChangeRequest pcr) {
     User user = storeProvider.getReaderStore(realm, userStorage).getUser(userId);
     boolean newPasswordIsValid = passwordService.validatePassword(pcr.getNewPassword());
     if (newPasswordIsValid) {
-      storeProvider.getWriterStore(realm, userStorage).changePassword(user, pcr.getOldPassword(), pcr.getNewPassword());
+      storeProvider
+          .getWriterStore(realm, userStorage)
+          .changePassword(user, pcr.getOldPassword(), pcr.getNewPassword());
+    } else {
+      throw new InvalidPasswordException("New password is not valid");
     }
-    throw new InvalidPasswordException("New password is not valid");
   }
 
   @Override
-  public void initPassword(String realm, String userStorage, String userId, PasswordChangeRequest pcr) {
+  public void initPassword(
+      String realm, String userStorage, String userId, PasswordChangeRequest pcr) {
     User user = storeProvider.getReaderStore(realm, userStorage).getUser(userId);
     storeProvider.getWriterStore(realm, userStorage).initPassword(user, pcr.getNewPassword());
   }
