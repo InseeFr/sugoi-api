@@ -11,6 +11,14 @@
                 "properties": null,
                 "readerType": null,
                 "writerType": null
+            },
+            {
+                "name": "other",
+                "userSource": "/users",
+                "organizationSource": "/organizations2",
+                "properties": null,
+                "readerType": null,
+                "writerType": null
             }
         ]
     }
