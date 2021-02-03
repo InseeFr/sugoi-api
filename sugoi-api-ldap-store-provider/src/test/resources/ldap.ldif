@@ -306,7 +306,7 @@ objectClass: top
 objectClass: inseeOrganisation
 uid: amodifier
 description: Autre
-dn: l=nvaddresse, ou=adresses,ou=clients_domaine1,o=insee,c=fr
+inseeAdressePostaleDN: l=nvaddresse, ou=adresses,ou=clients_domaine1,o=insee,c=fr
 
 dn: l=amodifier, ou=adresses,ou=clients_domaine1,o=insee,c=fr
 objectClass: top
