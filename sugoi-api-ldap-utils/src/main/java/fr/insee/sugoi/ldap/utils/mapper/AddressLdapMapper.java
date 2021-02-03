@@ -20,7 +20,6 @@ import com.unboundid.ldap.sdk.SearchResultEntry;
 import fr.insee.sugoi.ldap.utils.mapper.properties.AddressLdap;
 import fr.insee.sugoi.ldap.utils.mapper.properties.LdapObjectClass;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,8 +76,9 @@ public class AddressLdapMapper {
       attributes.add(
           new Attribute("inseeAdressePostaleCorrespondantLigne7", address.get("Ligne7")));
     }
-    Arrays.stream(AddressLdap.class.getAnnotation(LdapObjectClass.class).values())
-        .forEach(objectClass -> attributes.add(new Attribute("objectClass", objectClass)));
+    attributes.add(
+        new Attribute(
+            "objectClass", AddressLdap.class.getAnnotation(LdapObjectClass.class).values()));
     return attributes;
   }
 
