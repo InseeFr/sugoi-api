@@ -27,8 +27,4 @@ public class ApplicationLdap {
   @MapToAttribute("name")
   @AttributeLdapName("ou")
   public String name;
-
-  @MapToAttribute("owner")
-  @AttributeLdapName("creatorsName")
-  public String owner;
 }
