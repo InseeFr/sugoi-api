@@ -93,11 +93,13 @@ public class UserLdapMapperFromAttributesTest {
 
     Attribute habilitationAttribute1 =
         new Attribute("inseeGroupeDefaut", "property_role_application");
-    Attribute habilitationAttribute2 =
-        new Attribute("inseeGroupeDefaut", "property_role_application2");
+    Attribute habilitationWithoutPropAttribute =
+        new Attribute("inseeGroupeDefaut", "role_application2");
+    Attribute malformedHabilitation = new Attribute("inseeGroupeDefaut", "toto");
     Collection<Attribute> attributes = new ArrayList<>();
     attributes.add(habilitationAttribute1);
-    attributes.add(habilitationAttribute2);
+    attributes.add(habilitationWithoutPropAttribute);
+    attributes.add(malformedHabilitation);
     User mappedUser = userLdapMapper.mapFromAttributes(attributes);
 
     assertThat(
@@ -105,9 +107,16 @@ public class UserLdapMapperFromAttributesTest {
         mappedUser.getHabilitations().stream()
             .anyMatch(habilitation -> habilitation.getApplication().equals("application")));
     assertThat(
-        "Should have habilitation habilitation2",
+        "Should have habilitation without prop",
         mappedUser.getHabilitations().stream()
-            .anyMatch(habilitation -> habilitation.getApplication().equals("application2")));
+            .anyMatch(
+                habilitation ->
+                    habilitation.getApplication().equals("application2")
+                        && habilitation.getProperty() == null));
+    assertThat(
+        "All habilitation have role",
+        mappedUser.getHabilitations().stream()
+            .allMatch(habilitation -> habilitation.getRole() != null));
   }
 
   @Test
