@@ -155,6 +155,10 @@ public class GenericLdapMapper {
             entityField.set(
                 mappedEntity,
                 attributeValues.stream()
+                    .filter(
+                        attributeValue ->
+                            attributeValue.split("_").length == 2
+                                || attributeValue.split("_").length == 3)
                     .map(attributeValue -> new Habilitation(attributeValue))
                     .collect(Collectors.toList()));
             break;
@@ -251,6 +255,9 @@ public class GenericLdapMapper {
           case LIST_HABILITATION:
             return ((List<Habilitation>) attributeValue)
                 .stream()
+                    .filter(
+                        habilitation ->
+                            habilitation.getApplication() != null && habilitation.getRole() != null)
                     .map(habilitation -> new Attribute(attributeName, habilitation.getId()))
                     .collect(Collectors.toList());
           case LIST_USER:
