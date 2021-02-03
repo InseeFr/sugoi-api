@@ -332,7 +332,7 @@ dn: l=testu,ou=adresses,ou=clients_domaine1,o=insee,c=fr
 objectClass: top
 objectClass: locality
 objectClass: inseeAdressePostale
-l: testa
+l: testu
 inseeAdressePostaleCorrespondantLigne4: 88 AVE VERDIER
 inseeAdressePostaleCorrespondantLigne3: _
 inseeAdressePostaleCorrespondantLigne2: _
