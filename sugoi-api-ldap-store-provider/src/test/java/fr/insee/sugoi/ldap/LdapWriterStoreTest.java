@@ -180,7 +180,6 @@ public class LdapWriterStoreTest {
   public void testCreateApplication() {
     Application application = new Application();
     application.setName("MyApplication");
-    application.setOwner("Mine");
     List<Group> groups = new ArrayList<>();
     Group group1 = new Group();
     group1.setName("Group1_MyApplication");
@@ -201,7 +200,6 @@ public class LdapWriterStoreTest {
   @Test
   public void testUpdateApplication() {
     Application application = ldapReaderStore.getApplication("Applitest");
-    application.setOwner("Mine");
     List<Group> groups = new ArrayList<>();
     Group group1 = new Group();
     group1.setName("Group1_Applitest");
@@ -209,7 +207,6 @@ public class LdapWriterStoreTest {
     application.setGroups(groups);
     ldapWriterStore.updateApplication(application);
     Application retrievedApplication = ldapReaderStore.getApplication("Applitest");
-    assertThat("Applitest should have a new owner", retrievedApplication.getOwner(), is("Mine"));
     assertThat(
         "Applitest should have group1",
         retrievedApplication.getGroups().stream()
@@ -220,7 +217,6 @@ public class LdapWriterStoreTest {
   public void testDeleteApplication() {
     Application application = new Application();
     application.setName("NotEmptyApplication");
-    application.setOwner("Mine");
     List<Group> groups = new ArrayList<>();
     Group group1 = new Group();
     group1.setName("Group1_NotEmptyApplication");
