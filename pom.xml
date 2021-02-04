@@ -26,14 +26,14 @@
 		<java.version>11</java.version>
 		<spring-boot.version>2.3.3.RELEASE</spring-boot.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<tomcat.version>9.0.40</tomcat.version>
+		<tomcat.version>10.0.2</tomcat.version>
 		<jackson.version>2.11.3</jackson.version>
 		<commons-io.version>2.6</commons-io.version>
 		<com.unboundid.version>5.1.2</com.unboundid.version>
 		<org.xmlunit.version>2.7.0</org.xmlunit.version>
 		<org.fusesource.jansi.version>1.18</org.fusesource.jansi.version>
 		<commons-lang.version>2.6</commons-lang.version>
-		<org.springdoc.version>1.5.0</org.springdoc.version>
+		<org.springdoc.version>1.5.3</org.springdoc.version>
 		<cucumber.version>6.9.1</cucumber.version>
 		<cucumber-reporting-plugin.version>4.0.94</cucumber-reporting-plugin.version>
 		<httpclient.version>4.5.11</httpclient.version>
