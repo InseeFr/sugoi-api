@@ -148,6 +148,22 @@ inseepropriete: habilitationsPossibles$propriete_role_appli
 inseepropriete: branchesApplicativesPossibles$applitest
 description: domaine1
 
+dn: cn=Profil_uppercaseTest_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We
+ bServicesLdap_Objets,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
+cn: Profil_upperCaseTest_WebServiceLdap
+objectclass: inseeOrganizationalRole
+inseePropriete: ldapUrl$localhost
+inseeprOpriete: ldapPort$10389
+inseepropriEte: bRanchecontact$ou=contacts,ou=clients_domaine1,o=insee,c=fr
+inSeepropriete: brancheAdresse$ou=adresses,ou=clients_domaine1,o=insee,c=fr
+inSeepropriete: brancheOrganisation$ou=organisations,ou=clients_domaine1,o=in
+ see,c=fr
+inseePropriete: groupSourcePattern$ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr
+inseePropriete: groupFilterPattern$(cn={group}_{appliname})
+inseePropriete: habilitationsPossibles$propriete_role_appli
+inseePropriete: branchesApplicativesPossibles$applitest
+description: upperCaseTest
+
 dn: cn=Utilisateurs_contacts_domaine1_WebServicesLdap,ou=WebServicesLdap_Obje
  ts,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
 description: Utilisateur du webservices contact
