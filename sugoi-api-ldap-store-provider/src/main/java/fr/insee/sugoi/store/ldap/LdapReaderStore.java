@@ -69,8 +69,10 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     User user = (entry != null) ? userLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
     if (user != null && user.getAddress() != null && user.getAddress().containsKey("id")) {
       Map<String, String> address = getAddress(user.getAddress().get("id"));
-      address.put("id", user.getAddress().get("id"));
-      user.setAddress(address);
+      if (address != null) {
+        address.put("id", user.getAddress().get("id"));
+        user.setAddress(address);
+      }
     }
     if (user != null && user.getOrganization() != null) {
       user.setOrganization(getOrganization(user.getOrganization().getIdentifiant()));
@@ -89,8 +91,10 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
         (entry != null) ? organizationLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
     if (org != null && org.getAddress() != null && org.getAddress().containsKey("id")) {
       Map<String, String> address = getAddress(org.getAddress().get("id"));
-      address.put("id", org.getAddress().get("id"));
-      org.setAddress(address);
+      if (address != null) {
+        address.put("id", org.getAddress().get("id"));
+        org.setAddress(address);
+      }
     }
     if (org != null && org.getOrganization() != null) {
       org.setOrganization(getOrganization(org.getOrganization().getIdentifiant()));
