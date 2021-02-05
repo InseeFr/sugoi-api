@@ -23,25 +23,25 @@ public class UserStorageLdapMapper {
   public static UserStorage mapFromAttributes(Collection<Attribute> attributes) {
     UserStorage userStorage = new UserStorage();
     attributes.stream()
-        .filter(attribute -> attribute.getName().equals("inseepropriete"))
+        .filter(attribute -> attribute.getName().equalsIgnoreCase("inseepropriete"))
         .forEach(
             attribute -> {
               for (String value : attribute.getValues()) {
                 String[] property = value.split("\\$");
                 if (property.length == 2) {
-                  if (property[0].contains("brancheContact")) {
+                  if (property[0].equalsIgnoreCase("brancheContact")) {
                     userStorage.setUserSource(property[1]);
                   }
-                  if (property[0].equals("brancheOrganisation")) {
+                  if (property[0].equalsIgnoreCase("brancheOrganisation")) {
                     userStorage.setOrganizationSource(property[1]);
                   }
-                  if (property[0].equals("brancheAdresse")) {
+                  if (property[0].equalsIgnoreCase("brancheAdresse")) {
                     userStorage.setAddressSource(property[1]);
                   }
-                  if (property[0].equals("groupSourcePattern")) {
+                  if (property[0].equalsIgnoreCase("groupSourcePattern")) {
                     userStorage.addProperty("group_source_pattern", property[1]);
                   }
-                  if (property[0].equals("groupFilterPattern")) {
+                  if (property[0].equalsIgnoreCase("groupFilterPattern")) {
                     userStorage.addProperty("group_filter_pattern", property[1]);
                   }
                 }
@@ -49,7 +49,7 @@ public class UserStorageLdapMapper {
             });
     String name =
         attributes.stream()
-            .filter(attribute -> attribute.getName().equals("cn"))
+            .filter(attribute -> attribute.getName().equalsIgnoreCase("cn"))
             .collect(Collectors.toList())
             .get(0)
             .getValue();

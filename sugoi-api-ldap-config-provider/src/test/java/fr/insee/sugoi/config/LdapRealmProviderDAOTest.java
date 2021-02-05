@@ -57,10 +57,26 @@ public class LdapRealmProviderDAOTest {
   @Test
   public void findAllStorages() {
     List<Realm> realms = ldapRealmProviderDAOImpl.findAll();
-    assertThat("Should have three realm", realms.size(), is(3));
+    assertThat("Should have 4 realm", realms.size(), is(4));
     assertThat(
         "Should have userstorages",
         realms.get(1).getUserStorages().get(0).getName(),
         is("autreUserStorage"));
+  }
+
+  @Test
+  public void testCaseInsensitivity() {
+    List<Realm> realms = ldapRealmProviderDAOImpl.findAll();
+    assertThat("Should have 4 realm", realms.size(), is(4));
+    Realm uc =
+        realms.stream()
+            .filter(r -> r.getName().equalsIgnoreCase("uppercasetest"))
+            .findFirst()
+            .get();
+    assertThat("Should be on localhost", uc.getUrl(), is("localhost"));
+    assertThat(
+        "userstorage should be on 'ou=contacts,ou=clients_domaine1,o=insee,c=fr'",
+        uc.getUserStorages().get(0).getUserSource(),
+        is("ou=contacts,ou=clients_domaine1,o=insee,c=fr"));
   }
 }

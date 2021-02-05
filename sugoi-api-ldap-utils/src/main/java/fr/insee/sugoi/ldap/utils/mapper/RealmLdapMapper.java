@@ -21,16 +21,17 @@ public class RealmLdapMapper {
 
   public static Realm mapFromSearchEntry(SearchResultEntry searchResultEntry) {
     Realm realm = new Realm();
+    // this means we can't have _ in a realm name !
     realm.setName(searchResultEntry.getAttributeValue("cn").split("_")[1]);
     String[] inseeProperties = searchResultEntry.getAttributeValues("inseepropriete");
     for (String inseeProperty : inseeProperties) {
       String[] property = inseeProperty.split("\\$");
       // Test if property is valid
       if (property.length == 2) {
-        if (property[0].equals("ldapUrl")) {
+        if (property[0].equalsIgnoreCase("ldapUrl")) {
           realm.setUrl(property[1]);
         }
-        if (property[0].contains("branchesApplicativesPossibles")) {
+        if (property[0].equalsIgnoreCase("branchesApplicativesPossibles")) {
           realm.setAppSource(property[1]);
         }
       }
