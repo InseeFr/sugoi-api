@@ -109,20 +109,22 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   public User updateUser(User updatedUser) {
     try {
       User currentUser = ldapReaderStore.getUser(updatedUser.getUsername());
-      if (updatedUser.getAddress() != null) {
-        if (currentUser.getAddress().containsKey("id")) {
-          updateAddress(currentUser.getAddress().get("id"), updatedUser.getAddress());
-        } else {
-          Map<String, String> newAddress = new HashMap<>();
-          newAddress.put("id", createAddress(updatedUser.getAddress()).toString());
-          updatedUser.setAddress(newAddress);
-          createAddress(updatedUser.getAddress());
+      if (updatedUser != null) {
+        if (updatedUser.getAddress() != null) {
+          if (currentUser.getAddress() != null && currentUser.getAddress().containsKey("id")) {
+            updateAddress(currentUser.getAddress().get("id"), updatedUser.getAddress());
+          } else {
+            Map<String, String> newAddress = new HashMap<>();
+            newAddress.put("id", createAddress(updatedUser.getAddress()).toString());
+            updatedUser.setAddress(newAddress);
+            createAddress(updatedUser.getAddress());
+          }
         }
+        ModifyRequest mr =
+            new ModifyRequest(
+                getUserDN(updatedUser.getUsername()), userLdapMapper.createMods(updatedUser));
+        ldapPoolConnection.modify(mr);
       }
-      ModifyRequest mr =
-          new ModifyRequest(
-              getUserDN(updatedUser.getUsername()), userLdapMapper.createMods(updatedUser));
-      ldapPoolConnection.modify(mr);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to update user while writing to LDAP", e);
     }
