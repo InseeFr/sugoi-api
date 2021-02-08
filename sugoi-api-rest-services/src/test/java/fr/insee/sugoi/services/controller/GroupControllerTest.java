@@ -195,6 +195,11 @@ public class GroupControllerTest {
           objectMapper.readValue(response.getContentAsString(), Group.class).getDescription(),
           is("groupe pas fou"));
 
+      assertThat(
+          "Should get location",
+          response.getHeader("Location"),
+          is("http://localhost/domaine1/groups/Group2"));
+
     } catch (Exception e) {
       e.printStackTrace();
       fail();

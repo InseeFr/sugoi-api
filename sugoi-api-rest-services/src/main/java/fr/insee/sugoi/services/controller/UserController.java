@@ -150,11 +150,7 @@ public class UserController {
 
     if (userService.findById(realm, storage, id) != null) {
       userService.update(realm, storage, user);
-      URI location =
-          ServletUriComponentsBuilder.fromCurrentRequest()
-              .path("/" + user.getUsername())
-              .build()
-              .toUri();
+      URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
       return ResponseEntity.status(HttpStatus.OK)
           .header(HttpHeaders.LOCATION, location.toString())
           .body(userService.findById(realm, storage, id));

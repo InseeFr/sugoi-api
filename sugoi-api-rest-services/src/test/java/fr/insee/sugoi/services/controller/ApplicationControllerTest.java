@@ -198,6 +198,11 @@ public class ApplicationControllerTest {
           objectMapper.readValue(response.getContentAsString(), Application.class).getOwner(),
           is("NewOwner"));
 
+      assertThat(
+          "Should get location",
+          response.getHeader("Location"),
+          is("http://localhost/domaine1/applications/SuperAppli"));
+
     } catch (Exception e) {
       e.printStackTrace();
       fail();

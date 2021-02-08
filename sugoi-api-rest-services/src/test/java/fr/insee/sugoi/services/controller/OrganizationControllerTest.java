@@ -196,6 +196,11 @@ public class OrganizationControllerTest {
               .getIdentifiant(),
           is("BigOrga"));
 
+      assertThat(
+          "Should get location",
+          response.getHeader("Location"),
+          is("http://localhost/domaine1/organizations/SimpleOrga"));
+
     } catch (Exception e) {
       e.printStackTrace();
       fail();

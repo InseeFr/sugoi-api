@@ -127,11 +127,7 @@ public class OrganizationController {
     if (organizationService.findById(realm, storage, id) != null) {
       organizationService.update(realm, storage, organization);
 
-      URI location =
-          ServletUriComponentsBuilder.fromCurrentRequest()
-              .path("/" + organization.getIdentifiant())
-              .build()
-              .toUri();
+      URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
 
       return ResponseEntity.status(HttpStatus.OK)
           .header(HttpHeaders.LOCATION, location.toString())
