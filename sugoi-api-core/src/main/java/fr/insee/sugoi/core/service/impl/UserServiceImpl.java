@@ -21,6 +21,7 @@ import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.User;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,26 +34,32 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public User create(String realm, String storage, User user) {
-    sugoiEventPublisher.publishCustomEvent(realm, storage, SugoiEventTypeEnum.CREATE_USER, user);
+    sugoiEventPublisher.publishCustomEvent(
+        realm, storage, SugoiEventTypeEnum.CREATE_USER, Map.ofEntries(Map.entry("user", user)));
     return storeProvider.getWriterStore(realm, storage).createUser(user);
   }
 
   @Override
   public void update(String realm, String storage, User user) {
-    sugoiEventPublisher.publishCustomEvent(realm, storage, SugoiEventTypeEnum.UPDATE_USER, user);
+    sugoiEventPublisher.publishCustomEvent(
+        realm, storage, SugoiEventTypeEnum.UPDATE_USER, Map.ofEntries(Map.entry("user", user)));
     storeProvider.getWriterStore(realm, storage).updateUser(user);
   }
 
   @Override
   public void delete(String realmName, String storage, String id) {
-    sugoiEventPublisher.publishCustomEvent(realmName, storage, SugoiEventTypeEnum.DELETE_USER, id);
+    sugoiEventPublisher.publishCustomEvent(
+        realmName, storage, SugoiEventTypeEnum.DELETE_USER, Map.ofEntries(Map.entry("userId", id)));
     storeProvider.getWriterStore(realmName, storage).deleteUser(id);
   }
 
   @Override
   public User findById(String realmName, String storage, String id) {
     sugoiEventPublisher.publishCustomEvent(
-        realmName, storage, SugoiEventTypeEnum.FIND_USER_BY_ID, id);
+        realmName,
+        storage,
+        SugoiEventTypeEnum.FIND_USER_BY_ID,
+        Map.ofEntries(Map.entry("userId", id)));
     try {
       return storeProvider.getReaderStore(realmName, storage).getUser(id);
     } catch (Exception e) {
@@ -67,8 +74,15 @@ public class UserServiceImpl implements UserService {
       User userProperties,
       PageableResult pageable,
       SearchType typeRecherche) {
+
     sugoiEventPublisher.publishCustomEvent(
-        realm, storage, SugoiEventTypeEnum.FIND_USERS, userProperties);
+        realm,
+        storage,
+        SugoiEventTypeEnum.FIND_USERS,
+        Map.ofEntries(
+            Map.entry("userProperties", userProperties),
+            Map.entry("pageable", pageable),
+            Map.entry("typeRecherche", typeRecherche)));
     try {
       return storeProvider
           .getReaderStore(realm, storage)

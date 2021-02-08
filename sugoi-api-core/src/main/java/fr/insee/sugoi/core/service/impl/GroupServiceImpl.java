@@ -21,6 +21,7 @@ import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Group;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,19 +35,30 @@ public class GroupServiceImpl implements GroupService {
   @Override
   public Group create(String realm, String storageName, String appName, Group group) {
     sugoiEventPublisher.publishCustomEvent(
-        realm, storageName, SugoiEventTypeEnum.CREATE_GROUP, group);
+        realm,
+        storageName,
+        SugoiEventTypeEnum.CREATE_GROUP,
+        Map.ofEntries(Map.entry("group", group), Map.entry("appName", appName)));
     return storeProvider.getWriterStore(realm, storageName).createGroup(appName, group);
   }
 
   @Override
   public void delete(String realm, String storageName, String appName, String id) {
-    sugoiEventPublisher.publishCustomEvent(realm, storageName, SugoiEventTypeEnum.DELETE_GROUP, id);
+    sugoiEventPublisher.publishCustomEvent(
+        realm,
+        storageName,
+        SugoiEventTypeEnum.DELETE_GROUP,
+        Map.ofEntries(Map.entry("groupId", id)));
     storeProvider.getWriterStore(realm, storageName).deleteGroup(appName, id);
   }
 
   @Override
   public Group findById(String realm, String storage, String appName, String id) {
-    sugoiEventPublisher.publishCustomEvent(realm, storage, SugoiEventTypeEnum.FIND_GROUP_BY_ID, id);
+    sugoiEventPublisher.publishCustomEvent(
+        realm,
+        storage,
+        SugoiEventTypeEnum.FIND_GROUP_BY_ID,
+        Map.ofEntries(Map.entry("groupId", id), Map.entry("appName", appName)));
     return storeProvider.getReaderStore(realm, storage).getGroup(appName, id);
   }
 
@@ -58,7 +70,10 @@ public class GroupServiceImpl implements GroupService {
       Group groupFilter,
       PageableResult pageableResult) {
     sugoiEventPublisher.publishCustomEvent(
-        realm, storageName, SugoiEventTypeEnum.FIND_GROUPS, groupFilter);
+        realm,
+        storageName,
+        SugoiEventTypeEnum.FIND_GROUPS,
+        Map.ofEntries(Map.entry("appName", appName), Map.entry("groupFilter", groupFilter)));
     return storeProvider
         .getReaderStore(realm, storageName)
         .searchGroups(appName, groupFilter, pageableResult, SearchType.AND.name());
@@ -67,7 +82,10 @@ public class GroupServiceImpl implements GroupService {
   @Override
   public void update(String realm, String storageName, String appName, Group group) {
     sugoiEventPublisher.publishCustomEvent(
-        realm, storageName, SugoiEventTypeEnum.UPDATE_GROUP, group);
+        realm,
+        storageName,
+        SugoiEventTypeEnum.UPDATE_GROUP,
+        Map.ofEntries(Map.entry("group", group), Map.entry("appName", appName)));
     storeProvider.getWriterStore(realm, storageName).updateGroup(appName, group);
   }
 }

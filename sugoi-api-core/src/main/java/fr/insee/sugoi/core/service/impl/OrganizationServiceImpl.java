@@ -21,6 +21,7 @@ import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.OrganizationService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Organization;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,14 +35,20 @@ public class OrganizationServiceImpl implements OrganizationService {
   @Override
   public Organization create(String realm, String storageName, Organization organization) {
     sugoiEventPublisher.publishCustomEvent(
-        realm, storageName, SugoiEventTypeEnum.CREATE_ORGANIZATION, organization);
+        realm,
+        storageName,
+        SugoiEventTypeEnum.CREATE_ORGANIZATION,
+        Map.ofEntries(Map.entry("organization", organization)));
     return storeProvider.getWriterStore(realm, storageName).createOrganization(organization);
   }
 
   @Override
   public void delete(String realm, String storageName, String id) {
     sugoiEventPublisher.publishCustomEvent(
-        realm, storageName, SugoiEventTypeEnum.DELETE_ORGANIZATION, id);
+        realm,
+        storageName,
+        SugoiEventTypeEnum.DELETE_ORGANIZATION,
+        Map.ofEntries(Map.entry("organizationId", id)));
 
     storeProvider.getWriterStore(realm, storageName).deleteOrganization(id);
   }
@@ -49,7 +56,10 @@ public class OrganizationServiceImpl implements OrganizationService {
   @Override
   public Organization findById(String realm, String storage, String id) {
     sugoiEventPublisher.publishCustomEvent(
-        realm, storage, SugoiEventTypeEnum.FIND_ORGANIZATION_BY_ID, id);
+        realm,
+        storage,
+        SugoiEventTypeEnum.FIND_ORGANIZATION_BY_ID,
+        Map.ofEntries(Map.entry("organizationId", id)));
     return storeProvider.getReaderStore(realm, storage).getOrganization(id);
   }
 
@@ -60,17 +70,27 @@ public class OrganizationServiceImpl implements OrganizationService {
       Organization organizationFilter,
       PageableResult pageableResult,
       SearchType typeRecherche) {
+
     sugoiEventPublisher.publishCustomEvent(
-        realm, storageName, SugoiEventTypeEnum.FIND_ORGANIZATIONS, organizationFilter);
+        realm,
+        storageName,
+        SugoiEventTypeEnum.FIND_ORGANIZATIONS,
+        Map.ofEntries(
+            Map.entry("organizationFilter", organizationFilter),
+            Map.entry("pageableResult", pageableResult),
+            Map.entry("typeRecherche", typeRecherche)));
     return storeProvider
         .getReaderStore(realm, storageName)
-        .searchOrganizations(organizationFilter, pageableResult, typeRecherche.name());
+        .searchOrganizations(organizationFilter, pageableResult, "AND");
   }
 
   @Override
   public void update(String realm, String storageName, Organization organization) {
     sugoiEventPublisher.publishCustomEvent(
-        realm, storageName, SugoiEventTypeEnum.UPDATE_ORGANIZATION, organization);
+        realm,
+        storageName,
+        SugoiEventTypeEnum.UPDATE_ORGANIZATION,
+        Map.ofEntries(Map.entry("organization", organization)));
     storeProvider.getWriterStore(realm, storageName).updateOrganization(organization);
   }
 }

@@ -23,15 +23,17 @@ import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import java.util.HashMap;
 import java.util.Map;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component
-@ConditionalOnProperty(name = "sugoi.api.event.log.producer.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(
+    name = "sugoi.api.event.log.producer.enabled",
+    havingValue = "true",
+    matchIfMissing = false)
 public class SugoiEventLogProducer {
 
   public static final Logger logger = LoggerFactory.getLogger(SugoiEventLogProducer.class);
@@ -39,8 +41,8 @@ public class SugoiEventLogProducer {
   @EventListener
   public void handleContextStart(SugoiEvent cse) {
     SugoiEventTypeEnum eventType = cse.getEventType();
-    Object object = cse.getObject();
     String realm = cse.getRealm();
+    Map<String, Object> properties = cse.getProperties();
     String userStorage = cse.getUserStorage() == null ? "default" : cse.getUserStorage();
     Map<String, Object> toLog = new HashMap<>();
     toLog.put("type", eventType.toString());
@@ -48,71 +50,77 @@ public class SugoiEventLogProducer {
       case CREATE_USER:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("userId", ((User) object).getUsername());
+        toLog.put("userId", ((User) properties.get("user")).getUsername());
         break;
       case UPDATE_USER:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("userId", ((User) object).getUsername());
+        toLog.put("userId", ((User) properties.get("user")).getUsername());
         break;
       case DELETE_USER:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("userId", (String) object);
+        toLog.put("userId", (String) properties.get("userId"));
         break;
       case FIND_USERS:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
         Map<String, String> params = new HashMap<>();
-        params.put("username", ((User) object).getUsername());
-        params.put("commun_name", (String) ((User) object).getAttributes().get("commmun_name"));
-        params.put("description", (String) ((User) object).getAttributes().get("description"));
+        params.put("username", ((User) properties.get("user")).getUsername());
+        params.put(
+            "commun_name",
+            (String) ((User) properties.get("user")).getAttributes().get("commmun_name"));
+        params.put(
+            "description",
+            (String) ((User) properties.get("user")).getAttributes().get("description"));
         toLog.put("params", params);
         break;
       case FIND_USER_BY_ID:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("userId", (String) object);
+        toLog.put("userId", (String) properties.get("userId"));
         break;
       case CREATE_ORGANIZATION:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("organizationId", ((Organization) object).getIdentifiant());
+        toLog.put(
+            "organizationId", ((Organization) properties.get("organization")).getIdentifiant());
         break;
       case UPDATE_ORGANIZATION:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("organizationId", ((Organization) object).getIdentifiant());
+        toLog.put(
+            "organizationId", ((Organization) properties.get("organization")).getIdentifiant());
         break;
       case DELETE_ORGANIZATION:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("organizationId", (String) object);
+        toLog.put("organizationId", (String) properties.get("organizationId"));
         break;
       case FIND_ORGANIZATIONS:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("params", ((Organization) object).getIdentifiant());
+        toLog.put("params", ((Organization) properties.get("organization")).getIdentifiant());
         break;
       case FIND_ORGANIZATION_BY_ID:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("organizationId", (String) object);
+        toLog.put("organizationId", (String) properties.get("organizationId"));
         break;
       case CREATE_HABILITATION:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("habilitationId", ((Habilitation) object).getId());
+        toLog.put("habilitationId", ((Habilitation) properties.get("habilitation")).getId());
         break;
       case UPDATE_HABILITATION:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("habilitationId", ((Habilitation) object).getId());
+        toLog.put("habilitationId", ((Habilitation) properties.get("habilitation")).getId());
         break;
       case DELETE_HABILITATION:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("habilitationId", (String) object);
+        toLog.put("habilitationId", (String) properties.get("habilitationId"));
         break;
       case FIND_HABILITATIONS:
         toLog.put("realm", realm);
@@ -121,61 +129,61 @@ public class SugoiEventLogProducer {
       case FIND_HABILITATION_BY_ID:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("habilitationId", (String) object);
+        toLog.put("habilitationId", (String) properties.get("habilitationId"));
         break;
       case CREATE_REALM:
-        toLog.put("realmName", ((Realm) object).getName());
+        toLog.put("realmName", ((Realm) properties.get("realm")).getName());
         break;
       case UPDATE_REALM:
-        toLog.put("realmName", ((Realm) object).getName());
+        toLog.put("realmName", ((Realm) properties.get("realm")).getName());
         break;
       case DELETE_REALM:
-        toLog.put("realmName", ((Realm) object).getName());
+        toLog.put("realmName", ((Realm) properties.get("realm")).getName());
         break;
       case FIND_REALMS:
         break;
       case FIND_REALM_BY_ID:
-        toLog.put("realmName", (String) object);
+        toLog.put("realmName", (String) properties.get("realmName"));
         break;
       case CREATE_APPLICATION:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("applicationName", ((Application) object).getName());
+        toLog.put("applicationName", ((Application) properties.get("application")).getName());
         break;
       case UPDATE_APPLICATION:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("applicationName", ((Application) object).getName());
+        toLog.put("applicationName", ((Application) properties.get("application")).getName());
         break;
       case DELETE_APPLICATION:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("applicationName", (String) object);
+        toLog.put("applicationName", (String) properties.get("applicationId"));
         break;
       case FIND_APPLICATIONS:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("params", ((Application) object).getName());
+        toLog.put("params", ((Application) properties.get("application")).getName());
         break;
       case FIND_APPLICATION_BY_ID:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("applicationName", ((Application) object).getName());
+        toLog.put("applicationName", ((Application) properties.get("application")).getName());
         break;
       case CREATE_GROUP:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("groupName", ((Group) object).getName());
+        toLog.put("groupName", ((Group) properties.get("group")).getName());
         break;
       case UPDATE_GROUP:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("groupName", ((Group) object).getName());
+        toLog.put("groupName", ((Group) properties.get("group")).getName());
         break;
       case DELETE_GROUP:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("groupName", ((String) object));
+        toLog.put("groupName", ((String) properties.get("groupId")));
         break;
       case FIND_GROUPS:
         toLog.put("realm", realm);
@@ -184,22 +192,22 @@ public class SugoiEventLogProducer {
       case FIND_GROUP_BY_ID:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("groupName", ((String) object));
+        toLog.put("groupName", ((String) properties.get("groupId")));
         break;
       case CHANGE_PASSWORD:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("userId", (String) object);
+        toLog.put("userId", ((User) properties.get("user")).getUsername());
         break;
       case INIT_PASSWORD:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("userId", (String) object);
+        toLog.put("userId", (String) ((User) properties.get("user")).getUsername());
         break;
       case RESET_PASSWORD:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("userId", (String) object);
+        toLog.put("userId", (String) ((User) properties.get("user")).getUsername());
         break;
     }
     if (!toLog.isEmpty()) {

@@ -21,6 +21,7 @@ import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.ApplicationService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Application;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,28 +34,40 @@ public class ApplicationServiceImpl implements ApplicationService {
   @Override
   public Application create(String realm, String storageName, Application application) {
     sugoiEventPublisher.publishCustomEvent(
-        realm, storageName, SugoiEventTypeEnum.CREATE_APPLICATION, application);
+        realm,
+        storageName,
+        SugoiEventTypeEnum.CREATE_APPLICATION,
+        Map.ofEntries(Map.entry("application", application)));
     return storeProvider.getWriterStore(realm, storageName).createApplication(application);
   }
 
   @Override
   public void delete(String realm, String storageName, String id) {
     sugoiEventPublisher.publishCustomEvent(
-        realm, storageName, SugoiEventTypeEnum.DELETE_APPLICATION, id);
+        realm,
+        storageName,
+        SugoiEventTypeEnum.DELETE_APPLICATION,
+        Map.ofEntries(Map.entry("applicationId", id)));
     storeProvider.getWriterStore(realm, storageName).deleteApplication(id);
   }
 
   @Override
   public void update(String realm, String storageName, Application application) {
     sugoiEventPublisher.publishCustomEvent(
-        realm, storageName, SugoiEventTypeEnum.UPDATE_APPLICATION, application);
+        realm,
+        storageName,
+        SugoiEventTypeEnum.UPDATE_APPLICATION,
+        Map.ofEntries(Map.entry("application", application)));
     storeProvider.getWriterStore(realm, storageName).updateApplication(application);
   }
 
   @Override
   public Application findById(String realm, String storage, String id) {
     sugoiEventPublisher.publishCustomEvent(
-        realm, storage, SugoiEventTypeEnum.FIND_APPLICATION_BY_ID, id);
+        realm,
+        storage,
+        SugoiEventTypeEnum.FIND_APPLICATION_BY_ID,
+        Map.ofEntries(Map.entry("applicationId", id)));
     return storeProvider.getReaderStore(realm, storage).getApplication(id);
   }
 
@@ -65,7 +78,10 @@ public class ApplicationServiceImpl implements ApplicationService {
       Application applicationFilter,
       PageableResult pageableResult) {
     sugoiEventPublisher.publishCustomEvent(
-        realm, storageName, SugoiEventTypeEnum.FIND_APPLICATIONS, applicationFilter);
+        realm,
+        storageName,
+        SugoiEventTypeEnum.FIND_APPLICATIONS,
+        Map.ofEntries(Map.entry("applicationFilter", applicationFilter)));
     return storeProvider
         .getReaderStore(realm, storageName)
         .searchApplications(applicationFilter, pageableResult, SearchType.AND.name());
