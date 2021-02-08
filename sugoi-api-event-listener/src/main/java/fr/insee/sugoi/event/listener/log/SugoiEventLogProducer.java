@@ -11,7 +11,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.event.listener;
+package fr.insee.sugoi.event.listener.log;
 
 import fr.insee.sugoi.core.event.model.SugoiEvent;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
@@ -23,17 +23,15 @@ import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import java.util.HashMap;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
-@ConditionalOnProperty(
-    name = "sugoi.api.event.log.producer.enabled",
-    havingValue = "true",
-    matchIfMissing = false)
+@ConditionalOnProperty(name = "sugoi.api.event.log.producer.enabled", havingValue = "true", matchIfMissing = false)
 public class SugoiEventLogProducer {
 
   public static final Logger logger = LoggerFactory.getLogger(SugoiEventLogProducer.class);

@@ -29,56 +29,42 @@ import org.springframework.stereotype.Service;
 @Service
 public class CredentialsServiceImpl implements CredentialsService {
 
-  @Autowired private StoreProvider storeProvider;
+  @Autowired
+  private StoreProvider storeProvider;
 
-  @Autowired private PasswordService passwordService;
+  @Autowired
+  private PasswordService passwordService;
 
-  @Autowired private SugoiEventPublisher sugoiEventPublisher;
+  @Autowired
+  private SugoiEventPublisher sugoiEventPublisher;
 
   @Override
-  public void reinitPassword(
-      String realm, String userStorage, String userId, PasswordChangeRequest pcr) {
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        userStorage,
-        SugoiEventTypeEnum.RESET_PASSWORD,
-        userId,
-        Map.ofEntries(Map.entry("pcr", pcr)));
+  public void reinitPassword(String realm, String userStorage, String userId, PasswordChangeRequest pcr) {
     User user = storeProvider.getReaderStore(realm, userStorage).getUser(userId);
     String password = passwordService.generatePassword();
     WriterStore writerStore = storeProvider.getWriterStore(realm, userStorage);
+    sugoiEventPublisher.publishCustomEvent(realm, userStorage, SugoiEventTypeEnum.RESET_PASSWORD, userId,
+        Map.ofEntries(Map.entry("pcr", pcr), Map.entry("user", user), Map.entry("password", password)));
     writerStore.reinitPassword(user, password);
     writerStore.changePasswordResetStatus(user, true);
   }
 
   @Override
-  public void changePassword(
-      String realm, String userStorage, String userId, PasswordChangeRequest pcr) {
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        userStorage,
-        SugoiEventTypeEnum.CHANGE_PASSWORD,
-        userId,
+  public void changePassword(String realm, String userStorage, String userId, PasswordChangeRequest pcr) {
+    sugoiEventPublisher.publishCustomEvent(realm, userStorage, SugoiEventTypeEnum.CHANGE_PASSWORD, userId,
         Map.ofEntries(Map.entry("pcr", pcr)));
     User user = storeProvider.getReaderStore(realm, userStorage).getUser(userId);
     boolean newPasswordIsValid = passwordService.validatePassword(pcr.getNewPassword());
     if (newPasswordIsValid) {
-      storeProvider
-          .getWriterStore(realm, userStorage)
-          .changePassword(user, pcr.getOldPassword(), pcr.getNewPassword());
+      storeProvider.getWriterStore(realm, userStorage).changePassword(user, pcr.getOldPassword(), pcr.getNewPassword());
     } else {
       throw new InvalidPasswordException("New password is not valid");
     }
   }
 
   @Override
-  public void initPassword(
-      String realm, String userStorage, String userId, PasswordChangeRequest pcr) {
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        userStorage,
-        SugoiEventTypeEnum.INIT_PASSWORD,
-        userId,
+  public void initPassword(String realm, String userStorage, String userId, PasswordChangeRequest pcr) {
+    sugoiEventPublisher.publishCustomEvent(realm, userStorage, SugoiEventTypeEnum.INIT_PASSWORD, userId,
         Map.ofEntries(Map.entry("pcr", pcr)));
     User user = storeProvider.getReaderStore(realm, userStorage).getUser(userId);
     storeProvider.getWriterStore(realm, userStorage).initPassword(user, pcr.getNewPassword());

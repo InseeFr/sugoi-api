@@ -1,0 +1,22 @@
+{
+  "MessageTemplate": {
+    "Header": [
+      {
+        "Name": "string",
+        "Value": "string"
+      }
+    ],
+    "Sender": "string",
+    "Subject": "string",
+    "Content": "string",
+    "PlainTextContent": "string",
+    "ContentReference": "string"
+  },
+  "Recipients": {
+    "Recipient": [
+      {
+        "Address": "string"
+      }
+    ]
+  }
+}
