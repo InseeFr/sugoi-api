@@ -17,6 +17,7 @@ import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
+import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.OrganizationService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Organization;
@@ -57,12 +58,13 @@ public class OrganizationServiceImpl implements OrganizationService {
       String realm,
       String storageName,
       Organization organizationFilter,
-      PageableResult pageableResult) {
+      PageableResult pageableResult,
+      SearchType typeRecherche) {
     sugoiEventPublisher.publishCustomEvent(
         realm, storageName, SugoiEventTypeEnum.FIND_ORGANIZATIONS, organizationFilter);
     return storeProvider
         .getReaderStore(realm, storageName)
-        .searchOrganizations(organizationFilter, pageableResult, "AND");
+        .searchOrganizations(organizationFilter, pageableResult, typeRecherche.name());
   }
 
   @Override

@@ -15,6 +15,7 @@ package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
+import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.OrganizationService;
 import fr.insee.sugoi.model.Organization;
 import io.swagger.v3.oas.annotations.Operation;
@@ -56,13 +57,16 @@ public class OrganizationController {
       @PathVariable(name = "storage", required = false) String storage,
       @RequestParam(value = "identifiant", required = false) String identifiant,
       @RequestParam(value = "size", defaultValue = "20") int size,
-      @RequestParam(value = "offset", defaultValue = "0") int offset) {
+      @RequestParam(value = "offset", defaultValue = "0") int offset,
+      @RequestParam(name = "typeRecherche", defaultValue = "AND", required = true)
+          SearchType typeRecherche) {
     Organization filterOrganization = new Organization();
     filterOrganization.setIdentifiant(identifiant);
     PageableResult pageableResult = new PageableResult(size, offset);
 
     PageResult<Organization> foundOrganizations =
-        organizationService.findByProperties(realm, storage, filterOrganization, pageableResult);
+        organizationService.findByProperties(
+            realm, storage, filterOrganization, pageableResult, typeRecherche);
 
     if (foundOrganizations.isHasMoreResult()) {
       URI location =
