@@ -17,6 +17,7 @@ import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
+import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.ApplicationService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Application;
@@ -67,6 +68,6 @@ public class ApplicationServiceImpl implements ApplicationService {
         realm, storageName, SugoiEventTypeEnum.FIND_APPLICATIONS, applicationFilter);
     return storeProvider
         .getReaderStore(realm, storageName)
-        .searchApplications(applicationFilter, pageableResult, "AND");
+        .searchApplications(applicationFilter, pageableResult, SearchType.AND.name());
   }
 }

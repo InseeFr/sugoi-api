@@ -17,6 +17,7 @@ import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
+import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Group;
@@ -60,7 +61,7 @@ public class GroupServiceImpl implements GroupService {
         realm, storageName, SugoiEventTypeEnum.FIND_GROUPS, groupFilter);
     return storeProvider
         .getReaderStore(realm, storageName)
-        .searchGroups(appName, groupFilter, pageableResult, "AND");
+        .searchGroups(appName, groupFilter, pageableResult, SearchType.AND.name());
   }
 
   @Override

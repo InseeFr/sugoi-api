@@ -15,6 +15,7 @@ package fr.insee.sugoi.core.service;
 
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
+import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.model.Organization;
 
 public interface OrganizationService {
@@ -26,7 +27,11 @@ public interface OrganizationService {
   Organization findById(String realm, String storage, String id);
 
   PageResult<Organization> findByProperties(
-      String realm, String storage, Organization organizationFilter, PageableResult pageableResult);
+      String realm,
+      String storage,
+      Organization organizationFilter,
+      PageableResult pageableResult,
+      SearchType typeRecherche);
 
   void update(String realm, String storage, Organization organization);
 }

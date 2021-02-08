@@ -15,6 +15,7 @@ package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
+import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
@@ -64,8 +65,8 @@ public class UserController {
       @RequestParam(name = "size", defaultValue = "20") int size,
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "searchCookie", required = false) String searchCookie,
-      @RequestParam(name = "typeRecherche", defaultValue = "et", required = true)
-          String typeRecherche,
+      @RequestParam(name = "typeRecherche", defaultValue = "AND", required = true)
+          SearchType typeRecherche,
       @RequestParam(name = "habilitation", required = false) List<String> habilitations,
       @RequestParam(name = "application", required = false) String application) {
 
@@ -92,7 +93,7 @@ public class UserController {
     pageable.setSize(size);
 
     PageResult<User> foundUsers =
-        userService.findByProperties(realm, storage, searchUser, pageable);
+        userService.findByProperties(realm, storage, searchUser, pageable, typeRecherche);
     if (foundUsers.isHasMoreResult()) {
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()

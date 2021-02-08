@@ -119,7 +119,7 @@ public class LdapReaderStoreTest {
   public void testSearchAllOrganizations() {
     PageableResult pageableResult = new PageableResult();
     List<Organization> organizations =
-        ldapReaderStore.searchOrganizations(new Organization(), pageableResult, "").getResults();
+        ldapReaderStore.searchOrganizations(new Organization(), pageableResult, "AND").getResults();
     assertThat(
         "Should contain testi",
         organizations.stream().anyMatch(orga -> orga.getIdentifiant().equals("testi")));
@@ -136,7 +136,7 @@ public class LdapReaderStoreTest {
     Organization organizationFilter = new Organization();
     organizationFilter.addAttributes("description", "Insee");
     List<Organization> organizations =
-        ldapReaderStore.searchOrganizations(organizationFilter, pageableResult, "").getResults();
+        ldapReaderStore.searchOrganizations(organizationFilter, pageableResult, "AND").getResults();
     assertThat("Should find one result", organizations.size(), is(1));
     assertThat(
         "First element found should be testo", organizations.get(0).getIdentifiant(), is("testo"));
@@ -165,7 +165,7 @@ public class LdapReaderStoreTest {
   @Test
   public void testSearchAllUsers() {
     PageableResult pageableResult = new PageableResult();
-    List<User> users = ldapReaderStore.searchUsers(new User(), pageableResult, "et").getResults();
+    List<User> users = ldapReaderStore.searchUsers(new User(), pageableResult, "AND").getResults();
     assertThat(
         "Should contain testo",
         users.stream().anyMatch(user -> user.getUsername().equals("testo")));
@@ -179,7 +179,7 @@ public class LdapReaderStoreTest {
     PageableResult pageableResult = new PageableResult();
     User testUser = new User();
     testUser.setMail("test@test.fr");
-    List<User> users = ldapReaderStore.searchUsers(testUser, pageableResult, "et").getResults();
+    List<User> users = ldapReaderStore.searchUsers(testUser, pageableResult, "AND").getResults();
     assertThat("Should find one result", users.size(), is(1));
     assertThat("First element found should be testc", users.get(0).getUsername(), is("testc"));
   }
@@ -214,7 +214,7 @@ public class LdapReaderStoreTest {
   public void testSearchAllApplications() {
     PageableResult pageableResult = new PageableResult();
     List<Application> applications =
-        ldapReaderStore.searchApplications(new Application(), pageableResult, "").getResults();
+        ldapReaderStore.searchApplications(new Application(), pageableResult, "AND").getResults();
     assertThat(
         "Should contain applitest",
         applications.stream().anyMatch(appli -> appli.getName().equals("Applitest")));
@@ -229,7 +229,7 @@ public class LdapReaderStoreTest {
     Application applicationFilter = new Application();
     applicationFilter.setName("Applitest");
     List<Application> applications =
-        ldapReaderStore.searchApplications(applicationFilter, pageableResult, "").getResults();
+        ldapReaderStore.searchApplications(applicationFilter, pageableResult, "AND").getResults();
     assertThat("Should find one result", applications.size(), is(1));
     assertThat(
         "First element found should be Applitest", applications.get(0).getName(), is("Applitest"));
@@ -252,7 +252,7 @@ public class LdapReaderStoreTest {
   public void testSearchAllGroups() {
     PageableResult pageableResult = new PageableResult();
     List<Group> groups =
-        ldapReaderStore.searchGroups("Applitest", new Group(), pageableResult, "").getResults();
+        ldapReaderStore.searchGroups("Applitest", new Group(), pageableResult, "AND").getResults();
     assertThat(
         "Should contain utilisateurs",
         groups.stream().anyMatch(group -> group.getName().equals("Utilisateurs_Applitest")));

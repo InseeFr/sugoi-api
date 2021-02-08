@@ -17,6 +17,7 @@ import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
+import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.User;
@@ -61,11 +62,17 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public PageResult<User> findByProperties(
-      String realm, String storage, User userProperties, PageableResult pageable) {
+      String realm,
+      String storage,
+      User userProperties,
+      PageableResult pageable,
+      SearchType typeRecherche) {
     sugoiEventPublisher.publishCustomEvent(
         realm, storage, SugoiEventTypeEnum.FIND_USERS, userProperties);
     try {
-      return storeProvider.getReaderStore(realm, storage).searchUsers(userProperties, pageable, "");
+      return storeProvider
+          .getReaderStore(realm, storage)
+          .searchUsers(userProperties, pageable, typeRecherche.name());
     } catch (Exception e) {
       throw new RuntimeException("Erreur lors de la récupération des utilisateurs", e);
     }

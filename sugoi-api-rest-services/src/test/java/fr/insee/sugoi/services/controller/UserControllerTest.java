@@ -87,7 +87,11 @@ public class UserControllerTest {
 
       Mockito.when(
               userService.findByProperties(
-                  Mockito.anyString(), Mockito.isNull(), Mockito.any(), Mockito.any()))
+                  Mockito.anyString(),
+                  Mockito.isNull(),
+                  Mockito.any(),
+                  Mockito.any(),
+                  Mockito.any()))
           .thenReturn(pageResult);
 
       RequestBuilder requestBuilder =
@@ -238,7 +242,7 @@ public class UserControllerTest {
 
       Mockito.when(
               userService.findByProperties(
-                  Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any()))
+                  Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
           .thenReturn(pageResult);
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.get("/domaine1/users?size=2").accept(MediaType.APPLICATION_JSON);

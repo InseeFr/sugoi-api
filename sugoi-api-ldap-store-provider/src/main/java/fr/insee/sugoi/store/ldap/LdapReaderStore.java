@@ -110,7 +110,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       return searchOnLdap(
           config.get("user_source"),
           SearchScope.SUBORDINATE_SUBTREE,
-          getFilterFromObject(userFilter, userLdapMapper),
+          getFilterFromObject(userFilter, userLdapMapper, typeRecherche),
           pageable,
           userLdapMapper);
     } catch (LDAPSearchException e) {
@@ -142,7 +142,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       return searchOnLdap(
           config.get("organization_source"),
           SearchScope.SUBORDINATE_SUBTREE,
-          getFilterFromObject(organizationFilter, organizationLdapMapper),
+          getFilterFromObject(organizationFilter, organizationLdapMapper, searchOperator),
           pageable,
           organizationLdapMapper);
     } catch (LDAPSearchException e) {
@@ -177,7 +177,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
           SearchScope.SUBORDINATE_SUBTREE,
           Filter.createANDFilter(
               Filter.create(getGroupWildcardFilter(appName)),
-              getFilterFromObject(groupFilter, groupLdapMapper)),
+              getFilterFromObject(groupFilter, groupLdapMapper, searchOperator)),
           pageable,
           groupLdapMapper);
     } catch (LDAPException e) {
@@ -214,7 +214,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       return searchOnLdap(
           config.get("app_source"),
           SearchScope.ONE,
-          getFilterFromObject(applicationFilter, applicationLdapMapper),
+          getFilterFromObject(applicationFilter, applicationLdapMapper, searchOperator),
           pageable,
           applicationLdapMapper);
     } catch (LDAPSearchException e) {
@@ -232,11 +232,19 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
    * @return a filter corresponding to the properties of object
    */
   private <MapperType> Filter getFilterFromObject(
-      MapperType object, LdapMapper<MapperType> mapper) {
-    return LdapFilter.and(
-        mapper.mapToAttributes(object).stream()
-            .map(attribute -> LdapFilter.contains(attribute.getName(), attribute.getValue()))
-            .collect(Collectors.toList()));
+      MapperType object, LdapMapper<MapperType> mapper, String searchType) {
+    if (searchType.equalsIgnoreCase("AND")) {
+      return LdapFilter.and(
+          mapper.mapToAttributes(object).stream()
+              .map(attribute -> LdapFilter.contains(attribute.getName(), attribute.getValue()))
+              .collect(Collectors.toList()));
+    } else if (searchType.equalsIgnoreCase("OR")) {
+      return LdapFilter.or(
+          mapper.mapToAttributes(object).stream()
+              .map(attribute -> LdapFilter.contains(attribute.getName(), attribute.getValue()))
+              .collect(Collectors.toList()));
+    }
+    throw new RuntimeException("Invalid searchType must be AND or OR");
   }
 
   private SearchResultEntry getEntryByDn(String dn) {

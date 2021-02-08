@@ -15,6 +15,7 @@ package fr.insee.sugoi.core.service;
 
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
+import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.model.User;
 
 public interface UserService {
@@ -28,5 +29,9 @@ public interface UserService {
   User findById(String realm, String storageName, String idep);
 
   PageResult<User> findByProperties(
-      String realm, String storageName, User userProperties, PageableResult pageable);
+      String realm,
+      String storageName,
+      User userProperties,
+      PageableResult pageable,
+      SearchType typeRecherche);
 }
