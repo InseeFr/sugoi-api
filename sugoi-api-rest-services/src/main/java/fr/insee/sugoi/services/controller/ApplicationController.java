@@ -127,11 +127,7 @@ public class ApplicationController {
     if (applicationService.findById(realm, storage, id) != null) {
       applicationService.update(realm, storage, application);
 
-      URI location =
-          ServletUriComponentsBuilder.fromCurrentRequest()
-              .path("/" + application.getName())
-              .build()
-              .toUri();
+      URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
 
       return ResponseEntity.status(HttpStatus.OK)
           .header(HttpHeaders.LOCATION, location.toString())

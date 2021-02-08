@@ -197,6 +197,11 @@ public class UserControllerTest {
           objectMapper.readValue(response.getContentAsString(), User.class).getMail(),
           is("new.toto@insee.fr"));
 
+      assertThat(
+          "Should get location",
+          response.getHeader("Location"),
+          is("http://localhost/domaine1/users/Toto"));
+
     } catch (Exception e) {
       e.printStackTrace();
       fail();

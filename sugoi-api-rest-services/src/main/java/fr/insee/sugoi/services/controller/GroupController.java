@@ -128,11 +128,7 @@ public class GroupController {
 
     if (groupService.findById(realm, storage, applicationName, id) != null) {
       groupService.update(realm, storage, applicationName, group);
-      URI location =
-          ServletUriComponentsBuilder.fromCurrentRequest()
-              .path("/" + group.getName())
-              .build()
-              .toUri();
+      URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
       return ResponseEntity.status(HttpStatus.OK)
           .header(HttpHeaders.LOCATION, location.toString())
           .body(groupService.findById(realm, storage, applicationName, id));
