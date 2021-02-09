@@ -25,7 +25,7 @@ public class SugoiApiServicesApplication extends SpringBootServletInitializer {
   protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
     return application
         .properties(
-            "spring.config.location=classpath:/,file:${catalina.base}/webapps/"
+            "spring.config.location=optional:classpath:/,optional:file:${catalina.base}/webapps/"
                 + "sugoi.properties")
         .sources(SugoiApiServicesApplication.class);
   }

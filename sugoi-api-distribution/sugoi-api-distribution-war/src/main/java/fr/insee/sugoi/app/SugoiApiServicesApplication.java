@@ -38,7 +38,9 @@ public class SugoiApiServicesApplication extends SpringBootServletInitializer {
     log.info("Loading configuration from {}{}", propertiesPath, "sugoi.properties");
     return application
         .properties(
-            "spring.config.location=classpath:/,file:" + propertiesPath + "sugoi.properties")
+            "spring.config.location=optional:classpath:/,optional:file:"
+                + propertiesPath
+                + "sugoi.properties")
         .sources(SugoiApiServicesApplication.class);
   }
 
