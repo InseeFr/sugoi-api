@@ -13,9 +13,11 @@
 */
 package fr.insee.sugoi.converter.ouganext;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import fr.insee.sugoi.converter.utils.MapFromAttribute;
 
 /**
  * Java class for PasswordChangeRequestType complex type.
@@ -48,15 +50,21 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 public class PasswordChangeRequest {
 
   @JacksonXmlProperty(localName = "AdresseMessagerie", namespace = Namespace.ANNUAIRE)
+  @MapFromAttribute(attributeName = "email")
+  @JsonProperty(value = "AdresseMessagerie")
   protected String adresseMessagerie;
 
   @JacksonXmlProperty(localName = "AdressePostale", namespace = Namespace.INSEE)
   private Adresse adressePostale;
 
   @JacksonXmlProperty(localName = "AncienMotDePasse", namespace = Namespace.ANNUAIRE)
+  @MapFromAttribute(attributeName = "oldPassword")
+  @JsonProperty(value = "AncienMotDePasse")
   protected String ancienMotDePasse;
 
   @JacksonXmlProperty(localName = "NouveauMotDePasse", namespace = Namespace.ANNUAIRE)
+  @MapFromAttribute(attributeName = "newPassword")
+  @JsonProperty(value = "NouveauMotDePasse")
   protected String nouveauMotDePasse;
 
   @JacksonXmlProperty(localName = "InfoFormattageEnvoi", namespace = Namespace.ANNUAIRE)

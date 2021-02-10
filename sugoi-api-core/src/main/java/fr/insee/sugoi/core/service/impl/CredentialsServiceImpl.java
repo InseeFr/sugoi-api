@@ -15,7 +15,7 @@ package fr.insee.sugoi.core.service.impl;
 
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
-import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
+import fr.insee.sugoi.core.exceptions.PasswordPolicyNotMetException;
 import fr.insee.sugoi.core.model.PasswordChangeRequest;
 import fr.insee.sugoi.core.model.SendMode;
 import fr.insee.sugoi.core.service.CredentialsService;
@@ -79,7 +79,7 @@ public class CredentialsServiceImpl implements CredentialsService {
           .getWriterStore(realm, userStorage)
           .changePassword(user, pcr.getOldPassword(), pcr.getNewPassword(), pcr);
     } else {
-      throw new InvalidPasswordException("New password is not valid");
+      throw new PasswordPolicyNotMetException("New password is not valid");
     }
   }
 
@@ -90,19 +90,24 @@ public class CredentialsServiceImpl implements CredentialsService {
       String userId,
       PasswordChangeRequest pcr,
       List<SendMode> sendMode) {
-    User user = storeProvider.getReaderStore(realm, userStorage).getUser(userId);
-    storeProvider
-        .getWriterStore(realm, userStorage)
-        .initPassword(user, pcr.getNewPassword(), pcr, sendMode);
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        userStorage,
-        SugoiEventTypeEnum.INIT_PASSWORD,
-        Map.ofEntries(
-            Map.entry("pcr", pcr),
-            Map.entry("sendModes", sendMode),
-            Map.entry("user", user),
-            Map.entry("password", pcr.getNewPassword())));
+    boolean newPasswordIsValid = passwordService.validatePassword(pcr.getNewPassword());
+    if (newPasswordIsValid) {
+      User user = storeProvider.getReaderStore(realm, userStorage).getUser(userId);
+      storeProvider
+          .getWriterStore(realm, userStorage)
+          .initPassword(user, pcr.getNewPassword(), pcr, sendMode);
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          userStorage,
+          SugoiEventTypeEnum.INIT_PASSWORD,
+          Map.ofEntries(
+              Map.entry("pcr", pcr),
+              Map.entry("sendModes", sendMode),
+              Map.entry("user", user),
+              Map.entry("password", pcr.getNewPassword())));
+    } else {
+      throw new PasswordPolicyNotMetException("New password is not valid");
+    }
   }
 
   @Override
