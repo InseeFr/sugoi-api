@@ -13,10 +13,15 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
+import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
 import fr.insee.sugoi.converter.ouganext.PasswordChangeRequest;
+import fr.insee.sugoi.core.service.CredentialsService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,6 +39,18 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "basic")
 public class ContactPasswordDomaineController {
 
+  @Autowired private CredentialsService credentialsService;
+  @Autowired private OuganextSugoiMapper ouganextSugoiMapper;
+
+  /**
+   * Reinitialize a password with a random new password
+   *
+   * @param identifiant contact
+   * @param domaine
+   * @param modeEnvoisString "mail" or "courrier"
+   * @param pcr mail address, mail format
+   * @return NO_CONTENT if modification occured
+   */
   @PostMapping(
       value = "/{domaine}/contact/{id}/password",
       consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
@@ -44,9 +61,25 @@ public class ContactPasswordDomaineController {
       @PathVariable("domaine") String domaine,
       @RequestParam("modeEnvoi") List<String> modeEnvoisString,
       @RequestBody PasswordChangeRequest pcr) {
-    return null;
+    credentialsService.reinitPassword(
+        domaine,
+        null,
+        identifiant,
+        ouganextSugoiMapper.serializeToSugoi(
+            pcr, fr.insee.sugoi.core.model.PasswordChangeRequest.class),
+        new ArrayList<>());
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
+  /**
+   * Initialize a contact password with a provided password
+   *
+   * @param identifiant of the contact which password to initialize
+   * @param domaine
+   * @param pcr a PCR containting the new password
+   * @return NO_CONTENT if password is initialized, CONFLICT if a password already exist or if new
+   *     password does not respect password policy TODO : check if user already has password
+   */
   @PostMapping(
       value = "/{domaine}/contact/{id}/password/first",
       consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
@@ -55,11 +88,28 @@ public class ContactPasswordDomaineController {
   public ResponseEntity<?> initPassword(
       @PathVariable("id") String identifiant,
       @PathVariable("domaine") String domaine,
-      @RequestParam("modeEnvoi") List<String> modeEnvoisString,
       @RequestBody PasswordChangeRequest pcr) {
-    return null;
+    credentialsService.initPassword(
+        domaine,
+        null,
+        identifiant,
+        ouganextSugoiMapper.serializeToSugoi(
+            pcr, fr.insee.sugoi.core.model.PasswordChangeRequest.class),
+        new ArrayList<>());
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
+  /**
+   * Change password
+   *
+   * @param identifiant contact which password will be changed
+   * @param domaine
+   * @param modeEnvoisString can be "mail" or "courrier"
+   * @param pcr mail to send the new password, format informations, address if modeEnvois is
+   *     address, new password and old password
+   * @return NO_CONTENT if modification occured, UNAUTHORIZED if old password does not correspond or
+   *     CONFLICT if does not respect password policy
+   */
   @PutMapping(
       value = "/{domaine}/contact/{id}/password",
       consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
@@ -70,6 +120,12 @@ public class ContactPasswordDomaineController {
       @PathVariable("domaine") String domaine,
       @RequestParam("modeEnvoi") List<String> modeEnvoisString,
       @RequestBody PasswordChangeRequest pcr) {
-    return null;
+    credentialsService.changePassword(
+        domaine,
+        null,
+        identifiant,
+        ouganextSugoiMapper.serializeToSugoi(
+            pcr, fr.insee.sugoi.core.model.PasswordChangeRequest.class));
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }
