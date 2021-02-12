@@ -13,8 +13,15 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
+import fr.insee.sugoi.core.service.UserService;
+import fr.insee.sugoi.model.User;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,13 +38,20 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "basic")
 public class ContactInseeRoleApplicatifDomaineController {
 
+  @Autowired private UserService userService;
+
   @GetMapping(
       value = "/{domaine}/contact/{id}/inseeroles",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
   public ResponseEntity<?> getInseeRoles(
       @PathVariable("id") String identifiant, @PathVariable("domaine") String domaine) {
-    return null;
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(
+            userService
+                .findById(domaine, null, identifiant)
+                .getAttributes()
+                .get("insee_roles_applicatifs"));
   }
 
   @PutMapping(
@@ -48,9 +62,21 @@ public class ContactInseeRoleApplicatifDomaineController {
       @PathVariable("id") String identifiant,
       @PathVariable("domaine") String domaine,
       @PathVariable("inseerole") String inseeRole) {
-    return null;
+    User user = userService.findById(domaine, null, identifiant);
+    if (user.getAttributes().containsKey("insee_roles_applicatifs")) {
+      @SuppressWarnings("unchecked")
+      List<String> userRoles = (List<String>) user.getAttributes().get("insee_roles_applicatifs");
+      userRoles.add(inseeRole);
+    } else {
+      List<String> userRoles = new ArrayList<String>();
+      userRoles.add(inseeRole);
+      user.getAttributes().put("insee_roles_applicatifs", userRoles);
+    }
+    userService.update(domaine, null, user);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
+  @SuppressWarnings("unchecked")
   @DeleteMapping(
       value = "/{domaine}/contact/{id}/inseeroles/{inseerole}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
@@ -59,6 +85,17 @@ public class ContactInseeRoleApplicatifDomaineController {
       @PathVariable("id") String identifiant,
       @PathVariable("domaine") String domaine,
       @PathVariable("inseerole") String inseeRole) {
-    return null;
+    User user = userService.findById(domaine, null, identifiant);
+    if (user.getAttributes().containsKey("insee_roles_applicatifs")) {
+      user.getAttributes()
+          .put(
+              "insee_roles_applicatifs",
+              ((List<String>) user.getAttributes().get("insee_roles_applicatifs"))
+                  .stream()
+                      .filter(role -> !role.equalsIgnoreCase(inseeRole))
+                      .collect(Collectors.toList()));
+    }
+    userService.update(domaine, null, user);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }
