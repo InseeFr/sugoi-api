@@ -19,6 +19,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import fr.insee.sugoi.converter.utils.MapFromAttribute;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Collectors;
 import javax.xml.bind.annotation.XmlAttribute;
 
 @JacksonXmlRootElement(localName = "application", namespace = Namespace.ANNUAIRE)
@@ -57,5 +58,12 @@ public class Application {
 
   public void addRole(Role role) {
     this.role.add(role);
+  }
+
+  public void removeRole(String roleName) {
+    this.role =
+        this.role.stream()
+            .filter(r -> !r.getName().equalsIgnoreCase(roleName))
+            .collect(Collectors.toList());
   }
 }

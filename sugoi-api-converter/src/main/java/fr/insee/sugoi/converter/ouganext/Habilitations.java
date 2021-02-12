@@ -16,8 +16,10 @@ package fr.insee.sugoi.converter.ouganext;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import fr.insee.sugoi.model.Habilitation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
@@ -54,6 +56,72 @@ import javax.xml.bind.annotation.XmlAccessorType;
 @JsonPropertyOrder({"application"})
 public class Habilitations {
 
+  public Habilitations() {}
+
+  public Habilitations(List<Habilitation> habilitations) {
+    List<Habilitation> filteredHabilitations =
+        habilitations.stream()
+            .filter(habilitation -> habilitation.getApplication() != null)
+            .collect(Collectors.toList());
+    this.application =
+        filteredHabilitations.stream()
+            .map(habilitation -> habilitation.getApplication())
+            .distinct()
+            .map(
+                appName -> {
+                  return new Application(appName);
+                })
+            .collect(Collectors.toList());
+    application.forEach(
+        app -> {
+          filteredHabilitations.stream()
+              .filter(habilitation -> habilitation.getApplication().equals(app.getName()))
+              .map(habilitation -> habilitation.getRole())
+              .distinct()
+              .forEach(roleName -> app.addRole(new Role(roleName)));
+        });
+    application.forEach(
+        app ->
+            app.getRole()
+                .forEach(
+                    role -> {
+                      filteredHabilitations.stream()
+                          .filter(
+                              habilitation -> habilitation.getApplication().equals(app.getName()))
+                          .filter(habilitation -> habilitation.getRole().equals(role.getName()))
+                          .map(habilitation -> habilitation.getProperty())
+                          .filter(property -> property != null)
+                          .distinct()
+                          .forEach(
+                              property -> {
+                                role.addPropriete(property);
+                              });
+                    }));
+  }
+
+  public List<Habilitation> convertSugoiHabilitation() {
+    List<Habilitation> habilitations = new ArrayList<>();
+    this.application.stream()
+        .forEach(
+            app -> {
+              app.getRole().stream()
+                  .forEach(
+                      role -> {
+                        if (role.getPropriete().size() == 0) {
+                          habilitations.add(new Habilitation(app.getName(), role.getName(), null));
+                        } else {
+                          role.getPropriete().stream()
+                              .forEach(
+                                  propriete ->
+                                      habilitations.add(
+                                          new Habilitation(
+                                              app.getName(), role.getName(), propriete)));
+                        }
+                      });
+            });
+    return habilitations;
+  }
+
   @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
   protected List<Application> application = new ArrayList<Application>();
 
@@ -71,6 +139,85 @@ public class Habilitations {
 
   public void setApplicationList(List<Application> applicationList) {
     this.application = applicationList;
+  }
+
+  public void addHabilitation(String appName, List<String> nomRoles) {
+    if (!this.application.stream().anyMatch(app -> app.getName().equalsIgnoreCase(appName))) {
+      this.application.add(new Application(appName));
+    }
+    Application appli =
+        this.application.stream()
+            .filter(app -> app.getName().equalsIgnoreCase(appName))
+            .collect(Collectors.toList())
+            .get(0);
+    nomRoles.stream()
+        .forEach(
+            roleName -> {
+              if (!appli.getRole().stream()
+                  .anyMatch(role -> role.getName().equalsIgnoreCase(roleName))) {
+                appli.addRole(new Role(roleName));
+              }
+            });
+  }
+
+  public void removeHabilitation(String appName, List<String> nomRoles) {
+    if (this.application.stream().anyMatch(app -> app.getName().equalsIgnoreCase(appName))) {
+      Application appli =
+          this.application.stream()
+              .filter(app -> app.getName().equalsIgnoreCase(appName))
+              .collect(Collectors.toList())
+              .get(0);
+      nomRoles.stream().forEach(role -> appli.removeRole(role));
+    }
+  }
+
+  public void removeHabilitation(String appName, String roleName, List<String> proprietes) {
+    if (this.application.stream().anyMatch(app -> app.getName().equalsIgnoreCase(appName))) {
+      Application appli =
+          this.application.stream()
+              .filter(app -> app.getName().equalsIgnoreCase(appName))
+              .collect(Collectors.toList())
+              .get(0);
+      if (appli.getRole().stream()
+          .anyMatch(roleFilter -> roleFilter.getName().equalsIgnoreCase(roleName))) {
+        Role role =
+            appli.getRole().stream()
+                .filter(roleFilter -> roleFilter.getName().equalsIgnoreCase(roleName))
+                .collect(Collectors.toList())
+                .get(0);
+        proprietes.stream().forEach(prop -> role.removePropriete(prop));
+      }
+    }
+  }
+
+  public void addHabilitations(String appName, String roleName, List<String> proprietes) {
+    Application appli;
+    Role role;
+    if (!this.application.stream().anyMatch(app -> app.getName().equalsIgnoreCase(appName))) {
+      appli = new Application(appName);
+      this.application.add(appli);
+      role = new Role(roleName);
+      appli.addRole(role);
+    } else {
+      appli =
+          this.application.stream()
+              .filter(app -> app.getName().equalsIgnoreCase(appName))
+              .collect(Collectors.toList())
+              .get(0);
+      if (appli.getRole().stream()
+          .anyMatch(roleFilter -> roleFilter.getName().equalsIgnoreCase(roleName))) {
+        role =
+            appli.getRole().stream()
+                .filter(roleFilter -> roleFilter.getName().equalsIgnoreCase(roleName))
+                .collect(Collectors.toList())
+                .get(0);
+      } else {
+        role = new Role(roleName);
+        appli.addRole(role);
+      }
+    }
+    proprietes.stream().forEach(prop -> role.addPropriete(prop));
+    ;
   }
 
   // /**
