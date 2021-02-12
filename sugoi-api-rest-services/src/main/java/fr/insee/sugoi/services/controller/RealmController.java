@@ -60,22 +60,18 @@ public class RealmController {
       realms.addAll(configService.getRealms());
     }
     // Filter realm before sending if user not admin
-    if (!authorizeService.isAdmin()) {
-      List<Realm> realmsFiltered = new ArrayList<>();
-      for (Realm realm : realms) {
-        String realmName = realm.getName();
-        realm.setUserStorages(
-            realm.getUserStorages().stream()
-                .filter(us -> authorizeService.isAtLeastReader(realmName, us.getName()))
-                .collect(Collectors.toList()));
-        if (realm.getUserStorages().size() > 0) {
-          realmsFiltered.add(realm);
-        }
+    List<Realm> realmsFiltered = new ArrayList<>();
+    for (Realm realm : realms) {
+      String realmName = realm.getName();
+      realm.setUserStorages(
+          realm.getUserStorages().stream()
+              .filter(us -> authorizeService.isReader(realmName, us.getName()))
+              .collect(Collectors.toList()));
+      if (realm.getUserStorages().size() > 0) {
+        realmsFiltered.add(realm);
       }
-      return new ResponseEntity<List<Realm>>(realmsFiltered, HttpStatus.OK);
-    } else {
-      return new ResponseEntity<List<Realm>>(realms, HttpStatus.OK);
     }
+    return new ResponseEntity<List<Realm>>(realmsFiltered, HttpStatus.OK);
   }
 
   @PostMapping(

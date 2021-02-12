@@ -50,7 +50,7 @@ public class ApplicationController {
       path = {"/{realm}/applications", "/{realm}/{storage}/applications"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Search applications")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
   public ResponseEntity<PageResult<Application>> getApplications(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
@@ -86,7 +86,7 @@ public class ApplicationController {
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Create application")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
   public ResponseEntity<Application> createApplication(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
@@ -113,7 +113,7 @@ public class ApplicationController {
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Update application")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
   public ResponseEntity<Application> updateApplication(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
@@ -145,7 +145,7 @@ public class ApplicationController {
       value = {"/{realm}/applications/{id}", "/{realm}/{storage}/applications/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete application")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
   public ResponseEntity<String> deleteApplication(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
@@ -163,7 +163,7 @@ public class ApplicationController {
       path = {"/{realm}/applications/{name}", "/{realm}/{storage}/applications/{name}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get application by name")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
   public ResponseEntity<Application> getApplicationByName(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,

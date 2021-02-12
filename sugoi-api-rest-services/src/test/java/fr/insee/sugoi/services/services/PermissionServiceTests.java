@@ -38,24 +38,24 @@ public class PermissionServiceTests {
   @Test
   @WithMockUser(username = "reader_realm1", roles = "Reader_realm1_sugoi")
   public void testReaderRegexp() {
-    assertThat("User can read realm1", permissions.isAtLeastReader("realm1", ""), is(true));
-    assertThat("User cannot write realm1", permissions.isAtLeastWriter("realm1", ""), is(false));
-    assertThat("User cannot read realm2", permissions.isAtLeastReader("realm2", ""), is(false));
+    assertThat("User can read realm1", permissions.isReader("realm1", ""), is(true));
+    assertThat("User cannot write realm1", permissions.isWriter("realm1", ""), is(false));
+    assertThat("User cannot read realm2", permissions.isReader("realm2", ""), is(false));
   }
 
   @Test
   @WithMockUser(username = "writer_realm1", roles = "Writer_realm1_sugoi")
   public void testWriterRegexp() {
-    assertThat("User can read realm1", permissions.isAtLeastReader("realm1", ""), is(true));
-    assertThat("User can write realm1", permissions.isAtLeastWriter("realm1", ""), is(true));
-    assertThat("User cannot read realm2", permissions.isAtLeastReader("realm2", ""), is(false));
+    assertThat("User can read realm1", permissions.isReader("realm1", ""), is(true));
+    assertThat("User can write realm1", permissions.isWriter("realm1", ""), is(true));
+    assertThat("User cannot read realm2", permissions.isReader("realm2", ""), is(false));
   }
 
   @Test
   @WithMockUser(username = "writer_realm1", roles = "Writer_realm1_sugoi")
   public void testUserStorageNull() {
     try {
-      assertThat("No nullPointerException", permissions.isAtLeastReader("realm1", null), is(true));
+      assertThat("No nullPointerException", permissions.isReader("realm1", null), is(true));
     } catch (Exception e) {
       fail();
     }

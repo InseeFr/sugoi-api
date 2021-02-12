@@ -30,21 +30,44 @@ public class AuthorizeMethodDecider {
 
   @Autowired PermissionService permissionService;
 
-  public boolean isAtLeastReader(String realm, String userStorage) {
+  public boolean isReader(String realm, String userStorage) {
     if (enable) {
-      logger.info(
-          "Check if user is at least reader on realm {} and userStorage {}", realm, userStorage);
-      return permissionService.isAtLeastReader(realm, userStorage);
+      logger.info("Check if user is reader on realm {} and userStorage {}", realm, userStorage);
+      return permissionService.isReader(realm, userStorage);
     }
     logger.warn("PreAuthorize on request is disabled, can cause security problem");
     return true;
   }
 
-  public boolean isAtLeastWriter(String realm, String userStorage) {
+  public boolean isAppManager(String realm, String userStorage, String application) {
+    if (enable) {
+      logger.info(
+          "Check if user is at least reader on realm {} and userStorage {}", realm, userStorage);
+      return (permissionService.isApplicationManager(realm, userStorage, application)
+              && permissionService.isReader(realm, userStorage))
+          || permissionService.isWriter(realm, userStorage);
+    }
+    logger.warn("PreAuthorize on request is disabled, can cause security problem");
+    return true;
+  }
+
+  public boolean isPasswordManager(String realm, String userStorage) {
+    if (enable) {
+      logger.info(
+          "Check if user is at least reader on realm {} and userStorage {}", realm, userStorage);
+      return (permissionService.isReader(realm, userStorage)
+              && permissionService.isPasswordManager(realm, userStorage))
+          || permissionService.isWriter(realm, userStorage);
+    }
+    logger.warn("PreAuthorize on request is disabled, can cause security problem");
+    return true;
+  }
+
+  public boolean isWriter(String realm, String userStorage) {
     if (enable) {
       logger.info(
           "Check if user is at least writer on realm {} and userStorage {}", realm, userStorage);
-      return permissionService.isAtLeastWriter(realm, userStorage);
+      return permissionService.isWriter(realm, userStorage);
     }
     logger.warn("PreAuthorize on request is disabled, can cause security problem");
     return true;

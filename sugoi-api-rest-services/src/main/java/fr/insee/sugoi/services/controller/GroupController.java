@@ -50,7 +50,7 @@ public class GroupController {
       path = {"/{realm}/groups", "/{realm}/{storage}/groups"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Search groups")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
   public ResponseEntity<?> getGroups(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
@@ -86,7 +86,7 @@ public class GroupController {
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Add group")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isApplicationManager(#realm,#storage,#applicationName)")
   public ResponseEntity<?> createGroups(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
@@ -114,7 +114,7 @@ public class GroupController {
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Update group")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isApplicationManager(#realm,#storage,#applicationName)")
   public ResponseEntity<?> updateGroups(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
@@ -145,7 +145,7 @@ public class GroupController {
       value = {"/{realm}/groups/{id}", "/{realm}/{storage}/groups/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete group")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isApplicationManager(#realm,#storage,#applicationName)")
   public ResponseEntity<String> deleteGroups(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
@@ -164,7 +164,7 @@ public class GroupController {
       path = {"/{realm}/groups/{groupname}", "/{realm}/{storage}/groups/{groupname}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get group by name")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
   public ResponseEntity<Group> getGroupByGroupname(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,

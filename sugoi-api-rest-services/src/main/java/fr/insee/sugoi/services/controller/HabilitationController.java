@@ -39,7 +39,7 @@ public class HabilitationController {
   @GetMapping(
       path = {"/{realm}/habilitations", "/{realm}/{storage}/habilitations"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
   public ResponseEntity<?> getHabilitations(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
@@ -55,7 +55,7 @@ public class HabilitationController {
       value = {"/{realm}/habilitations", "/{realm}/{storage}/habilitations"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
   public ResponseEntity<?> createHabilitations(
       @PathVariable("realm") String realm,
       @PathVariable("storage") String storage,
@@ -69,7 +69,7 @@ public class HabilitationController {
       value = {"/{realm}/habilitations/{id}", "/{realm}/{storage}/habilitations/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
   public ResponseEntity<?> updateHabilitations(
       @PathVariable("realm") String realm,
       @PathVariable("storage") String storage,
@@ -83,7 +83,7 @@ public class HabilitationController {
   @DeleteMapping(
       value = {"/{realm}/habilitations/{id}", "/{realm}/{storage}/habilitations/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
   public ResponseEntity<String> deleteHabilitations(
       @PathVariable("realm") String realm,
       @PathVariable("storage") String storage,
