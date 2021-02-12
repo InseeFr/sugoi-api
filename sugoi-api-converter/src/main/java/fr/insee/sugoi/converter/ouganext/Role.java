@@ -17,6 +17,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
@@ -36,7 +37,7 @@ public class Role {
   @XmlAttribute(name = "name")
   private String name;
 
-  @XmlElement private List<String> propriete;
+  @XmlElement private List<String> propriete = new ArrayList<>();
 
   public String getName() {
     return name;
@@ -52,5 +53,16 @@ public class Role {
       propriete = new ArrayList<String>();
     }
     return propriete;
+  }
+
+  public void addPropriete(String prop) {
+    this.propriete.add(prop);
+  }
+
+  public void removePropriete(String propName) {
+    this.propriete =
+        this.propriete.stream()
+            .filter(prop -> !prop.equalsIgnoreCase(propName))
+            .collect(Collectors.toList());
   }
 }

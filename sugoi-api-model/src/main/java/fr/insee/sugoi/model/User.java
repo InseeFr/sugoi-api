@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 ;
 
@@ -148,5 +149,23 @@ public class User {
 
   public void setMetadatas(Map<String, Object> metadatas) {
     this.metadatas = metadatas;
+  }
+
+  public void removeFromHabilitations(String appName, String role, String property) {
+    this.habilitations =
+        this.habilitations.stream()
+            .filter(
+                habilitation ->
+                    !(habilitation.getApplication().equals(appName)
+                        && habilitation.getRole().equals(role)
+                        && habilitation.getProperty().equals(property)))
+            .collect(Collectors.toList());
+  }
+
+  public void removeFromHabilitations(String habilitationId) {
+    this.habilitations =
+        this.habilitations.stream()
+            .filter(habilitation -> !(habilitation.getId().equals(habilitationId)))
+            .collect(Collectors.toList());
   }
 }

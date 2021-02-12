@@ -120,12 +120,22 @@ public class GenericLdapMapper {
 
   public static <O, N> List<Modification> createMods(
       N entity, Class<O> propertiesClazz, Class<N> clazz, Map<String, String> config) {
-
-    return mapObjectToLdapAttributes(entity, propertiesClazz, clazz, config).stream()
+    List<Attribute> attributes = mapObjectToLdapAttributes(entity, propertiesClazz, clazz, config);
+    return attributes.stream()
+        .map(attribute -> attribute.getName())
+        .distinct()
         .map(
-            attribute ->
+            attributeName ->
                 new Modification(
-                    ModificationType.REPLACE, attribute.getName(), attribute.getValues()))
+                    ModificationType.REPLACE,
+                    attributeName,
+                    attributes.stream()
+                        .filter(
+                            filterAttribute ->
+                                filterAttribute.getName().equalsIgnoreCase(attributeName))
+                        .map(filterAttribute -> filterAttribute.getValues())
+                        .flatMap(values -> Arrays.stream(values))
+                        .toArray(String[]::new)))
         .collect(Collectors.toList());
   }
 

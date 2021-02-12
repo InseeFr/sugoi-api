@@ -13,9 +13,14 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
+import fr.insee.sugoi.converter.ouganext.Habilitations;
+import fr.insee.sugoi.core.service.UserService;
+import fr.insee.sugoi.model.User;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,15 +38,36 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "basic")
 public class ContactHabilitationDomaineController {
 
+  @Autowired private UserService userService;
+
+  /**
+   * Retrieve all the habilitations of a contact
+   *
+   * @param identifiant id of the contact
+   * @param domaine
+   * @return OK with the list of habilitations
+   */
   @GetMapping(
       value = "/{domaine}/contact/{id}/habilitations",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
   public ResponseEntity<?> getHabilitation(
       @PathVariable("id") String identifiant, @PathVariable("domaine") String domaine) {
-    return null;
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(
+            new Habilitations(userService.findById(domaine, null, identifiant).getHabilitations()));
   }
 
+  /**
+   * Add habiltiations without properties on an application to a contact. Create the habilitation
+   * application if it does not already exist.
+   *
+   * @param identifiant id of the contact
+   * @param domaine
+   * @param appName name of the app on which the habilitation applies
+   * @param nomRoles roles to add on the app to the user
+   * @return NO_CONTENT if creating went well
+   */
   @PutMapping(
       value = "/{domaine}/contact/{id}/habilitations/{application}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
@@ -51,9 +77,25 @@ public class ContactHabilitationDomaineController {
       @PathVariable("domaine") String domaine,
       @PathVariable("application") String appName,
       @RequestParam("role") List<String> nomRoles) {
-    return null;
+    User user = userService.findById(domaine, null, identifiant);
+    Habilitations habilitations = new Habilitations(user.getHabilitations());
+    habilitations.addHabilitation(appName, nomRoles);
+    user.setHabilitations(habilitations.convertSugoiHabilitation());
+    userService.update(domaine, null, user);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
+  /**
+   * Add habilitations of a specified role and application with one or more properties to a contact.
+   * Role and application habilitation are created if they do not already exist.
+   *
+   * @param identifiant id of the contact
+   * @param domaine
+   * @param appName name of the application on which the habilitation apply
+   * @param role role on which the habilitation apply
+   * @param proprietes properties to add to the role of the application
+   * @return NO_CONTENT if creating went well
+   */
   @PutMapping(
       value = "/{domaine}/contact/{id}/habilitations/{application}/{role}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
@@ -62,10 +104,25 @@ public class ContactHabilitationDomaineController {
       @PathVariable("id") String identifiant,
       @PathVariable("domaine") String domaine,
       @PathVariable("application") String appName,
-      @PathVariable("role") @RequestParam("propriete") List<String> nomRoles) {
-    return null;
+      @PathVariable("role") String role,
+      @RequestParam("propriete") List<String> proprietes) {
+    User user = userService.findById(domaine, null, identifiant);
+    Habilitations habilitations = new Habilitations(user.getHabilitations());
+    habilitations.addHabilitations(appName, role, proprietes);
+    user.setHabilitations(habilitations.convertSugoiHabilitation());
+    userService.update(domaine, null, user);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
+  /**
+   * Delete habilitations of a contact on an application.
+   *
+   * @param identifiant id of the contact
+   * @param domaine
+   * @param appName name of the app on which the habilitation applies
+   * @param nomRoles roles to delete on the app
+   * @return NO_CONTENT if deleting went well
+   */
   @DeleteMapping(
       value = "/{domaine}/contact/{id}/habilitations/{application}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
@@ -75,9 +132,24 @@ public class ContactHabilitationDomaineController {
       @PathVariable("domaine") String domaine,
       @PathVariable("application") String appName,
       @RequestParam("role") List<String> nomRoles) {
-    return null;
+    User user = userService.findById(domaine, null, identifiant);
+    Habilitations habilitations = new Habilitations(user.getHabilitations());
+    habilitations.removeHabilitation(appName, nomRoles);
+    user.setHabilitations(habilitations.convertSugoiHabilitation());
+    userService.update(domaine, null, user);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
+  /**
+   * Delete habilitation properties of a specified role and application.
+   *
+   * @param identifiant id of the contact
+   * @param domaine
+   * @param appName name of the application on which the habilitation apply
+   * @param role role on which the habilitation apply
+   * @param proprietes properties to delete from the role of the application
+   * @return NO_CONTENT if deleting went well
+   */
   @DeleteMapping(
       value = "/{domaine}/contact/{id}/habilitations/{application}/{role}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
@@ -88,6 +160,11 @@ public class ContactHabilitationDomaineController {
       @PathVariable("application") String appName,
       @PathVariable("role") String nomRole,
       @RequestParam("propriete") List<String> proprietes) {
-    return null;
+    User user = userService.findById(domaine, null, identifiant);
+    Habilitations habilitations = new Habilitations(user.getHabilitations());
+    habilitations.removeHabilitation(appName, nomRole, proprietes);
+    user.setHabilitations(habilitations.convertSugoiHabilitation());
+    userService.update(domaine, null, user);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }
