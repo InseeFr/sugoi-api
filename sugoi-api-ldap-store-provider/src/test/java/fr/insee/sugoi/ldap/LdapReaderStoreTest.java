@@ -155,6 +155,10 @@ public class LdapReaderStoreTest {
         "testo should have address",
         user.getOrganization().getAddress().get("Ligne1"),
         is("Insee"));
+    assertThat(
+        "Should have a group",
+        user.getGroups().stream()
+            .anyMatch(group -> group.getName().equals("Utilisateurs_Applitest")));
   }
 
   @Test
