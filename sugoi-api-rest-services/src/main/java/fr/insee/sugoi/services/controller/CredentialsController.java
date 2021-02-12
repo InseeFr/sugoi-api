@@ -41,7 +41,7 @@ public class CredentialsController {
 
   @PostMapping(
       path = {"/{realm}/users/{id}/reinitPassword", "/{realm}/{storage}/users/{id}/reinitPassword"})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void reinitPassword(
       @RequestBody PasswordChangeRequest pcr,
@@ -55,7 +55,7 @@ public class CredentialsController {
 
   @PostMapping(
       path = {"/{realm}/users/{id}/changePassword", "/{realm}/{storage}/users/{id}/changePassword"})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void changePassword(
       @RequestBody PasswordChangeRequest pcr,
@@ -67,7 +67,7 @@ public class CredentialsController {
 
   @PostMapping(
       path = {"/{realm}/users/{id}/initPassword", "/{realm}/{storage}/users/{id}/initPassword"})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void initPassword(
       @PathVariable("realm") String realm,

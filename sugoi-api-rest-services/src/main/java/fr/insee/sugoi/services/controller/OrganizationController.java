@@ -50,7 +50,7 @@ public class OrganizationController {
   @GetMapping(
       path = {"/{realm}/organizations", "/{realm}/{storage}/organizations"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
   @Operation(summary = "Search organizations")
   public ResponseEntity<?> getOrganizations(
       @PathVariable("realm") String realm,
@@ -87,7 +87,7 @@ public class OrganizationController {
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Create a new organization")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
   public ResponseEntity<?> createOrganizations(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
@@ -113,7 +113,7 @@ public class OrganizationController {
       value = {"/{realm}/organizations/{id}", "/{realm}/{storage}/organizations/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
   @Operation(summary = "Update organization")
   public ResponseEntity<?> updateOrganizations(
       @PathVariable("realm") String realm,
@@ -144,7 +144,7 @@ public class OrganizationController {
   @DeleteMapping(
       value = {"/{realm}/organizations/{id}", "/{realm}/{storage}/organizations/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
   @Operation(summary = "Delete organization")
   public ResponseEntity<String> deleteOrganizations(
       @PathVariable("realm") String realm,
@@ -163,7 +163,7 @@ public class OrganizationController {
       path = {"/{realm}/organizations/{orgId}", "/{realm}/{storage}/organizations/{orgId}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get organization by identifiant")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
   public ResponseEntity<Organization> getUserByUsername(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,

@@ -38,15 +38,33 @@ public class PermissionService {
   @Value("${fr.insee.sugoi.api.regexp.role.admin:}")
   private List<String> adminRoleList;
 
+  @Value("${fr.insee.sugoi.api.regexp.role.password.manager:}")
+  private List<String> passwordManagerRoleList;
+
+  @Value("${fr.insee.sugoi.api.regexp.role.application.manager:}")
+  private List<String> applicationManagerRoleList;
+
   public static final Logger logger = LoggerFactory.getLogger(PermissionService.class);
 
-  public boolean isAtLeastReader(String realm, String userStorage) {
-    List<String> searchRoleList = getSearchRoleList(realm, userStorage, regexpReaderList);
-    return checkIfUserGetRoles(searchRoleList) || isAtLeastWriter(realm, userStorage);
+  public boolean isReader(String realm, String userStorage) {
+    List<String> searchRoleList = getSearchRoleList(realm, userStorage, null, regexpReaderList);
+    return checkIfUserGetRoles(searchRoleList) || isWriter(realm, userStorage);
   }
 
-  public boolean isAtLeastWriter(String realm, String userStorage) {
-    List<String> searchRoleList = getSearchRoleList(realm, userStorage, regexpWriterList);
+  public boolean isPasswordManager(String realm, String userStorage) {
+    List<String> searchRoleList =
+        getSearchRoleList(realm, userStorage, null, passwordManagerRoleList);
+    return checkIfUserGetRoles(searchRoleList);
+  }
+
+  public boolean isApplicationManager(String realm, String userStorage, String application) {
+    List<String> searchRoleList =
+        getSearchRoleList(realm, userStorage, application, passwordManagerRoleList);
+    return checkIfUserGetRoles(searchRoleList);
+  }
+
+  public boolean isWriter(String realm, String userStorage) {
+    List<String> searchRoleList = getSearchRoleList(realm, userStorage, null, regexpWriterList);
     return checkIfUserGetRoles(searchRoleList) || isAdmin();
   }
 
@@ -73,11 +91,14 @@ public class PermissionService {
   }
 
   private List<String> getSearchRoleList(
-      String realm, String userStorage, List<String> regexpList) {
+      String realm, String userStorage, String application, List<String> regexpList) {
     Map<String, String> valueMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     valueMap.put("realm", realm.toUpperCase());
     if (userStorage != null) {
       valueMap.put("userStorage", userStorage.toUpperCase());
+    }
+    if (application != null) {
+      valueMap.put("application", application);
     }
     return regexpList.stream()
         .map(regexp -> StrSubstitutor.replace(regexp, valueMap, "$(", ")"))

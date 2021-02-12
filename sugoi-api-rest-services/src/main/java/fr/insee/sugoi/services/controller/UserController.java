@@ -54,7 +54,7 @@ public class UserController {
       path = {"/{realm}/users", "/{realm}/{storage}/users"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Search users")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
   public ResponseEntity<?> getUsers(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
@@ -113,7 +113,7 @@ public class UserController {
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Create user")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
   public ResponseEntity<?> createUsers(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
@@ -137,7 +137,7 @@ public class UserController {
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Update user")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
   public ResponseEntity<?> updateUsers(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
@@ -167,7 +167,7 @@ public class UserController {
       value = {"/{realm}/users/{id}", "/{realm}/{storage}/users/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete user")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
   public ResponseEntity<String> deleteUsers(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
@@ -185,7 +185,7 @@ public class UserController {
       path = {"/{realm}/users/{username}", "/{realm}/{storage}/users/{username}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get user by username")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAtLeastReader(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
   public ResponseEntity<User> getUserByUsername(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,

@@ -66,13 +66,13 @@ public class SugoiEventLogProducer {
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
         Map<String, String> params = new HashMap<>();
-        params.put("username", ((User) properties.get("user")).getUsername());
+        params.put("username", ((User) properties.get("userProperties")).getUsername());
         params.put(
             "commun_name",
-            (String) ((User) properties.get("user")).getAttributes().get("commmun_name"));
+            (String) ((User) properties.get("userProperties")).getAttributes().get("commmun_name"));
         params.put(
             "description",
-            (String) ((User) properties.get("user")).getAttributes().get("description"));
+            (String) ((User) properties.get("userProperties")).getAttributes().get("description"));
         toLog.put("params", params);
         break;
       case FIND_USER_BY_ID:
@@ -100,7 +100,7 @@ public class SugoiEventLogProducer {
       case FIND_ORGANIZATIONS:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("params", ((Organization) properties.get("organization")).getIdentifiant());
+        toLog.put("params", ((Organization) properties.get("organizationFilter")).getIdentifiant());
         break;
       case FIND_ORGANIZATION_BY_ID:
         toLog.put("realm", realm);
@@ -163,12 +163,12 @@ public class SugoiEventLogProducer {
       case FIND_APPLICATIONS:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("params", ((Application) properties.get("application")).getName());
+        toLog.put("params", ((Application) properties.get("applicationFilter")).getName());
         break;
       case FIND_APPLICATION_BY_ID:
         toLog.put("realm", realm);
         toLog.put("userStorage", userStorage);
-        toLog.put("applicationName", ((Application) properties.get("application")).getName());
+        toLog.put("applicationName", ((String) properties.get("applicationId")));
         break;
       case CREATE_GROUP:
         toLog.put("realm", realm);
