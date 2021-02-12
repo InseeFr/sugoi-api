@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.insee.sugoi</groupId>
 	<artifactId>sugoi-api-parent</artifactId>
@@ -36,6 +37,9 @@
 		<cucumber.version>6.9.1</cucumber.version>
 		<cucumber-reporting-plugin.version>4.0.95</cucumber-reporting-plugin.version>
 		<httpclient.version>4.5.13</httpclient.version>
+		<apache.commons.version>1.9</apache.commons.version>
+		<wiremock-standalone.version>2.27.2</wiremock-standalone.version>
+		<freemarker.version>2.3.30</freemarker.version>
 	</properties>
 
 	<dependencies></dependencies>
@@ -130,10 +134,14 @@
 
 			<dependency>
 				<groupId>fr.insee.sugoi</groupId>
-				<artifactId>sugoi-api-event-listener</artifactId>
+				<artifactId>sugoi-api-event-log</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-
+			<dependency>
+				<groupId>fr.insee.sugoi</groupId>
+				<artifactId>sugoi-api-event-webhook</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>fr.insee.sugoi</groupId>
 				<artifactId>sugoi-api-jms-utils</artifactId>
@@ -257,6 +265,25 @@
 				<artifactId>httpclient</artifactId>
 				<version>${httpclient.version}</version>
 			</dependency>
+
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-text</artifactId>
+				<version>${apache.commons.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.github.tomakehurst</groupId>
+				<artifactId>wiremock-standalone</artifactId>
+				<version>${wiremock-standalone.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.freemarker</groupId>
+				<artifactId>freemarker</artifactId>
+				<version>${freemarker.version}</version>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 
@@ -266,7 +293,8 @@
 		<module>sugoi-api-rest-services</module>
 		<module>sugoi-api-rest-old-services</module>
 		<module>sugoi-api-rest-commons-services</module>
-		<module>sugoi-api-event-listener</module>
+		<module>sugoi-api-event-log</module>
+		<module>sugoi-api-event-webhook</module>
 		<module>sugoi-api-converter</module>
 		<module>sugoi-api-distribution</module>
 		<module>sugoi-api-file-config-provider</module>

@@ -19,6 +19,7 @@ import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.model.Realm;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +33,11 @@ public class ConfigServiceImpl implements ConfigService {
 
   @Override
   public Realm getRealm(String name) {
-    sugoiEventPublisher.publishCustomEvent(null, null, SugoiEventTypeEnum.FIND_REALM_BY_ID, name);
+    sugoiEventPublisher.publishCustomEvent(
+        null,
+        null,
+        SugoiEventTypeEnum.FIND_REALM_BY_ID,
+        Map.ofEntries(Map.entry("realmName", name)));
     return realmProvider.load(name);
   }
 

@@ -28,18 +28,8 @@ public class SugoiEventPublisher {
       final String realm,
       final String storage,
       final SugoiEventTypeEnum eventType,
-      final Object object) {
-    SugoiEvent sugoiEvent = new SugoiEvent(realm, storage, eventType, object);
-    applicationEventPublisher.publishEvent(sugoiEvent);
-  }
-
-  public void publishCustomEvent(
-      final String realm,
-      final String storage,
-      final SugoiEventTypeEnum eventType,
-      final Object object,
       final Map<String, Object> properties) {
-    SugoiEvent sugoiEvent = new SugoiEvent(realm, storage, eventType, object, properties);
+    SugoiEvent sugoiEvent = new SugoiEvent(realm, storage, eventType, properties);
     applicationEventPublisher.publishEvent(sugoiEvent);
   }
 }

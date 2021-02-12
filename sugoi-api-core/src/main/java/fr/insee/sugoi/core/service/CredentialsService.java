@@ -14,12 +14,24 @@
 package fr.insee.sugoi.core.service;
 
 import fr.insee.sugoi.core.model.PasswordChangeRequest;
+import fr.insee.sugoi.core.model.SendMode;
+import java.util.List;
 
 public interface CredentialsService {
 
-  void reinitPassword(String realm, String userStorage, String userId, PasswordChangeRequest pcr);
+  void reinitPassword(
+      String realm,
+      String userStorage,
+      String userId,
+      PasswordChangeRequest pcr,
+      List<SendMode> sendMode);
 
   void changePassword(String realm, String userStorage, String userId, PasswordChangeRequest pcr);
 
-  void initPassword(String realm, String userStorage, String userId, PasswordChangeRequest pcr);
+  void initPassword(
+      String realm,
+      String userStorage,
+      String userId,
+      PasswordChangeRequest pcr,
+      List<SendMode> sendMode);
 }

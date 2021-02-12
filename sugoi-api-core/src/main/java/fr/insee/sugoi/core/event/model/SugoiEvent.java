@@ -27,38 +27,19 @@ public class SugoiEvent extends ApplicationEvent {
 
   private String userStorage;
 
-  private Object object;
-
   private Map<String, Object> properties;
 
-  public SugoiEvent(String realm, String storage, SugoiEventTypeEnum eventType, Object object) {
-    super(eventType);
-    this.realm = realm;
-    this.userStorage = storage;
-    this.object = object;
-    this.eventType = eventType;
-  }
-
   public SugoiEvent(
-      String realm,
-      String storage,
-      SugoiEventTypeEnum eventType,
-      Object object,
-      Map<String, Object> properties) {
+      String realm, String storage, SugoiEventTypeEnum eventType, Map<String, Object> properties) {
     super(eventType);
     this.realm = realm;
     this.userStorage = storage;
-    this.object = object;
     this.eventType = eventType;
     this.properties = properties;
   }
 
   public SugoiEventTypeEnum getEventType() {
     return eventType;
-  }
-
-  public Object getObject() {
-    return object;
   }
 
   public String getRealm() {
