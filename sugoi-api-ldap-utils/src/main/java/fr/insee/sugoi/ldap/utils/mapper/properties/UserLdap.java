@@ -97,6 +97,13 @@ public class UserLdap {
   @MapToMapElement(name = "attributes", key = "insee_organisme")
   private String inseeOrganisme;
 
+  @AttributeLdapName("inseeRoleApplicatif")
+  @MapToMapElement(
+      name = "attributes",
+      key = "insee_roles_applicatifs",
+      type = ModelType.LIST_STRING)
+  private String[] inseeRolesApplicatifs;
+
   @AttributeLdapName("inseeAdresseCorrespondantLigne1")
   private String inseeAdresseCorrespondantLigne1;
 

@@ -105,9 +105,10 @@ public class GenericLdapMapper {
                       && ldapField.getDeclaredAnnotationsByType(MapToMapElement.class).length > 0)
           .forEach(
               ldapField -> {
-                Attribute mappedAttribute = createAttributesFromMapAnnotation(entity, ldapField);
+                List<Attribute> mappedAttribute =
+                    createAttributesFromMapAnnotation(entity, ldapField);
                 if (mappedAttribute != null) {
-                  attributes.add(mappedAttribute);
+                  attributes.addAll(mappedAttribute);
                 }
               });
 
@@ -211,9 +212,16 @@ public class GenericLdapMapper {
       List<String> attributeValue = getAttributeValuesFromField(attributes, ldapField);
       if (attributeValue.size() > 0) {
         Map<String, Object> entityFieldMap = (Map<String, Object>) entityField.get(mappedEntity);
-        entityFieldMap.put(
-            ldapField.getAnnotation(MapToMapElement.class).key(),
-            getAttributeValuesFromField(attributes, ldapField).get(0));
+        switch (ldapField.getAnnotation(MapToMapElement.class).type()) {
+          case LIST_STRING:
+            entityFieldMap.put(
+                ldapField.getAnnotation(MapToMapElement.class).key(), attributeValue);
+            break;
+          default:
+            entityFieldMap.put(
+                ldapField.getAnnotation(MapToMapElement.class).key(), attributeValue.get(0));
+            break;
+        }
         entityField.set(mappedEntity, entityFieldMap);
       }
     } catch (NoSuchFieldException | SecurityException | IllegalAccessException e) {
@@ -332,7 +340,7 @@ public class GenericLdapMapper {
   }
 
   @SuppressWarnings("unchecked")
-  private static <ObjectType> Attribute createAttributesFromMapAnnotation(
+  private static <ObjectType> List<Attribute> createAttributesFromMapAnnotation(
       ObjectType entity, Field ldapField) {
     try {
       Field entityField =
@@ -345,10 +353,22 @@ public class GenericLdapMapper {
         if (attributeValue != null) {
           ModelType type = ldapField.getAnnotation(MapToMapElement.class).type();
           switch (type) {
+            case LIST_STRING:
+              return ((List<String>) attributeValue)
+                  .stream()
+                      .map(
+                          value ->
+                              new Attribute(
+                                  ldapField.getAnnotation(AttributeLdapName.class).value(),
+                                  (String) value))
+                      .collect(Collectors.toList());
             default:
-              return new Attribute(
-                  ldapField.getAnnotation(AttributeLdapName.class).value(),
-                  (String) attributeValue);
+              List<Attribute> attributes = new ArrayList<>();
+              attributes.add(
+                  new Attribute(
+                      ldapField.getAnnotation(AttributeLdapName.class).value(),
+                      (String) attributeValue));
+              return attributes;
           }
         }
       }

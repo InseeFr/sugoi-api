@@ -209,7 +209,7 @@ public class Contact {
   private Collection<String> propriete;
 
   @JacksonXmlProperty(localName = "InseeRoleApplicatif", namespace = Namespace.ANNUAIRE)
-  // @MapFromAttribute(attributeName = "habilitations")
+  @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "insee_roles_applicatifs")
   @JsonProperty(value = "InseeRoleApplicatif")
   private Collection<String> inseeRoleApplicatif;
 

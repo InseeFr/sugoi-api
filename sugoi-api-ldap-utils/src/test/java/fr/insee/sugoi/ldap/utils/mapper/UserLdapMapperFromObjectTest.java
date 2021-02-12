@@ -202,4 +202,29 @@ public class UserLdapMapperFromObjectTest {
         mappedAttributes.stream()
             .allMatch(attribute -> !attribute.getName().equals("modifyTimestamp")));
   }
+
+  @Test
+  public void getUserInseeRoleApplicatifFromJavaObject() {
+
+    List<String> inseeRoleApplicatif = new ArrayList<String>();
+    inseeRoleApplicatif.add("toto");
+    inseeRoleApplicatif.add("tata");
+    user.addAttributes("insee_roles_applicatifs", inseeRoleApplicatif);
+    List<Attribute> mappedAttributes = userLdapMapper.mapToAttributes(user);
+
+    assertThat(
+        "Should have attribute inseeRoleApplicatif toto",
+        mappedAttributes.stream()
+            .anyMatch(
+                attribute ->
+                    attribute.getName().equals("inseeRoleApplicatif")
+                        && attribute.getValue().equals("toto")));
+    assertThat(
+        "Should have attribute inseeRoleApplicatif tata",
+        mappedAttributes.stream()
+            .anyMatch(
+                attribute ->
+                    attribute.getName().equals("inseeRoleApplicatif")
+                        && attribute.getValue().equals("tata")));
+  }
 }

@@ -21,5 +21,6 @@ public enum ModelType {
   LIST_HABILITATION,
   ADDRESS,
   LIST_GROUP,
-  LIST_USER
+  LIST_USER,
+  LIST_STRING
 }

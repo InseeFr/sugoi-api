@@ -21,6 +21,7 @@ import fr.insee.sugoi.model.User;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -163,5 +164,26 @@ public class UserLdapMapperFromAttributesTest {
     assertThat(
         "Should have admin group",
         mappedUser.getGroups().stream().anyMatch(group -> group.getName().equals("reader")));
+  }
+
+  @Test
+  public void getInseeRolesApplicatifsFromAttributes() {
+
+    Attribute inseeRoleAppAttribute1 = new Attribute("inseeRoleApplicatif", "toto");
+    Attribute inseeRoleAppAttribute2 = new Attribute("inseeRoleApplicatif", "tata");
+    Collection<Attribute> attributes = new ArrayList<>();
+    attributes.add(inseeRoleAppAttribute1);
+    attributes.add(inseeRoleAppAttribute2);
+    User mappedUser = userLdapMapper.mapFromAttributes(attributes);
+    @SuppressWarnings("unchecked")
+    List<String> inseeRoleApplicatifs =
+        (List<String>) mappedUser.getAttributes().get("insee_roles_applicatifs");
+
+    assertThat(
+        "Should have inseeRoleapplicatif tata",
+        inseeRoleApplicatifs.stream().anyMatch(role -> role.equals("toto")));
+    assertThat(
+        "Should have inseeRoleapplicatif tata",
+        inseeRoleApplicatifs.stream().anyMatch(role -> role.equals("tata")));
   }
 }
