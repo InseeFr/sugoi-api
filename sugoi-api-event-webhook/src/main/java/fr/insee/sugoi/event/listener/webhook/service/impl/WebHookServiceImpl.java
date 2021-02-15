@@ -22,9 +22,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -157,7 +158,7 @@ public class WebHookServiceImpl implements WebHookService {
     try {
       ResourceLoader resourceLoader = new DefaultResourceLoader();
       Resource resource = resourceLoader.getResource(path);
-      return new String(Files.readAllBytes(resource.getFile().toPath()));
+      return new String(IOUtils.toString(resource.getInputStream(), StandardCharsets.UTF_8.name()));
     } catch (IOException e) {
       throw new RuntimeException("Unable to load " + path, e);
     }
