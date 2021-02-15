@@ -313,7 +313,8 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public void changePasswordResetStatus(User user, boolean isReset) {
     Modification mod =
-        new Modification(ModificationType.REPLACE, "pwdReset", Boolean.toString(isReset));
+        new Modification(
+            ModificationType.REPLACE, "pwdReset", Boolean.toString(isReset).toUpperCase());
     try {
       ldapPoolConnection.modify("uid=" + user.getUsername() + "," + config.get("user_source"), mod);
     } catch (LDAPException e) {

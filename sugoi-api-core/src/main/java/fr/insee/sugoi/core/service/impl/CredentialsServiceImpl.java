@@ -48,7 +48,11 @@ public class CredentialsServiceImpl implements CredentialsService {
     String password = passwordService.generatePassword();
     WriterStore writerStore = storeProvider.getWriterStore(realm, userStorage);
     writerStore.reinitPassword(user, password);
-    writerStore.changePasswordResetStatus(user, true);
+    writerStore.changePasswordResetStatus(
+        user,
+        (pcr.getProperties() != null && pcr.getProperties().get("mustChangePassword") != null)
+            ? Boolean.parseBoolean(pcr.getProperties().get("mustChangePassword"))
+            : false);
     sugoiEventPublisher.publishCustomEvent(
         realm,
         userStorage,
