@@ -31,7 +31,7 @@
 		<commons-io.version>2.8.0</commons-io.version>
 		<com.unboundid.version>5.1.3</com.unboundid.version>
 		<org.xmlunit.version>2.8.2</org.xmlunit.version>
-		<org.fusesource.jansi.version>2.2.0</org.fusesource.jansi.version>
+		<org.fusesource.jansi.version>2.3.1</org.fusesource.jansi.version>
 		<commons-lang.version>2.6</commons-lang.version>
 		<org.springdoc.version>1.5.3</org.springdoc.version>
 		<cucumber.version>6.9.1</cucumber.version>
