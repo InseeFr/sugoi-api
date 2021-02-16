@@ -111,11 +111,7 @@ public class Converter {
   }
 
   public List<SendMode> toSendModeList(Object object) {
-    LinkedHashMap linkedHashMap = (LinkedHashMap) object;
-    if (linkedHashMap != null) {
-      logger.debug("Trying to transform:" + linkedHashMap.toString());
-      return List.of(SendMode.MAIL);
-    }
-    return null;
+    logger.debug("Trying to transform:" + object);
+    return List.of(SendMode.MAIL);
   }
 }
