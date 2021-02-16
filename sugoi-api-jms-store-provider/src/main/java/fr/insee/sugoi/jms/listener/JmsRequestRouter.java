@@ -123,18 +123,19 @@ public class JmsRequestRouter {
       case Method.REINIT_PASSWORD:
         user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
         PasswordChangeRequest pcr =
-            (PasswordChangeRequest)
-                (request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
+            converter.toPasswordChangeRequest(
+                request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
         List<SendMode> sendMode =
-            (List<SendMode>) (request.getmethodParams().get(JmsAtttributes.SEND_MODE));
+            converter.toSendModeList(request.getmethodParams().get(JmsAtttributes.SEND_MODE));
         credentialsService.reinitPassword(realm, userStorage, user.getUsername(), pcr, sendMode);
         break;
       case Method.INIT_PASSWORD:
         user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
         pcr =
-            (PasswordChangeRequest)
-                (request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
-        sendMode = (List<SendMode>) (request.getmethodParams().get(JmsAtttributes.SEND_MODE));
+            converter.toPasswordChangeRequest(
+                request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
+        sendMode =
+            converter.toSendModeList(request.getmethodParams().get(JmsAtttributes.SEND_MODE));
         credentialsService.initPassword(realm, userStorage, user.getUsername(), pcr, sendMode);
         break;
       case Method.CHANGE_PASSWORD_RESET_STATUS:
@@ -159,8 +160,8 @@ public class JmsRequestRouter {
       case Method.CHANGE_PASSWORD:
         user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
         pcr =
-            (PasswordChangeRequest)
-                request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST);
+            converter.toPasswordChangeRequest(
+                request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
         credentialsService.changePassword(realm, userStorage, user.getUsername(), pcr);
         break;
       default:
