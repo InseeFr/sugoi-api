@@ -47,7 +47,7 @@ public class CredentialsServiceImpl implements CredentialsService {
     User user = storeProvider.getReaderStore(realm, userStorage).getUser(userId);
     String password = passwordService.generatePassword();
     WriterStore writerStore = storeProvider.getWriterStore(realm, userStorage);
-    writerStore.reinitPassword(user, password);
+    writerStore.reinitPassword(user, password, pcr, sendMode);
     writerStore.changePasswordResetStatus(
         user,
         (pcr.getProperties() != null && pcr.getProperties().get("mustChangePassword") != null)
@@ -77,7 +77,7 @@ public class CredentialsServiceImpl implements CredentialsService {
     if (newPasswordIsValid) {
       storeProvider
           .getWriterStore(realm, userStorage)
-          .changePassword(user, pcr.getOldPassword(), pcr.getNewPassword());
+          .changePassword(user, pcr.getOldPassword(), pcr.getNewPassword(), pcr);
     } else {
       throw new InvalidPasswordException("New password is not valid");
     }
@@ -91,7 +91,9 @@ public class CredentialsServiceImpl implements CredentialsService {
       PasswordChangeRequest pcr,
       List<SendMode> sendMode) {
     User user = storeProvider.getReaderStore(realm, userStorage).getUser(userId);
-    storeProvider.getWriterStore(realm, userStorage).initPassword(user, pcr.getNewPassword());
+    storeProvider
+        .getWriterStore(realm, userStorage)
+        .initPassword(user, pcr.getNewPassword(), pcr, sendMode);
     sugoiEventPublisher.publishCustomEvent(
         realm,
         userStorage,

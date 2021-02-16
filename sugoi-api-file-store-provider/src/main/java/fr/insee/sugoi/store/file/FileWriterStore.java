@@ -13,11 +13,14 @@
 */
 package fr.insee.sugoi.store.file;
 
+import fr.insee.sugoi.core.model.PasswordChangeRequest;
+import fr.insee.sugoi.core.model.SendMode;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import java.util.List;
 import java.util.Map;
 
 public class FileWriterStore implements WriterStore {
@@ -90,13 +93,15 @@ public class FileWriterStore implements WriterStore {
   }
 
   @Override
-  public void reinitPassword(User user, String generatedPassword) {
+  public void reinitPassword(
+      User user, String generatedPassword, PasswordChangeRequest pcr, List<SendMode> sendMode) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void initPassword(User user, String password) {
+  public void initPassword(
+      User user, String password, PasswordChangeRequest pcr, List<SendMode> sendMode) {
     // TODO Auto-generated method stub
 
   }
@@ -126,7 +131,8 @@ public class FileWriterStore implements WriterStore {
   }
 
   @Override
-  public void changePassword(User user, String oldPassword, String newPassword) {
+  public void changePassword(
+      User user, String oldPassword, String newPassword, PasswordChangeRequest pcr) {
     // TODO Auto-generated method stub
 
   }

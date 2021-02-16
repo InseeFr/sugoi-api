@@ -26,6 +26,8 @@ import com.unboundid.ldap.sdk.ResultCode;
 import com.unboundid.ldap.sdk.extensions.PasswordModifyExtendedRequest;
 import com.unboundid.util.SubtreeDeleter;
 import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
+import fr.insee.sugoi.core.model.PasswordChangeRequest;
+import fr.insee.sugoi.core.model.SendMode;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;
@@ -38,6 +40,7 @@ import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -271,7 +274,8 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   }
 
   @Override
-  public void reinitPassword(User user, String generatedPassword) {
+  public void reinitPassword(
+      User user, String generatedPassword, PasswordChangeRequest pcr, List<SendMode> sendMode) {
     Modification mod =
         new Modification(ModificationType.REPLACE, "userPassword", generatedPassword);
     try {
@@ -282,7 +286,8 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   }
 
   @Override
-  public void initPassword(User user, String password) {
+  public void initPassword(
+      User user, String password, PasswordChangeRequest pcr, List<SendMode> sendMode) {
     Modification mod = new Modification(ModificationType.ADD, "userPassword", password);
     try {
       ldapPoolConnection.modify("uid=" + user.getUsername() + "," + config.get("user_source"), mod);
@@ -292,7 +297,8 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   }
 
   @Override
-  public void changePassword(User user, String oldPassword, String newPassword) {
+  public void changePassword(
+      User user, String oldPassword, String newPassword, PasswordChangeRequest pcr) {
     try {
       PasswordModifyExtendedRequest pmer =
           new PasswordModifyExtendedRequest(

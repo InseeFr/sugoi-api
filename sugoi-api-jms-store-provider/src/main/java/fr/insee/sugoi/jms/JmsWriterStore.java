@@ -13,6 +13,8 @@
 */
 package fr.insee.sugoi.jms;
 
+import fr.insee.sugoi.core.model.PasswordChangeRequest;
+import fr.insee.sugoi.core.model.SendMode;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.jms.utils.JmsAtttributes;
 import fr.insee.sugoi.jms.utils.Method;
@@ -24,6 +26,7 @@ import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class JmsWriterStore implements WriterStore {
@@ -172,22 +175,28 @@ public class JmsWriterStore implements WriterStore {
   }
 
   @Override
-  public void reinitPassword(User user, String password) {
+  public void reinitPassword(
+      User user, String password, PasswordChangeRequest pcr, List<SendMode> sendModes) {
     Map<String, Object> params = new HashMap<>();
     params.put(JmsAtttributes.USER, user);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
     params.put(JmsAtttributes.PASSWORD, password);
+    params.put(JmsAtttributes.PASSWORD_CHANGE_REQUEST, pcr);
+    params.put(JmsAtttributes.SEND_MODE, sendModes);
     jmsWriter.writeRequestInQueue(queueRequestName, Method.REINIT_PASSWORD, params);
   }
 
   @Override
-  public void initPassword(User user, String password) {
+  public void initPassword(
+      User user, String password, PasswordChangeRequest pcr, List<SendMode> sendModes) {
     Map<String, Object> params = new HashMap<>();
     params.put(JmsAtttributes.USER, user);
     params.put(JmsAtttributes.PASSWORD, password);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    params.put(JmsAtttributes.PASSWORD_CHANGE_REQUEST, pcr);
+    params.put(JmsAtttributes.SEND_MODE, sendModes);
     jmsWriter.writeRequestInQueue(queueRequestName, Method.INIT_PASSWORD, params);
   }
 
@@ -231,13 +240,15 @@ public class JmsWriterStore implements WriterStore {
   }
 
   @Override
-  public void changePassword(User user, String oldPassword, String newPassword) {
+  public void changePassword(
+      User user, String oldPassword, String newPassword, PasswordChangeRequest pcr) {
     Map<String, Object> params = new HashMap<>();
     params.put(JmsAtttributes.USER, user);
     params.put(JmsAtttributes.NEW_PASSWORD, newPassword);
     params.put(JmsAtttributes.OLD_PASSWORD, oldPassword);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    params.put(JmsAtttributes.PASSWORD_CHANGE_REQUEST, pcr);
     jmsWriter.writeRequestInQueue(queueRequestName, Method.CHANGE_PASSWORD, params);
   }
 }
