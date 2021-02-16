@@ -187,8 +187,11 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
 
   @Override
   public boolean validateCredentials(User user, String credential) {
-    // TODO Auto-generated method stub
-    return false;
+    try {
+      return LdapFactory.validateUserPassword(config, getUserDN(user.getUsername()), credential);
+    } catch (LDAPException e) {
+      return false;
+    }
   }
 
   /** Retrieve the specified application with all its groups */

@@ -22,7 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -77,5 +80,28 @@ public class CredentialsController {
       @RequestParam(value = "sendModes", required = false) List<SendMode> sendMode) {
     credentialsService.initPassword(
         realm, userStorage, id, pcr, sendMode != null ? sendMode : new ArrayList<>());
+  }
+
+  @PostMapping(
+      path = {
+        "/{realm}/users/{id}/validate-password",
+        "/{realm}/{storage}/users/{id}/validate-password"
+      },
+      consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public ResponseEntity<Void> validatePassword(
+      @PathVariable("realm") String realm,
+      @PathVariable(value = "storage", required = false) String userStorage,
+      @PathVariable("id") String id,
+      @RequestParam MultiValueMap<String, String> params) {
+    if (params.containsKey("password")
+        && credentialsService.validateCredential(
+            realm, userStorage, id, params.getFirst("password"))) {
+      return ResponseEntity.ok().build();
+
+    } else {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
   }
 }

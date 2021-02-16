@@ -102,4 +102,16 @@ public class CredentialsServiceImpl implements CredentialsService {
             Map.entry("user", user),
             Map.entry("password", pcr.getNewPassword())));
   }
+
+  @Override
+  public boolean validateCredential(
+      String realm, String userStorage, String userName, String password) {
+    User user = storeProvider.getReaderStore(realm, userStorage).getUser(userName);
+    sugoiEventPublisher.publishCustomEvent(
+        realm,
+        userStorage,
+        SugoiEventTypeEnum.VALIDATE_CREDENTIAL,
+        Map.ofEntries(Map.entry("user", user)));
+    return storeProvider.getReaderStore(realm, userStorage).validateCredentials(user, password);
+  }
 }
