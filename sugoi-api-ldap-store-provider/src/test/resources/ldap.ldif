@@ -205,6 +205,7 @@ objectClass: inseeAttributsAuthentification
 objectClass: inseeAttributsHabilitation
 objectClass: inseeAttributsCommunication
 inseeOrganisationDN: uid=testo,ou=organisations,ou=clients_domaine1,o=insee,c=fr
+userPassword: testc
 mail: test@test.fr
 uid: testc
 inseeAdressePostaleDN: l=testc,ou=adresses,ou=clients_domaine1,o=insee,c=fr

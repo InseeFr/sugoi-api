@@ -271,4 +271,21 @@ public class LdapReaderStoreTest {
     assertThat("Is null, maybe not the expected behavior", users.get(0), is(nullValue()));
     assertThat("Should be administrateurs", users.get(1).getUsername(), is("testc"));
   }
+
+  @Test
+  public void validateCredential() {
+    User user = ldapReaderStore.getUser("testc");
+    assertThat(
+        "Password should be validated",
+        ldapReaderStore.validateCredentials(user, "testc"),
+        is(true));
+    assertThat(
+        "Password should not be validated",
+        ldapReaderStore.validateCredentials(user, "testc2"),
+        is(false));
+    assertThat(
+        "Password should not be validated",
+        ldapReaderStore.validateCredentials(user, null),
+        is(false));
+  }
 }

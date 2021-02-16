@@ -34,4 +34,6 @@ public interface CredentialsService {
       String userId,
       PasswordChangeRequest pcr,
       List<SendMode> sendMode);
+
+  boolean validateCredential(String realm, String userStorage, String userName, String password);
 }

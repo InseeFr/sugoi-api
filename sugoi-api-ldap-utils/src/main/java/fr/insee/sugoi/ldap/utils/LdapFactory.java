@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.ldap.utils;
 
+import com.unboundid.ldap.sdk.BindResult;
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
 import com.unboundid.ldap.sdk.LDAPException;
@@ -99,5 +100,19 @@ public class LdapFactory {
               config.get("password")));
     }
     return openLdapMonoConnection.get(key);
+  }
+
+  public static boolean validateUserPassword(
+      Map<String, String> config, String userdn, String password) throws LDAPException {
+    try (LDAPConnection conn =
+        new LDAPConnection(config.get("url"), Integer.valueOf(config.get("port")))) {
+      BindResult result = conn.bind(userdn, password);
+      if (result.getResultCode().intValue() != 0) {
+        return false;
+      }
+    } catch (Exception e) {
+      return false;
+    }
+    return true;
   }
 }
