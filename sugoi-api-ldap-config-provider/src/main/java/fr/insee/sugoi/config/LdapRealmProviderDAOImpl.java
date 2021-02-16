@@ -54,6 +54,9 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   @Value("${fr.insee.sugoi.config.ldap.profils.branche:}")
   private String baseDn;
 
+  @Value("${fr.insee.sugoi.config.ldap.profils.pattern:cn=Profil_{realm}_WebServiceLdap}")
+  private String realmEntryPattern;
+
   private static final Logger logger = LogManager.getLogger(LdapRealmProviderDAOImpl.class);
 
   @Override
@@ -62,7 +65,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
     try (LDAPConnectionPool ldapConnection =
         new LDAPConnectionPool(new LDAPConnection(url, port), 1)) {
       SearchResultEntry realmEntry =
-          ldapConnection.getEntry("cn=Profil_" + realmName + "_WebServiceLdap," + baseDn);
+          ldapConnection.getEntry(realmEntryPattern.replace("{realm}", realmName) + "," + baseDn);
       logger.debug("Found entry {}", realmEntry.getDN());
       Realm realm = RealmLdapMapper.mapFromSearchEntry(realmEntry);
       logger.debug("Parsing as realm {}", realm);
