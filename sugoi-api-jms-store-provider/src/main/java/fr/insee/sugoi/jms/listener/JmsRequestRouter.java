@@ -124,17 +124,17 @@ public class JmsRequestRouter {
         user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
         PasswordChangeRequest pcr =
             (PasswordChangeRequest)
-                request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST);
+                (request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
         List<SendMode> sendMode =
-            (List<SendMode>) request.getmethodParams().get(JmsAtttributes.SEND_MODE);
+            (List<SendMode>) (request.getmethodParams().get(JmsAtttributes.SEND_MODE));
         credentialsService.reinitPassword(realm, userStorage, user.getUsername(), pcr, sendMode);
         break;
       case Method.INIT_PASSWORD:
         user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
         pcr =
             (PasswordChangeRequest)
-                request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST);
-        sendMode = (List<SendMode>) request.getmethodParams().get(JmsAtttributes.SEND_MODE);
+                (request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
+        sendMode = (List<SendMode>) (request.getmethodParams().get(JmsAtttributes.SEND_MODE));
         credentialsService.initPassword(realm, userStorage, user.getUsername(), pcr, sendMode);
         break;
       case Method.CHANGE_PASSWORD_RESET_STATUS:
