@@ -84,7 +84,7 @@ public class WebHookServiceImpl implements WebHookService {
 
   @Override
   public void resetPassword(String webHookName, Map<String, Object> values) {
-    String template;
+    String template = null;
     try {
       template =
           configService.getRealm((String) values.get("realm")).getUserStorages().stream()
@@ -94,7 +94,9 @@ public class WebHookServiceImpl implements WebHookService {
               .getProperties()
               .get(webHookName + "_reset_template");
     } catch (Exception e) {
-      // TODO: handle exception
+      // we don't need to manage this exception here
+    }
+    if (template == null) {
       template =
           loadResource(
               env.getProperty(
@@ -112,7 +114,7 @@ public class WebHookServiceImpl implements WebHookService {
 
   @Override
   public void initPassword(String webHookName, Map<String, Object> values) {
-    String template;
+    String template = null;
     try {
       template =
           configService.getRealm((String) values.get("realm")).getUserStorages().stream()
@@ -122,7 +124,9 @@ public class WebHookServiceImpl implements WebHookService {
               .getProperties()
               .get(webHookName + "_init_template");
     } catch (Exception e) {
-      // TODO: handle exception
+      // we don't need to manage this exception here
+    }
+    if (template == null) {
       template =
           loadResource(
               env.getProperty(
