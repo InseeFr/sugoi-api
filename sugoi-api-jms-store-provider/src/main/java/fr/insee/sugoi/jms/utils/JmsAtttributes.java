@@ -41,4 +41,8 @@ public class JmsAtttributes {
   public static final String OLD_PASSWORD = "oldPassword";
 
   public static final String NEW_PASSWORD = "newPassword";
+
+  public static final String PASSWORD_CHANGE_REQUEST = "passwordChangeRequest";
+
+  public static final String SEND_MODE = "sendMode";
 }

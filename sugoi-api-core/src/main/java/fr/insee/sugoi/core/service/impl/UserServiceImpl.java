@@ -91,4 +91,32 @@ public class UserServiceImpl implements UserService {
       throw new RuntimeException("Erreur lors de la récupération des utilisateurs", e);
     }
   }
+
+  @Override
+  public void addUserToGroup(
+      String realm, String storage, String userId, String appName, String groupName) {
+    sugoiEventPublisher.publishCustomEvent(
+        realm,
+        storage,
+        SugoiEventTypeEnum.ADD_USER_TO_GROUP,
+        Map.ofEntries(
+            Map.entry("user", userId),
+            Map.entry("appName", appName),
+            Map.entry("groupName", groupName)));
+    storeProvider.getWriterStore(realm, storage).addUserToGroup(appName, groupName, userId);
+  }
+
+  @Override
+  public void deleteUserFromGroup(
+      String realm, String storage, String userId, String appName, String groupName) {
+    sugoiEventPublisher.publishCustomEvent(
+        realm,
+        storage,
+        SugoiEventTypeEnum.DELETE_USER_FROM_GROUP,
+        Map.ofEntries(
+            Map.entry("user", userId),
+            Map.entry("appName", appName),
+            Map.entry("groupName", groupName)));
+    storeProvider.getWriterStore(realm, storage).deleteUserFromGroup(appName, groupName, userId);
+  }
 }

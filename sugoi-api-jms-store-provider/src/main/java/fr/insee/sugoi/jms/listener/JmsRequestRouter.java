@@ -14,6 +14,13 @@
 package fr.insee.sugoi.jms.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.sugoi.core.model.PasswordChangeRequest;
+import fr.insee.sugoi.core.model.SendMode;
+import fr.insee.sugoi.core.service.ApplicationService;
+import fr.insee.sugoi.core.service.CredentialsService;
+import fr.insee.sugoi.core.service.GroupService;
+import fr.insee.sugoi.core.service.OrganizationService;
+import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.jms.model.BrokerRequest;
 import fr.insee.sugoi.jms.utils.Converter;
@@ -23,6 +30,7 @@ import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +45,22 @@ public class JmsRequestRouter {
 
   @Autowired private Converter converter;
 
+  @Autowired private UserService userService;
+
+  @Autowired private CredentialsService credentialsService;
+
+  @Autowired private ApplicationService appService;
+
+  @Autowired private GroupService groupService;
+
+  @Autowired private OrganizationService orgService;
+
+  private static ObjectMapper mapper = new ObjectMapper();
+
   public void exec(BrokerRequest request) throws Exception {
     String realm = (String) request.getmethodParams().get("realm");
     String userStorage = (String) request.getmethodParams().get("userStorage");
     String operation = request.getMethod();
-    ObjectMapper mapper = new ObjectMapper();
     logger.info(
         "Receive request from Broker for realm {} and userStorage {} operation:{}",
         realm,
@@ -50,68 +69,73 @@ public class JmsRequestRouter {
     switch (operation) {
       case Method.DELETE_USER:
         String id = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
-        storeProvider.getWriterStore(realm, userStorage).deleteUser(id);
+        userService.delete(realm, userStorage, id);
         break;
       case Method.CREATE_USER:
         User user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
-        storeProvider.getWriterStore(realm, userStorage).createUser(user);
+        userService.create(realm, userStorage, user);
         break;
       case Method.UPDATE_USER:
         User updatedUser = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
-        storeProvider.getWriterStore(realm, userStorage).updateUser(updatedUser);
+        userService.update(realm, userStorage, updatedUser);
         break;
       case Method.DELETE_GROUP:
         String appName = (String) request.getmethodParams().get(JmsAtttributes.APP_NAME);
         String groupName = (String) request.getmethodParams().get(JmsAtttributes.GROUP_NAME);
-        storeProvider.getWriterStore(realm, userStorage).deleteGroup(appName, groupName);
+        groupService.delete(realm, userStorage, appName, groupName);
         break;
       case Method.CREATE_GROUP:
         appName = (String) request.getmethodParams().get(JmsAtttributes.APP_NAME);
         Group group = converter.toGroup(request.getmethodParams().get(JmsAtttributes.GROUP));
-        storeProvider.getWriterStore(realm, userStorage).createGroup(appName, group);
+        groupService.create(realm, userStorage, appName, group);
         break;
       case Method.UPDATE_GROUP:
         appName = (String) request.getmethodParams().get(JmsAtttributes.APP_NAME);
         Group updatedGroup = converter.toGroup(request.getmethodParams().get(JmsAtttributes.GROUP));
-        storeProvider.getWriterStore(realm, userStorage).createGroup(appName, updatedGroup);
+        groupService.update(realm, userStorage, appName, updatedGroup);
         break;
       case Method.DELETE_ORGANIZATION:
         String name = (String) request.getmethodParams().get(JmsAtttributes.ORGANIZATION_NAME);
-        storeProvider.getWriterStore(realm, userStorage).deleteOrganization(name);
+        orgService.delete(realm, userStorage, name);
         break;
       case Method.CREATE_ORGANIZATION:
         Organization organization =
             converter.toOrganization(request.getmethodParams().get(JmsAtttributes.ORGANIZATION));
-        storeProvider.getWriterStore(realm, userStorage).createOrganization(organization);
+        orgService.create(realm, userStorage, organization);
         break;
       case Method.UPDATE_ORGANIZATION:
         Organization updatedOrganization =
             converter.toOrganization(request.getmethodParams().get(JmsAtttributes.ORGANIZATION));
-        storeProvider.getWriterStore(realm, userStorage).updateOrganization(updatedOrganization);
+        orgService.update(realm, userStorage, updatedOrganization);
         break;
       case Method.DELETE_USER_FROM_GROUP:
         appName = (String) request.getmethodParams().get(JmsAtttributes.APP_NAME);
         groupName = (String) request.getmethodParams().get(JmsAtttributes.GROUP_NAME);
         String userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
-        storeProvider
-            .getWriterStore(realm, userStorage)
-            .deleteUserFromGroup(appName, groupName, userId);
+        userService.deleteUserFromGroup(realm, userStorage, userId, appName, groupName);
         break;
       case Method.ADD_USER_TO_GROUP:
         appName = (String) request.getmethodParams().get(JmsAtttributes.APP_NAME);
         groupName = (String) request.getmethodParams().get(JmsAtttributes.GROUP_NAME);
         userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
-        storeProvider.getWriterStore(realm, userStorage).addUserToGroup(appName, groupName, userId);
+        userService.addUserToGroup(realm, userStorage, userId, appName, groupName);
         break;
       case Method.REINIT_PASSWORD:
         user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
-        String password = (String) request.getmethodParams().get(JmsAtttributes.PASSWORD);
-        storeProvider.getWriterStore(realm, userStorage).reinitPassword(user, password);
+        PasswordChangeRequest pcr =
+            (PasswordChangeRequest)
+                request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST);
+        List<SendMode> sendMode =
+            (List<SendMode>) request.getmethodParams().get(JmsAtttributes.SEND_MODE);
+        credentialsService.reinitPassword(realm, userStorage, user.getUsername(), pcr, sendMode);
         break;
       case Method.INIT_PASSWORD:
         user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
-        password = (String) request.getmethodParams().get(JmsAtttributes.PASSWORD);
-        storeProvider.getWriterStore(realm, userStorage).initPassword(user, password);
+        pcr =
+            (PasswordChangeRequest)
+                request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST);
+        sendMode = (List<SendMode>) request.getmethodParams().get(JmsAtttributes.SEND_MODE);
+        credentialsService.initPassword(realm, userStorage, user.getUsername(), pcr, sendMode);
         break;
       case Method.CHANGE_PASSWORD_RESET_STATUS:
         user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
@@ -133,12 +157,12 @@ public class JmsRequestRouter {
         storeProvider.getWriterStore(realm, userStorage).deleteApplication(applicationName);
         break;
       case Method.CHANGE_PASSWORD:
-        String oldPassword = (String) request.getmethodParams().get(JmsAtttributes.OLD_PASSWORD);
-        String newPassword = (String) request.getmethodParams().get(JmsAtttributes.NEW_PASSWORD);
         user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
-        storeProvider
-            .getWriterStore(realm, userStorage)
-            .changePassword(user, oldPassword, newPassword);
+        pcr =
+            (PasswordChangeRequest)
+                request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST);
+        credentialsService.changePassword(realm, userStorage, user.getUsername(), pcr);
+        break;
       default:
         throw new Exception("Invalid Operation");
     }

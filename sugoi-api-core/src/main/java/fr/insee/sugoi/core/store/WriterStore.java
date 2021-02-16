@@ -13,10 +13,13 @@
 */
 package fr.insee.sugoi.core.store;
 
+import fr.insee.sugoi.core.model.PasswordChangeRequest;
+import fr.insee.sugoi.core.model.SendMode;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import java.util.List;
 
 public interface WriterStore {
 
@@ -48,11 +51,13 @@ public interface WriterStore {
 
   void addUserToGroup(String appName, String groupName, String userId);
 
-  void reinitPassword(User user, String generatedPassword);
+  void reinitPassword(
+      User user, String generatedPassword, PasswordChangeRequest pcr, List<SendMode> sendModes);
 
-  void initPassword(User user, String initPassword);
+  void initPassword(
+      User user, String initPassword, PasswordChangeRequest pcr, List<SendMode> sendModes);
 
-  void changePassword(User user, String oldPassword, String newPassword);
+  void changePassword(User user, String oldPassword, String newPassword, PasswordChangeRequest pcr);
 
   void changePasswordResetStatus(User user, boolean isReset);
 }
