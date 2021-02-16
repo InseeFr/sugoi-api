@@ -18,7 +18,6 @@ import org.springframework.context.ApplicationEvent;
 
 public class SugoiEvent extends ApplicationEvent {
 
-  /** */
   private static final long serialVersionUID = 1L;
 
   private SugoiEventTypeEnum eventType;

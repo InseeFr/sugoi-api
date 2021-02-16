@@ -21,6 +21,7 @@ import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import java.util.List;
 
+/** Writer stores are responsible for all operations modifying the underlying store. */
 public interface WriterStore {
 
   void deleteUser(String id);

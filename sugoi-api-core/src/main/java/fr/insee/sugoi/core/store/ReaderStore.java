@@ -20,6 +20,13 @@ import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 
+/**
+ * Reader store are responsible of all operations reading a store (to fetch informations) All method
+ * in this class should have no effect on the store (except for `validateCredential`)
+ *
+ * <p>Implementations may use caching, but should take care of managing this cache so that
+ * modifications are reflected in due time
+ */
 public interface ReaderStore {
 
   public User getUser(String id);

@@ -13,6 +13,11 @@
 */
 package fr.insee.sugoi.core.store;
 
+/**
+ * Service class to get a store for the pair realm-userstorage
+ *
+ * @see StoreProviderImpl
+ */
 public interface StoreProvider {
 
   public Store getStoreForUserStorage(String realmName, String userStorageName);

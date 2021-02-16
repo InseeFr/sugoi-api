@@ -26,5 +26,12 @@ import fr.insee.sugoi.model.UserStorage;
  */
 public interface StoreStorage {
 
+  /**
+   * Get the store (writer/reader) for the realm/userStorage pair
+   *
+   * @param realm
+   * @param userStorage
+   * @return the store for the realm/userstorage wanted
+   */
   public Store getStore(Realm realm, UserStorage userStorage);
 }

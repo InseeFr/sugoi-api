@@ -13,13 +13,27 @@
 */
 package fr.insee.sugoi.core.service;
 
+import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.Realm;
 import java.util.List;
 
+/** Managing realm configuration */
 public interface ConfigService {
 
-  Realm getRealm(String realmName);
+  /**
+   * Finds a realm by its name by using the RealmProvider Bean The result is cached.
+   *
+   * @throws RealmNotFoundException in case no realm is found
+   * @param name
+   * @return the Realm
+   */
+  Realm getRealm(String name);
 
+  /**
+   * Finds all realms using the RelmProvider bean. The resulting list is cached.
+   *
+   * @return a list of all realms
+   */
   List<Realm> getRealms();
 
   void deleteRealm(String realmName);
