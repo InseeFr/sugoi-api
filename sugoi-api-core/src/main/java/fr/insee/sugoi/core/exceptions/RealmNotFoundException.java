@@ -15,7 +15,6 @@ package fr.insee.sugoi.core.exceptions;
 
 public class RealmNotFoundException extends RuntimeException {
 
-  /** */
   private static final long serialVersionUID = 1L;
 
   private String message;

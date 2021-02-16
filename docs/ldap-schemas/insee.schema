@@ -1,0 +1,691 @@
+attributetype ( 1.2.250.1.61.2.1 NAME 'inseeTimbre'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.10 NAME 'inseeDomaineNT'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.11 NAME 'inseeFonctionDN'
+	DESC 'User Defined Attribute'
+	EQUALITY distinguishedNameMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.12
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.12 NAME 'inseeFonction'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.13 NAME 'inseeGrade'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.14 NAME 'inseeUniteDN'
+	DESC 'User Defined Attribute'
+	EQUALITY distinguishedNameMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.12
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.15 NAME 'inseeUnite'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.16 NAME 'inseeOrganismeDN'
+	DESC 'User Defined Attribute'
+	EQUALITY distinguishedNameMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.12
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.17 NAME 'inseeOrganisme'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.18 NAME 'inseeCNChef'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.19 NAME 'inseeAdresseDN'
+	DESC 'User Defined Attribute'
+	EQUALITY distinguishedNameMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.12
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.2 NAME 'inseeGroupDN'
+	DESC 'User Defined Attribute'
+	EQUALITY distinguishedNameMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.12
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.20 NAME 'inseeNumAbreges'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.21 NAME 'inseePrenomGIP'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.22 NAME 'inseeNomGIP'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.23 NAME 'inseeLogonid'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.24 NAME 'inseeRoleApplicatif'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.25 NAME 'inseePropriete'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.26 NAME 'pin'
+	DESC 'User Defined Attribute'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.5
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.27 NAME 'inseeGroupeDefaut'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.28 NAME 'inseeVille'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.29 NAME 'inseeGabaritMail'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.3 NAME 'inseeOrganigramme'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.30 NAME 'inseeAdresseCorrespondantLigne1'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.31 NAME 'inseeAdresseCorrespondantLigne2'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.32 NAME 'inseeAdresseCorrespondantLigne3'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.33 NAME 'inseeNomRefCorrespondant'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.34 NAME 'inseeCodeFamilleEnquete'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.35 NAME 'inseeEnquetes'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.36 NAME 'inseeEtatCompte'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.37 NAME 'inseePasswordLastChangeTime'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	ORDERING caseIgnoreOrderingMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.38 NAME 'inseePasswordExpirationTime'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	ORDERING caseIgnoreOrderingMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.39 NAME 'inseePasswordRetryCount'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	ORDERING caseIgnoreOrderingMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.4 NAME 'inseeDateDebut'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	ORDERING caseIgnoreOrderingMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.40 NAME 'inseenomcorrespondant'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.41 NAME 'inseeIdentifiantUE'
+	DESC 'User Defined Attribute'
+	EQUALITY caseExactIA5Match
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.42 NAME 'inseeLastConnectionTime'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	ORDERING caseIgnoreOrderingMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.43 NAME 'inseeTelephoneNumberCorrespondant'
+	DESC 'User Defined Attribute'
+	EQUALITY telephoneNumberMatch
+	SUBSTR telephoneNumberSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.50
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.44 NAME 'inseeMailCorrespondant'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.45 NAME 'inseeIdentifiantMinisteriel'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.46 NAME 'inseeLogCn'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.47 NAME 'inseeLogIdeP'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.48 NAME 'inseeDateCreation'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	ORDERING caseIgnoreOrderingMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.49 NAME 'inseeLogDatePrevue'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	ORDERING caseIgnoreOrderingMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.5 NAME 'inseeDateFin'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	ORDERING caseIgnoreOrderingMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.50 NAME 'inseeLogDateRealisee'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	ORDERING caseIgnoreOrderingMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.51 NAME 'inseeLogCategorie'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.52 NAME 'inseeLogSituationAvant'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.53 NAME 'inseeLogSituationApres'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.54 NAME 'inseeLogSuivi'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.55 NAME 'inseeCorrespondantDN'
+	DESC 'User Defined Attribute'
+	EQUALITY distinguishedNameMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.12
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.56 NAME 'inseeAdressePostaleCorrespondantLigne1'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.57 NAME 'inseeAdressePostaleCorrespondantLigne2'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.58 NAME 'inseeAdressePostaleCorrespondantLigne3'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.59 NAME 'inseeAdressePostaleCorrespondantLigne4'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.6 NAME 'inseeGroupRole'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.60 NAME 'inseeAdressePostaleCorrespondantLigne5'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.61 NAME 'inseeAdressePostaleCorrespondantLigne6'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.62 NAME 'inseeAdressePostaleCorrespondantLigne7'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.63 NAME 'inseeClefChiffrement'
+	DESC 'User Defined Attribute'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.5
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.64 NAME 'inseeRepertoireDeDistribution'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.65 NAME 'inseeOrganisationDN'
+	DESC 'User Defined Attribute'
+	EQUALITY distinguishedNameMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.12
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.66 NAME 'inseeAdressePostaleDN'
+	DESC 'User Defined Attribute'
+	EQUALITY distinguishedNameMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.12
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.67 NAME 'inseeIdentifiantMetier'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.68 NAME 'inseenumerotelephoneportable'
+	DESC 'User Defined Attribute'
+	EQUALITY telephoneNumberMatch
+	SUBSTR telephoneNumberSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.50
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.69 NAME 'inseePasswordInitial'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.7 NAME 'inseeNiveauDiffusion'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.70 NAME 'inseeLogEtat'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.71 NAME 'inseeLogPriorite'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	ORDERING caseIgnoreOrderingMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.72 NAME 'inseeLogCategorieHautePriorite'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.73 NAME 'inseeLogCategoriePriorite'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.74 NAME 'inseeLogAjoutRole'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.75 NAME 'inseeLogSuppRole'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.76 NAME 'inseeLogAjoutGroupe'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.77 NAME 'inseeLogSuppGroupe'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.78 NAME 'inseeLogSuppAUS'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.79 NAME 'inseeLogSeeAlso'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.8 NAME 'inseePrenomUsage'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.2.250.1.61.2.9 NAME 'inseeServeurExchange'
+	DESC 'User Defined Attribute'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE
+	USAGE userApplications )
+attributetype ( 1.3.6.1.4.1.1466.115.121.1.26 NAME 'aci'
+	DESC 'Standard Attribute'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+	USAGE userApplications )
+attributetype ( 2.5.4.97 NAME 'organizationIdentifier'
+	DESC 'Organization Identifier'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	USAGE userApplications )
+objectclass ( 1.2.250.1.61.1.1 NAME 'inseePerson'
+	DESC 'User Defined ObjectClass'
+	SUP inetOrgPerson
+	STRUCTURAL
+	MUST ( objectclass $ sn $ cn $ uid )
+	MAY ( description $ seealso $ telephonenumber $ userpassword $ destinationindicator $ facsimiletelephonenumber $ internationalisdnnumber $ l $ ou $ physicaldeliveryofficename $ postofficebox $ postaladdress $ postalcode $ preferreddeliverymethod $ registeredaddress $ st $ street $ teletexterminalidentifier $ telexnumber $ title $ x121address $ audio $ businesscategory $ carlicense $ departmentnumber $ displayname $ employeetype $ employeenumber $ givenname $ homephone $ homepostaladdress $ initials $ jpegphoto $ labeleduri $ manager $ mobile $ pager $ photo $ preferredlanguage $ mail $ o $ roomnumber $ secretary $ uid $ x500uniqueidentifier $ usercertificate $ usersmimecertificate $ userpkcs12 $ inseedomainent $ inseefonction $ inseefonctiondn $ inseegrade $ inseegroupdn $ inseegroupedefaut $ inseeidentifiantministeriel $ inseelogonid $ inseeniveaudiffusion $ inseenomgip $ inseeorganisme $ inseeorganismedn $ inseeprenomgip $ inseeprenomusage $ inseeroleapplicatif $ inseeserveurexchange $ inseetimbre $ inseeunite $ inseeunitedn $ personaltitle $ pin ) )
+objectclass ( 1.2.250.1.61.1.10 NAME 'inseeMairie'
+	DESC 'User Defined ObjectClass'
+	SUP top
+	STRUCTURAL
+	MUST ( objectclass $ cn )
+	MAY ( cn $ uid $ description $ userpassword $ inseelastconnectiontime $ inseepasswordlastchangetime $ inseepasswordexpirationtime $ inseepasswordretrycount $ inseeetatcompte $ pin $ usercertificate $ usersmimecertificate $ inseeroleapplicatif $ inseegroupedefaut $ inseepropriete $ mail ) )
+objectclass ( 1.2.250.1.61.1.11 NAME 'inseePartenaire'
+	DESC 'User Defined ObjectClass'
+	SUP inetOrgPerson
+	STRUCTURAL
+	MUST ( objectclass $ sn $ cn )
+	MAY ( aci $ description $ seealso $ telephonenumber $ userpassword $ destinationindicator $ facsimiletelephonenumber $ internationalisdnnumber $ l $ ou $ physicaldeliveryofficename $ postofficebox $ postaladdress $ postalcode $ preferreddeliverymethod $ registeredaddress $ st $ street $ teletexterminalidentifier $ telexnumber $ title $ x121address $ audio $ businesscategory $ carlicense $ departmentnumber $ displayname $ employeetype $ employeenumber $ givenname $ homephone $ homepostaladdress $ initials $ jpegphoto $ labeleduri $ manager $ mobile $ pager $ photo $ preferredlanguage $ mail $ o $ roomnumber $ secretary $ uid $ x500uniqueidentifier $ usercertificate $ usersmimecertificate $ userpkcs12 ) )
+objectclass ( 1.2.250.1.61.1.12 NAME 'inseeAdresse'
+	DESC 'User Defined ObjectClass'
+	SUP locality
+	STRUCTURAL
+	MUST objectclass
+	MAY ( description $ l $ searchguide $ seealso $ st $ street $ postaladdress $ postalcode $ postofficebox $ physicaldeliveryofficename $ inseeville ) )
+objectclass ( 1.2.250.1.61.1.13 NAME 'inseeCompteEnquete'
+	DESC 'User Defined ObjectClass'
+	SUP top
+	STRUCTURAL
+	MUST ( objectclass $ uid )
+	MAY ( cn $ uid $ description $ userpassword $ inseelastconnectiontime $ inseepasswordlastchangetime $ inseepasswordexpirationtime $ inseepasswordretrycount $ inseeetatcompte $ pin $ usercertificate $ usersmimecertificate $ inseeroleapplicatif $ inseegroupedefaut $ inseepropriete $ employeetype $ facsimiletelephonenumber $ inseemailcorrespondant $ inseeadressecorrespondantligne1 $ inseeadressecorrespondantligne2 $ inseeadressecorrespondantligne3 $ inseecodefamilleenquete $ inseeenquetes $ inseeidentifiantue $ inseenomcorrespondant $ inseenomrefcorrespondant $ inseetelephonenumbercorrespondant $ mail $ personaltitle $ postalcode $ postofficebox $ telephonenumber $ title ) )
+objectclass ( 1.2.250.1.61.1.14 NAME 'inseeAuthenticatedUser'
+	DESC 'User Defined ObjectClass'
+	SUP top
+	AUXILIARY
+	MUST objectclass
+	MAY ( cn $ uid $ description $ userpassword $ inseelastconnectiontime $ inseepasswordlastchangetime $ inseepasswordexpirationtime $ inseepasswordretrycount $ inseeetatcompte $ pin $ usercertificate $ usersmimecertificate $ inseeroleapplicatif $ inseegroupedefaut $ inseepropriete $ inseePasswordInitial ) )
+objectclass ( 1.2.250.1.61.1.15 NAME 'inseeClientPASE'
+	DESC 'User Defined ObjectClass'
+	SUP top
+	STRUCTURAL
+	MUST ( objectclass $ cn )
+	MAY ( cn $ uid $ description $ userpassword $ inseelastconnectiontime $ inseepasswordlastchangetime $ inseepasswordexpirationtime $ inseepasswordretrycount $ inseeetatcompte $ pin $ usercertificate $ usersmimecertificate $ inseeroleapplicatif $ inseegroupedefaut $ inseepropriete ) )
+objectclass ( 1.2.250.1.61.1.16 NAME 'inseeCompteService'
+	DESC 'User Defined ObjectClass'
+	SUP top
+	STRUCTURAL
+	MUST objectclass
+	MAY ( cn $ uid $ description $ userpassword $ inseelastconnectiontime $ inseepasswordlastchangetime $ inseepasswordexpirationtime $ inseepasswordretrycount $ inseeetatcompte $ pin $ usercertificate $ usersmimecertificate $ inseeroleapplicatif $ inseegroupedefaut $ inseepropriete ) )
+objectclass ( 1.2.250.1.61.1.17 NAME 'inseeLogItem'
+	DESC 'User Defined ObjectClass'
+	SUP top
+	STRUCTURAL
+	MUST ( objectclass $ uid )
+	MAY ( aci $ inseedatecreation $ inseelogcategorie $ inseelogcn $ inseelogdateprevue $ inseelogdaterealisee $ inseelogidep $ inseelogsituationapres $ inseelogsituationavant $ inseelogsuivi $ inseelogpriorite $ inseelogetat $ inseelogajoutrole $ inseelogsupprole $ inseelogajoutgroupe $ inseelogsuppgroupe $ inseelogsuppaus $ inseeLogSeeAlso ) )
+objectclass ( 1.2.250.1.61.1.19 NAME 'inseeAdressePostale'
+	DESC 'User Defined ObjectClass'
+	SUP locality
+	STRUCTURAL
+	MUST objectclass
+	MAY ( description $ l $ searchguide $ seealso $ st $ street $ inseeadressepostalecorrespondantligne1 $ inseeadressepostalecorrespondantligne2 $ inseeadressepostalecorrespondantligne3 $ inseeadressepostalecorrespondantligne4 $ inseeadressepostalecorrespondantligne5 $ inseeadressepostalecorrespondantligne6 $ inseeadressepostalecorrespondantligne7 ) )
+objectclass ( 1.2.250.1.61.1.2 NAME 'inseeCompte'
+	DESC 'User Defined ObjectClass'
+	SUP top
+	STRUCTURAL
+	MUST objectclass
+	MAY ( uid $ cn $ mail $ description $ inseecorrespondantdn $ inseeIdentifiantMetier ) )
+objectclass ( 1.2.250.1.61.1.20 NAME 'inseeOrganisation'
+	DESC 'User Defined ObjectClass'
+	SUP inseeCompte
+	STRUCTURAL
+	MUST ( objectclass $ uid )
+	MAY ( uid $ cn $ mail $ description $ inseecorrespondantdn $ o $ ou $ seealso $ inseeadressepostaledn $ inseeclefchiffrement $ inseerepertoirededistribution $ inseeorganisationdn ) )
+objectclass ( 1.2.250.1.61.1.21 NAME 'inseeSspPerson'
+	DESC 'User Defined ObjectClass'
+	SUP inseeCompte
+	STRUCTURAL
+	MUST objectclass
+	MAY ( uid $ cn $ mail $ description $ inseecorrespondantdn $ o $ inseeadressepostaledn ) )
+objectclass ( 1.2.250.1.61.1.22 NAME 'inseeAttributsAuthentification'
+	DESC 'User Defined ObjectClass'
+	SUP top
+	AUXILIARY
+	MAY ( userpassword $ pin $ usercertificate $ usersmimecertificate $ inseenumerotelephoneportable ) )
+objectclass ( 1.2.250.1.61.1.23 NAME 'inseeAttributsHabilitation'
+	DESC 'User Defined ObjectClass'
+	SUP top
+	AUXILIARY
+	MAY ( inseeroleapplicatif $ inseegroupedefaut $ inseepropriete ) )
+objectclass ( 1.2.250.1.61.1.24 NAME 'inseeAttributsCommunication'
+	DESC 'User Defined ObjectClass'
+	SUP top
+	AUXILIARY
+	MAY ( inseeadressecorrespondantligne1 $ inseeadressecorrespondantligne2 $ inseeadressecorrespondantligne3 $ inseemailcorrespondant $ inseenomcorrespondant $ inseetelephonenumbercorrespondant $ telephonenumber $ facsimiletelephonenumber $ postalcode $ postofficebox $ postaladdress $ uid $ inseeville ) )
+objectclass ( 1.2.250.1.61.1.25 NAME 'inseeLogAdministration'
+	DESC 'User Defined ObjectClass'
+	SUP top
+	STRUCTURAL
+	MUST ( objectclass $ cn )
+	MAY ( inseeLogCategoriePriorite $ inseeLogCategorieHautePriorite ) )
+objectclass ( 1.2.250.1.61.1.3 NAME 'inseeOrganisme'
+	DESC 'User Defined ObjectClass'
+	SUP organization
+	STRUCTURAL
+	MUST ( objectclass $ o )
+	MAY ( businesscategory $ description $ destinationindicator $ facsimiletelephonenumber $ internationalisdnnumber $ l $ physicaldeliveryofficename $ postofficebox $ postaladdress $ postalcode $ preferreddeliverymethod $ registeredaddress $ searchguide $ seealso $ st $ street $ telephonenumber $ teletexterminalidentifier $ telexnumber $ userpassword $ x121address $ inseeorganismedn $ mail $ inseegabaritmail $ labeleduri ) )
+objectclass ( 1.2.250.1.61.1.4 NAME 'inseeUnite'
+	DESC 'User Defined ObjectClass'
+	SUP organizationalUnit
+	STRUCTURAL
+	MUST ( objectclass $ ou )
+	MAY ( businesscategory $ description $ destinationindicator $ facsimiletelephonenumber $ internationalisdnnumber $ l $ physicaldeliveryofficename $ postofficebox $ postaladdress $ postalcode $ preferreddeliverymethod $ registeredaddress $ searchguide $ seealso $ st $ street $ telephonenumber $ teletexterminalidentifier $ telexnumber $ userpassword $ x121address $ cn $ inseeadressedn $ inseecnchef $ inseenumabreges $ inseeunitedn $ mail $ labeleduri ) )
+objectclass ( 1.2.250.1.61.1.5 NAME 'inseeFonction'
+	DESC 'User Defined ObjectClass'
+	SUP organizationalRole
+	STRUCTURAL
+	MUST ( objectclass $ cn $ uid )
+	MAY ( aci $ description $ destinationindicator $ facsimiletelephonenumber $ internationalisdnnumber $ l $ ou $ physicaldeliveryofficename $ postofficebox $ postaladdress $ postalcode $ preferreddeliverymethod $ registeredaddress $ roleoccupant $ seealso $ st $ street $ telephonenumber $ teletexterminalidentifier $ telexnumber $ x121address ) )
+objectclass ( 1.2.250.1.61.1.7 NAME 'inseeGroupe'
+	DESC 'User Defined ObjectClass'
+	SUP groupOfNames
+	STRUCTURAL
+	MUST ( objectclass $ cn )
+	MAY ( aci $ member $ businesscategory $ description $ o $ ou $ owner $ seealso $ inseedatedebut $ inseedatefin $ inseegrouprole ) )
+objectclass ( 1.2.250.1.61.1.8 NAME 'inseeOrganizationalRole'
+	DESC 'User Defined ObjectClass'
+	SUP organizationalRole
+	STRUCTURAL
+	MUST ( objectclass $ cn )
+	MAY ( aci $ description $ destinationindicator $ facsimiletelephonenumber $ internationalisdnnumber $ l $ ou $ physicaldeliveryofficename $ postofficebox $ postaladdress $ postalcode $ preferreddeliverymethod $ registeredaddress $ roleoccupant $ seealso $ st $ street $ telephonenumber $ teletexterminalidentifier $ telexnumber $ x121address $ inseetimbre $ inseepropriete $ mail ) )
+objectclass ( 1.2.250.1.61.1.9 NAME 'inseeApplication'
+	DESC 'User Defined ObjectClass'
+	SUP inetOrgPerson
+	STRUCTURAL
+	MUST ( objectclass $ sn $ cn )
+	MAY ( aci $ description $ seealso $ telephonenumber $ userpassword $ destinationindicator $ facsimiletelephonenumber $ internationalisdnnumber $ l $ ou $ physicaldeliveryofficename $ postofficebox $ postaladdress $ postalcode $ preferreddeliverymethod $ registeredaddress $ st $ street $ teletexterminalidentifier $ telexnumber $ title $ x121address $ audio $ businesscategory $ carlicense $ departmentnumber $ displayname $ employeetype $ employeenumber $ givenname $ homephone $ homepostaladdress $ initials $ jpegphoto $ labeleduri $ manager $ mobile $ pager $ photo $ preferredlanguage $ mail $ o $ roomnumber $ secretary $ uid $ x500uniqueidentifier $ usercertificate $ usersmimecertificate $ userpkcs12 ) )
+objectclass ( 1.2.250.1.61.1.18 NAME 'inseeContact'
+	DESC 'User Defined ObjectClass'
+	SUP inseeCompte
+	STRUCTURAL
+	MUST ( objectclass $ uid )
+	MAY ( uid $ cn $ mail $ description $ inseecorrespondantdn $ seealso $ owner $ inseeadressepostaledn $ inseeorganisationdn $ inseerepertoirededistribution $ sn $ givenName $ personalTitle ) )
