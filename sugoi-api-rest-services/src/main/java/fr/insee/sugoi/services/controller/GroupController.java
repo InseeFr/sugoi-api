@@ -122,7 +122,7 @@ public class GroupController {
       @RequestParam("application") String applicationName,
       @RequestBody Group group) {
 
-    if (!group.getName().equals(id)) {
+    if (!group.getName().equalsIgnoreCase(id)) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
