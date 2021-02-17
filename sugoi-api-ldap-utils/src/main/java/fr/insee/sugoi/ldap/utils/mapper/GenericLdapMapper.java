@@ -36,6 +36,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,7 +47,10 @@ public class GenericLdapMapper {
   private static final Logger logger = LogManager.getLogger(GenericLdapMapper.class);
 
   public static <LdapType, ReturnType> ReturnType mapLdapAttributesToObject(
-      Collection<Attribute> attributes, Class<LdapType> ldapClazz, Class<ReturnType> returnClazz) {
+      Collection<Attribute> attributes,
+      Class<LdapType> ldapClazz,
+      Class<ReturnType> returnClazz,
+      Map<String, String> config) {
     try {
       ReturnType mappedEntity = returnClazz.getDeclaredConstructor().newInstance();
 
@@ -55,7 +60,8 @@ public class GenericLdapMapper {
                   ldapField.getDeclaredAnnotationsByType(AttributeLdapName.class).length > 0
                       && ldapField.getDeclaredAnnotationsByType(MapToAttribute.class).length > 0)
           .forEach(
-              ldapField -> setFieldFromAttributeAnnotation(mappedEntity, ldapField, attributes));
+              ldapField ->
+                  setFieldFromAttributeAnnotation(mappedEntity, ldapField, attributes, config));
 
       Arrays.stream(ldapClazz.getDeclaredFields())
           .filter(
@@ -141,7 +147,10 @@ public class GenericLdapMapper {
   }
 
   private static <ObjectType> void setFieldFromAttributeAnnotation(
-      ObjectType mappedEntity, Field ldapField, Collection<Attribute> attributes) {
+      ObjectType mappedEntity,
+      Field ldapField,
+      Collection<Attribute> attributes,
+      Map<String, String> config) {
     try {
       Field entityField =
           mappedEntity
@@ -186,7 +195,20 @@ public class GenericLdapMapper {
                 attributeValues.stream()
                     .map(
                         attributeValue -> {
-                          return new Group(LdapUtils.getNodeValueFromDN(attributeValue));
+                          Pattern pattern =
+                              Pattern.compile(
+                                  config
+                                      .get("group_source_pattern")
+                                      .replace("{appliname}", "(.*)"));
+                          Matcher matcher =
+                              pattern.matcher(
+                                  attributeValue.substring(attributeValue.indexOf(",") + 1));
+                          if (matcher.matches()) {
+                            return new Group(
+                                matcher.group(1), LdapUtils.getNodeValueFromDN(attributeValue));
+                          } else {
+                            return null;
+                          }
                         })
                     .collect(Collectors.toList()));
             break;

@@ -36,7 +36,10 @@ public class UserLdapMapperFromAttributesTest {
   public void setup() {
 
     Map<String, String> config = new HashMap<>();
-    config.put("organization_source", "ou=organisations,ou=clients_domaine1,o=inese,c=fr");
+    config.put("organization_source", "ou=organisations,ou=clients_domaine1,o=insee,c=fr");
+    config.put(
+        "group_source_pattern",
+        "ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr");
     userLdapMapper = new UserLdapMapper(config);
   }
 
@@ -150,9 +153,11 @@ public class UserLdapMapperFromAttributesTest {
   public void getUserGroupFromAttributes() {
 
     Attribute groupAttributes1 =
-        new Attribute("memberOf", "cn=admin,ou=monappli,ou=Applications,o=insee,c=fr");
+        new Attribute(
+            "memberOf", "cn=admin,ou=monappli_Objets,ou=monappli,ou=Applications,o=insee,c=fr");
     Attribute groupAttributes2 =
-        new Attribute("memberOf", "cn=reader,ou=monappli,ou=Applications,o=insee,c=fr");
+        new Attribute(
+            "memberOf", "cn=reader,ou=monappli_Objets,ou=monappli,ou=Applications,o=insee,c=fr");
     Collection<Attribute> attributes = new ArrayList<>();
     attributes.add(groupAttributes1);
     attributes.add(groupAttributes2);
@@ -161,6 +166,9 @@ public class UserLdapMapperFromAttributesTest {
     assertThat(
         "Should have admin group",
         mappedUser.getGroups().stream().anyMatch(group -> group.getName().equals("admin")));
+    assertThat(
+        "Admin group should have monappli app name",
+        mappedUser.getGroups().stream().anyMatch(group -> group.getAppName().equals("monappli")));
     assertThat(
         "Should have admin group",
         mappedUser.getGroups().stream().anyMatch(group -> group.getName().equals("reader")));

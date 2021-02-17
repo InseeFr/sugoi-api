@@ -19,10 +19,16 @@ public class Group {
   private String name;
   private String description;
   private List<User> users;
+  private String appName;
 
   public Group() {}
 
   public Group(String name) {
+    this.name = name;
+  }
+
+  public Group(String appName, String name) {
+    this.appName = appName;
     this.name = name;
   }
 
@@ -48,5 +54,13 @@ public class Group {
 
   public void setUsers(List<User> users) {
     this.users = users;
+  }
+
+  public String getAppName() {
+    return this.appName;
+  }
+
+  public void setAppName(String appName) {
+    this.appName = appName;
   }
 }
