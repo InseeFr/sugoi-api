@@ -86,7 +86,7 @@ public class GroupController {
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Add group")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isApplicationManager(#realm,#storage,#applicationName)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#storage,#applicationName)")
   public ResponseEntity<?> createGroups(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
@@ -114,7 +114,7 @@ public class GroupController {
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Update group")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isApplicationManager(#realm,#storage,#applicationName)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#storage,#applicationName)")
   public ResponseEntity<?> updateGroups(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
@@ -145,7 +145,7 @@ public class GroupController {
       value = {"/{realm}/groups/{id}", "/{realm}/{storage}/groups/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete group")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isApplicationManager(#realm,#storage,#applicationName)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#storage,#applicationName)")
   public ResponseEntity<String> deleteGroups(
       @PathVariable("realm") String realm,
       @PathVariable(name = "storage", required = false) String storage,
