@@ -24,7 +24,7 @@ Feature: Credential scenario
             }
             """
         And body received
-        Then the client receives status code 500
+        Then the client receives status code 204
 
     Scenario: Change password with bad oldPassword
         Given the client authentified with username appli_sugoi and password sugoi
