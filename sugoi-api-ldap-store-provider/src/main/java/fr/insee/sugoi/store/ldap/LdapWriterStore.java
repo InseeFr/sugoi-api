@@ -288,7 +288,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public void initPassword(
       User user, String password, PasswordChangeRequest pcr, List<SendMode> sendMode) {
-    Modification mod = new Modification(ModificationType.ADD, "userPassword", password);
+    Modification mod = new Modification(ModificationType.REPLACE, "userPassword", password);
     try {
       ldapPoolConnection.modify("uid=" + user.getUsername() + "," + config.get("user_source"), mod);
     } catch (LDAPException e) {
