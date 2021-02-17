@@ -156,6 +156,19 @@ public class LdapWriterStoreTest {
   }
 
   @Test
+  public void testCreateUserWithoutAddress() {
+    User user = new User();
+    user.setUsername("TitiNoAddress");
+    user.setLastName("Test");
+    user.setFirstName("Petit");
+    user.setMail("petittest@titi.fr");
+    ldapWriterStore.createUser(user);
+    User retrievedUser = ldapReaderStore.getUser("TitiNoAddress");
+    assertThat("TitiNoAddress should have been added", retrievedUser, not(nullValue()));
+    assertThat("TitiNoAddress shouldn't have an address", retrievedUser.getAddress().size(), is(0));
+  }
+
+  @Test
   public void testUpdateUser() {
     User user = ldapReaderStore.getUser("testo");
     user.setMail("nvtest@insee.fr");

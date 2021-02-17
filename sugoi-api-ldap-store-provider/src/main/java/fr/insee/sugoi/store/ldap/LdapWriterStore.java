@@ -91,7 +91,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public User createUser(User user) {
     try {
-      if (user.getAddress() != null) {
+      if (user.getAddress() != null && user.getAddress().size() > 0) {
         UUID addressUuid = createAddress(user.getAddress());
         user.addAddress("id", addressUuid.toString());
       }
@@ -110,7 +110,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     try {
       User currentUser = ldapReaderStore.getUser(updatedUser.getUsername());
       if (updatedUser != null) {
-        if (updatedUser.getAddress() != null) {
+        if (updatedUser.getAddress() != null && updatedUser.getAddress().size() > 0) {
           if (currentUser.getAddress() != null && currentUser.getAddress().containsKey("id")) {
             updateAddress(currentUser.getAddress().get("id"), updatedUser.getAddress());
           } else {
@@ -199,7 +199,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public Organization createOrganization(Organization organization) {
     try {
-      if (organization.getAddress() != null) {
+      if (organization.getAddress() != null && organization.getAddress().size() > 0) {
         UUID addressUuid = createAddress(organization.getAddress());
         organization.addAddress("id", addressUuid.toString());
       }
@@ -224,7 +224,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     try {
       Organization currentOrganization =
           ldapReaderStore.getOrganization(updatedOrganization.getIdentifiant());
-      if (updatedOrganization.getAddress() != null) {
+      if (updatedOrganization.getAddress() != null && updatedOrganization.getAddress().size() > 0) {
         if (currentOrganization.getAddress().containsKey("id")) {
           updateAddress(
               currentOrganization.getAddress().get("id"), updatedOrganization.getAddress());
