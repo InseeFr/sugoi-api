@@ -31,7 +31,7 @@ public class ApplicationLdapMapper implements LdapMapper<Application> {
 
   public Application mapFromAttributes(Collection<Attribute> attributes) {
     return GenericLdapMapper.mapLdapAttributesToObject(
-        attributes, ApplicationLdap.class, Application.class);
+        attributes, ApplicationLdap.class, Application.class, config);
   }
 
   public List<Attribute> mapToAttributes(Application application) {

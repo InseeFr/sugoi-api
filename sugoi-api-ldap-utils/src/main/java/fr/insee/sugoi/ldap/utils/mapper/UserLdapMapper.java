@@ -31,7 +31,8 @@ public class UserLdapMapper implements LdapMapper<User> {
 
   @Override
   public User mapFromAttributes(Collection<Attribute> attributes) {
-    return GenericLdapMapper.mapLdapAttributesToObject(attributes, UserLdap.class, User.class);
+    return GenericLdapMapper.mapLdapAttributesToObject(
+        attributes, UserLdap.class, User.class, config);
   }
 
   @Override

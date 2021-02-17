@@ -33,7 +33,7 @@ public class OrganizationLdapMapper implements LdapMapper<Organization> {
   public Organization mapFromAttributes(Collection<Attribute> attributes) {
     Organization org =
         GenericLdapMapper.mapLdapAttributesToObject(
-            attributes, OrganizationLdap.class, Organization.class);
+            attributes, OrganizationLdap.class, Organization.class, config);
     // org.setGpgkey(searchResultEntry.getAttribute("inseeClefChiffrement").getValueByteArray());
     return org;
   }
