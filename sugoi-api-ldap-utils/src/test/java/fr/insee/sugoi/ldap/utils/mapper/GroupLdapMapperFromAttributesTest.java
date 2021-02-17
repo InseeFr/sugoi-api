@@ -57,7 +57,7 @@ public class GroupLdapMapperFromAttributesTest {
   @Test
   public void getUsersInGroupFromAttributes() {
 
-    Attribute userAttribute1 = new Attribute("uniquemember", "uid=tata,ou=contact,o=insee,c=fr");
+    Attribute userAttribute1 = new Attribute("uniqueMember", "uid=tata,ou=contact,o=insee,c=fr");
     Attribute userAttribute2 = new Attribute("uniquemember", "uid=toto,ou=contact,o=insee,c=fr");
     Collection<Attribute> attributes = new ArrayList<>();
     attributes.add(userAttribute1);

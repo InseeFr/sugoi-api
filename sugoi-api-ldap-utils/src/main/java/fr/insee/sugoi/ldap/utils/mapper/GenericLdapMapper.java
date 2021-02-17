@@ -221,7 +221,7 @@ public class GenericLdapMapper {
                 ldapField
                     .getAnnotation(AttributeLdapName.class)
                     .value()
-                    .equals(attribute.getName()))
+                    .equalsIgnoreCase(attribute.getName()))
         .forEach(attribute -> attributeValueStrings.addAll(Arrays.asList(attribute.getValues())));
     return attributeValueStrings;
   }
