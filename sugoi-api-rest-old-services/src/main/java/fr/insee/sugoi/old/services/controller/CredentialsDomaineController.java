@@ -13,8 +13,11 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
+import fr.insee.sugoi.core.service.CredentialsService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,6 +33,15 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "basic")
 public class CredentialsDomaineController {
 
+  @Autowired CredentialsService credentialsService;
+  /**
+   * Validate credentials of a contact
+   *
+   * @param domaine
+   * @param id id of the contact
+   * @param motDePasse credential to test
+   * @return 200 if credential do match, 403 if not
+   */
   @PostMapping(
       value = "/{domaine}/credentials/{id}",
       consumes = {MediaType.TEXT_PLAIN_VALUE})
@@ -38,6 +50,10 @@ public class CredentialsDomaineController {
       @PathVariable("domaine") String domaine,
       @PathVariable("id") String id,
       @RequestBody String motDePasse) {
-    return null;
+    if (credentialsService.validateCredential(domaine, null, id, motDePasse)) {
+      return ResponseEntity.ok().build();
+    } else {
+      return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
   }
 }
