@@ -39,7 +39,7 @@
 		<httpclient.version>4.5.13</httpclient.version>
 		<apache.commons.version>1.9</apache.commons.version>
 		<wiremock-standalone.version>2.27.2</wiremock-standalone.version>
-		<freemarker.version>2.3.30</freemarker.version>
+		<freemarker.version>2.3.31</freemarker.version>
 	</properties>
 
 	<dependencies></dependencies>
