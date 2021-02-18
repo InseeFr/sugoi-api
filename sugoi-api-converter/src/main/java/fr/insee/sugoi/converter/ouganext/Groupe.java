@@ -14,13 +14,16 @@
 package fr.insee.sugoi.converter.ouganext;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import fr.insee.sugoi.converter.utils.MapFromAttribute;
 
 public class Groupe {
 
   @JsonAlias({"application", "Application"})
+  @MapFromAttribute(attributeName = "appName")
   private String application;
 
   @JsonAlias({"nom", "Nom"})
+  @MapFromAttribute(attributeName = "name")
   private String nom;
 
   public String getApplication() {

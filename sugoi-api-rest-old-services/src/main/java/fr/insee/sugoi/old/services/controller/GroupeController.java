@@ -13,9 +13,17 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
+import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
+import fr.insee.sugoi.converter.ouganext.Contact;
+import fr.insee.sugoi.converter.ouganext.Contacts;
+import fr.insee.sugoi.core.service.GroupService;
+import fr.insee.sugoi.model.Group;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,15 +38,43 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "basic")
 public class GroupeController {
 
+  private OuganextSugoiMapper ouganextSugoiMapper = new OuganextSugoiMapper();
+
+  @Autowired private GroupService groupService;
+
+  /**
+   * Get all contacts in a group
+   *
+   * @param domaine
+   * @param application name of application of the group
+   * @param groupe name of the group
+   * @return OK with contact if at least one contact found, NOT_FOUND if no contact found
+   */
   @GetMapping(
       value = "/{domaine}/contacts/groupe/{application}/{groupe}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @Operation(deprecated = true, description = "", tags = "Recherche de contacts")
+  @Operation(description = "", tags = "Recherche de contacts")
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
   public ResponseEntity<?> getContactByDomaineAndGroups(
       @PathVariable("domaine") String domaine,
       @PathVariable("application") String application,
       @PathVariable("groupe") String groupe) {
-    return null;
+    Group group = groupService.findById(domaine, null, application, groupe);
+    if (group.getUsers() != null) {
+      if (group.getUsers().isEmpty()) {
+        return new ResponseEntity<>("No users in group", HttpStatus.NOT_FOUND);
+      } else {
+        Contacts contacts = new Contacts();
+        contacts
+            .getListe()
+            .addAll(
+                group.getUsers().stream()
+                    .map(user -> ouganextSugoiMapper.serializeToOuganext(user, Contact.class))
+                    .collect(Collectors.toList()));
+        return ResponseEntity.ok().body(contacts);
+      }
+    } else {
+      return new ResponseEntity<>("Group not found", HttpStatus.NOT_FOUND);
+    }
   }
 }
