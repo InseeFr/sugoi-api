@@ -20,7 +20,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -54,22 +53,20 @@ public class RealmController {
   public ResponseEntity<List<Realm>> getRealms(
       @RequestParam(name = "id", required = false) String id, Authentication authentication) {
     List<Realm> realms = new ArrayList<>();
+    List<Realm> realmsFiltered = new ArrayList<>();
+
     if (id != null) {
       realms.add(configService.getRealm(id));
     } else {
       realms.addAll(configService.getRealms());
     }
+
     // Filter realm before sending if user not admin
-    List<Realm> realmsFiltered = new ArrayList<>();
     for (Realm realm : realms) {
-      String realmName = realm.getName();
-      realm.setUserStorages(
-          realm.getUserStorages().stream()
-              .filter(us -> authorizeService.isReader(realmName, us.getName()))
-              .collect(Collectors.toList()));
-      if (realm.getUserStorages().size() > 0) {
-        realmsFiltered.add(realm);
-      }
+      if (realm.getUserStorages().stream()
+              .filter(us -> authorizeService.isReader(realm.getName(), us.getName()))
+              .count()
+          > 0) realmsFiltered.add(realm);
     }
     return new ResponseEntity<List<Realm>>(realmsFiltered, HttpStatus.OK);
   }
