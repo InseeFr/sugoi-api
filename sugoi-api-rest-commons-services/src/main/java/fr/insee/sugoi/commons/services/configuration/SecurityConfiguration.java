@@ -61,6 +61,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     // api, so csrf is disabled
     http.csrf().disable();
+
     // allow basic authentication
     if (basicAuthenticationEnabled) {
       http.httpBasic();
@@ -74,15 +75,25 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter());
                   }));
     }
-    // security constraints
+
+    String adminRegex =
+        getApplicationContext()
+            .getEnvironment()
+            .getProperty("fr.insee.sugoi.api.regexp.role.admin");
+    String[] adminRoles = adminRegex.split(",");
+
     http.authorizeRequests(
         authz ->
             authz
+                .antMatchers("/actuator/health/**")
+                .permitAll()
+                .antMatchers("/actuator/**")
+                .hasAnyAuthority(adminRoles)
+                .antMatchers("/swagger-ui/**", "/v3/api-docs/**")
+                .permitAll()
                 .antMatchers(HttpMethod.OPTIONS)
                 .permitAll()
                 .antMatchers(HttpMethod.GET, "/**")
-                .permitAll()
-                .antMatchers("/swagger-ui/**", "/v3/api-docs/**")
                 .permitAll()
                 .antMatchers("/**")
                 .authenticated()
