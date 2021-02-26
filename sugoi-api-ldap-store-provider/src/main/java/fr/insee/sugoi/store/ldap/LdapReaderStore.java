@@ -239,13 +239,34 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     if (searchType.equalsIgnoreCase("AND")) {
       return LdapFilter.and(
           mapper.mapToAttributes(object).stream()
+              .filter(attribute -> !attribute.getValue().equals(""))
               .map(attribute -> LdapFilter.contains(attribute.getName(), attribute.getValue()))
               .collect(Collectors.toList()));
     } else if (searchType.equalsIgnoreCase("OR")) {
-      return LdapFilter.or(
+      List<Filter> objectClassListFilter =
           mapper.mapToAttributes(object).stream()
+              .filter(attribute -> attribute.getName().equals("objectClass"))
               .map(attribute -> LdapFilter.contains(attribute.getName(), attribute.getValue()))
-              .collect(Collectors.toList()));
+              .collect(Collectors.toList());
+
+      List<Filter> attributeListFilter =
+          mapper.mapToAttributes(object).stream()
+              .filter(
+                  attribute ->
+                      !attribute.getName().equals("objectClass")
+                          && !attribute.getValue().equals(""))
+              .map(attribute -> LdapFilter.contains(attribute.getName(), attribute.getValue()))
+              .collect(Collectors.toList());
+
+      if (objectClassListFilter.size() > 0 & attributeListFilter.size() == 0) {
+        return LdapFilter.and(objectClassListFilter);
+      } else if (objectClassListFilter.size() == 0 & attributeListFilter.size() > 0) {
+        return LdapFilter.or(attributeListFilter);
+      } else {
+        return LdapFilter.and(
+            Arrays.asList(
+                LdapFilter.and(objectClassListFilter), LdapFilter.or(attributeListFilter)));
+      }
     }
     throw new RuntimeException("Invalid searchType must be AND or OR");
   }
