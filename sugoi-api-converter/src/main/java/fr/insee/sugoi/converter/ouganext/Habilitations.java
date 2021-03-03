@@ -220,6 +220,33 @@ public class Habilitations {
     ;
   }
 
+  /**
+   * Fournit le contenu des habilitations sous la forme d'une liste de String de la forme
+   * prop_role_app.
+   */
+  public List<String> toListString() {
+    List<String> list = new ArrayList<>();
+    for (Application app : getApplication()) {
+      for (Role role : app.getRole()) {
+        StringBuilder sb = new StringBuilder();
+        if (role.getPropriete().isEmpty()) {
+          sb.append(role.getName()).append("_").append(app.getName());
+          list.add(sb.toString());
+        } else {
+          for (String propriete : role.getPropriete()) {
+            if (!propriete.isEmpty()) {
+              sb.append(propriete).append("_");
+            }
+            sb.append(role.getName()).append("_").append(app.getName());
+            list.add(sb.toString());
+            sb = new StringBuilder();
+          }
+        }
+      }
+    }
+    return list;
+  }
+
   // /**
   // * Ajoute les {@link Role} passés en paramètre pour l'{@link Application}
   // * correspondant au nom appName passé en paramètre.<br/>
