@@ -40,11 +40,15 @@ public class PasswordServiceImpl implements PasswordService {
 
   @Override
   public boolean validatePassword(String password) {
-    PasswordValidator passwordValidator =
-        new PasswordValidator(new LengthRule(Integer.valueOf(passwordLength), Integer.MAX_VALUE));
-    PasswordData passwordData = new PasswordData(password);
-    RuleResult validate = passwordValidator.validate(passwordData);
-    return validate.isValid();
+    if (password != null) {
+      PasswordValidator passwordValidator =
+          new PasswordValidator(new LengthRule(Integer.valueOf(passwordLength), Integer.MAX_VALUE));
+      PasswordData passwordData = new PasswordData(password);
+      RuleResult validate = passwordValidator.validate(passwordData);
+      return validate.isValid();
+    } else {
+      return false;
+    }
   }
 
   @Override
