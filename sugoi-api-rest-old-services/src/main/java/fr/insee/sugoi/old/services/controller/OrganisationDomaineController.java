@@ -126,7 +126,7 @@ public class OrganisationDomaineController {
    * @param domaine
    * @param organisation
    * @param slug filled in header Slug, the id of the organisation if not already used
-   * @return OK with the created organisation
+   * @return CREATED with the created organisation link as a link header and as a location header
    */
   @PostMapping(
       value = "{domaine}/organisations",
@@ -139,17 +139,26 @@ public class OrganisationDomaineController {
       @RequestHeader(value = "Slug", required = false) String slug) {
     Organization sugoiOrganization =
         ouganextSugoiMapper.serializeToSugoi(organisation, Organization.class);
-    if (organizationService.findById(domaine, null, slug) == null) {
+    if (slug != null && organizationService.findById(domaine, null, slug) == null) {
       sugoiOrganization.setIdentifiant(slug);
-    } else {
+    } else if (sugoiOrganization.getIdentifiant() == null) {
       sugoiOrganization.setIdentifiant(UUID.randomUUID().toString());
     }
     organizationService.create(domaine, null, sugoiOrganization);
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(
-            ouganextSugoiMapper.serializeToOuganext(
-                organizationService.findById(domaine, null, sugoiOrganization.getIdentifiant()),
-                Organisation.class));
+    String request = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toString();
+    String location =
+        request.substring(0, request.lastIndexOf("/"))
+            + "/organisation/"
+            + sugoiOrganization.getIdentifiant();
+    String resultLink =
+        Link.fromUri(location)
+            .rel("http://xml/insee.fr/schema/annuaire/Organisation")
+            .build()
+            .toString();
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .header("Location", location)
+        .header("Link", resultLink)
+        .build();
   }
 
   /**

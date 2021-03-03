@@ -62,8 +62,8 @@ public class ContactsDomaineController {
    *
    * @param domaine
    * @param contact
-   * @param slug filled in header Slug, the id of the organisation if not already used
-   * @return OK with the created organisation
+   * @param slug filled in header Slug, the id of the contact if not already used
+   * @return CREATED with the link of the created contact as a header
    */
   @PostMapping(
       value = "/{domaine}/contacts",
@@ -75,16 +75,24 @@ public class ContactsDomaineController {
       @RequestHeader(value = "Slug", required = false) String slug,
       @RequestBody Contact contact) {
     User sugoiUser = ouganextSugoiMapper.serializeToSugoi(contact, User.class);
-    if (userService.findById(domaine, null, slug) == null) {
+    if (slug != null && userService.findById(domaine, null, slug) == null) {
       sugoiUser.setUsername(slug);
-    } else {
+    } else if (sugoiUser.getUsername() == null) {
       sugoiUser.setUsername(UUID.randomUUID().toString());
     }
     userService.create(domaine, null, sugoiUser);
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(
-            ouganextSugoiMapper.serializeToOuganext(
-                userService.findById(domaine, null, sugoiUser.getUsername()), Contact.class));
+    String request = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toString();
+    String location =
+        request.substring(0, request.lastIndexOf("/")) + "/contact/" + sugoiUser.getUsername();
+    String resultLink =
+        Link.fromUri(location)
+            .rel("http://xml/insee.fr/schema/annuaire/Contact")
+            .build()
+            .toString();
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .header("Location", location)
+        .header("Link", resultLink)
+        .build();
   }
 
   /**
