@@ -16,10 +16,12 @@ package fr.insee.sugoi.converter.ouganext;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import fr.insee.sugoi.converter.ouganext.adapters.OrganisationDeserializer;
 import fr.insee.sugoi.converter.ouganext.adapters.OrganisationSerializer;
 import fr.insee.sugoi.converter.utils.MapFromAttribute;
 import fr.insee.sugoi.converter.utils.MapFromHashmapElement;
@@ -108,7 +110,7 @@ public class Organisation {
 
   @JacksonXmlProperty(localName = "OrganisationDeRattachementUri", namespace = Namespace.ANNUAIRE)
   @JsonSerialize(using = OrganisationSerializer.class)
-  @JacksonXmlElementWrapper(useWrapping = false)
+  @JsonDeserialize(using = OrganisationDeserializer.class)
   protected Organisation organisationDeRattachement;
 
   @JacksonXmlProperty(localName = "RepertoireDeDistribution", namespace = Namespace.ANNUAIRE)
