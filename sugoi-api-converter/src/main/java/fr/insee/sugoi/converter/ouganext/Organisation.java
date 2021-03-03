@@ -86,7 +86,7 @@ public class Organisation {
   protected String domaineDeGestion;
 
   @JacksonXmlProperty(localName = "AdresseMessagerie", namespace = Namespace.ANNUAIRE)
-  @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "adresseMessagerie")
+  @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "mail")
   protected String adresseMessagerie;
 
   @JacksonXmlProperty(localName = "NumeroTelephone", namespace = Namespace.ANNUAIRE)
