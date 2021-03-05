@@ -17,8 +17,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.model.Realm;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -65,5 +68,42 @@ public class LocalFileRealmProviderDAO implements RealmProvider {
       throw new IllegalArgumentException("No resources found in " + localFilePath, e);
     }
     return realms;
+  }
+
+  @Override
+  public void createRealm(Realm realm) {
+    realms.add(realm);
+    overwriteConfig(realms);
+  }
+
+  @Override
+  public void updateRealm(Realm realm) {
+    Realm realmToModify =
+        realms.stream()
+            .filter(r -> r.getName().equalsIgnoreCase(realm.getName()))
+            .findFirst()
+            .orElse(null);
+    if (realmToModify != null) {
+      realmToModify = realm;
+    }
+  }
+
+  @Override
+  public void deleteRealm(String realmName) {
+    overwriteConfig(
+        realms.stream()
+            .filter(realm -> !realm.getName().equalsIgnoreCase(realmName))
+            .collect(Collectors.toList()));
+  }
+
+  private void overwriteConfig(List<Realm> realmsToWrite) {
+    try {
+      FileWriter fWriter = new FileWriter(resourceLoader.getResource(localFilePath).getFile());
+      fWriter.write(mapper.writeValueAsString(realmsToWrite));
+      fWriter.close();
+      realms = findAll();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

@@ -14,14 +14,20 @@
 package fr.insee.sugoi.ldap.utils;
 
 import com.unboundid.asn1.ASN1OctetString;
+import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Control;
 import com.unboundid.ldap.sdk.DN;
 import com.unboundid.ldap.sdk.LDAPException;
+import com.unboundid.ldap.sdk.Modification;
+import com.unboundid.ldap.sdk.ModificationType;
 import com.unboundid.ldap.sdk.SearchRequest;
 import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.controls.SimplePagedResultsControl;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -61,5 +67,24 @@ public class LdapUtils {
   public static void setRequestControls(SearchRequest searchRequest, PageableResult pageable) {
     ASN1OctetString cookie = new ASN1OctetString(pageable.getCookie());
     searchRequest.addControl(new SimplePagedResultsControl(pageable.getSize(), cookie, true));
+  }
+
+  public static List<Modification> convertAttributesToModifications(List<Attribute> attributes) {
+    return attributes.stream()
+        .map(attribute -> attribute.getName())
+        .distinct()
+        .map(
+            attributeName ->
+                new Modification(
+                    ModificationType.REPLACE,
+                    attributeName,
+                    attributes.stream()
+                        .filter(
+                            filterAttribute ->
+                                filterAttribute.getName().equalsIgnoreCase(attributeName))
+                        .map(filterAttribute -> filterAttribute.getValues())
+                        .flatMap(values -> Arrays.stream(values))
+                        .toArray(String[]::new)))
+        .collect(Collectors.toList());
   }
 }

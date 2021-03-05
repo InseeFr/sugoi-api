@@ -14,8 +14,12 @@
 package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.Attribute;
+import com.unboundid.ldap.sdk.Modification;
+import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.model.UserStorage;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserStorageLdapMapper {
@@ -55,5 +59,48 @@ public class UserStorageLdapMapper {
             .getValue();
     userStorage.setName(name);
     return userStorage;
+  }
+
+  public static List<Attribute> mapToAttributes(UserStorage userStorage) {
+    List<Attribute> attributes = new ArrayList<>();
+    attributes.add(new Attribute("objectClass", "inseeOrganizationalRole"));
+    if (userStorage.getUserSource() != null) {
+      attributes.add(
+          new Attribute(
+              "inseepropriete", String.format("brancheContact$%s", userStorage.getUserSource())));
+    }
+    if (userStorage.getAddressSource() != null) {
+      attributes.add(
+          new Attribute(
+              "inseepropriete",
+              String.format("brancheAdresse$%s", userStorage.getAddressSource())));
+    }
+    if (userStorage.getOrganizationSource() != null) {
+      attributes.add(
+          new Attribute(
+              "inseepropriete",
+              String.format("brancheOrganisation$%s", userStorage.getOrganizationSource())));
+    }
+    if (userStorage.getProperties().containsKey("group_source_pattern")) {
+      attributes.add(
+          new Attribute(
+              "inseepropriete",
+              String.format(
+                  "groupSourcePattern$%s",
+                  userStorage.getProperties().get("group_source_pattern"))));
+    }
+    if (userStorage.getProperties().containsKey("group_filter_pattern")) {
+      attributes.add(
+          new Attribute(
+              "inseepropriete",
+              String.format(
+                  "groupFilterPattern$%s",
+                  userStorage.getProperties().get("group_filter_pattern"))));
+    }
+    return attributes;
+  }
+
+  public static List<Modification> createMods(UserStorage userStorage) {
+    return LdapUtils.convertAttributesToModifications(mapToAttributes(userStorage));
   }
 }
