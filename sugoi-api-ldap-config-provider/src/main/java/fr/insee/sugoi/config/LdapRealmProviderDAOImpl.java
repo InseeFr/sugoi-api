@@ -13,9 +13,13 @@
 */
 package fr.insee.sugoi.config;
 
+import com.unboundid.ldap.sdk.AddRequest;
+import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Filter;
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
+import com.unboundid.ldap.sdk.LDAPException;
+import com.unboundid.ldap.sdk.ModifyRequest;
 import com.unboundid.ldap.sdk.SearchRequest;
 import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.SearchResultEntry;
@@ -23,6 +27,7 @@ import com.unboundid.ldap.sdk.SearchScope;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.ldap.utils.LdapFilter;
+import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.mapper.RealmLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserStorageLdapMapper;
 import fr.insee.sugoi.model.Realm;
@@ -62,8 +67,8 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   @Override
   public Realm load(String realmName) {
     logger.info("Loading configuration from ldap://{}:{}/{}", url, port, baseDn);
-    try (LDAPConnectionPool ldapConnection =
-        new LDAPConnectionPool(new LDAPConnection(url, port), 1)) {
+    try {
+      LDAPConnectionPool ldapConnection = initLdapPoolConnection();
       SearchResultEntry realmEntry =
           ldapConnection.getEntry(realmEntryPattern.replace("{realm}", realmName) + "," + baseDn);
       logger.debug("Found entry {}", realmEntry.getDN());
@@ -80,8 +85,8 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   @Override
   public List<Realm> findAll() {
     logger.info("Loading realms configurations from ldap://{}:{}/{}", url, port, baseDn);
-    try (LDAPConnectionPool ldapConnection =
-        new LDAPConnectionPool(new LDAPConnection(url, port), 1)) {
+    try {
+      LDAPConnectionPool ldapConnection = initLdapPoolConnection();
       SearchRequest searchRequest =
           new SearchRequest(
               baseDn, SearchScope.ONE, LdapFilter.create("(objectClass=*)"), "*", "+");
@@ -120,5 +125,99 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public void createRealm(Realm realm) {
+    try {
+      LDAPConnectionPool ldapConnectionPool = initLdapPoolConnection();
+      AddRequest addRequest =
+          new AddRequest(
+              getRealmDn(realm.getName()),
+              RealmLdapMapper.mapToAttributes(realm, realmEntryPattern, baseDn));
+      if (realm.getUserStorages().size() == 1) {
+        UserStorageLdapMapper.mapToAttributes(realm.getUserStorages().get(0)).stream()
+            .forEach(attribute -> addRequest.addAttribute(attribute));
+        ldapConnectionPool.add(addRequest);
+      } else {
+        ldapConnectionPool.add(addRequest);
+        for (UserStorage userStorage : realm.getUserStorages()) {
+          AddRequest userStorageAddRequest =
+              new AddRequest(
+                  String.format("cn=%s,%s", userStorage.getName(), getRealmDn(realm.getName())),
+                  UserStorageLdapMapper.mapToAttributes(userStorage));
+          ldapConnectionPool.add(userStorageAddRequest);
+        }
+      }
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to create realm " + realm.getName(), e);
+    }
+  }
+
+  @Override
+  public void updateRealm(Realm realm) {
+    try {
+      LDAPConnectionPool ldapConnectionPool = initLdapPoolConnection();
+      ModifyRequest modifyRequest;
+      if (realm.getUserStorages().size() == 1) {
+        List<Attribute> realmAttributes =
+            RealmLdapMapper.mapToAttributes(realm, realmEntryPattern, baseDn);
+        List<Attribute> userStorageAttributes =
+            UserStorageLdapMapper.mapToAttributes(realm.getUserStorages().get(0));
+        realmAttributes.addAll(userStorageAttributes);
+        modifyRequest =
+            new ModifyRequest(
+                getRealmDn(realm.getName()),
+                LdapUtils.convertAttributesToModifications(realmAttributes));
+        ldapConnectionPool.modify(modifyRequest);
+      } else {
+        for (UserStorage userStorage : realm.getUserStorages()) {
+          ModifyRequest userStorageModifyRequest =
+              new ModifyRequest(
+                  getUserStorageDn(userStorage.getName(), realm.getName()),
+                  UserStorageLdapMapper.createMods(userStorage));
+          ldapConnectionPool.modify(userStorageModifyRequest);
+        }
+        modifyRequest =
+            new ModifyRequest(
+                getRealmDn(realm.getName()),
+                RealmLdapMapper.createMods(realm, realmEntryPattern, baseDn));
+      }
+      ldapConnectionPool.modify(modifyRequest);
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to update realm " + realm.getName(), e);
+    }
+  }
+
+  @Override
+  public void deleteRealm(String realmName) {
+    try {
+      LDAPConnectionPool ldapConnectionPool = initLdapPoolConnection();
+      List<UserStorage> userStorages = load(realmName).getUserStorages();
+      if (userStorages.size() > 1) {
+        for (UserStorage userStorage : load(realmName).getUserStorages()) {
+          ldapConnectionPool.delete(getUserStorageDn(userStorage.getName(), realmName));
+        }
+      }
+      ldapConnectionPool.delete(getRealmDn(realmName));
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to delete realm " + realmName, e);
+    }
+  }
+
+  private LDAPConnectionPool initLdapPoolConnection() {
+    try {
+      return new LDAPConnectionPool(new LDAPConnection(url, port), 1);
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to init ldap connection", e);
+    }
+  }
+
+  private String getRealmDn(String realmName) {
+    return realmEntryPattern.replace("{realm}", realmName) + "," + baseDn;
+  }
+
+  private String getUserStorageDn(String userStorageName, String realmName) {
+    return String.format("cn=%s,%s", userStorageName, getRealmDn(realmName));
   }
 }

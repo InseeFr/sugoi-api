@@ -15,7 +15,6 @@ package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
-import com.unboundid.ldap.sdk.ModificationType;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.mapper.properties.AddressLdap;
 import fr.insee.sugoi.ldap.utils.mapper.properties.GroupLdap;
@@ -127,23 +126,8 @@ public class GenericLdapMapper {
 
   public static <O, N> List<Modification> createMods(
       N entity, Class<O> propertiesClazz, Class<N> clazz, Map<String, String> config) {
-    List<Attribute> attributes = mapObjectToLdapAttributes(entity, propertiesClazz, clazz, config);
-    return attributes.stream()
-        .map(attribute -> attribute.getName())
-        .distinct()
-        .map(
-            attributeName ->
-                new Modification(
-                    ModificationType.REPLACE,
-                    attributeName,
-                    attributes.stream()
-                        .filter(
-                            filterAttribute ->
-                                filterAttribute.getName().equalsIgnoreCase(attributeName))
-                        .map(filterAttribute -> filterAttribute.getValues())
-                        .flatMap(values -> Arrays.stream(values))
-                        .toArray(String[]::new)))
-        .collect(Collectors.toList());
+    return LdapUtils.convertAttributesToModifications(
+        mapObjectToLdapAttributes(entity, propertiesClazz, clazz, config));
   }
 
   private static <ObjectType> void setFieldFromAttributeAnnotation(

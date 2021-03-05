@@ -13,8 +13,13 @@
 */
 package fr.insee.sugoi.ldap.utils.mapper;
 
+import com.unboundid.ldap.sdk.Attribute;
+import com.unboundid.ldap.sdk.Modification;
 import com.unboundid.ldap.sdk.SearchResultEntry;
+import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.model.Realm;
+import java.util.ArrayList;
+import java.util.List;
 
 /** ProfilContextMapper */
 public class RealmLdapMapper {
@@ -37,5 +42,27 @@ public class RealmLdapMapper {
       }
     }
     return realm;
+  }
+
+  public static List<Attribute> mapToAttributes(
+      Realm realm, String realmEntryPattern, String baseDn) {
+    List<Attribute> attributes = new ArrayList<>();
+    attributes.add(new Attribute("objectClass", "inseeOrganizationalRole"));
+    if (realm.getUrl() != null) {
+      attributes.add(new Attribute("inseepropriete", String.format("ldapUrl$%s", realm.getUrl())));
+    }
+    if (realm.getAppSource() != null) {
+      attributes.add(
+          new Attribute(
+              "inseepropriete",
+              String.format("branchesApplicativesPossibles$%s", realm.getAppSource())));
+    }
+    return attributes;
+  }
+
+  public static List<Modification> createMods(
+      Realm realm, String realmEntryPattern, String baseDn) {
+    return LdapUtils.convertAttributesToModifications(
+        mapToAttributes(realm, realmEntryPattern, baseDn));
   }
 }

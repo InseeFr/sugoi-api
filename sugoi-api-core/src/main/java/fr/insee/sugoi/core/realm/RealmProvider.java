@@ -67,4 +67,10 @@ public interface RealmProvider {
 
   @Cacheable("Realms")
   public List<Realm> findAll();
+
+  public void createRealm(Realm realm);
+
+  public void updateRealm(Realm realm);
+
+  public void deleteRealm(String realmName);
 }
