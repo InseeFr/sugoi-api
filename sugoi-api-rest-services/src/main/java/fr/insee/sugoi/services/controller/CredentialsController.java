@@ -16,7 +16,13 @@ package fr.insee.sugoi.services.controller;
 import fr.insee.sugoi.core.model.PasswordChangeRequest;
 import fr.insee.sugoi.core.model.SendMode;
 import fr.insee.sugoi.core.service.CredentialsService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,70 +37,262 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(name = "Manage credentials")
+@Tag(
+    name = "Manage credentials",
+    description = "New endpoints to initialize, update or reset user password")
 @RequestMapping(value = {"/v2", "/"})
-@SecurityRequirement(name = "oAuth")
+@SecurityRequirements(
+    value = {@SecurityRequirement(name = "oAuth"), @SecurityRequirement(name = "basic")})
 public class CredentialsController {
 
   @Autowired private CredentialsService credentialsService;
 
-  @PostMapping(
-      path = {"/{realm}/users/{id}/reinitPassword", "/{realm}/{storage}/users/{id}/reinitPassword"})
+  @PostMapping(path = {"/{realm}/{storage}/users/{id}/reinitPassword"})
+  @Operation(summary = "Reinitialize the password of the user")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Operation done",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Something went wrong",
+            content = {@Content(mediaType = "application/json")})
+      })
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void reinitPassword(
-      @RequestBody PasswordChangeRequest pcr,
-      @PathVariable("realm") String realm,
-      @PathVariable(value = "storage", required = false) String userStorage,
-      @PathVariable("id") String id,
-      @RequestParam(value = "sendModes", required = false) List<SendMode> sendMode) {
-    credentialsService.reinitPassword(
-        realm, userStorage, id, pcr, sendMode != null ? sendMode : new ArrayList<>());
+  public ResponseEntity<Void> reinitPasswordByStorage(
+      @Parameter(description = "Password change request&", required = true) @RequestBody
+          PasswordChangeRequest pcr,
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(value = "storage", required = false)
+          String userStorage,
+      @Parameter(description = "User's id to change password", required = true) @PathVariable("id")
+          String id,
+      @Parameter(description = "Way to send password", required = false)
+          @RequestParam(value = "sendModes", required = false)
+          List<SendMode> sendMode) {
+    try {
+      credentialsService.reinitPassword(
+          realm, userStorage, id, pcr, sendMode != null ? sendMode : new ArrayList<>());
+      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  @PostMapping(path = {"/{realm}/users/{id}/reinitPassword"})
+  @Operation(summary = "Reinitialize the password of the user")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Operation done",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Something went wrong",
+            content = {@Content(mediaType = "application/json")})
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
+  public ResponseEntity<Void> reinitPassword(
+      @Parameter(description = "Password change request&", required = true) @RequestBody
+          PasswordChangeRequest pcr,
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "User's id to change password", required = true) @PathVariable("id")
+          String id,
+      @Parameter(description = "Way to send password", required = false)
+          @RequestParam(value = "sendModes", required = false)
+          List<SendMode> sendMode) {
+    return reinitPasswordByStorage(pcr, realm, null, id, sendMode);
+  }
+
+  @PostMapping(path = {"/{realm}/{storage}/users/{id}/changePassword"})
+  @Operation(summary = "Change user password with the new one provided")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Operation done",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Something went wrong",
+            content = {@Content(mediaType = "application/json")})
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
+  public ResponseEntity<Void> changePasswordByStorage(
+      @Parameter(description = "Password change request&", required = true) @RequestBody
+          PasswordChangeRequest pcr,
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(value = "storage", required = false)
+          String userStorage,
+      @Parameter(description = "User's id to change password", required = true) @PathVariable("id")
+          String id) {
+    try {
+      credentialsService.changePassword(realm, userStorage, id, pcr);
+      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  @PostMapping(path = {"/{realm}/users/{id}/changePassword"})
+  @Operation(summary = "Change user password with the new one provided")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Operation done",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Something went wrong",
+            content = {@Content(mediaType = "application/json")})
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
+  public ResponseEntity<Void> changePassword(
+      @Parameter(description = "Password change request&", required = true) @RequestBody
+          PasswordChangeRequest pcr,
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "User's id to change password", required = true) @PathVariable("id")
+          String id) {
+    return changePasswordByStorage(pcr, realm, null, id);
+  }
+
+  @PostMapping(path = {"/{realm}/{storage}/users/{id}/initPassword"})
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
+  @Operation(summary = "Initialize user's password with a random generated password")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Operation done",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Something went wrong",
+            content = {@Content(mediaType = "application/json")})
+      })
+  public ResponseEntity<Void> initPasswordByStorage(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(value = "storage", required = false)
+          String userStorage,
+      @Parameter(description = "User's id to initialize password", required = true)
+          @PathVariable("id")
+          String id,
+      @Parameter(description = "Password change request&", required = true) @RequestBody
+          PasswordChangeRequest pcr,
+      @Parameter(description = "Way to send password", required = false)
+          @RequestParam(value = "sendModes", required = false)
+          List<SendMode> sendMode) {
+    try {
+      credentialsService.initPassword(
+          realm, userStorage, id, pcr, sendMode != null ? sendMode : new ArrayList<>());
+      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  @PostMapping(path = {"/{realm}/users/{id}/initPassword"})
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
+  @Operation(summary = "Initialize user's password with a random generated password")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Operation done",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Something went wrong",
+            content = {@Content(mediaType = "application/json")})
+      })
+  public ResponseEntity<Void> initPassword(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "User's id to initialize password", required = true)
+          @PathVariable("id")
+          String id,
+      @Parameter(description = "Password change request&", required = true) @RequestBody
+          PasswordChangeRequest pcr,
+      @Parameter(description = "Way to send password", required = false)
+          @RequestParam(value = "sendModes", required = false)
+          List<SendMode> sendMode) {
+    return initPasswordByStorage(realm, null, id, pcr, sendMode);
   }
 
   @PostMapping(
-      path = {"/{realm}/users/{id}/changePassword", "/{realm}/{storage}/users/{id}/changePassword"})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void changePassword(
-      @RequestBody PasswordChangeRequest pcr,
-      @PathVariable("realm") String realm,
-      @PathVariable(value = "storage", required = false) String userStorage,
-      @PathVariable("id") String id) {
-    credentialsService.changePassword(realm, userStorage, id, pcr);
-  }
-
-  @PostMapping(
-      path = {"/{realm}/users/{id}/initPassword", "/{realm}/{storage}/users/{id}/initPassword"})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void initPassword(
-      @PathVariable("realm") String realm,
-      @PathVariable(value = "storage", required = false) String userStorage,
-      @PathVariable("id") String id,
-      @RequestBody PasswordChangeRequest pcr,
-      @RequestParam(value = "sendModes", required = false) List<SendMode> sendMode) {
-    credentialsService.initPassword(
-        realm, userStorage, id, pcr, sendMode != null ? sendMode : new ArrayList<>());
-  }
-
-  @PostMapping(
-      path = {
-        "/{realm}/users/{id}/validate-password",
-        "/{realm}/{storage}/users/{id}/validate-password"
-      },
+      path = {"/{realm}/{storage}/users/{id}/validate-password"},
       consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public ResponseEntity<Void> validatePassword(
-      @PathVariable("realm") String realm,
-      @PathVariable(value = "storage", required = false) String userStorage,
-      @PathVariable("id") String id,
-      @RequestParam MultiValueMap<String, String> params) {
+  @Operation(summary = "Check if provided password is the user's one")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Valid password",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Invalid password",
+            content = {@Content(mediaType = "application/json")})
+      })
+  public ResponseEntity<Void> validatePasswordByStorage(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(value = "storage", required = false)
+          String userStorage,
+      @Parameter(description = "User's id to validate password", required = true)
+          @PathVariable("id")
+          String id,
+      @Parameter(
+              description = "Map<String,String> containing the key password with user password",
+              required = true)
+          @RequestParam
+          MultiValueMap<String, String> params) {
     if (params.containsKey("password")
         && credentialsService.validateCredential(
             realm, userStorage, id, params.getFirst("password"))) {
@@ -103,5 +301,38 @@ public class CredentialsController {
     } else {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+  }
+
+  @PostMapping(
+      path = {"/{realm}/users/{id}/validate-password"},
+      consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
+  @Operation(summary = "Check if provided password is the user's one")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Valid password",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Invalid password",
+            content = {@Content(mediaType = "application/json")})
+      })
+  public ResponseEntity<Void> validatePassword(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "User's id to validate password", required = true)
+          @PathVariable("id")
+          String id,
+      @Parameter(
+              description = "Map<String,String> containing the key password with user password",
+              required = true)
+          @RequestParam
+          MultiValueMap<String, String> params) {
+    return validatePasswordByStorage(realm, null, id, params);
   }
 }

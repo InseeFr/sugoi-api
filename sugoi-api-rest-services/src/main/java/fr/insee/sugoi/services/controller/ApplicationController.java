@@ -18,7 +18,13 @@ import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.service.ApplicationService;
 import fr.insee.sugoi.model.Application;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,25 +45,55 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@Tag(name = "Manage applications")
+@Tag(
+    name = "Manage applications",
+    description = "New endpoints to create, update, delete, or find application")
 @RequestMapping(value = {"/v2", "/"})
-@SecurityRequirement(name = "oAuth")
+@SecurityRequirements(
+    value = {@SecurityRequirement(name = "oAuth"), @SecurityRequirement(name = "basic")})
 public class ApplicationController {
 
   @Autowired private ApplicationService applicationService;
 
   @GetMapping(
-      path = {"/{realm}/applications", "/{realm}/{storage}/applications"},
+      path = {"/{realm}/{storage}/applications"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Operation(summary = "Search applications")
+  @Operation(summary = "Search applications by parameter")
   @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
-  public ResponseEntity<PageResult<Application>> getApplications(
-      @PathVariable("realm") String realm,
-      @PathVariable(name = "storage", required = false) String storage,
-      @RequestParam(name = "size", defaultValue = "20") int size,
-      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(value = "name", required = false) String name,
-      @RequestParam(value = "owner", required = false) String owner) {
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Applications found according to parameter",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = PageResult.class))
+            })
+      })
+  public ResponseEntity<PageResult<Application>> getApplicationsByStorage(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "Expected size of result", required = false)
+          @RequestParam(name = "size", defaultValue = "20")
+          int size,
+      @Parameter(description = "Offset to apply when searching", required = false)
+          @RequestParam(name = "offset", required = false, defaultValue = "0")
+          int offset,
+      @Parameter(description = "Name of the app searched", required = false)
+          @RequestParam(value = "name", required = false)
+          String name,
+      @Parameter(description = "Name of the owner of the app searched", required = false)
+          @RequestParam(value = "owner", required = false)
+          String owner) {
     Application applicationFilter = new Application();
     applicationFilter.setName(name);
     applicationFilter.setOwner(owner);
@@ -81,16 +117,77 @@ public class ApplicationController {
     }
   }
 
+  @GetMapping(
+      path = {"/{realm}/applications"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Search applications by parameter")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Applications found according to parameter",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = PageResult.class))
+            })
+      })
+  public ResponseEntity<PageResult<Application>> getApplications(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "Expected size of result", required = false)
+          @RequestParam(name = "size", defaultValue = "20")
+          int size,
+      @Parameter(description = "Offset to apply when searching", required = false)
+          @RequestParam(name = "offset", required = false, defaultValue = "0")
+          int offset,
+      @Parameter(description = "Name of the app searched", required = false)
+          @RequestParam(value = "name", required = false)
+          String name,
+      @Parameter(description = "Name of the owner of the app searched", required = false)
+          @RequestParam(value = "owner", required = false)
+          String owner) {
+    return getApplicationsByStorage(realm, null, size, offset, name, owner);
+  }
+
   @PostMapping(
-      value = {"/{realm}/applications", "/{realm}/{storage}/applications"},
+      value = {"/{realm}/{storage}/applications"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Create application")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "Application created",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Application.class))
+            }),
+        @ApiResponse(
+            responseCode = "409",
+            description = "Application already exist",
+            content = {@Content(mediaType = "application/json")})
+      })
   @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
-  public ResponseEntity<Application> createApplication(
-      @PathVariable("realm") String realm,
-      @PathVariable(name = "storage", required = false) String storage,
-      @RequestBody Application application) {
+  public ResponseEntity<Application> createApplicationByStorage(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "Application to create", required = true) @RequestBody
+          Application application) {
 
     if (applicationService.findById(realm, storage, application.getName()) == null) {
       applicationService.create(realm, storage, application);
@@ -108,17 +205,74 @@ public class ApplicationController {
     }
   }
 
+  @PostMapping(
+      value = {"/{realm}/applications"},
+      consumes = {MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Create application")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "Application created",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Application.class))
+            }),
+        @ApiResponse(
+            responseCode = "409",
+            description = "Application already exist",
+            content = {@Content(mediaType = "application/json")})
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  public ResponseEntity<Application> createApplication(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "Application to create", required = true) @RequestBody
+          Application application) {
+    return createApplicationByStorage(realm, null, application);
+  }
+
   @PutMapping(
-      value = {"/{realm}/applications/{id}", "/{realm}/{storage}/applications/{id}"},
+      value = {"/{realm}/{storage}/applications/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Update application")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Application updated",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Application.class))
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Application does'nt exist",
+            content = {@Content(mediaType = "application/json")})
+      })
   @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
-  public ResponseEntity<Application> updateApplication(
-      @PathVariable("realm") String realm,
-      @PathVariable(name = "storage", required = false) String storage,
-      @PathVariable("id") String id,
-      @RequestBody Application application) {
+  public ResponseEntity<Application> updateApplicationByStorage(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "Id of the app to update", required = true) @PathVariable("id")
+          String id,
+      @Parameter(description = "Application to update", required = true) @RequestBody
+          Application application) {
 
     if (!application.getName().equals(id)) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -137,15 +291,69 @@ public class ApplicationController {
     }
   }
 
+  @PutMapping(
+      value = {"/{realm}/applications/{id}"},
+      consumes = {MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Update application")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Application updated",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Application.class))
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Application does'nt exist",
+            content = {@Content(mediaType = "application/json")})
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  public ResponseEntity<Application> updateApplication(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "Id of the app to update", required = true) @PathVariable("id")
+          String id,
+      @Parameter(description = "Application to update", required = true) @RequestBody
+          Application application) {
+    return updateApplicationByStorage(realm, null, id, application);
+  }
+
   @DeleteMapping(
-      value = {"/{realm}/applications/{id}", "/{realm}/{storage}/applications/{id}"},
+      value = {"/{realm}/{storage}/applications/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete application")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Application deleted",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Application does'nt exist",
+            content = {@Content(mediaType = "application/json")})
+      })
   @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
-  public ResponseEntity<String> deleteApplication(
-      @PathVariable("realm") String realm,
-      @PathVariable(name = "storage", required = false) String storage,
-      @PathVariable("id") String id) {
+  public ResponseEntity<String> deleteApplicationByStorage(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "Application's id to delete", required = false) @PathVariable("id")
+          String id) {
 
     if (applicationService.findById(realm, storage, id) != null) {
       applicationService.delete(realm, storage, id);
@@ -155,20 +363,102 @@ public class ApplicationController {
     }
   }
 
+  @DeleteMapping(
+      value = {"/{realm}/applications/{id}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Delete application")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Application deleted",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Application does'nt exist",
+            content = {@Content(mediaType = "application/json")})
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  public ResponseEntity<String> deleteApplication(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "Application's id to delete", required = false) @PathVariable("id")
+          String id) {
+    return deleteApplicationByStorage(realm, null, id);
+  }
+
   @GetMapping(
-      path = {"/{realm}/applications/{name}", "/{realm}/{storage}/applications/{name}"},
+      path = {"/{realm}/{storage}/applications/{name}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get application by name")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Application found according to parameter",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Application.class))
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Application does'nt exist",
+            content = {@Content(mediaType = "application/json")})
+      })
   @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
-  public ResponseEntity<Application> getApplicationByName(
-      @PathVariable("realm") String realm,
-      @PathVariable(name = "storage", required = false) String storage,
-      @PathVariable("name") String name) {
+  public ResponseEntity<Application> getApplicationByNameByStorage(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "Name of the app searched", required = true) @PathVariable("name")
+          String name) {
     Application application = applicationService.findById(realm, storage, name);
     if (application != null) {
       return ResponseEntity.status(HttpStatus.OK).body(application);
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
+  }
+
+  @GetMapping(
+      path = {"/{realm}/applications/{name}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Get application by name")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Application found according to parameter",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Application.class))
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Application does'nt exist",
+            content = {@Content(mediaType = "application/json")})
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  public ResponseEntity<Application> getApplicationByName(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "Name of the app searched", required = true) @PathVariable("name")
+          String name) {
+    return getApplicationByNameByStorage(realm, null, name);
   }
 }

@@ -19,7 +19,13 @@ import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.OrganizationService;
 import fr.insee.sugoi.model.Organization;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,24 +47,55 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping(value = {"/v2", "/"})
-@Tag(name = "Manage Organization")
-@SecurityRequirement(name = "oAuth")
+@Tag(
+    name = "Manage Organization",
+    description = "New endpoints to create, update, delete and find organizations")
+@SecurityRequirements(
+    value = {@SecurityRequirement(name = "oAuth"), @SecurityRequirement(name = "basic")})
 public class OrganizationController {
 
   @Autowired private OrganizationService organizationService;
 
   @GetMapping(
-      path = {"/{realm}/organizations", "/{realm}/{storage}/organizations"},
+      path = {"/{realm}/{storage}/organizations"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
-  @Operation(summary = "Search organizations")
-  public ResponseEntity<?> getOrganizations(
-      @PathVariable("realm") String realm,
-      @PathVariable(name = "storage", required = false) String storage,
-      @RequestParam(value = "identifiant", required = false) String identifiant,
-      @RequestParam(value = "size", defaultValue = "20") int size,
-      @RequestParam(value = "offset", defaultValue = "0") int offset,
-      @RequestParam(name = "typeRecherche", defaultValue = "AND", required = true)
+  @Operation(summary = "Search organizations by parameters")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Organizations found according to parameter",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = PageResult.class))
+            })
+      })
+  public ResponseEntity<?> getOrganizationsByStorage(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(
+              description = "Organization's identifiant of the wanted organization",
+              required = false)
+          @RequestParam(value = "identifiant", required = false)
+          String identifiant,
+      @Parameter(description = "Expected size of result", required = false)
+          @RequestParam(value = "size", defaultValue = "20")
+          int size,
+      @Parameter(description = "Offset to apply when searching", required = false)
+          @RequestParam(value = "offset", defaultValue = "0")
+          int offset,
+      @Parameter(description = "Default search can be AND or OR", required = true)
+          @RequestParam(name = "typeRecherche", defaultValue = "AND", required = true)
           SearchType typeRecherche) {
     Organization filterOrganization = new Organization();
     filterOrganization.setIdentifiant(identifiant);
@@ -82,16 +119,79 @@ public class OrganizationController {
     }
   }
 
+  @GetMapping(
+      path = {"/{realm}/organizations"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
+  @Operation(summary = "Search organizations by parameters")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Organizations found according to parameter",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = PageResult.class))
+            })
+      })
+  public ResponseEntity<?> getOrganizations(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Organization's identifiant of the wanted organization",
+              required = false)
+          @RequestParam(value = "identifiant", required = false)
+          String identifiant,
+      @Parameter(description = "Expected size of result", required = false)
+          @RequestParam(value = "size", defaultValue = "20")
+          int size,
+      @Parameter(description = "Offset to apply when searching", required = false)
+          @RequestParam(value = "offset", defaultValue = "0")
+          int offset,
+      @Parameter(description = "Default search can be AND or OR", required = true)
+          @RequestParam(name = "typeRecherche", defaultValue = "AND", required = true)
+          SearchType typeRecherche) {
+    return getOrganizationsByStorage(realm, null, identifiant, size, offset, typeRecherche);
+  }
+
   @PostMapping(
       value = {"/{realm}/organizations", "/{realm}/{storage}/organizations"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Create a new organization")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Organization created",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Organization.class))
+            }),
+        @ApiResponse(
+            responseCode = "409",
+            description = "Organization already exist",
+            content = {@Content(mediaType = "application/json")})
+      })
   @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
-  public ResponseEntity<?> createOrganizations(
-      @PathVariable("realm") String realm,
-      @PathVariable(name = "storage", required = false) String storage,
-      @RequestBody Organization organization) {
+  public ResponseEntity<Organization> createOrganizationsByStorage(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "Organization to create", required = false) @RequestBody
+          Organization organization) {
 
     if (organizationService.findById(realm, storage, organization.getIdentifiant()) == null) {
       organizationService.create(realm, storage, organization);
@@ -109,17 +209,78 @@ public class OrganizationController {
     }
   }
 
+  @PostMapping(
+      value = {"/{realm}/organizations"},
+      consumes = {MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Create a new organization")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Organization created",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Organization.class))
+            }),
+        @ApiResponse(
+            responseCode = "409",
+            description = "Organization already exist",
+            content = {@Content(mediaType = "application/json")})
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  public ResponseEntity<Organization> createOrganizations(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "Organization to create", required = false) @RequestBody
+          Organization organization) {
+    return createOrganizationsByStorage(realm, null, organization);
+  }
+
   @PutMapping(
-      value = {"/{realm}/organizations/{id}", "/{realm}/{storage}/organizations/{id}"},
+      value = {"/{realm}/{storage}/organizations/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
   @Operation(summary = "Update organization")
-  public ResponseEntity<?> updateOrganizations(
-      @PathVariable("realm") String realm,
-      @PathVariable(name = "storage", required = false) String storage,
-      @PathVariable("id") String id,
-      @RequestBody Organization organization) {
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Organization updated",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Organization.class))
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Organization does'nt exist",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "400",
+            description = "id in path and body are not equals",
+            content = {@Content(mediaType = "application/json")})
+      })
+  public ResponseEntity<?> updateOrganizationsByStorage(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "Organization's id to update", required = false) @PathVariable("id")
+          String id,
+      @Parameter(description = "Organization to update", required = false) @RequestBody
+          Organization organization) {
     if (!organization.getIdentifiant().equals(id)) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
@@ -137,15 +298,73 @@ public class OrganizationController {
     }
   }
 
+  @PutMapping(
+      value = {"/{realm}/organizations/{id}"},
+      consumes = {MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  @Operation(summary = "Update organization")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Organization updated",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Organization.class))
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Organization does'nt exist",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "400",
+            description = "id in path and body are not equals",
+            content = {@Content(mediaType = "application/json")})
+      })
+  public ResponseEntity<?> updateOrganizations(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "Organization's id to update", required = false) @PathVariable("id")
+          String id,
+      @Parameter(description = "Organization to update", required = false) @RequestBody
+          Organization organization) {
+    return updateOrganizationsByStorage(realm, null, id, organization);
+  }
+
   @DeleteMapping(
-      value = {"/{realm}/organizations/{id}", "/{realm}/{storage}/organizations/{id}"},
+      value = {"/{realm}/{storage}/organizations/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
   @Operation(summary = "Delete organization")
-  public ResponseEntity<String> deleteOrganizations(
-      @PathVariable("realm") String realm,
-      @PathVariable(name = "storage", required = false) String storage,
-      @PathVariable("id") String id) {
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Organization deleted",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Organization does'nt exist",
+            content = {@Content(mediaType = "application/json")})
+      })
+  public ResponseEntity<String> deleteOrganizationsByStorage(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "Organization's id to delete", required = false) @PathVariable("id")
+          String id) {
 
     if (organizationService.findById(realm, storage, id) != null) {
       organizationService.delete(realm, storage, id);
@@ -155,20 +374,96 @@ public class OrganizationController {
     }
   }
 
+  @DeleteMapping(
+      value = {"/{realm}/organizations/{id}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  @Operation(summary = "Delete organization")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Organization deleted",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Organization does'nt exist",
+            content = {@Content(mediaType = "application/json")})
+      })
+  public ResponseEntity<String> deleteOrganizations(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "Organization's id to delete", required = false) @PathVariable("id")
+          String id) {
+    return deleteOrganizationsByStorage(realm, null, id);
+  }
+
   @GetMapping(
-      path = {"/{realm}/organizations/{orgId}", "/{realm}/{storage}/organizations/{orgId}"},
+      path = {"/{realm}/{storage}/organizations/{orgId}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get organization by identifiant")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Organizations found according to params",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "404",
+            description = "No organization match name",
+            content = {@Content(mediaType = "application/json")})
+      })
   @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
-  public ResponseEntity<Organization> getUserByUsername(
-      @PathVariable("realm") String realm,
-      @PathVariable(name = "storage", required = false) String storage,
-      @PathVariable("orgId") String id) {
+  public ResponseEntity<Organization> getOrganizationByIdByStorage(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "Organization's id to search", required = false)
+          @PathVariable("orgId")
+          String id) {
     Organization organization = organizationService.findById(realm, storage, id);
     if (organization != null) {
       return ResponseEntity.status(HttpStatus.OK).body(organization);
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
+  }
+
+  @GetMapping(
+      path = {"/{realm}/organizations/{orgId}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Get organization by identifiant")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Organizations found according to params",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "404",
+            description = "No organization match name",
+            content = {@Content(mediaType = "application/json")})
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
+  public ResponseEntity<Organization> getOrganizationById(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "Organization's id to search", required = false)
+          @PathVariable("orgId")
+          String id) {
+    return getOrganizationByIdByStorage(realm, null, id);
   }
 }

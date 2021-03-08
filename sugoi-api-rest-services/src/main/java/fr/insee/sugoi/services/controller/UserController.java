@@ -21,7 +21,13 @@ import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
@@ -43,32 +49,71 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@Tag(name = "Manage users")
+@Tag(name = "Manage users", description = "New endpoints to create update delete and find users")
 @RequestMapping(value = {"/v2", "/"})
-@SecurityRequirement(name = "oAuth")
+@SecurityRequirements(
+    value = {@SecurityRequirement(name = "oAuth"), @SecurityRequirement(name = "basic")})
 public class UserController {
 
   @Autowired private UserService userService;
 
   @GetMapping(
-      path = {"/{realm}/users", "/{realm}/{storage}/users"},
+      path = {"/{realm}/{storage}/users"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Operation(summary = "Search users")
+  @Operation(summary = "Search users according to parameters")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Organizations found according to parameter",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = PageResult.class))
+            })
+      })
   @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
-  public ResponseEntity<?> getUsers(
-      @PathVariable("realm") String realm,
-      @PathVariable(name = "storage", required = false) String storage,
-      @RequestParam(name = "identifiant", required = false) String identifiant,
-      @RequestParam(name = "nomCommun", required = false) String nomCommun,
-      @RequestParam(name = "description", required = false) String description,
-      @RequestParam(name = "organisationId", required = false) String organisationId,
-      @RequestParam(name = "size", defaultValue = "20") int size,
-      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "searchCookie", required = false) String searchCookie,
-      @RequestParam(name = "typeRecherche", defaultValue = "AND", required = true)
+  public ResponseEntity<?> getUsersByStorage(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "User's identifiant of user to search ", required = false)
+          @RequestParam(name = "identifiant", required = false)
+          String identifiant,
+      @Parameter(description = "User's commun name of user to search ", required = false)
+          @RequestParam(name = "nomCommun", required = false)
+          String nomCommun,
+      @Parameter(description = "User's description", required = false)
+          @RequestParam(name = "description", required = false)
+          String description,
+      @Parameter(description = "User rattached organization", required = false)
+          @RequestParam(name = "organisationId", required = false)
+          String organisationId,
+      @Parameter(description = "Expected size of result", required = false)
+          @RequestParam(name = "size", defaultValue = "20")
+          int size,
+      @Parameter(description = "Offset to apply when searching", required = false)
+          @RequestParam(name = "offset", required = false, defaultValue = "0")
+          int offset,
+      @Parameter(description = "cookie to continue a previous search", required = false)
+          @RequestParam(name = "searchCookie", required = false)
+          String searchCookie,
+      @Parameter(description = "Search type can be OR or AND ", required = false)
+          @RequestParam(name = "typeRecherche", defaultValue = "AND", required = true)
           SearchType typeRecherche,
-      @RequestParam(name = "habilitation", required = false) List<String> habilitations,
-      @RequestParam(name = "application", required = false) String application) {
+      @Parameter(description = "User's habilitations of user to search ", required = false)
+          @RequestParam(name = "habilitation", required = false)
+          List<String> habilitations,
+      @Parameter(description = "User's application of user to search ", required = false)
+          @RequestParam(name = "application", required = false)
+          String application) {
 
     // set the user which will serve as a model to retrieve the matching users
     User searchUser = new User();
@@ -108,16 +153,110 @@ public class UserController {
     }
   }
 
+  @GetMapping(
+      path = {"/{realm}/users"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Search users according to parameters")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Users found according to parameters",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = PageResult.class))
+            })
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
+  public ResponseEntity<?> getUsers(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "User's identifiant of user to search ", required = false)
+          @RequestParam(name = "identifiant", required = false)
+          String identifiant,
+      @Parameter(description = "User's commun name of user to search ", required = false)
+          @RequestParam(name = "nomCommun", required = false)
+          String nomCommun,
+      @Parameter(description = "User's description", required = false)
+          @RequestParam(name = "description", required = false)
+          String description,
+      @Parameter(description = "User rattached organization", required = false)
+          @RequestParam(name = "organisationId", required = false)
+          String organisationId,
+      @Parameter(description = "Expected size of result", required = false)
+          @RequestParam(name = "size", defaultValue = "20")
+          int size,
+      @Parameter(description = "Offset to apply when searching", required = false)
+          @RequestParam(name = "offset", required = false, defaultValue = "0")
+          int offset,
+      @Parameter(description = "cookie to continue a previous search", required = false)
+          @RequestParam(name = "searchCookie", required = false)
+          String searchCookie,
+      @Parameter(description = "Search type can be OR or AND ", required = false)
+          @RequestParam(name = "typeRecherche", defaultValue = "AND", required = true)
+          SearchType typeRecherche,
+      @Parameter(description = "User's habilitations of user to search ", required = false)
+          @RequestParam(name = "habilitation", required = false)
+          List<String> habilitations,
+      @Parameter(description = "User's application of user to search ", required = false)
+          @RequestParam(name = "application", required = false)
+          String application) {
+    return getUsersByStorage(
+        realm,
+        null,
+        identifiant,
+        nomCommun,
+        description,
+        organisationId,
+        size,
+        offset,
+        searchCookie,
+        typeRecherche,
+        habilitations,
+        application);
+  }
+
   @PostMapping(
-      value = {"/{realm}/users", "/{realm}/{storage}/users"},
+      value = {"/{realm}/{storage}/users"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Create user")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "User created",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = User.class))
+            }),
+        @ApiResponse(
+            responseCode = "409",
+            description = "User already exist",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = User.class))
+            })
+      })
   @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
-  public ResponseEntity<?> createUsers(
-      @PathVariable("realm") String realm,
-      @PathVariable(name = "storage", required = false) String storage,
-      @RequestBody User user) {
+  public ResponseEntity<?> createUsersByStorage(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "User to create", required = true) @RequestBody User user) {
     if (userService.findById(realm, storage, user.getUsername()) == null) {
       userService.create(realm, storage, user);
       URI location =
@@ -132,17 +271,76 @@ public class UserController {
     }
   }
 
+  @PostMapping(
+      value = {"/{realm}/users"},
+      consumes = {MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Create user")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "User created",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = User.class))
+            }),
+        @ApiResponse(
+            responseCode = "409",
+            description = "User already exist",
+            content = {@Content(mediaType = "application/json")})
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  public ResponseEntity<?> createUsers(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "User to create", required = true) @RequestBody User user) {
+    return createUsersByStorage(realm, null, user);
+  }
+
   @PutMapping(
-      value = {"/{realm}/users/{id}", "/{realm}/{storage}/users/{id}"},
+      value = {"/{realm}/{storage}/users/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Update user")
   @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
-  public ResponseEntity<?> updateUsers(
-      @PathVariable("realm") String realm,
-      @PathVariable(name = "storage", required = false) String storage,
-      @PathVariable("id") String id,
-      @RequestBody User user) {
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "User updated",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = User.class))
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "User not found",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid combinaison of id between body and path",
+            content = {@Content(mediaType = "application/json")})
+      })
+  public ResponseEntity<?> updateUsersByStorage(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "User's id to update", required = true) @PathVariable("id")
+          String id,
+      @Parameter(description = "User to update", required = true) @RequestBody User user) {
 
     if (!user.getUsername().equals(id)) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -159,15 +357,77 @@ public class UserController {
     }
   }
 
+  @PutMapping(
+      value = {"/{realm}/users/{id}"},
+      consumes = {MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Update user")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "User updated",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = User.class))
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "User not found",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid combinaison of id between body and path",
+            content = {@Content(mediaType = "application/json")})
+      })
+  public ResponseEntity<?> updateUsers(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "User's id to update", required = true) @PathVariable("id")
+          String id,
+      @Parameter(description = "User to update", required = true) @RequestBody User user) {
+
+    return updateUsersByStorage(realm, null, id, user);
+  }
+
   @DeleteMapping(
-      value = {"/{realm}/users/{id}", "/{realm}/{storage}/users/{id}"},
+      value = {"/{realm}/{storage}/users/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete user")
   @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
-  public ResponseEntity<String> deleteUsers(
-      @PathVariable("realm") String realm,
-      @PathVariable(name = "storage", required = false) String storage,
-      @PathVariable("id") String id) {
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "User deleted",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = User.class))
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "User not found",
+            content = {@Content(mediaType = "application/json")})
+      })
+  public ResponseEntity<String> deleteUsersByStorage(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "User's id to delete", required = true) @PathVariable("id")
+          String id) {
 
     if (userService.findById(realm, storage, id) != null) {
       userService.delete(realm, storage, id);
@@ -177,20 +437,99 @@ public class UserController {
     }
   }
 
+  @DeleteMapping(
+      value = {"/{realm}/users/{id}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Delete user")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "User deleted",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = User.class))
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "User not found",
+            content = {@Content(mediaType = "application/json")})
+      })
+  public ResponseEntity<String> deleteUsers(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "User's id to delete", required = true) @PathVariable("id")
+          String id) {
+
+    return deleteUsersByStorage(realm, null, id);
+  }
+
   @GetMapping(
-      path = {"/{realm}/users/{username}", "/{realm}/{storage}/users/{username}"},
+      path = {"/{realm}/{storage}/users/{username}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get user by username")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "User found according to parameters",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = User.class))
+            })
+      })
   @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
-  public ResponseEntity<User> getUserByUsername(
-      @PathVariable("realm") String realm,
-      @PathVariable(name = "storage", required = false) String storage,
-      @PathVariable("username") String id) {
+  public ResponseEntity<User> getUserByUsernameByStorage(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "Username to search", required = true) @PathVariable("username")
+          String id) {
     User user = userService.findById(realm, storage, id);
     if (user != null) {
       return ResponseEntity.status(HttpStatus.OK).body(user);
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
+  }
+
+  @GetMapping(
+      path = {"/{realm}/users/{username}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Get user by username")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "User found according to parameters",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = User.class))
+            })
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
+  public ResponseEntity<User> getUserByUsername(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "Username to search", required = true) @PathVariable("username")
+          String id) {
+    return getUserByUsernameByStorage(realm, null, id);
   }
 }

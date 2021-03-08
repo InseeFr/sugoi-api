@@ -14,7 +14,10 @@
 package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.services.beans.MessageKeyValueGeneriqueBean;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,7 +41,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/debug")
-@SecurityRequirement(name = "oAuth")
+@Tag(name = "Admin debug", description = "New endpoints to debug")
+@SecurityRequirements(
+    value = {@SecurityRequirement(name = "oAuth"), @SecurityRequirement(name = "basic")})
 public class DebugController {
 
   private static final Logger logger = LogManager.getLogger(DebugController.class);
@@ -49,6 +54,7 @@ public class DebugController {
   @GetMapping(
       path = "/config",
       produces = {MediaType.TEXT_PLAIN_VALUE})
+  @Operation(summary = "Get all properties")
   @ResponseBody
   @PreAuthorize("@NewAuthorizeMethodDecider.isAdmin()")
   public ResponseEntity<?> printConfig() {
