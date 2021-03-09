@@ -19,8 +19,15 @@ import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,7 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1")
-@Tag(name = "V1 - Gestion des groupes")
+@Tag(name = "[Deprecated] - Manage groups", description = "Old Enpoints to manage contact's group")
 @SecurityRequirement(name = "basic")
 public class ContactGroupeDomaineController {
 
@@ -45,12 +52,41 @@ public class ContactGroupeDomaineController {
 
   @Autowired private OuganextSugoiMapper ouganextSugoiMapper;
 
+  /**
+   * Get the groups of a contact
+   *
+   * @param identifiant
+   * @param domaine
+   * @return OK with the list of groups
+   */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
   @GetMapping(
       value = "/{domaine}/contact/{id}/groupes",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
-  public ResponseEntity<?> getGroups(
-      @PathVariable("id") String identifiant, @PathVariable("domaine") String domaine) {
+  @Operation(summary = "Get the groups of a contact", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Contact successfully updated or created",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Groupe.class)),
+              @Content(
+                  mediaType = "application/xml",
+                  schema = @Schema(implementation = Groupe.class))
+            })
+      })
+  public ResponseEntity<List<Groupe>> getGroups(
+      @Parameter(description = "Contact to search groups", required = true)
+          @PathVariable(name = "id", required = true)
+          String identifiant,
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine) {
     User user = userService.findById(domaine, null, identifiant);
     return ResponseEntity.status(HttpStatus.OK)
         .body(
@@ -68,15 +104,50 @@ public class ContactGroupeDomaineController {
    * @param nomGroupe group name
    * @return NO_CONTENT if contact was added to the group, CONFLICT if user already in group
    */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
   @PutMapping(
       value = "/{domaine}/contact/{id}/groupes/{nomappli}/{nomgroupe}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-  public ResponseEntity<?> addToGroup(
-      @PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine,
-      @PathVariable("nomappli") String nomAppli,
-      @PathVariable("nomgroupe") String nomGroupe) {
+  @Operation(summary = "Add a contact in an application group", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Contact successfully added to group",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Group or contact not found",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            }),
+        @ApiResponse(
+            responseCode = "409",
+            description = "Contact already in group",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
+  public ResponseEntity<String> addToGroup(
+      @Parameter(description = "Contact's id to add to group", required = true)
+          @PathVariable(name = "id", required = true)
+          String identifiant,
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "Name of the application of the group", required = true)
+          @PathVariable(name = "nomappli", required = true)
+          String nomAppli,
+      @Parameter(description = "Group name", required = true)
+          @PathVariable(name = "nomgroupe", required = true)
+          String nomGroupe) {
     Group group = groupService.findById(domaine, null, nomAppli, nomGroupe);
     if (group != null) {
       User user = userService.findById(domaine, null, identifiant);
@@ -84,16 +155,16 @@ public class ContactGroupeDomaineController {
         if (user.getGroups() != null
             && user.getGroups().stream()
                 .anyMatch(g -> g.getName().equals(nomGroupe) && g.getAppName().equals(nomAppli))) {
-          return new ResponseEntity<>("Contact already in group", HttpStatus.CONFLICT);
+          return new ResponseEntity<String>("Contact already in group", HttpStatus.CONFLICT);
         } else {
           userService.addUserToGroup(domaine, null, identifiant, nomAppli, nomGroupe);
           return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
       } else {
-        return new ResponseEntity<>("Contact non trouvé", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<String>("Contact not found", HttpStatus.NOT_FOUND);
       }
     } else {
-      return new ResponseEntity<>("Groupe non trouvé", HttpStatus.NOT_FOUND);
+      return new ResponseEntity<String>("Group not found", HttpStatus.NOT_FOUND);
     }
   }
 
@@ -106,15 +177,50 @@ public class ContactGroupeDomaineController {
    * @param nomGroupe name of the group in which the user will be added
    * @return NO_CONTENT if deletion occured, CONFLICT if user doesn't not belong to the group
    */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
   @DeleteMapping(
       value = "{domaine}/contact/{id}/groupes/{nomappli}/{nomgroupe}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-  public ResponseEntity<?> removeFromGroups(
-      @PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine,
-      @PathVariable("nomappli") String nomAppli,
-      @PathVariable("nomgroupe") String nomGroupe) {
+  @Operation(summary = "Add a contact in an application group", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Contact successfully deleted from group",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Group or contact not found",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            }),
+        @ApiResponse(
+            responseCode = "409",
+            description = "Contact not in group",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
+  public ResponseEntity<String> removeFromGroups(
+      @Parameter(description = "Contact's id to delete from group", required = true)
+          @PathVariable(name = "id", required = true)
+          String identifiant,
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "Name of the application of the group", required = true)
+          @PathVariable(name = "nomappli", required = true)
+          String nomAppli,
+      @Parameter(description = "Group name", required = true)
+          @PathVariable(name = "nomgroupe", required = true)
+          String nomGroupe) {
     User user = userService.findById(domaine, null, identifiant);
     if (user != null) {
       if (user.getGroups() != null

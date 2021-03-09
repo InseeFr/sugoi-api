@@ -16,6 +16,12 @@ package fr.insee.sugoi.old.services.controller;
 import fr.insee.sugoi.converter.ouganext.Habilitations;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -34,7 +40,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1")
-@Tag(name = "V1 - Gestion des habilitations")
+@Tag(
+    name = "[Deprecated] - Manage habilitations",
+    description = "Old Enpoints to manage contact's habilitations")
 @SecurityRequirement(name = "basic")
 public class ContactHabilitationDomaineController {
 
@@ -47,12 +55,34 @@ public class ContactHabilitationDomaineController {
    * @param domaine
    * @return OK with the list of habilitations
    */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
   @GetMapping(
       value = "/{domaine}/contact/{id}/habilitations",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
-  public ResponseEntity<?> getHabilitation(
-      @PathVariable("id") String identifiant, @PathVariable("domaine") String domaine) {
+  @Operation(summary = "Retrieve all the habilitations of a contact", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "List of habilitations of the contact",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Habilitations.class)),
+              @Content(
+                  mediaType = "application/xml",
+                  schema = @Schema(implementation = Habilitations.class))
+            })
+      })
+  public ResponseEntity<Habilitations> getHabilitation(
+      @Parameter(description = "Contact's id to look for habilitations", required = true)
+          @PathVariable(name = "id", required = true)
+          String identifiant,
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine) {
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             new Habilitations(userService.findById(domaine, null, identifiant).getHabilitations()));
@@ -68,15 +98,39 @@ public class ContactHabilitationDomaineController {
    * @param nomRoles roles to add on the app to the user
    * @return NO_CONTENT if creating went well
    */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
   @PutMapping(
       value = "/{domaine}/contact/{id}/habilitations/{application}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  @Operation(
+      summary =
+          "Add habiltiations without properties on an application to a contact. Create the habilitation application if it does not already exist.",
+      deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Successfully added habilitation",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
   public ResponseEntity<?> addHabilitations(
-      @PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine,
-      @PathVariable("application") String appName,
-      @RequestParam("role") List<String> nomRoles) {
+      @Parameter(description = "Contact's id to add habilitations", required = true)
+          @PathVariable(name = "id", required = false)
+          String identifiant,
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "Name of the app on which the habilitation applies", required = true)
+          @PathVariable(name = "application", required = true)
+          String appName,
+      @Parameter(description = "Name of role to add on the app to the user", required = true)
+          @RequestParam(name = "role", required = true)
+          List<String> nomRoles) {
     User user = userService.findById(domaine, null, identifiant);
     Habilitations habilitations = new Habilitations(user.getHabilitations());
     habilitations.addHabilitation(appName, nomRoles);
@@ -96,16 +150,42 @@ public class ContactHabilitationDomaineController {
    * @param proprietes properties to add to the role of the application
    * @return NO_CONTENT if creating went well
    */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
   @PutMapping(
       value = "/{domaine}/contact/{id}/habilitations/{application}/{role}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  @Operation(
+      summary =
+          "Add habiltiations with properties on an application to a contact. Create the habilitation application if it does not already exist.",
+      deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Successfully added habilitation",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
   public ResponseEntity<?> addHabilitationsWithProperty(
-      @PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine,
-      @PathVariable("application") String appName,
-      @PathVariable("role") String role,
-      @RequestParam("propriete") List<String> proprietes) {
+      @Parameter(description = "Contact's id to add habilitations", required = true)
+          @PathVariable(name = "id", required = false)
+          String identifiant,
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "Name of the app on which the habilitation applies", required = true)
+          @PathVariable(name = "application", required = true)
+          String appName,
+      @Parameter(description = "Name of role to add on the app to the user", required = true)
+          @PathVariable(name = "role", required = true)
+          String role,
+      @Parameter(description = "List of properties to add on the app to the user", required = true)
+          @RequestParam(name = "propriete", required = true)
+          List<String> proprietes) {
     User user = userService.findById(domaine, null, identifiant);
     Habilitations habilitations = new Habilitations(user.getHabilitations());
     habilitations.addHabilitations(appName, role, proprietes);
@@ -123,15 +203,36 @@ public class ContactHabilitationDomaineController {
    * @param nomRoles roles to delete on the app
    * @return NO_CONTENT if deleting went well
    */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
   @DeleteMapping(
       value = "/{domaine}/contact/{id}/habilitations/{application}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  @Operation(summary = "Delete habilitations of a contact on an application.", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Successfully deleted habilitation",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
   public ResponseEntity<?> deleteHabilitations(
-      @PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine,
-      @PathVariable("application") String appName,
-      @RequestParam("role") List<String> nomRoles) {
+      @Parameter(description = "Contact's id to delete habilitations", required = true)
+          @PathVariable(name = "id", required = true)
+          String identifiant,
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "Name of the app on which the habilitation applies", required = true)
+          @PathVariable(name = "application", required = true)
+          String appName,
+      @Parameter(description = "List of roles to delete on the app for the user", required = true)
+          @RequestParam(name = "role", required = true)
+          List<String> nomRoles) {
     User user = userService.findById(domaine, null, identifiant);
     Habilitations habilitations = new Habilitations(user.getHabilitations());
     habilitations.removeHabilitation(appName, nomRoles);
@@ -150,16 +251,42 @@ public class ContactHabilitationDomaineController {
    * @param proprietes properties to delete from the role of the application
    * @return NO_CONTENT if deleting went well
    */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
   @DeleteMapping(
       value = "/{domaine}/contact/{id}/habilitations/{application}/{role}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  @Operation(summary = "Delete habilitations of a contact on an application.", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Successfully deleted habilitation",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
   public ResponseEntity<?> deleteHabilitationsWithProperty(
-      @PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine,
-      @PathVariable("application") String appName,
-      @PathVariable("role") String nomRole,
-      @RequestParam("propriete") List<String> proprietes) {
+      @Parameter(description = "Contact's id to delete habilitations", required = true)
+          @PathVariable(name = "id", required = true)
+          String identifiant,
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "Name of the app on which the habilitation applies", required = true)
+          @PathVariable(name = "application", required = true)
+          String appName,
+      @Parameter(description = "Name of role to delete on the app to the user", required = true)
+          @RequestParam(name = "role", required = true)
+          @PathVariable(name = "role", required = true)
+          String nomRole,
+      @Parameter(
+              description = "List of habilitation to delete on the app for the user",
+              required = true)
+          @RequestParam(name = "propriete", required = true)
+          List<String> proprietes) {
     User user = userService.findById(domaine, null, identifiant);
     Habilitations habilitations = new Habilitations(user.getHabilitations());
     habilitations.removeHabilitation(appName, nomRole, proprietes);

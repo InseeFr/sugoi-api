@@ -17,6 +17,11 @@ import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
 import fr.insee.sugoi.converter.ouganext.PasswordChangeRequest;
 import fr.insee.sugoi.core.service.CredentialsService;
 import fr.insee.sugoi.core.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
@@ -36,7 +41,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1")
-@Tag(name = "V1 - Gestion du mot de passe")
+@Tag(
+    name = "[Deprecated] - Manage password",
+    description = "Old Enpoints to manage contacts password")
 @SecurityRequirement(name = "basic")
 public class ContactPasswordDomaineController {
 
@@ -53,16 +60,46 @@ public class ContactPasswordDomaineController {
    * @param pcr mail address, mail format
    * @return NO_CONTENT if modification occured
    */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
   @PostMapping(
       value = "/{domaine}/contact/{id}/password",
       consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  @Operation(summary = "Reinitialize a password with a random new password", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "password successfully added to contact",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Contact not found",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
   public ResponseEntity<?> reinitPassword(
-      @PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine,
-      @RequestParam("modeEnvoi") List<String> modeEnvoisString,
-      @RequestBody PasswordChangeRequest pcr) {
+      @Parameter(description = "Contact's id to update", required = true)
+          @PathVariable(name = "id", required = true)
+          String identifiant,
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "Way to send login can be mail or courrier", required = false)
+          @RequestParam(name = "modeEnvoi", required = false)
+          List<String> modeEnvoisString,
+      @Parameter(
+              description = "Other infos to reset password: mail address, mail format",
+              required = true)
+          @RequestBody
+          PasswordChangeRequest pcr) {
     if (userService.findById(domaine, null, identifiant) != null) {
       credentialsService.reinitPassword(
           domaine,
@@ -86,15 +123,41 @@ public class ContactPasswordDomaineController {
    * @return NO_CONTENT if password is initialized, CONFLICT if a password already exist or if new
    *     password does not respect password policy TODO : check if user already has password
    */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
   @PostMapping(
       value = "/{domaine}/contact/{id}/password/first",
       consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  @Operation(summary = "Initialize a contact password with a provided password", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "password successfully added to contact",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Contact not found",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
   public ResponseEntity<?> initPassword(
-      @PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine,
-      @RequestBody PasswordChangeRequest pcr) {
+      @Parameter(description = "Contact's id to update", required = true)
+          @PathVariable(name = "id", required = true)
+          String identifiant,
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "Other infos to reset password: new password", required = true)
+          @RequestBody
+          PasswordChangeRequest pcr) {
     if (userService.findById(domaine, null, identifiant) != null) {
       credentialsService.initPassword(
           domaine,
@@ -126,10 +189,23 @@ public class ContactPasswordDomaineController {
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
   public ResponseEntity<?> changePassword(
-      @PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine,
-      @RequestParam("modeEnvoi") List<String> modeEnvoisString,
-      @RequestBody PasswordChangeRequest pcr) {
+      @Parameter(description = "Contact's id to update", required = true)
+          @PathVariable(name = "id", required = true)
+          String identifiant,
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "Way to send login can be mail or courrier", required = false)
+          @RequestParam(name = "modeEnvoi", required = false)
+          List<String> modeEnvoisString,
+      @Parameter(
+              description =
+                  "Other infos to reset password: mail to send the new password, format informations, ;address if modeEnvois is address, new password and old password",
+              required = true)
+          @RequestBody
+          PasswordChangeRequest pcr) {
     if (userService.findById(domaine, null, identifiant) != null) {
       credentialsService.changePassword(
           domaine,
