@@ -25,13 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1")
-@Tag(name = "[Deprecated]")
+@Tag(name = "[Deprecated]", description = "Old Enpoints")
 @SecurityRequirement(name = "basic")
 public class IdController {
 
-  @GetMapping(
-      value = "/{id}",
-      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @GetMapping(value = "/{id}", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
   @Operation(deprecated = true)
   public ResponseEntity<?> getById(@PathVariable("id") String id) {
     return null;

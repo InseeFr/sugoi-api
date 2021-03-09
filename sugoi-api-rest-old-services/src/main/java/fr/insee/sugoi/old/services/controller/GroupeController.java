@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "[Deprecated] - Manage group")
+@Tag(name = "[Deprecated] - Manage group", description = "Old Enpoints to manage group")
 @RestController
 @RequestMapping("/v1")
 @SecurityRequirement(name = "basic")
@@ -44,62 +44,39 @@ public class GroupeController {
 
   private OuganextSugoiMapper ouganextSugoiMapper = new OuganextSugoiMapper();
 
-  @Autowired private GroupService groupService;
+  @Autowired
+  private GroupService groupService;
 
   /**
    * Get all contacts in a group
    *
    * @param domaine
    * @param application name of application of the group
-   * @param groupe name of the group
-   * @return OK with contact if at least one contact found, NOT_FOUND if no contact found
+   * @param groupe      name of the group
+   * @return OK with contact if at least one contact found, NOT_FOUND if no
+   *         contact found
    */
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
-  @GetMapping(
-      value = "/{domaine}/contacts/groupe/{application}/{groupe}",
-      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @GetMapping(value = "/{domaine}/contacts/groupe/{application}/{groupe}", produces = { MediaType.APPLICATION_XML_VALUE,
+      MediaType.APPLICATION_JSON_VALUE })
   @Operation(summary = "Get all contacts in a group", deprecated = true)
-  @ApiResponses(
-      value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Group and its contacts",
-            content = {
-              @Content(mediaType = "application/json"),
-              @Content(mediaType = "application/xml")
-            }),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Group not found",
-            content = {
-              @Content(mediaType = "application/json"),
-              @Content(mediaType = "application/xml")
-            })
-      })
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Group and its contacts", content = {
+          @Content(mediaType = "application/json"), @Content(mediaType = "application/xml") }),
+      @ApiResponse(responseCode = "404", description = "Group not found", content = {
+          @Content(mediaType = "application/json"), @Content(mediaType = "application/xml") }) })
   public ResponseEntity<?> getContactByDomaineAndGroups(
-      @Parameter(
-              description = "Name of the domaine where the operation will be made",
-              required = true)
-          @PathVariable(name = "domaine", required = true)
-          String domaine,
-      @Parameter(description = "Application where to find groups", required = true)
-          @PathVariable(name = "application", required = true)
-          String application,
-      @Parameter(description = "Group where collect contacts", required = true)
-          @PathVariable(name = "groupe", required = true)
-          String groupe) {
+      @Parameter(description = "Name of the domaine where the operation will be made", required = true) @PathVariable(name = "domaine", required = true) String domaine,
+      @Parameter(description = "Application where to find groups", required = true) @PathVariable(name = "application", required = true) String application,
+      @Parameter(description = "Group where collect contacts", required = true) @PathVariable(name = "groupe", required = true) String groupe) {
     Group group = groupService.findById(domaine, null, application, groupe);
     if (group.getUsers() != null) {
       if (group.getUsers().isEmpty()) {
         return new ResponseEntity<>("No users in group", HttpStatus.NOT_FOUND);
       } else {
         Contacts contacts = new Contacts();
-        contacts
-            .getListe()
-            .addAll(
-                group.getUsers().stream()
-                    .map(user -> ouganextSugoiMapper.serializeToOuganext(user, Contact.class))
-                    .collect(Collectors.toList()));
+        contacts.getListe().addAll(group.getUsers().stream()
+            .map(user -> ouganextSugoiMapper.serializeToOuganext(user, Contact.class)).collect(Collectors.toList()));
         return ResponseEntity.ok().body(contacts);
       }
     } else {

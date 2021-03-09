@@ -32,45 +32,32 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1")
-@Tag(name = "[Deprecated] - Utils")
+@Tag(name = "[Deprecated] - Utils", description = "Old Enpoints to generate password")
 @SecurityRequirement(name = "basic")
 public class PasswordController {
 
-  @Autowired PasswordService passwordService;
+  @Autowired
+  PasswordService passwordService;
 
   private static final int TAILLE_MINIMALE_PASSWORD = 8;
 
-  @GetMapping(
-      value = "/password",
-      produces = {MediaType.TEXT_PLAIN_VALUE})
+  @GetMapping(value = "/password", produces = { MediaType.TEXT_PLAIN_VALUE })
   @Operation(summary = "Generate a list of random password", deprecated = true)
-  @ApiResponses(
-      value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Generated list password",
-            content = {@Content(mediaType = "text/plain")}),
-        @ApiResponse(
-            responseCode = "400",
-            description = "length attributes is not big enought",
-            content = {@Content(mediaType = "text/plain")}),
-      })
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Generated list password", content = {
+          @Content(mediaType = "text/plain") }),
+      @ApiResponse(responseCode = "400", description = "length attributes is not big enought", content = {
+          @Content(mediaType = "text/plain") }), })
   public ResponseEntity<?> generatePasswords(
-      @Parameter(description = "Number of password wanted", required = true) @RequestParam("nb")
-          int nb,
-      @Parameter(description = "Minimun length of a password", required = true)
-          @RequestParam("length")
-          int length) {
+      @Parameter(description = "Number of password wanted", required = true) @RequestParam("nb") int nb,
+      @Parameter(description = "Minimun length of a password", required = true) @RequestParam("length") int length) {
     if (length < TAILLE_MINIMALE_PASSWORD) {
       return new ResponseEntity<>(
-          "Le paramètre length est obligatoire et doit être supérieur ou égal à "
-              + TAILLE_MINIMALE_PASSWORD
-              + ".",
+          "Le paramètre length est obligatoire et doit être supérieur ou égal à " + TAILLE_MINIMALE_PASSWORD + ".",
           HttpStatus.BAD_REQUEST);
     }
     if (nb < 1) {
-      return new ResponseEntity<>(
-          "Le paramètre nb est obligatoire et doit être positif.", HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>("Le paramètre nb est obligatoire et doit être positif.", HttpStatus.BAD_REQUEST);
     }
     StringBuilder listeMdp = new StringBuilder();
     for (int i = 0; i < nb - 1; i++) {

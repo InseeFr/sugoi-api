@@ -32,55 +32,35 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "[Deprecated] - Verify Credentials")
+@Tag(name = "[Deprecated] - Verify Credentials", description = "Old Enpoints to manage user credentials")
 @RestController
 @RequestMapping("/v1")
 @SecurityRequirement(name = "basic")
 public class CredentialsDomaineController {
 
-  @Autowired CredentialsService credentialsService;
+  @Autowired
+  CredentialsService credentialsService;
 
   /**
    * Validate credentials of a contact
    *
    * @param domaine
-   * @param id id of the contact
+   * @param id         id of the contact
    * @param motDePasse credential to test
    * @return 200 if credential do match, 403 if not
    */
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-  @PostMapping(
-      value = "/{domaine}/credentials/{id}",
-      consumes = {MediaType.TEXT_PLAIN_VALUE})
+  @PostMapping(value = "/{domaine}/credentials/{id}", consumes = { MediaType.TEXT_PLAIN_VALUE })
   @Operation(summary = "Validate credentials of a contact", deprecated = true)
-  @ApiResponses(
-      value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Password is valid",
-            content = {
-              @Content(mediaType = "application/json"),
-              @Content(mediaType = "application/xml")
-            }),
-        @ApiResponse(
-            responseCode = "403",
-            description = "Password is invalid",
-            content = {
-              @Content(mediaType = "application/json"),
-              @Content(mediaType = "application/xml")
-            })
-      })
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Password is valid", content = {
+          @Content(mediaType = "application/json"), @Content(mediaType = "application/xml") }),
+      @ApiResponse(responseCode = "403", description = "Password is invalid", content = {
+          @Content(mediaType = "application/json"), @Content(mediaType = "application/xml") }) })
   public ResponseEntity<?> authentifierContact(
-      @Parameter(
-              description = "Name of the domaine where the operation will be made",
-              required = true)
-          @PathVariable(name = "domaine", required = true)
-          String domaine,
-      @Parameter(description = "Contact's id", required = true)
-          @PathVariable(name = "id", required = true)
-          String id,
-      @Parameter(description = "Contact's password", required = true) @RequestBody
-          String motDePasse) {
+      @Parameter(description = "Name of the domaine where the operation will be made", required = true) @PathVariable(name = "domaine", required = true) String domaine,
+      @Parameter(description = "Contact's id", required = true) @PathVariable(name = "id", required = true) String id,
+      @Parameter(description = "Contact's password", required = true) @RequestBody String motDePasse) {
     if (credentialsService.validateCredential(domaine, null, id, motDePasse)) {
       return ResponseEntity.ok().build();
     } else {
