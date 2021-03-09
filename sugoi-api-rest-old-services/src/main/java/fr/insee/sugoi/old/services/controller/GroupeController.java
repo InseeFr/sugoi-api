@@ -19,6 +19,10 @@ import fr.insee.sugoi.converter.ouganext.Contacts;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.model.Group;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.stream.Collectors;
@@ -32,7 +36,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "V1 - Groupe")
+@Tag(name = "[Deprecated] - Manage group")
 @RestController
 @RequestMapping("/v1")
 @SecurityRequirement(name = "basic")
@@ -50,15 +54,40 @@ public class GroupeController {
    * @param groupe name of the group
    * @return OK with contact if at least one contact found, NOT_FOUND if no contact found
    */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
   @GetMapping(
       value = "/{domaine}/contacts/groupe/{application}/{groupe}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @Operation(description = "", tags = "Recherche de contacts")
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
+  @Operation(summary = "Get all contacts in a group", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Group and its contacts",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Group not found",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
   public ResponseEntity<?> getContactByDomaineAndGroups(
-      @PathVariable("domaine") String domaine,
-      @PathVariable("application") String application,
-      @PathVariable("groupe") String groupe) {
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "Application where to find groups", required = true)
+          @PathVariable(name = "application", required = true)
+          String application,
+      @Parameter(description = "Group where collect contacts", required = true)
+          @PathVariable(name = "groupe", required = true)
+          String groupe) {
     Group group = groupService.findById(domaine, null, application, groupe);
     if (group.getUsers() != null) {
       if (group.getUsers().isEmpty()) {

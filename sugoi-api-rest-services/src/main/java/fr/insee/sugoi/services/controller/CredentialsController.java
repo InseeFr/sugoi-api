@@ -50,7 +50,7 @@ public class CredentialsController {
 
   @Autowired private CredentialsService credentialsService;
 
-  @PostMapping(path = {"/{realm}/{storage}/users/{id}/reinitPassword"})
+  @PostMapping(path = {"/realm/{realm}/storage/{storage}/users/{id}/reinitPassword"})
   @Operation(summary = "Reinitialize the password of the user")
   @ApiResponses(
       value = {
@@ -64,7 +64,7 @@ public class CredentialsController {
             content = {@Content(mediaType = "application/json")})
       })
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
-  public ResponseEntity<Void> reinitPasswordByStorage(
+  public ResponseEntity<Void> reinitPassword(
       @Parameter(description = "Password change request&", required = true) @RequestBody
           PasswordChangeRequest pcr,
       @Parameter(
@@ -91,7 +91,7 @@ public class CredentialsController {
     }
   }
 
-  @PostMapping(path = {"/{realm}/users/{id}/reinitPassword"})
+  @PostMapping(path = {"/realm/{realm}/users/{id}/reinitPassword"})
   @Operation(summary = "Reinitialize the password of the user")
   @ApiResponses(
       value = {
@@ -118,10 +118,10 @@ public class CredentialsController {
       @Parameter(description = "Way to send password", required = false)
           @RequestParam(value = "sendModes", required = false)
           List<SendMode> sendMode) {
-    return reinitPasswordByStorage(pcr, realm, null, id, sendMode);
+    return reinitPassword(pcr, realm, null, id, sendMode);
   }
 
-  @PostMapping(path = {"/{realm}/{storage}/users/{id}/changePassword"})
+  @PostMapping(path = {"/realm/{realm}/storage/{storage}/users/{id}/changePassword"})
   @Operation(summary = "Change user password with the new one provided")
   @ApiResponses(
       value = {
@@ -135,7 +135,7 @@ public class CredentialsController {
             content = {@Content(mediaType = "application/json")})
       })
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
-  public ResponseEntity<Void> changePasswordByStorage(
+  public ResponseEntity<Void> changePassword(
       @Parameter(description = "Password change request&", required = true) @RequestBody
           PasswordChangeRequest pcr,
       @Parameter(
@@ -158,7 +158,7 @@ public class CredentialsController {
     }
   }
 
-  @PostMapping(path = {"/{realm}/users/{id}/changePassword"})
+  @PostMapping(path = {"/realm/{realm}/users/{id}/changePassword"})
   @Operation(summary = "Change user password with the new one provided")
   @ApiResponses(
       value = {
@@ -182,10 +182,10 @@ public class CredentialsController {
           String realm,
       @Parameter(description = "User's id to change password", required = true) @PathVariable("id")
           String id) {
-    return changePasswordByStorage(pcr, realm, null, id);
+    return changePassword(pcr, realm, null, id);
   }
 
-  @PostMapping(path = {"/{realm}/{storage}/users/{id}/initPassword"})
+  @PostMapping(path = {"/realm/{realm}/storage/{storage}/users/{id}/initPassword"})
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
   @Operation(summary = "Initialize user's password with a random generated password")
   @ApiResponses(
@@ -199,7 +199,7 @@ public class CredentialsController {
             description = "Something went wrong",
             content = {@Content(mediaType = "application/json")})
       })
-  public ResponseEntity<Void> initPasswordByStorage(
+  public ResponseEntity<Void> initPassword(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -227,7 +227,7 @@ public class CredentialsController {
     }
   }
 
-  @PostMapping(path = {"/{realm}/users/{id}/initPassword"})
+  @PostMapping(path = {"/realm/{realm}/users/{id}/initPassword"})
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
   @Operation(summary = "Initialize user's password with a random generated password")
   @ApiResponses(
@@ -255,11 +255,11 @@ public class CredentialsController {
       @Parameter(description = "Way to send password", required = false)
           @RequestParam(value = "sendModes", required = false)
           List<SendMode> sendMode) {
-    return initPasswordByStorage(realm, null, id, pcr, sendMode);
+    return initPassword(realm, null, id, pcr, sendMode);
   }
 
   @PostMapping(
-      path = {"/{realm}/{storage}/users/{id}/validate-password"},
+      path = {"/realm/{realm}/storage/{storage}/users/{id}/validate-password"},
       consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
   @Operation(summary = "Check if provided password is the user's one")
@@ -274,7 +274,7 @@ public class CredentialsController {
             description = "Invalid password",
             content = {@Content(mediaType = "application/json")})
       })
-  public ResponseEntity<Void> validatePasswordByStorage(
+  public ResponseEntity<Void> validatePassword(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -304,7 +304,7 @@ public class CredentialsController {
   }
 
   @PostMapping(
-      path = {"/{realm}/users/{id}/validate-password"},
+      path = {"/realm/{realm}/users/{id}/validate-password"},
       consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
   @Operation(summary = "Check if provided password is the user's one")
@@ -333,6 +333,6 @@ public class CredentialsController {
               required = true)
           @RequestParam
           MultiValueMap<String, String> params) {
-    return validatePasswordByStorage(realm, null, id, params);
+    return validatePassword(realm, null, id, params);
   }
 }

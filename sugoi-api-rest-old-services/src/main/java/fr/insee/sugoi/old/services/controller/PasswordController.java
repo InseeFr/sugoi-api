@@ -14,7 +14,13 @@
 package fr.insee.sugoi.old.services.controller;
 
 import fr.insee.sugoi.core.service.PasswordService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1")
+@Tag(name = "[Deprecated] - Utils")
 @SecurityRequirement(name = "basic")
 public class PasswordController {
 
@@ -36,8 +43,24 @@ public class PasswordController {
   @GetMapping(
       value = "/password",
       produces = {MediaType.TEXT_PLAIN_VALUE})
+  @Operation(summary = "Generate a list of random password", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Generated list password",
+            content = {@Content(mediaType = "text/plain")}),
+        @ApiResponse(
+            responseCode = "400",
+            description = "length attributes is not big enought",
+            content = {@Content(mediaType = "text/plain")}),
+      })
   public ResponseEntity<?> generatePasswords(
-      @RequestParam("nb") int nb, @RequestParam("length") int length) {
+      @Parameter(description = "Number of password wanted", required = true) @RequestParam("nb")
+          int nb,
+      @Parameter(description = "Minimun length of a password", required = true)
+          @RequestParam("length")
+          int length) {
     if (length < TAILLE_MINIMALE_PASSWORD) {
       return new ResponseEntity<>(
           "Le paramètre length est obligatoire et doit être supérieur ou égal à "

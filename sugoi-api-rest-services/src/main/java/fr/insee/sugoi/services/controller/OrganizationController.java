@@ -57,7 +57,7 @@ public class OrganizationController {
   @Autowired private OrganizationService organizationService;
 
   @GetMapping(
-      path = {"/{realm}/{storage}/organizations"},
+      path = {"/realm/{realm}/storage/{storage}/organizations"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
   @Operation(summary = "Search organizations by parameters")
@@ -72,7 +72,7 @@ public class OrganizationController {
                   schema = @Schema(implementation = PageResult.class))
             })
       })
-  public ResponseEntity<?> getOrganizationsByStorage(
+  public ResponseEntity<?> getOrganizations(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -120,7 +120,7 @@ public class OrganizationController {
   }
 
   @GetMapping(
-      path = {"/{realm}/organizations"},
+      path = {"/realm/{realm}/organizations"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
   @Operation(summary = "Search organizations by parameters")
@@ -155,11 +155,11 @@ public class OrganizationController {
       @Parameter(description = "Default search can be AND or OR", required = true)
           @RequestParam(name = "typeRecherche", defaultValue = "AND", required = true)
           SearchType typeRecherche) {
-    return getOrganizationsByStorage(realm, null, identifiant, size, offset, typeRecherche);
+    return getOrganizations(realm, null, identifiant, size, offset, typeRecherche);
   }
 
   @PostMapping(
-      value = {"/{realm}/organizations", "/{realm}/{storage}/organizations"},
+      value = {"/realm/{realm}/organizations", "/realm/{realm}/storage/{storage}/organizations"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Create a new organization")
@@ -179,7 +179,7 @@ public class OrganizationController {
             content = {@Content(mediaType = "application/json")})
       })
   @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
-  public ResponseEntity<Organization> createOrganizationsByStorage(
+  public ResponseEntity<Organization> createOrganizations(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -210,7 +210,7 @@ public class OrganizationController {
   }
 
   @PostMapping(
-      value = {"/{realm}/organizations"},
+      value = {"/realm/{realm}/organizations"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Create a new organization")
@@ -238,11 +238,11 @@ public class OrganizationController {
           String realm,
       @Parameter(description = "Organization to create", required = false) @RequestBody
           Organization organization) {
-    return createOrganizationsByStorage(realm, null, organization);
+    return createOrganizations(realm, null, organization);
   }
 
   @PutMapping(
-      value = {"/{realm}/{storage}/organizations/{id}"},
+      value = {"/realm/{realm}/storage/{storage}/organizations/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
@@ -266,7 +266,7 @@ public class OrganizationController {
             description = "id in path and body are not equals",
             content = {@Content(mediaType = "application/json")})
       })
-  public ResponseEntity<?> updateOrganizationsByStorage(
+  public ResponseEntity<?> updateOrganizations(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -299,7 +299,7 @@ public class OrganizationController {
   }
 
   @PutMapping(
-      value = {"/{realm}/organizations/{id}"},
+      value = {"/realm/{realm}/organizations/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
@@ -333,11 +333,11 @@ public class OrganizationController {
           String id,
       @Parameter(description = "Organization to update", required = false) @RequestBody
           Organization organization) {
-    return updateOrganizationsByStorage(realm, null, id, organization);
+    return updateOrganizations(realm, null, id, organization);
   }
 
   @DeleteMapping(
-      value = {"/{realm}/{storage}/organizations/{id}"},
+      value = {"/realm/{realm}/storage/{storage}/organizations/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
   @Operation(summary = "Delete organization")
@@ -352,7 +352,7 @@ public class OrganizationController {
             description = "Organization does'nt exist",
             content = {@Content(mediaType = "application/json")})
       })
-  public ResponseEntity<String> deleteOrganizationsByStorage(
+  public ResponseEntity<String> deleteOrganizations(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -375,7 +375,7 @@ public class OrganizationController {
   }
 
   @DeleteMapping(
-      value = {"/{realm}/organizations/{id}"},
+      value = {"/realm/{realm}/organizations/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
   @Operation(summary = "Delete organization")
@@ -398,11 +398,11 @@ public class OrganizationController {
           String realm,
       @Parameter(description = "Organization's id to delete", required = false) @PathVariable("id")
           String id) {
-    return deleteOrganizationsByStorage(realm, null, id);
+    return deleteOrganizations(realm, null, id);
   }
 
   @GetMapping(
-      path = {"/{realm}/{storage}/organizations/{orgId}"},
+      path = {"/realm/{realm}/storage/{storage}/organizations/{orgId}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get organization by identifiant")
   @ApiResponses(
@@ -417,7 +417,7 @@ public class OrganizationController {
             content = {@Content(mediaType = "application/json")})
       })
   @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
-  public ResponseEntity<Organization> getOrganizationByIdByStorage(
+  public ResponseEntity<Organization> getOrganizationById(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -440,7 +440,7 @@ public class OrganizationController {
   }
 
   @GetMapping(
-      path = {"/{realm}/organizations/{orgId}"},
+      path = {"/realm/{realm}/organizations/{orgId}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get organization by identifiant")
   @ApiResponses(
@@ -464,6 +464,6 @@ public class OrganizationController {
       @Parameter(description = "Organization's id to search", required = false)
           @PathVariable("orgId")
           String id) {
-    return getOrganizationByIdByStorage(realm, null, id);
+    return getOrganizationById(realm, null, id);
   }
 }

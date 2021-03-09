@@ -56,7 +56,7 @@ public class GroupController {
   @Autowired private GroupService groupService;
 
   @GetMapping(
-      path = {"/{realm}/{storage}/groups"},
+      path = {"/realm/{realm}/storage/{storage}/groups"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Search groups by parameters")
   @ApiResponses(
@@ -71,7 +71,7 @@ public class GroupController {
             })
       })
   @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
-  public ResponseEntity<PageResult<Group>> getGroupsByStorage(
+  public ResponseEntity<PageResult<Group>> getGroups(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -120,7 +120,7 @@ public class GroupController {
   }
 
   @GetMapping(
-      path = {"/{realm}/groups"},
+      path = {"/realm/{realm}/groups"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Search groups by parameters")
   @ApiResponses(
@@ -156,11 +156,11 @@ public class GroupController {
       @Parameter(description = "Offset to apply when searching", required = false)
           @RequestParam(value = "offset", defaultValue = "0")
           int offset) {
-    return getGroupsByStorage(realm, null, applicationName, description, name, size, offset);
+    return getGroups(realm, null, applicationName, description, name, size, offset);
   }
 
   @PostMapping(
-      value = {"/{realm}/{storage}/groups"},
+      value = {"/realm/{realm}/storage/{storage}/groups"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Create group in application according to parameters")
@@ -180,7 +180,7 @@ public class GroupController {
             content = {@Content(mediaType = "application/json")})
       })
   @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#storage,#applicationName)")
-  public ResponseEntity<?> createGroupsByStorage(
+  public ResponseEntity<?> createGroups(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -213,7 +213,7 @@ public class GroupController {
   }
 
   @PostMapping(
-      value = {"/{realm}/groups"},
+      value = {"/realm/{realm}/groups"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Create group in application according to parameters")
@@ -244,11 +244,11 @@ public class GroupController {
           String applicationName,
       @Parameter(description = "Group to create", required = true) @RequestBody Group group) {
 
-    return createGroupsByStorage(realm, null, applicationName, group);
+    return createGroups(realm, null, applicationName, group);
   }
 
   @PutMapping(
-      value = {"/{realm}/{storage}/groups/{id}"},
+      value = {"/realm/{realm}/storage/{storage}/groups/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Update group in application according to parameters")
@@ -272,7 +272,7 @@ public class GroupController {
             content = {@Content(mediaType = "application/json")})
       })
   @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#storage,#applicationName)")
-  public ResponseEntity<?> updateGroupsByStorage(
+  public ResponseEntity<?> updateGroups(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -306,7 +306,7 @@ public class GroupController {
   }
 
   @PutMapping(
-      value = {"/{realm}/groups/{id}"},
+      value = {"/realm/{realm}/groups/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Update group in application according to parameters")
@@ -342,11 +342,11 @@ public class GroupController {
           @RequestParam("application")
           String applicationName,
       @Parameter(description = "Group to update", required = true) @RequestBody Group group) {
-    return updateGroupsByStorage(realm, null, id, applicationName, group);
+    return updateGroups(realm, null, id, applicationName, group);
   }
 
   @DeleteMapping(
-      value = {"/{realm}/{storage}/groups/{id}"},
+      value = {"/realm/{realm}/storage/{storage}/groups/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete group in application")
   @ApiResponses(
@@ -365,7 +365,7 @@ public class GroupController {
             content = {@Content(mediaType = "application/json")})
       })
   @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#storage,#applicationName)")
-  public ResponseEntity<String> deleteGroupsByStorage(
+  public ResponseEntity<String> deleteGroups(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -391,7 +391,7 @@ public class GroupController {
   }
 
   @DeleteMapping(
-      value = {"/{realm}/groups/{id}"},
+      value = {"/realm/{realm}/groups/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete group in application")
   @ApiResponses(
@@ -421,11 +421,11 @@ public class GroupController {
           String applicationName,
       @Parameter(description = "Group's id to delete", required = true) @PathVariable("id")
           String id) {
-    return deleteGroupsByStorage(realm, null, applicationName, id);
+    return deleteGroups(realm, null, applicationName, id);
   }
 
   @GetMapping(
-      path = {"/{realm}/{storage}/groups/{groupname}"},
+      path = {"/realm/{realm}/storage/{storage}/groups/{groupname}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get group by name in an application")
   @ApiResponses(
@@ -444,7 +444,7 @@ public class GroupController {
             content = {@Content(mediaType = "application/json")})
       })
   @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
-  public ResponseEntity<Group> getGroupByGroupnameByStorage(
+  public ResponseEntity<Group> getGroupByGroupname(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -469,7 +469,7 @@ public class GroupController {
   }
 
   @GetMapping(
-      path = {"/{realm}/groups/{groupname}"},
+      path = {"/realm/{realm}/groups/{groupname}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get group by name in an application")
   @ApiResponses(
@@ -499,6 +499,6 @@ public class GroupController {
           String applicationName,
       @Parameter(description = "Group's name to search", required = true) @PathVariable("groupname")
           String id) {
-    return getGroupByGroupnameByStorage(realm, null, applicationName, id);
+    return getGroupByGroupname(realm, null, applicationName, id);
   }
 }
