@@ -59,7 +59,8 @@ public class CredentialsControllerTest {
           .thenReturn(false);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/userStorage/users/user/validate-password")
+          MockMvcRequestBuilders.post(
+                  "/realms/domaine1/storages/userStorage/users/user/validate-password")
               .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
               .param("password", "myPassword")
               .with(csrf());
@@ -84,7 +85,8 @@ public class CredentialsControllerTest {
           .thenReturn(true);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/userStorage/users/user/validate-password")
+          MockMvcRequestBuilders.post(
+                  "/realms/domaine1/storages/userStorage/users/user/validate-password")
               .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
               .param("password", "myPassword")
               .with(csrf());
@@ -109,7 +111,8 @@ public class CredentialsControllerTest {
           .thenReturn(true);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/userStorage/users/user/validate-password")
+          MockMvcRequestBuilders.post(
+                  "/realms/domaine1/storages/userStorage/users/user/validate-password")
               .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
               .param("passwordd", "myPassword")
               .with(csrf());

@@ -95,7 +95,7 @@ public class UserControllerTest {
           .thenReturn(pageResult);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/users").accept(MediaType.APPLICATION_JSON);
+          MockMvcRequestBuilders.get("/realms/domaine1/users").accept(MediaType.APPLICATION_JSON);
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
       TypeReference<PageResult<User>> mapType = new TypeReference<PageResult<User>>() {};
       PageResult<User> appRes = objectMapper.readValue(response.getContentAsString(), mapType);
@@ -133,7 +133,8 @@ public class UserControllerTest {
       Mockito.when(userService.findById("domaine1", null, "Toto")).thenReturn(user1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/users/Toto").accept(MediaType.APPLICATION_JSON);
+          MockMvcRequestBuilders.get("/realms/domaine1/users/Toto")
+              .accept(MediaType.APPLICATION_JSON);
 
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
       User res = objectMapper.readValue(response.getContentAsString(), User.class);
@@ -160,7 +161,7 @@ public class UserControllerTest {
           .thenReturn(user1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/domaine1/users/supprimemoi")
+          MockMvcRequestBuilders.delete("/realms/domaine1/users/supprimemoi")
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
@@ -183,7 +184,7 @@ public class UserControllerTest {
           .thenReturn(user1Updated);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/users/Toto")
+          MockMvcRequestBuilders.put("/realms/domaine1/users/Toto")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(user1Updated))
               .accept(MediaType.APPLICATION_JSON)
@@ -200,7 +201,7 @@ public class UserControllerTest {
       assertThat(
           "Should get location",
           response.getHeader("Location"),
-          is("http://localhost/domaine1/users/Toto"));
+          is("http://localhost/realms/domaine1/users/Toto"));
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -218,7 +219,7 @@ public class UserControllerTest {
           .thenReturn(user1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/users")
+          MockMvcRequestBuilders.post("/realms/domaine1/users")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(user1))
               .accept(MediaType.APPLICATION_JSON)
@@ -250,12 +251,13 @@ public class UserControllerTest {
                   Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
           .thenReturn(pageResult);
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/users?size=2").accept(MediaType.APPLICATION_JSON);
+          MockMvcRequestBuilders.get("/realms/domaine1/users?size=2")
+              .accept(MediaType.APPLICATION_JSON);
 
       assertThat(
           "Location header gives next page",
           mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
-          is("http://localhost/domaine1/users?size=2&offset=2"));
+          is("http://localhost/realms/domaine1/users?size=2&offset=2"));
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -274,7 +276,7 @@ public class UserControllerTest {
           .thenReturn(user1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/users")
+          MockMvcRequestBuilders.post("/realms/domaine1/users")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(user1))
               .accept(MediaType.APPLICATION_JSON)
@@ -283,7 +285,7 @@ public class UserControllerTest {
       assertThat(
           "Location header gives get uri",
           mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
-          is("http://localhost/domaine1/users/Toto"));
+          is("http://localhost/realms/domaine1/users/Toto"));
 
     } catch (Exception e1) {
       e1.printStackTrace();
@@ -297,7 +299,7 @@ public class UserControllerTest {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/users")
+          MockMvcRequestBuilders.post("/realms/domaine1/users")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(user1))
               .accept(MediaType.APPLICATION_JSON)
@@ -319,7 +321,7 @@ public class UserControllerTest {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/domaine1/users/supprimemoi")
+          MockMvcRequestBuilders.delete("/realms/domaine1/users/supprimemoi")
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
@@ -339,7 +341,7 @@ public class UserControllerTest {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/users/Toto")
+          MockMvcRequestBuilders.put("/realms/domaine1/users/Toto")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(user1))
               .accept(MediaType.APPLICATION_JSON)
@@ -365,7 +367,7 @@ public class UserControllerTest {
           .thenReturn(user1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/users")
+          MockMvcRequestBuilders.post("/realms/domaine1/users")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(user1))
               .accept(MediaType.APPLICATION_JSON)
@@ -391,7 +393,7 @@ public class UserControllerTest {
           .thenReturn(null);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/users/dontexist")
+          MockMvcRequestBuilders.get("/realms/domaine1/users/dontexist")
               .accept(MediaType.APPLICATION_JSON);
 
       assertThat(
@@ -411,7 +413,7 @@ public class UserControllerTest {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/users/dontexist")
+          MockMvcRequestBuilders.put("/realms/domaine1/users/dontexist")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(user1))
               .accept(MediaType.APPLICATION_JSON)
@@ -437,7 +439,7 @@ public class UserControllerTest {
           .thenReturn(null);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/users/Toto")
+          MockMvcRequestBuilders.put("/realms/domaine1/users/Toto")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(user1))
               .accept(MediaType.APPLICATION_JSON)
@@ -463,7 +465,7 @@ public class UserControllerTest {
           .thenReturn(null);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/domaine1/users/dontexist")
+          MockMvcRequestBuilders.delete("/realms/domaine1/users/dontexist")
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 

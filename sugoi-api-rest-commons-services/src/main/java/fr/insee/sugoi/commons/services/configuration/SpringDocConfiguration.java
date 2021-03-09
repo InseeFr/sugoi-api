@@ -53,8 +53,7 @@ public class SpringDocConfiguration {
   @Value("${fr.insee.sugoi.springdoc.contact.email:}")
   public String contactEmail;
 
-  @Autowired
-  BuildProperties buildProperties;
+  @Autowired BuildProperties buildProperties;
 
   public final String OAUTHSCHEME = "oAuth";
   public final String SCHEMEBASIC = "basic";
@@ -62,14 +61,28 @@ public class SpringDocConfiguration {
   @Bean
   public OpenAPI customOpenAPIBasicAndOIDC() {
     final OpenAPI openapi = createOpenAPI();
-    openapi.components(new Components()
-        .addSecuritySchemes(SCHEMEBASIC,
-            new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme(SCHEMEBASIC).in(SecurityScheme.In.HEADER)
-                .description("Authentification Basic"))
-        .addSecuritySchemes(OAUTHSCHEME,
-            new SecurityScheme().type(SecurityScheme.Type.OAUTH2).in(SecurityScheme.In.HEADER)
-                .description(issuerDescription).flows(new OAuthFlows().authorizationCode(new OAuthFlow()
-                    .authorizationUrl(issuerAuthorizationURL).tokenUrl(issuerTokenURL).refreshUrl(issuerRefreshURL)))));
+    openapi.components(
+        new Components()
+            .addSecuritySchemes(
+                SCHEMEBASIC,
+                new SecurityScheme()
+                    .type(SecurityScheme.Type.HTTP)
+                    .scheme(SCHEMEBASIC)
+                    .in(SecurityScheme.In.HEADER)
+                    .description("Authentification Basic"))
+            .addSecuritySchemes(
+                OAUTHSCHEME,
+                new SecurityScheme()
+                    .type(SecurityScheme.Type.OAUTH2)
+                    .in(SecurityScheme.In.HEADER)
+                    .description(issuerDescription)
+                    .flows(
+                        new OAuthFlows()
+                            .authorizationCode(
+                                new OAuthFlow()
+                                    .authorizationUrl(issuerAuthorizationURL)
+                                    .tokenUrl(issuerTokenURL)
+                                    .refreshUrl(issuerRefreshURL)))));
     return openapi;
   }
 
@@ -79,11 +92,19 @@ public class SpringDocConfiguration {
     if (contactEmail != null) {
       contact = contact.email(contactEmail).name(contactEmail);
     }
-    final OpenAPI openapi = new OpenAPI().info(new Info().title("Swagger SUGOI")
-        .description("Sugoi aims to provide a tool to manage users with multi tenancy in mind.")
-        .version(buildProperties.getVersion())
-        .license(new License().name("Apache 2.0").url("http://www.apache.org/licenses/LICENSE-2.0.html"))
-        .contact(contact));
+    final OpenAPI openapi =
+        new OpenAPI()
+            .info(
+                new Info()
+                    .title("Swagger SUGOI")
+                    .description(
+                        "Sugoi aims to provide a tool to manage users with multi tenancy in mind.")
+                    .version(buildProperties.getVersion())
+                    .license(
+                        new License()
+                            .name("Apache 2.0")
+                            .url("http://www.apache.org/licenses/LICENSE-2.0.html"))
+                    .contact(contact));
 
     return openapi;
   }
@@ -91,7 +112,8 @@ public class SpringDocConfiguration {
   @Bean
   public OperationCustomizer addAuth() {
     return (operation, handlerMethod) -> {
-      return operation.addSecurityItem(new SecurityRequirement().addList(SCHEMEBASIC))
+      return operation
+          .addSecurityItem(new SecurityRequirement().addList(SCHEMEBASIC))
           .addSecurityItem(new SecurityRequirement().addList(OAUTHSCHEME));
     };
   }

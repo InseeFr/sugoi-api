@@ -29,7 +29,9 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "basic")
 public class IdController {
 
-  @GetMapping(value = "/{id}", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+  @GetMapping(
+      value = "/{id}",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @Operation(deprecated = true)
   public ResponseEntity<?> getById(@PathVariable("id") String id) {
     return null;

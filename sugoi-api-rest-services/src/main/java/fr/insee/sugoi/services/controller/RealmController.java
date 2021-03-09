@@ -73,7 +73,7 @@ public class RealmController {
             })
       })
   public ResponseEntity<List<Realm>> getRealms(
-      @Parameter(description = "Id of the realm to search", required = true)
+      @Parameter(description = "Id of the realm to search", required = false)
           @RequestParam(name = "id", required = false)
           String id,
       Authentication authentication) {

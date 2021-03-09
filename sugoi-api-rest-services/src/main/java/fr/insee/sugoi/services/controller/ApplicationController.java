@@ -56,7 +56,7 @@ public class ApplicationController {
   @Autowired private ApplicationService applicationService;
 
   @GetMapping(
-      path = {"/realm/{realm}/storage/{storage}/applications"},
+      path = {"/realms/{realm}/storages/{storage}/applications"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Search applications by parameter")
   @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
@@ -118,7 +118,7 @@ public class ApplicationController {
   }
 
   @GetMapping(
-      path = {"/realm/{realm}/applications"},
+      path = {"/realms/{realm}/applications"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Search applications by parameter")
   @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
@@ -155,7 +155,7 @@ public class ApplicationController {
   }
 
   @PostMapping(
-      value = {"/realm/{realm}/storage/{storage}/applications"},
+      value = {"/realms/{realm}/storages/{storage}/applications"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Create application")
@@ -206,7 +206,7 @@ public class ApplicationController {
   }
 
   @PostMapping(
-      value = {"/realm/{realm}/applications"},
+      value = {"/realms/{realm}/applications"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Create application")
@@ -238,7 +238,7 @@ public class ApplicationController {
   }
 
   @PutMapping(
-      value = {"/realm/{realm}/storage/{storage}/applications/{id}"},
+      value = {"/realms/{realm}/storages/{storage}/applications/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Update application")
@@ -292,7 +292,7 @@ public class ApplicationController {
   }
 
   @PutMapping(
-      value = {"/realm/{realm}/applications/{id}"},
+      value = {"/realms/{realm}/applications/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Update application")
@@ -326,7 +326,7 @@ public class ApplicationController {
   }
 
   @DeleteMapping(
-      value = {"/realm/{realm}/storage/{storage}/applications/{id}"},
+      value = {"/realms/{realm}/storages/{storage}/applications/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete application")
   @ApiResponses(
@@ -364,7 +364,7 @@ public class ApplicationController {
   }
 
   @DeleteMapping(
-      value = {"/realm/{realm}/applications/{id}"},
+      value = {"/realms/{realm}/applications/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete application")
   @ApiResponses(
@@ -391,7 +391,7 @@ public class ApplicationController {
   }
 
   @GetMapping(
-      path = {"/realm/{realm}/storage/{storage}/applications/{name}"},
+      path = {"/realms/{realm}/storages/{storage}/applications/{name}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get application by name")
   @ApiResponses(
@@ -432,7 +432,7 @@ public class ApplicationController {
   }
 
   @GetMapping(
-      path = {"/realm/{realm}/applications/{name}"},
+      path = {"/realms/{realm}/applications/{name}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get application by name")
   @ApiResponses(

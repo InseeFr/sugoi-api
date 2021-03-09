@@ -93,7 +93,8 @@ public class OrganizationControllerTest {
           .thenReturn(pageResult);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/organizations").accept(MediaType.APPLICATION_JSON);
+          MockMvcRequestBuilders.get("/realms/domaine1/organizations")
+              .accept(MediaType.APPLICATION_JSON);
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
       TypeReference<PageResult<Organization>> mapType =
           new TypeReference<PageResult<Organization>>() {};
@@ -130,7 +131,7 @@ public class OrganizationControllerTest {
           .thenReturn(organization1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/organizations/BigOrga")
+          MockMvcRequestBuilders.get("/realms/domaine1/organizations/BigOrga")
               .accept(MediaType.APPLICATION_JSON);
 
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
@@ -156,7 +157,7 @@ public class OrganizationControllerTest {
           .thenReturn(organization1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/domaine1/organizations/supprimemoi")
+          MockMvcRequestBuilders.delete("/realms/domaine1/organizations/supprimemoi")
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
@@ -179,7 +180,7 @@ public class OrganizationControllerTest {
           .thenReturn(organization2Updated);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/organizations/SimpleOrga")
+          MockMvcRequestBuilders.put("/realms/domaine1/organizations/SimpleOrga")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(organization2Updated))
               .accept(MediaType.APPLICATION_JSON)
@@ -199,7 +200,7 @@ public class OrganizationControllerTest {
       assertThat(
           "Should get location",
           response.getHeader("Location"),
-          is("http://localhost/domaine1/organizations/SimpleOrga"));
+          is("http://localhost/realms/domaine1/organizations/SimpleOrga"));
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -217,7 +218,7 @@ public class OrganizationControllerTest {
           .thenReturn(organization1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/organizations")
+          MockMvcRequestBuilders.post("/realms/domaine1/organizations")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(organization1))
               .accept(MediaType.APPLICATION_JSON)
@@ -251,13 +252,13 @@ public class OrganizationControllerTest {
                   Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
           .thenReturn(pageResult);
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/organizations?size=2")
+          MockMvcRequestBuilders.get("/realms/domaine1/organizations?size=2")
               .accept(MediaType.APPLICATION_JSON);
 
       assertThat(
           "Location header gives next page",
           mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
-          is("http://localhost/domaine1/organizations?size=2&offset=2"));
+          is("http://localhost/realms/domaine1/organizations?size=2&offset=2"));
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -275,7 +276,7 @@ public class OrganizationControllerTest {
           .thenReturn(organization1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/organizations")
+          MockMvcRequestBuilders.post("/realms/domaine1/organizations")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(organization1))
               .accept(MediaType.APPLICATION_JSON)
@@ -284,7 +285,7 @@ public class OrganizationControllerTest {
       assertThat(
           "Location header gives get uri",
           mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
-          is("http://localhost/domaine1/organizations/BigOrga"));
+          is("http://localhost/realms/domaine1/organizations/BigOrga"));
 
     } catch (Exception e1) {
       e1.printStackTrace();
@@ -298,7 +299,7 @@ public class OrganizationControllerTest {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/organizations")
+          MockMvcRequestBuilders.post("/realms/domaine1/organizations")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(organization1))
               .accept(MediaType.APPLICATION_JSON)
@@ -320,7 +321,7 @@ public class OrganizationControllerTest {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/domaine1/organizations/supprimemoi")
+          MockMvcRequestBuilders.delete("/realms/domaine1/organizations/supprimemoi")
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
@@ -340,7 +341,7 @@ public class OrganizationControllerTest {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/organizations/BigOrga")
+          MockMvcRequestBuilders.put("/realms/domaine1/organizations/BigOrga")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(organization1))
               .accept(MediaType.APPLICATION_JSON)
@@ -366,7 +367,7 @@ public class OrganizationControllerTest {
           .thenReturn(organization1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/organizations")
+          MockMvcRequestBuilders.post("/realms/domaine1/organizations")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(organization1))
               .accept(MediaType.APPLICATION_JSON)
@@ -391,7 +392,7 @@ public class OrganizationControllerTest {
       Mockito.when(organizationService.findById("domaine1", null, "dontexist")).thenReturn(null);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/organizations/dontexist")
+          MockMvcRequestBuilders.get("/realms/domaine1/organizations/dontexist")
               .accept(MediaType.APPLICATION_JSON);
 
       assertThat(
@@ -411,7 +412,7 @@ public class OrganizationControllerTest {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/organizations/dontexist")
+          MockMvcRequestBuilders.put("/realms/domaine1/organizations/dontexist")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(organization1))
               .accept(MediaType.APPLICATION_JSON)
@@ -436,7 +437,7 @@ public class OrganizationControllerTest {
       Mockito.when(organizationService.findById("domaine1", null, "BigOrga")).thenReturn(null);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/organizations/BigOrga")
+          MockMvcRequestBuilders.put("/realms/domaine1/organizations/BigOrga")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(organization1))
               .accept(MediaType.APPLICATION_JSON)
@@ -461,7 +462,7 @@ public class OrganizationControllerTest {
       Mockito.when(organizationService.findById("domaine1", null, "dontexist")).thenReturn(null);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/domaine1/organizations/dontexist")
+          MockMvcRequestBuilders.delete("/realms/domaine1/organizations/dontexist")
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 

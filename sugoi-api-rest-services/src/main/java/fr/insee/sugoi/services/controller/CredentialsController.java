@@ -50,7 +50,7 @@ public class CredentialsController {
 
   @Autowired private CredentialsService credentialsService;
 
-  @PostMapping(path = {"/realm/{realm}/storage/{storage}/users/{id}/reinitPassword"})
+  @PostMapping(path = {"/realms/{realm}/storages/{storage}/users/{id}/reinitPassword"})
   @Operation(summary = "Reinitialize the password of the user")
   @ApiResponses(
       value = {
@@ -91,7 +91,7 @@ public class CredentialsController {
     }
   }
 
-  @PostMapping(path = {"/realm/{realm}/users/{id}/reinitPassword"})
+  @PostMapping(path = {"/realms/{realm}/users/{id}/reinitPassword"})
   @Operation(summary = "Reinitialize the password of the user")
   @ApiResponses(
       value = {
@@ -121,7 +121,7 @@ public class CredentialsController {
     return reinitPassword(pcr, realm, null, id, sendMode);
   }
 
-  @PostMapping(path = {"/realm/{realm}/storage/{storage}/users/{id}/changePassword"})
+  @PostMapping(path = {"/realms/{realm}/storages/{storage}/users/{id}/changePassword"})
   @Operation(summary = "Change user password with the new one provided")
   @ApiResponses(
       value = {
@@ -136,7 +136,7 @@ public class CredentialsController {
       })
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
   public ResponseEntity<Void> changePassword(
-      @Parameter(description = "Password change request&", required = true) @RequestBody
+      @Parameter(description = "Password change request", required = true) @RequestBody
           PasswordChangeRequest pcr,
       @Parameter(
               description = "Name of the realm where the operation will be made",
@@ -145,8 +145,8 @@ public class CredentialsController {
           String realm,
       @Parameter(
               description = "Name of the userStorage where the operation will be made",
-              required = false)
-          @PathVariable(value = "storage", required = false)
+              required = true)
+          @PathVariable(value = "storage", required = true)
           String userStorage,
       @Parameter(description = "User's id to change password", required = true) @PathVariable("id")
           String id) {
@@ -158,7 +158,7 @@ public class CredentialsController {
     }
   }
 
-  @PostMapping(path = {"/realm/{realm}/users/{id}/changePassword"})
+  @PostMapping(path = {"/realms/{realm}/users/{id}/changePassword"})
   @Operation(summary = "Change user password with the new one provided")
   @ApiResponses(
       value = {
@@ -185,7 +185,7 @@ public class CredentialsController {
     return changePassword(pcr, realm, null, id);
   }
 
-  @PostMapping(path = {"/realm/{realm}/storage/{storage}/users/{id}/initPassword"})
+  @PostMapping(path = {"/realms/{realm}/storages/{storage}/users/{id}/initPassword"})
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
   @Operation(summary = "Initialize user's password with a random generated password")
   @ApiResponses(
@@ -227,7 +227,7 @@ public class CredentialsController {
     }
   }
 
-  @PostMapping(path = {"/realm/{realm}/users/{id}/initPassword"})
+  @PostMapping(path = {"/realms/{realm}/users/{id}/initPassword"})
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
   @Operation(summary = "Initialize user's password with a random generated password")
   @ApiResponses(
@@ -259,7 +259,7 @@ public class CredentialsController {
   }
 
   @PostMapping(
-      path = {"/realm/{realm}/storage/{storage}/users/{id}/validate-password"},
+      path = {"/realms/{realm}/storages/{storage}/users/{id}/validate-password"},
       consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
   @Operation(summary = "Check if provided password is the user's one")
@@ -304,7 +304,7 @@ public class CredentialsController {
   }
 
   @PostMapping(
-      path = {"/realm/{realm}/users/{id}/validate-password"},
+      path = {"/realms/{realm}/users/{id}/validate-password"},
       consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
   @Operation(summary = "Check if provided password is the user's one")

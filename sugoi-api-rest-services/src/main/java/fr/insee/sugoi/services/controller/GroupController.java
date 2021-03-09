@@ -56,7 +56,7 @@ public class GroupController {
   @Autowired private GroupService groupService;
 
   @GetMapping(
-      path = {"/realm/{realm}/storage/{storage}/groups"},
+      path = {"/realms/{realm}/storages/{storage}/groups"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Search groups by parameters")
   @ApiResponses(
@@ -120,7 +120,7 @@ public class GroupController {
   }
 
   @GetMapping(
-      path = {"/realm/{realm}/groups"},
+      path = {"/realms/{realm}/groups"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Search groups by parameters")
   @ApiResponses(
@@ -160,7 +160,7 @@ public class GroupController {
   }
 
   @PostMapping(
-      value = {"/realm/{realm}/storage/{storage}/groups"},
+      value = {"/realms/{realm}/storages/{storage}/groups"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Create group in application according to parameters")
@@ -213,7 +213,7 @@ public class GroupController {
   }
 
   @PostMapping(
-      value = {"/realm/{realm}/groups"},
+      value = {"/realms/{realm}/groups"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Create group in application according to parameters")
@@ -248,7 +248,7 @@ public class GroupController {
   }
 
   @PutMapping(
-      value = {"/realm/{realm}/storage/{storage}/groups/{id}"},
+      value = {"/realms/{realm}/storages/{storage}/groups/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Update group in application according to parameters")
@@ -306,7 +306,7 @@ public class GroupController {
   }
 
   @PutMapping(
-      value = {"/realm/{realm}/groups/{id}"},
+      value = {"/realms/{realm}/groups/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Update group in application according to parameters")
@@ -346,7 +346,7 @@ public class GroupController {
   }
 
   @DeleteMapping(
-      value = {"/realm/{realm}/storage/{storage}/groups/{id}"},
+      value = {"/realms/{realm}/storages/{storage}/groups/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete group in application")
   @ApiResponses(
@@ -391,7 +391,7 @@ public class GroupController {
   }
 
   @DeleteMapping(
-      value = {"/realm/{realm}/groups/{id}"},
+      value = {"/realms/{realm}/groups/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete group in application")
   @ApiResponses(
@@ -425,7 +425,7 @@ public class GroupController {
   }
 
   @GetMapping(
-      path = {"/realm/{realm}/storage/{storage}/groups/{groupname}"},
+      path = {"/realms/{realm}/storages/{storage}/groups/{groupname}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get group by name in an application")
   @ApiResponses(
@@ -469,7 +469,7 @@ public class GroupController {
   }
 
   @GetMapping(
-      path = {"/realm/{realm}/groups/{groupname}"},
+      path = {"/realms/{realm}/groups/{groupname}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get group by name in an application")
   @ApiResponses(

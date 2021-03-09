@@ -44,61 +44,98 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "basic")
 public class ProfilController {
 
-    @Autowired
-    private ConfigService configService;
+  @Autowired private ConfigService configService;
 
-    /**
-     * Get a profile by its name
-     *
-     * @param nom
-     * @return OK with the wanted profile
-     */
-    @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
-    @GetMapping(value = "/{nom}", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
-    @Operation(summary = "Get a profile by its name", deprecated = true)
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Profile found", content = {
-            @Content(mediaType = "application/json", schema = @Schema(implementation = Profil.class)),
-            @Content(mediaType = "application/xml", schema = @Schema(implementation = Profil.class)) }), })
-    public ResponseEntity<?> getProfil(
-            @Parameter(description = "Name of the profil to search", required = true) @PathVariable(name = "nom", required = true) String nom) {
-        Realm realm = configService.getRealm(nom);
-        Profil profil = ResponseUtils.convertRealmToProfils(realm).get(0);
-        return new ResponseEntity<>(profil, HttpStatus.OK);
-    }
+  /**
+   * Get a profile by its name
+   *
+   * @param nom
+   * @return OK with the wanted profile
+   */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
+  @GetMapping(
+      value = "/{nom}",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Get a profile by its name", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Profile found",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Profil.class)),
+              @Content(
+                  mediaType = "application/xml",
+                  schema = @Schema(implementation = Profil.class))
+            }),
+      })
+  public ResponseEntity<?> getProfil(
+      @Parameter(description = "Name of the profil to search", required = true)
+          @PathVariable(name = "nom", required = true)
+          String nom) {
+    Realm realm = configService.getRealm(nom);
+    Profil profil = ResponseUtils.convertRealmToProfils(realm).get(0);
+    return new ResponseEntity<>(profil, HttpStatus.OK);
+  }
 
-    /**
-     * Update a profile
-     *
-     * @param profil
-     * @return null
-     */
-    @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
-    @PutMapping(value = "/", consumes = { MediaType.APPLICATION_XML_VALUE,
-            MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
-                    MediaType.APPLICATION_JSON_VALUE })
-    @Operation(summary = "Update a profile", deprecated = true)
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Profile successfully created or updated", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Profil.class)),
-                    @Content(mediaType = "application/xml", schema = @Schema(implementation = Profil.class)) }) })
-    public ResponseEntity<?> createOrModifyProfil(
-            @Parameter(description = "The profil to update/create", required = true) @RequestBody Profil profil) {
-        return null;
-    }
+  /**
+   * Update a profile
+   *
+   * @param profil
+   * @return null
+   */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
+  @PutMapping(
+      value = "/",
+      consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Update a profile", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Profile successfully created or updated",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Profil.class)),
+              @Content(
+                  mediaType = "application/xml",
+                  schema = @Schema(implementation = Profil.class))
+            })
+      })
+  public ResponseEntity<?> createOrModifyProfil(
+      @Parameter(description = "The profil to update/create", required = true) @RequestBody
+          Profil profil) {
+    return null;
+  }
 
-    /**
-     * Delete a profil by its name
-     *
-     * @param nom
-     * @return null
-     */
-    @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
-    @DeleteMapping(value = "/nom", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
-    @Operation(summary = "Delete a profile", deprecated = true)
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Profile successfully deleted", content = {
-            @Content(mediaType = "application/json"), @Content(mediaType = "application/xml") }) })
-    public ResponseEntity<?> deleteProfil(
-            @Parameter(description = "Name of the profil to delete", required = true) @PathVariable("nom") String nom) {
-        return null;
-    }
+  /**
+   * Delete a profil by its name
+   *
+   * @param nom
+   * @return null
+   */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
+  @DeleteMapping(
+      value = "/nom",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Delete a profile", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Profile successfully deleted",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
+  public ResponseEntity<?> deleteProfil(
+      @Parameter(description = "Name of the profil to delete", required = true) @PathVariable("nom")
+          String nom) {
+    return null;
+  }
 }

@@ -58,7 +58,7 @@ public class UserController {
   @Autowired private UserService userService;
 
   @GetMapping(
-      path = {"/realm/{realm}/storage/{storage}/users"},
+      path = {"/realms/{realm}/storages/{storage}/users"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Search users according to parameters")
   @ApiResponses(
@@ -154,7 +154,7 @@ public class UserController {
   }
 
   @GetMapping(
-      path = {"/realm/{realm}/users"},
+      path = {"/realms/{realm}/users"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Search users according to parameters")
   @ApiResponses(
@@ -221,7 +221,7 @@ public class UserController {
   }
 
   @PostMapping(
-      value = {"/realm/{realm}/storage/{storage}/users"},
+      value = {"/realms/{realm}/storages/{storage}/users"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Create user")
@@ -272,7 +272,7 @@ public class UserController {
   }
 
   @PostMapping(
-      value = {"/realm/{realm}/users"},
+      value = {"/realms/{realm}/users"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Create user")
@@ -303,7 +303,7 @@ public class UserController {
   }
 
   @PutMapping(
-      value = {"/realm/{realm}/storage/{storage}/users/{id}"},
+      value = {"/realms/{realm}/storages/{storage}/users/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Update user")
@@ -358,7 +358,7 @@ public class UserController {
   }
 
   @PutMapping(
-      value = {"/realm/{realm}/users/{id}"},
+      value = {"/realms/{realm}/users/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Update user")
@@ -396,7 +396,7 @@ public class UserController {
   }
 
   @DeleteMapping(
-      value = {"/realm/{realm}/storage/{storage}/users/{id}"},
+      value = {"/realms/{realm}/storages/{storage}/users/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete user")
   @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
@@ -438,7 +438,7 @@ public class UserController {
   }
 
   @DeleteMapping(
-      value = {"/realm/{realm}/users/{id}"},
+      value = {"/realms/{realm}/users/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete user")
   @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
@@ -470,7 +470,7 @@ public class UserController {
   }
 
   @GetMapping(
-      path = {"/realm/{realm}/storage/{storage}/users/{username}"},
+      path = {"/realms/{realm}/storages/{storage}/users/{username}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get user by username")
   @ApiResponses(
@@ -507,7 +507,7 @@ public class UserController {
   }
 
   @GetMapping(
-      path = {"/realm/{realm}/users/{username}"},
+      path = {"/realms/{realm}/users/{username}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get user by username")
   @ApiResponses(

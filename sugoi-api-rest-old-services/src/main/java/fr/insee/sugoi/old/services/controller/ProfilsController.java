@@ -41,8 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "basic")
 public class ProfilsController {
 
-  @Autowired
-  private ConfigService configService;
+  @Autowired private ConfigService configService;
 
   /**
    * Get all profiles
@@ -50,16 +49,34 @@ public class ProfilsController {
    * @return Ok with a list of all available profiles
    */
   @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
-  @GetMapping(value = "/", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+  @GetMapping(
+      value = "/",
+      produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get all profiles", deprecated = true)
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Profile found", content = {
-      @Content(mediaType = "application/json", schema = @Schema(implementation = Profils.class)),
-      @Content(mediaType = "application/xml", schema = @Schema(implementation = Profils.class)) }), })
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Profile found",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Profils.class)),
+              @Content(
+                  mediaType = "application/xml",
+                  schema = @Schema(implementation = Profils.class))
+            }),
+      })
   public ResponseEntity<?> getProfils() {
     List<Realm> realms = configService.getRealms();
     Profils profils = new Profils();
-    profils.getListe().addAll(realms.stream().map(realm -> ResponseUtils.convertRealmToProfils(realm))
-        .flatMap(List::stream).collect(Collectors.toList()));
+    profils
+        .getListe()
+        .addAll(
+            realms.stream()
+                .map(realm -> ResponseUtils.convertRealmToProfils(realm))
+                .flatMap(List::stream)
+                .collect(Collectors.toList()));
     return new ResponseEntity<>(profils, HttpStatus.OK);
   }
 }

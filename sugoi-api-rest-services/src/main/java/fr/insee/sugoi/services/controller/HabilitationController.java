@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HabilitationController {
 
   @GetMapping(
-      path = {"/realm/{realm}/habilitations", "/realm/{realm}/storage/{storage}/habilitations"},
+      path = {"/realms/{realm}/habilitations", "/realms/{realm}/storages/{storage}/habilitations"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
   public ResponseEntity<?> getHabilitations(
@@ -52,7 +52,7 @@ public class HabilitationController {
   }
 
   @PostMapping(
-      value = {"/realm/{realm}/habilitations", "/realm/{realm}/storage/{storage}/habilitations"},
+      value = {"/realms/{realm}/habilitations", "/realms/{realm}/storages/{storage}/habilitations"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
@@ -67,8 +67,8 @@ public class HabilitationController {
 
   @PutMapping(
       value = {
-        "/realm/{realm}/habilitations/{id}",
-        "/realm/{realm}/storage/{storage}/habilitations/{id}"
+        "/realms/{realm}/habilitations/{id}",
+        "/realms/{realm}/storages/{storage}/habilitations/{id}"
       },
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -85,8 +85,8 @@ public class HabilitationController {
 
   @DeleteMapping(
       value = {
-        "/realm/{realm}/habilitations/{id}",
-        "/realm/{realm}/storage/{storage}/habilitations/{id}"
+        "/realms/{realm}/habilitations/{id}",
+        "/realms/{realm}/storages/{storage}/habilitations/{id}"
       },
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
