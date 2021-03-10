@@ -71,11 +71,14 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
       LDAPConnectionPool ldapConnection = initLdapPoolConnection();
       SearchResultEntry realmEntry =
           ldapConnection.getEntry(realmEntryPattern.replace("{realm}", realmName) + "," + baseDn);
-      logger.debug("Found entry {}", realmEntry.getDN());
-      Realm realm = RealmLdapMapper.mapFromSearchEntry(realmEntry);
-      logger.debug("Parsing as realm {}", realm);
-      realm.setUserStorages(loadUserStorages(realmEntry, ldapConnection));
-      return realm;
+      if (realmEntry != null) {
+        logger.debug("Found entry {}", realmEntry.getDN());
+        Realm realm = RealmLdapMapper.mapFromSearchEntry(realmEntry);
+        logger.debug("Parsing as realm {}", realm);
+        realm.setUserStorages(loadUserStorages(realmEntry, ldapConnection));
+        return realm;
+      }
+      return null;
     } catch (Exception e) {
       e.printStackTrace();
       throw new RealmNotFoundException("Erreur lors du chargement du realm " + realmName);
