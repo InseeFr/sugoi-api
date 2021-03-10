@@ -21,4 +21,10 @@ public interface ConfigService {
   Realm getRealm(String name);
 
   List<Realm> getRealms();
+
+  void deleteRealm(String nom);
+
+  void updateRealm(Realm serializeToSugoi);
+
+  void createRealm(Realm serializeToSugoi);
 }

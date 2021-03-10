@@ -46,4 +46,22 @@ public class ConfigServiceImpl implements ConfigService {
     sugoiEventPublisher.publishCustomEvent(null, null, SugoiEventTypeEnum.FIND_REALMS, null);
     return realmProvider.findAll();
   }
+
+  @Override
+  public void deleteRealm(String realmName) {
+    sugoiEventPublisher.publishCustomEvent(null, null, SugoiEventTypeEnum.DELETE_REALM, null);
+    realmProvider.deleteRealm(realmName);
+  }
+
+  @Override
+  public void updateRealm(Realm realm) {
+    sugoiEventPublisher.publishCustomEvent(null, null, SugoiEventTypeEnum.UPDATE_REALM, null);
+    realmProvider.updateRealm(realm);
+  }
+
+  @Override
+  public void createRealm(Realm realm) {
+    sugoiEventPublisher.publishCustomEvent(null, null, SugoiEventTypeEnum.CREATE_REALM, null);
+    realmProvider.createRealm(realm);
+  }
 }

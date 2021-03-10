@@ -17,11 +17,14 @@ import fr.insee.sugoi.converter.ouganext.Adresse;
 import fr.insee.sugoi.converter.ouganext.Application;
 import fr.insee.sugoi.converter.ouganext.Habilitations;
 import fr.insee.sugoi.converter.ouganext.Organisation;
+import fr.insee.sugoi.converter.ouganext.Profil;
 import fr.insee.sugoi.converter.ouganext.Role;
 import fr.insee.sugoi.converter.utils.MapFromAttribute;
 import fr.insee.sugoi.converter.utils.MapFromHashmapElement;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.UserStorage;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -285,5 +288,22 @@ public class OuganextSugoiMapper {
     List<Application> applicationList = new ArrayList<Application>(applications.values());
     habilitationsOuganext.setApplicationList(applicationList);
     return habilitationsOuganext;
+  }
+
+  /**
+   * This function is used to address the specificity of profil converting such as : - the name
+   * which must be extracted from the pattern (which is ouganext pattern :
+   * Profil_{realm}_WebservicesLdap) - the UserStorage which takes several values from profil
+   */
+  public Realm convertProfilToRealm(Profil profil) {
+    // fields can be treated the usual way on Profil
+    Realm realm = serializeToSugoi(profil, Realm.class);
+    UserStorage userStorage = new UserStorage();
+    userStorage.setOrganizationSource(profil.getBrancheOrganisation());
+    userStorage.setAddressSource(profil.getBrancheAdresse());
+    userStorage.setUserSource(profil.getBrancheContact());
+    realm.setUserStorages(List.of(userStorage));
+    realm.setName(profil.getNomProfil().split("_")[1]);
+    return realm;
   }
 }

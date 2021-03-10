@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
+import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
 import fr.insee.sugoi.converter.ouganext.Profil;
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.model.Realm;
@@ -45,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProfilController {
 
   @Autowired private ConfigService configService;
+  @Autowired private OuganextSugoiMapper ouganextSugoiMapper;
 
   /**
    * Get a profile by its name
@@ -81,10 +83,10 @@ public class ProfilController {
   }
 
   /**
-   * Update a profile
+   * Update or create a profile
    *
    * @param profil
-   * @return null
+   * @return NO_CONTENT
    */
   @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
   @PutMapping(
@@ -109,18 +111,24 @@ public class ProfilController {
   public ResponseEntity<?> createOrModifyProfil(
       @Parameter(description = "The profil to update/create", required = true) @RequestBody
           Profil profil) {
-    return null;
+    Realm sugoiRealm = ouganextSugoiMapper.convertProfilToRealm(profil);
+    if (configService.getRealm(sugoiRealm.getName()) != null) {
+      configService.updateRealm(sugoiRealm);
+    } else {
+      configService.createRealm(sugoiRealm);
+    }
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   /**
    * Delete a profil by its name
    *
    * @param nom
-   * @return null
+   * @return OK
    */
   @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
   @DeleteMapping(
-      value = "/nom",
+      value = "/{nom}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete a profile", deprecated = true)
   @ApiResponses(
@@ -136,6 +144,7 @@ public class ProfilController {
   public ResponseEntity<?> deleteProfil(
       @Parameter(description = "Name of the profil to delete", required = true) @PathVariable("nom")
           String nom) {
-    return null;
+    configService.deleteRealm(nom);
+    return ResponseEntity.status(HttpStatus.OK).build();
   }
 }
