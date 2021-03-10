@@ -72,6 +72,7 @@ public class LdapUtils {
   public static List<Modification> convertAttributesToModifications(List<Attribute> attributes) {
     return attributes.stream()
         .map(attribute -> attribute.getName())
+        .filter(attributeName -> !attributeName.equalsIgnoreCase("objectClass"))
         .distinct()
         .map(
             attributeName ->
