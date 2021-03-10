@@ -23,6 +23,12 @@ import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
@@ -48,7 +54,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/v1")
-@Tag(name = "V1- Gestion des contacts")
+@Tag(name = "[Deprecated] - Gestion des contacts", description = "Old Enpoints to manage contacts")
 @SecurityRequirement(name = "basic")
 public class ContactsDomaineController {
 
@@ -65,15 +71,39 @@ public class ContactsDomaineController {
    * @param slug filled in header Slug, the id of the contact if not already used
    * @return CREATED with the link of the created contact as a header
    */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
   @PostMapping(
       value = "/{domaine}/contacts",
       consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  @Operation(
+      summary =
+          "Create a contact. The contact id is slug if filled and not already used. Otherwise the id is generated.",
+      deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "Contact successfully updated or created",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Contact.class)),
+              @Content(
+                  mediaType = "application/xml",
+                  schema = @Schema(implementation = Contact.class))
+            })
+      })
   public ResponseEntity<Contact> createContactIdentifiant(
-      @PathVariable("domaine") String domaine,
-      @RequestHeader(value = "Slug", required = false) String slug,
-      @RequestBody Contact contact) {
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "the id of the contact if not already used", required = false)
+          @RequestHeader(value = "Slug", required = false)
+          String slug,
+      @Parameter(description = "Contact to create", required = true) @RequestBody Contact contact) {
     User sugoiUser = ouganextSugoiMapper.serializeToSugoi(contact, User.class);
     if (slug != null && userService.findById(domaine, null, slug) == null) {
       sugoiUser.setUsername(slug);
@@ -119,28 +149,82 @@ public class ContactsDomaineController {
    * @return OK and all the contacts in the body if resultatsDansBody or NO_CONTENT and the Link to
    *     the results as a header
    */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
   @GetMapping(
       value = "/{domaine}/contacts",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
+  @Operation(summary = "Search contacts matching criteria.", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Contacts matching criterias",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Contact[].class)),
+              @Content(
+                  mediaType = "application/xml",
+                  schema = @Schema(implementation = Contact[].class))
+            })
+      })
   public ResponseEntity<?> getContacts(
-      @PathVariable("domaine") String domaine,
-      @RequestParam(name = "identifiant", required = false) String identifiant,
-      @RequestParam(name = "nomCommun", required = false) String nomCommun,
-      @RequestParam(name = "description", required = false) String description,
-      @RequestParam(name = "organisationId", required = false) String organisationId,
-      @RequestParam(name = "mail", required = false) String mail,
-      @RequestParam(name = "size", defaultValue = "20") int size,
-      @RequestParam(name = "start", defaultValue = "0") int offset,
-      @RequestParam(name = "searchCookie", required = false) String searchCookie,
-      @RequestParam(name = "typeRecherche", defaultValue = "et") String typeRecherche,
-      @RequestParam(name = "habilitation", required = false) List<String> habilitations,
-      @RequestParam(name = "application", required = false) String application,
-      @RequestParam(name = "role", required = false) String role,
-      @RequestParam(name = "rolePropriete", required = false) String rolePropriete,
-      @RequestParam(name = "body", defaultValue = "false") boolean resultatsDansBody,
-      @RequestParam(name = "idOnly", defaultValue = "false") boolean identifiantsSeuls,
-      @RequestParam(name = "certificat", required = false) String certificat) {
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "Identifiant of the contact", required = false)
+          @RequestParam(name = "identifiant", required = false)
+          String identifiant,
+      @Parameter(description = "NomCommun of the contact", required = false)
+          @RequestParam(name = "nomCommun", required = false)
+          String nomCommun,
+      @Parameter(description = "Description of the contact", required = false)
+          @RequestParam(name = "description", required = false)
+          String description,
+      @Parameter(description = "Organization's id where the contact belongs ", required = false)
+          @RequestParam(name = "organisationId", required = false)
+          String organisationId,
+      @Parameter(description = "Mail of the contact", required = false)
+          @RequestParam(name = "mail", required = false)
+          String mail,
+      @Parameter(description = "Number of results to return", required = false)
+          @RequestParam(name = "size", defaultValue = "20", required = false)
+          int size,
+      @Parameter(description = "Offset to apply to the search", required = false)
+          @RequestParam(name = "start", defaultValue = "0", required = false)
+          int offset,
+      @Parameter(description = "Cookie to continue a previous search", required = false)
+          @RequestParam(name = "searchCookie", required = false)
+          String searchCookie,
+      @Parameter(description = "Kind of search can be Et or Ou", required = false)
+          @RequestParam(name = "typeRecherche", defaultValue = "et", required = false)
+          String typeRecherche,
+      @Parameter(description = "Habilitation which contact can have", required = false)
+          @RequestParam(name = "habilitation", required = false)
+          List<String> habilitations,
+      @Parameter(description = "Application in which contact can be", required = false)
+          @RequestParam(name = "application", required = false)
+          String application,
+      @Parameter(description = "Role which contact can have", required = false)
+          @RequestParam(name = "role", required = false)
+          String role,
+      @Parameter(description = "Propriete which contact can have", required = false)
+          @RequestParam(name = "rolePropriete", required = false)
+          String rolePropriete,
+      @Parameter(
+              description =
+                  "if false, response is 204 and Http Response contains link headers to retrieve the resources",
+              required = false)
+          @RequestParam(name = "body", defaultValue = "false")
+          boolean resultatsDansBody,
+      @Parameter(description = "Get only a list of identifiant", required = false)
+          @RequestParam(name = "idOnly", defaultValue = "false")
+          boolean identifiantsSeuls,
+      @Parameter(description = "Find a contact by it's certificate", required = false)
+          @RequestParam(name = "certificat", required = false)
+          String certificat) {
     Contact searchContact = new Contact();
     searchContact.setIdentifiant(identifiant);
     searchContact.setNomCommun(nomCommun);
@@ -238,12 +322,30 @@ public class ContactsDomaineController {
    * @param id id of the certificate
    * @return NOT IMPLEMENTED
    */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
   @GetMapping(
       value = "/{domaine}/contacts/certificat/{id}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
+  @Operation(summary = "Find contacts by certificate", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "501",
+            description = "Not yet implemented",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
   public ResponseEntity<?> getAPartirDeIdCertificat(
-      @PathVariable("domaine") String domaine, @PathVariable("id") String id) {
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = " id of the certificate", required = true)
+          @PathVariable(name = "id", required = true)
+          String id) {
     return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
   }
 
@@ -253,11 +355,27 @@ public class ContactsDomaineController {
    * @param domaine
    * @return number of contacts in domaine
    */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
   @GetMapping(
       value = "/{domaine}/contacts/size",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
-  public ResponseEntity<?> getContactsSize(@PathVariable("domaine") String domaine) {
+  @Operation(summary = "Get the number of contacts in domaine.", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Size of the domaine",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
+  public ResponseEntity<?> getContactsSize(
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine) {
     PageableResult pageable = new PageableResult();
     PageResult<User> foundUsers =
         userService.findByProperties(domaine, null, new User(), pageable, SearchType.AND);

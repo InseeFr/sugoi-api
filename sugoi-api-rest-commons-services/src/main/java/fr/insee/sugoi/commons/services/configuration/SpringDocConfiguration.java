@@ -25,7 +25,9 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springdoc.core.customizers.OperationCustomizer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -50,6 +52,8 @@ public class SpringDocConfiguration {
 
   @Value("${fr.insee.sugoi.springdoc.contact.email:}")
   public String contactEmail;
+
+  @Autowired BuildProperties buildProperties;
 
   public final String OAUTHSCHEME = "oAuth";
   public final String SCHEMEBASIC = "basic";
@@ -93,7 +97,9 @@ public class SpringDocConfiguration {
             .info(
                 new Info()
                     .title("Swagger SUGOI")
-                    .description("API de sugoi")
+                    .description(
+                        "Sugoi aims to provide a tool to manage users with multi tenancy in mind.")
+                    .version(buildProperties.getVersion())
                     .license(
                         new License()
                             .name("Apache 2.0")

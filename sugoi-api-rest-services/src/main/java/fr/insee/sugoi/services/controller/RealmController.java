@@ -16,7 +16,14 @@ package fr.insee.sugoi.services.controller;
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.services.decider.AuthorizeMethodDecider;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +46,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = {"/v2", "/"})
-@Tag(name = "Manage Realms and storages")
-@SecurityRequirement(name = "oAuth")
+@Tag(
+    name = "Manage Realms and storages",
+    description = "New Endpoints to create, update, delete and find realms")
+@SecurityRequirements(
+    value = {@SecurityRequirement(name = "oAuth"), @SecurityRequirement(name = "basic")})
 public class RealmController {
 
   @Autowired ConfigService configService;
@@ -50,8 +60,23 @@ public class RealmController {
   AuthorizeMethodDecider authorizeService;
 
   @GetMapping(value = "/realms")
+  @Operation(summary = "Get realms where you have rights")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "realm found",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Realm[].class))
+            })
+      })
   public ResponseEntity<List<Realm>> getRealms(
-      @RequestParam(name = "id", required = false) String id, Authentication authentication) {
+      @Parameter(description = "Id of the realm to search", required = false)
+          @RequestParam(name = "id", required = false)
+          String id,
+      Authentication authentication) {
     List<Realm> realms = new ArrayList<>();
     List<Realm> realmsFiltered = new ArrayList<>();
 
@@ -75,6 +100,7 @@ public class RealmController {
       value = "/realms",
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Create realm")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAdmin()")
   public ResponseEntity<Realm> createRealm(@RequestBody Realm realm) {
     // TODO: process POST request
@@ -86,6 +112,7 @@ public class RealmController {
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isAdmin()")
+  @Operation(summary = "Update realm")
   public ResponseEntity<Realm> updateRealm(
       @RequestBody Realm realm, @PathVariable("id") String id) {
     // TODO: process PUT request
@@ -96,6 +123,7 @@ public class RealmController {
       value = "/realms/{id}",
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Delete Realm")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAdmin()")
   public ResponseEntity<String> deleteRealm(@PathVariable("id") String id) {
     return new ResponseEntity<String>(id, HttpStatus.OK);

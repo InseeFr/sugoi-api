@@ -21,6 +21,12 @@ import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.OrganizationService;
 import fr.insee.sugoi.model.Organization;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
@@ -47,7 +53,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RestController
 @RequestMapping("/v1")
 @SecurityRequirement(name = "basic")
-@Tag(name = "V1- Gestion des organisations")
+@Tag(
+    name = "[Deprecated] - Manage organizations",
+    description = "Old endpoints to manage organizations")
 public class OrganisationDomaineController {
 
   private OuganextSugoiMapper ouganextSugoiMapper = new OuganextSugoiMapper();
@@ -64,16 +72,50 @@ public class OrganisationDomaineController {
    * @param organisation
    * @return OK with the updated or created organisation
    */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
   @PutMapping(
       value = "/{domaine}/organisation/{id}",
       consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  @Operation(summary = "Update or create an organisation", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Organization successfully updated or created",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Organisation.class)),
+              @Content(
+                  mediaType = "application/xml",
+                  schema = @Schema(implementation = Organisation.class))
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Organization to update not found",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
   public ResponseEntity<Organisation> createOrModifyOrganisation(
-      @PathVariable("domaine") String domaine,
-      @PathVariable("id") String id,
-      @RequestParam("creation") boolean creation,
-      @RequestBody Organisation organisation) {
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "Organization's id to modify", required = false)
+          @PathVariable(name = "id", required = true)
+          String id,
+      @Parameter(
+              description =
+                  "Boolean indicates whether the organization must be created if not already exist",
+              required = false)
+          @RequestParam(name = "creation", required = false)
+          boolean creation,
+      @Parameter(description = "Organization to create or modify", required = true) @RequestBody
+          Organisation organisation) {
     organisation.setIdentifiant(id);
     Organization sugoiOrganization =
         ouganextSugoiMapper.serializeToSugoi(organisation, Organization.class);
@@ -92,24 +134,85 @@ public class OrganisationDomaineController {
                 organizationService.findById(domaine, null, id), Organisation.class));
   }
 
+  /**
+   * Get an organization of the domaine by its identifiant
+   *
+   * @param domaine
+   * @param id
+   * @return Ok with the desired organization
+   */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
   @GetMapping(
       value = "/{domaine}/organisation/{id}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
+  @Operation(summary = "Get an organization with its identifiant", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Organization found",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Organisation.class)),
+              @Content(
+                  mediaType = "application/xml",
+                  schema = @Schema(implementation = Organisation.class))
+            })
+      })
   public ResponseEntity<Organisation> getOrganisationDomaine(
-      @PathVariable("domaine") String domaine, @PathVariable("id") String id) {
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "Organization's id to find", required = true)
+          @PathVariable(name = "id", required = true)
+          String id) {
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             ouganextSugoiMapper.serializeToOuganext(
                 organizationService.findById(domaine, null, id), Organisation.class));
   }
 
+  /**
+   * Delete an organization according the id
+   *
+   * @param domaine
+   * @param id
+   * @return NO_CONTENT and delete the organization
+   */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
   @DeleteMapping(
       value = "/{domaine}/organisation/{id}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  @Operation(summary = "Delete an organization by its identifiant", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Organization deleted",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Organization not found",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
   public ResponseEntity<?> deleteOrganisation(
-      @PathVariable("domaine") String domaine, @PathVariable("id") String id) {
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "Organization's id to delete", required = true)
+          @PathVariable(name = "id", required = true)
+          String id) {
 
     if (organizationService.findById(domaine, null, id) != null) {
       organizationService.delete(domaine, null, id);
@@ -128,15 +231,38 @@ public class OrganisationDomaineController {
    * @param slug filled in header Slug, the id of the organisation if not already used
    * @return CREATED with the created organisation link as a link header and as a location header
    */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
   @PostMapping(
       value = "{domaine}/organisations",
       consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  @Operation(
+      summary =
+          "Create an organisation. The organisation id is slug if filled and not already used. Otherwise the id is generated.",
+      deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "Organization created",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
   public ResponseEntity<?> createOrganisation(
-      @PathVariable("domaine") String domaine,
-      @RequestBody Organisation organisation,
-      @RequestHeader(value = "Slug", required = false) String slug) {
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "Organization to create", required = true) @RequestBody
+          Organisation organisation,
+      @Parameter(
+              description = "filled in header Slug, the id of the organisation if not already used",
+              required = false)
+          @RequestHeader(value = "Slug", required = false)
+          String slug) {
     Organization sugoiOrganization =
         ouganextSugoiMapper.serializeToSugoi(organisation, Organization.class);
     if (slug != null && organizationService.findById(domaine, null, slug) == null) {
@@ -181,24 +307,70 @@ public class OrganisationDomaineController {
    * @return OK and all the Organisation in the body if resultatsDansBody or NO_CONTENT and the Link
    *     to the results as a header
    */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
   @GetMapping(
       value = "/{domaine}/organisations",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
+  @Operation(summary = "Search organizations matching criteria.", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Organization found",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
   public ResponseEntity<?> getOrganisations(
-      @PathVariable("domaine") String domaine,
-      @RequestParam(name = "identifiant", required = false) String identifiant,
-      @RequestParam(name = "nomCommun", required = false) String nomCommun,
-      @RequestParam(name = "description", required = false) String description,
-      @RequestParam(name = "organisationId", required = false) String organisationId,
-      @RequestParam(name = "mail", required = false) String mail,
-      @RequestParam(name = "size", defaultValue = "20") int size,
-      @RequestParam(name = "start", defaultValue = "0") int offset,
-      @RequestParam(name = "searchCookie", required = false) String searchCookie,
-      @RequestParam(name = "typeRecherche", defaultValue = "et") String typeRecherche,
-      @RequestParam(name = "body", defaultValue = "false") boolean resultatsDansBody,
-      @RequestParam(name = "idOnly", defaultValue = "false") boolean identifiantsSeuls,
-      @RequestParam(name = "certificat", required = false) String certificat) {
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "Identifiant of the organization", required = false)
+          @RequestParam(name = "identifiant", required = false)
+          String identifiant,
+      @Parameter(description = "NomCommun of the organization", required = false)
+          @RequestParam(name = "nomCommun", required = false)
+          String nomCommun,
+      @Parameter(description = "Description of the organization", required = false)
+          @RequestParam(name = "description", required = false)
+          String description,
+      @Parameter(
+              description = "Organization's id where the organization belongs ",
+              required = false)
+          @RequestParam(name = "organisationId", required = false)
+          String organisationId,
+      @Parameter(description = "Mail of the organization", required = false)
+          @RequestParam(name = "mail", required = false)
+          String mail,
+      @Parameter(description = "Number of results to return", required = false)
+          @RequestParam(name = "size", defaultValue = "20")
+          int size,
+      @Parameter(description = "Offset to apply to the search", required = false)
+          @RequestParam(name = "start", defaultValue = "0")
+          int offset,
+      @Parameter(description = "Cookie to continue a previous search", required = false)
+          @RequestParam(name = "searchCookie", required = false)
+          String searchCookie,
+      @Parameter(description = "Kind of search can be Et or Ou", required = false)
+          @RequestParam(name = "typeRecherche", defaultValue = "et")
+          String typeRecherche,
+      @Parameter(
+              description =
+                  "if false, response is 204 and Http Response contains link headers to retrieve the resources",
+              required = false)
+          @RequestParam(name = "body", defaultValue = "false")
+          boolean resultatsDansBody,
+      @Parameter(
+              description = "if true, the contacts found will only have id value",
+              required = false)
+          @RequestParam(name = "idOnly", defaultValue = "false")
+          boolean identifiantsSeuls,
+      @Parameter(description = "Find a organization by it's certificate", required = false)
+          @RequestParam(name = "certificat", required = false)
+          String certificat) {
     Organisation searchOrganisation = new Organisation();
     searchOrganisation.setIdentifiant(identifiant);
     searchOrganisation.setNomCommun(nomCommun);

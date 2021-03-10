@@ -17,7 +17,13 @@ import fr.insee.sugoi.converter.ouganext.Profils;
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.old.services.utils.ResponseUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,15 +37,36 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1/profils")
+@Tag(name = "[Deprecated] - Manage profiles", description = "Old Enpoints to manage profiles")
 @SecurityRequirement(name = "basic")
 public class ProfilsController {
 
   @Autowired private ConfigService configService;
 
+  /**
+   * Get all profiles
+   *
+   * @return Ok with a list of all available profiles
+   */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
   @GetMapping(
       value = "/",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAdmin()")
+  @Operation(summary = "Get all profiles", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Profile found",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Profils.class)),
+              @Content(
+                  mediaType = "application/xml",
+                  schema = @Schema(implementation = Profils.class))
+            }),
+      })
   public ResponseEntity<?> getProfils() {
     List<Realm> realms = configService.getRealms();
     Profils profils = new Profils();

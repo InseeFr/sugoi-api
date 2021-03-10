@@ -18,6 +18,12 @@ import fr.insee.sugoi.converter.ouganext.Contact;
 import fr.insee.sugoi.converter.ouganext.InfoFormattage;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -38,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1")
-@Tag(name = "V1 - Gestion des contacts")
+@Tag(name = "[Deprecated] - Manage contacts", description = "Old Enpoints to manage contact")
 @SecurityRequirement(name = "basic")
 public class ContactDomaineController {
 
@@ -55,16 +61,50 @@ public class ContactDomaineController {
    * @param contact
    * @return OK with the updated or created contact
    */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
   @PutMapping(
       value = "/{domaine}/contact/{id}",
       consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-  public ResponseEntity<?> createOrModifyContact(
-      @RequestBody Contact contact,
-      @PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine,
-      @RequestParam("creation") boolean creation) {
+  @Operation(summary = "Create or modify a contact", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Contact successfully updated or created",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Contact.class)),
+              @Content(
+                  mediaType = "application/xml",
+                  schema = @Schema(implementation = Contact.class))
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Contact to update not found",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
+  public ResponseEntity<Contact> createOrModifyContact(
+      @Parameter(description = "Contact to create or modify", required = true) @RequestBody
+          Contact contact,
+      @Parameter(description = "Contact's id to modify", required = false)
+          @PathVariable(name = "id", required = true)
+          String identifiant,
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(
+              description =
+                  "Boolean indicates whether the contact must be created if not already exist",
+              required = false)
+          @RequestParam(name = "creation")
+          boolean creation) {
     contact.setIdentifiant(identifiant);
     User sugoiUser = ouganextSugoiMapper.serializeToSugoi(contact, User.class);
     if (userService.findById(domaine, null, identifiant) != null) {
@@ -81,24 +121,84 @@ public class ContactDomaineController {
                 userService.findById(domaine, null, identifiant), Contact.class));
   }
 
+  /**
+   * Get a contact by its identifiant
+   *
+   * @param identifiant
+   * @param domaine
+   * @return Ok and the first contact matching the identifiant
+   */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
   @GetMapping(
       value = "/{domaine}/contact/{id}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
-  public ResponseEntity<?> getContactDomaine(
-      @PathVariable("id") String identifiant, @PathVariable("domaine") String domaine) {
+  @Operation(summary = "Get a contact by its identifiant", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Contact found",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Contact.class)),
+              @Content(
+                  mediaType = "application/xml",
+                  schema = @Schema(implementation = Contact.class))
+            })
+      })
+  public ResponseEntity<Contact> getContactDomaine(
+      @Parameter(description = "Contact's id to search", required = true)
+          @PathVariable(name = "id", required = true)
+          String identifiant,
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine) {
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             ouganextSugoiMapper.serializeToOuganext(
                 userService.findById(domaine, null, identifiant), Contact.class));
   }
 
+  /**
+   * Delete a contact by its identifiant
+   *
+   * @param identifiant
+   * @param domaine
+   * @return No content if success, not found if the contact doesn't exist
+   */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
   @DeleteMapping(
       value = "/{domaine}/contact/{id}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-  public ResponseEntity<?> deleteContact(
-      @PathVariable("id") String identifiant, @PathVariable("domaine") String domaine) {
+  @Operation(summary = "Delete a contact by its identifiant", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Contact deleted",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Contact to delete not found",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
+  public ResponseEntity<Contact> deleteContact(
+      @Parameter(description = "Contact's id to search", required = true) @PathVariable("id")
+          String identifiant,
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable("domaine")
+          String domaine) {
     if (userService.findById(domaine, null, identifiant) != null) {
       userService.delete(domaine, null, identifiant);
       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -116,16 +216,36 @@ public class ContactDomaineController {
    * @param infoEnvoi mail formating information
    * @return NOT_IMPLEMENTED
    */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
   @PostMapping(
       value = "/{domaine}/contact/{id}/login",
       consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  @Operation(summary = "Send identifiant to a contact", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "Not yet implemented",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
   public ResponseEntity<?> envoiLogin(
-      @PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine,
-      @RequestParam("modeEnvoi") List<String> modeEnvoiStrings,
-      @RequestBody InfoFormattage infoEnvoi) {
+      @Parameter(description = "Contact's id to search", required = true)
+          @PathVariable(name = "id", required = true)
+          String identifiant,
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "Way to send login can be mail or letter", required = false)
+          @RequestParam(name = "modeEnvoi", required = false)
+          List<String> modeEnvoiStrings,
+      @Parameter(description = "Other infos to send login", required = true) @RequestBody
+          InfoFormattage infoEnvoi) {
     return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
   }
 }

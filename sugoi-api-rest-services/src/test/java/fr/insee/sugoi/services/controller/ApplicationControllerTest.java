@@ -91,7 +91,8 @@ public class ApplicationControllerTest {
           .thenReturn(pageResult);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/applications").accept(MediaType.APPLICATION_JSON);
+          MockMvcRequestBuilders.get("/realms/domaine1/applications")
+              .accept(MediaType.APPLICATION_JSON);
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
       TypeReference<PageResult<Application>> mapType =
           new TypeReference<PageResult<Application>>() {};
@@ -134,7 +135,7 @@ public class ApplicationControllerTest {
           .thenReturn(application1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/applications/SuperAppli")
+          MockMvcRequestBuilders.get("/realms/domaine1/applications/SuperAppli")
               .accept(MediaType.APPLICATION_JSON);
 
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
@@ -161,7 +162,7 @@ public class ApplicationControllerTest {
           .thenReturn(application1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/domaine1/applications/supprimemoi")
+          MockMvcRequestBuilders.delete("/realms/domaine1/applications/supprimemoi")
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
@@ -184,7 +185,7 @@ public class ApplicationControllerTest {
           .thenReturn(application1Updated);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/applications/SuperAppli")
+          MockMvcRequestBuilders.put("/realms/domaine1/applications/SuperAppli")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(application1Updated))
               .accept(MediaType.APPLICATION_JSON)
@@ -201,7 +202,7 @@ public class ApplicationControllerTest {
       assertThat(
           "Should get location",
           response.getHeader("Location"),
-          is("http://localhost/domaine1/applications/SuperAppli"));
+          is("http://localhost/realms/domaine1/applications/SuperAppli"));
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -219,7 +220,7 @@ public class ApplicationControllerTest {
           .thenReturn(application1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/applications")
+          MockMvcRequestBuilders.post("/realms/domaine1/applications")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(application1))
               .accept(MediaType.APPLICATION_JSON)
@@ -251,13 +252,13 @@ public class ApplicationControllerTest {
                   Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any()))
           .thenReturn(pageResult);
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/applications?size=2")
+          MockMvcRequestBuilders.get("/realms/domaine1/applications?size=2")
               .accept(MediaType.APPLICATION_JSON);
 
       assertThat(
           "Location header gives next page",
           mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
-          is("http://localhost/domaine1/applications?size=2&offset=2"));
+          is("http://localhost/realms/domaine1/applications?size=2&offset=2"));
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -275,7 +276,7 @@ public class ApplicationControllerTest {
           .thenReturn(application1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/applications")
+          MockMvcRequestBuilders.post("/realms/domaine1/applications")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(application1))
               .accept(MediaType.APPLICATION_JSON)
@@ -284,7 +285,7 @@ public class ApplicationControllerTest {
       assertThat(
           "Location header gives get uri",
           mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
-          is("http://localhost/domaine1/applications/SuperAppli"));
+          is("http://localhost/realms/domaine1/applications/SuperAppli"));
 
     } catch (Exception e1) {
       e1.printStackTrace();
@@ -320,7 +321,7 @@ public class ApplicationControllerTest {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/domaine1/applications/supprimemoi")
+          MockMvcRequestBuilders.delete("/realms/domaine1/applications/supprimemoi")
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
@@ -340,7 +341,7 @@ public class ApplicationControllerTest {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/applications/SuperAppli")
+          MockMvcRequestBuilders.put("/realms/domaine1/applications/SuperAppli")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(application1))
               .accept(MediaType.APPLICATION_JSON)
@@ -366,7 +367,7 @@ public class ApplicationControllerTest {
           .thenReturn(application1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/domaine1/applications")
+          MockMvcRequestBuilders.post("/realms/domaine1/applications")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(application1))
               .accept(MediaType.APPLICATION_JSON)
@@ -391,7 +392,7 @@ public class ApplicationControllerTest {
       Mockito.when(applicationService.findById("domaine1", null, "dontexist")).thenReturn(null);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/domaine1/applications/dontexist")
+          MockMvcRequestBuilders.get("/realms/domaine1/applications/dontexist")
               .accept(MediaType.APPLICATION_JSON);
 
       assertThat(
@@ -411,7 +412,7 @@ public class ApplicationControllerTest {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/applications/dontexist")
+          MockMvcRequestBuilders.put("/realms/domaine1/applications/dontexist")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(application1))
               .accept(MediaType.APPLICATION_JSON)
@@ -436,7 +437,7 @@ public class ApplicationControllerTest {
       Mockito.when(applicationService.findById("domaine1", null, "SuperAppli")).thenReturn(null);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/domaine1/applications/SuperAppli")
+          MockMvcRequestBuilders.put("/realms/domaine1/applications/SuperAppli")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(application1))
               .accept(MediaType.APPLICATION_JSON)
@@ -461,7 +462,7 @@ public class ApplicationControllerTest {
       Mockito.when(applicationService.findById("domaine1", null, "dontexist")).thenReturn(null);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/domaine1/applications/dontexist")
+          MockMvcRequestBuilders.delete("/realms/domaine1/applications/dontexist")
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 

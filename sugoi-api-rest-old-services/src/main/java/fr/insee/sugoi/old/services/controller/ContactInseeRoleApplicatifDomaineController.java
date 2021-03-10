@@ -15,6 +15,12 @@ package fr.insee.sugoi.old.services.controller;
 
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
@@ -34,18 +40,49 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1")
-@Tag(name = "V1 - Gestion des inseeRoleApplicatif")
+@Tag(
+    name = "[Deprecated] - Gestion des inseeRoleApplicatif",
+    description = "Old Enpoints to manage inseeRoleApplicatif of contacts")
 @SecurityRequirement(name = "basic")
 public class ContactInseeRoleApplicatifDomaineController {
 
   @Autowired private UserService userService;
 
+  /**
+   * Get inseeroleapplicatif for a contact
+   *
+   * @param identifiant
+   * @param domaine
+   * @return Ok with the list of insee_roles_applicatifs
+   */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
   @GetMapping(
       value = "/{domaine}/contact/{id}/inseeroles",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastConsultant(#domaine)")
-  public ResponseEntity<?> getInseeRoles(
-      @PathVariable("id") String identifiant, @PathVariable("domaine") String domaine) {
+  @Operation(summary = "Get inseeroleapplicatif for a contact", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Contact successfully updated or created",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = String[].class)),
+              @Content(
+                  mediaType = "application/xml",
+                  schema = @Schema(implementation = String[].class))
+            })
+      })
+  public ResponseEntity<Object> getInseeRoles(
+      @Parameter(description = "Contact to look for inseeRoleApplicatifs", required = true)
+          @PathVariable(name = "id", required = true)
+          String identifiant,
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine) {
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             userService
@@ -54,14 +91,41 @@ public class ContactInseeRoleApplicatifDomaineController {
                 .get("insee_roles_applicatifs"));
   }
 
+  /**
+   * Add inseeroleapplicatif to a contact
+   *
+   * @param identifiant
+   * @param domaine
+   * @param inseeRole
+   * @return NO_CONTENT
+   */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
   @PutMapping(
       value = "/{domaine}/contact/{id}/inseeroles/{inseerole}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
-  public ResponseEntity<?> addInseeRoles(
-      @PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine,
-      @PathVariable("inseerole") String inseeRole) {
+  @Operation(summary = "Add inseeroleapplicatif to a contact", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "inseeroleapplicatif successfully added to contact",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
+  public ResponseEntity<Object> addInseeRoles(
+      @Parameter(description = "Contact's id to update", required = true)
+          @PathVariable(name = "id", required = true)
+          String identifiant,
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "Name of the inseeRoleApplicatif to add", required = true)
+          @PathVariable(name = "inseerole", required = true)
+          String inseeRole) {
     User user = userService.findById(domaine, null, identifiant);
     if (user.getAttributes().containsKey("insee_roles_applicatifs")) {
       @SuppressWarnings("unchecked")
@@ -76,15 +140,42 @@ public class ContactInseeRoleApplicatifDomaineController {
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
-  @SuppressWarnings("unchecked")
+  /**
+   * Delete inseeRoleApplicatif from a contact
+   *
+   * @param identifiant
+   * @param domaine
+   * @param inseeRole
+   * @return NO_CONTENT
+   */
+  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
   @DeleteMapping(
       value = "/{domaine}/contact/{id}/inseeroles/{inseerole}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
+  @Operation(summary = "Delete inseeroleapplicatif from a contact", deprecated = true)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "inseeroleapplicatif successfully deleted from contact",
+            content = {
+              @Content(mediaType = "application/json"),
+              @Content(mediaType = "application/xml")
+            })
+      })
+  @SuppressWarnings("unchecked")
   public ResponseEntity<?> removeInseeRole(
-      @PathVariable("id") String identifiant,
-      @PathVariable("domaine") String domaine,
-      @PathVariable("inseerole") String inseeRole) {
+      @Parameter(description = "Contact's id to update", required = true)
+          @PathVariable(name = "id", required = true)
+          String identifiant,
+      @Parameter(
+              description = "Name of the domaine where the operation will be made",
+              required = true)
+          @PathVariable(name = "domaine", required = true)
+          String domaine,
+      @Parameter(description = "Name of the inseeRoleApplicatif to delete", required = true)
+          @PathVariable(name = "inseerole", required = true)
+          String inseeRole) {
     User user = userService.findById(domaine, null, identifiant);
     if (user.getAttributes().containsKey("insee_roles_applicatifs")) {
       user.getAttributes()
