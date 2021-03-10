@@ -15,9 +15,7 @@ package fr.insee.sugoi.config;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.fail;
 
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.ArrayList;
@@ -44,27 +42,24 @@ public class LdapRealmProviderWriteTest {
     uniqueUserStorage.setOrganizationSource("ou=organisations,ou=clients_domaine2,o=insee,c=fr");
     uniqueUserStorage.addProperty("group_filter_pattern", "toto");
     realmToAdd.setUserStorages(List.of(uniqueUserStorage));
-    try {
-      ldapRealmProviderDAOImpl.load("toadd");
-      fail();
-    } catch (RealmNotFoundException e) {
-      ldapRealmProviderDAOImpl.createRealm(realmToAdd);
-      Realm retrievedRealm = ldapRealmProviderDAOImpl.load("toadd");
-      assertThat("Realm should be present", retrievedRealm.getName(), is("toadd"));
-      assertThat("Realm should have an url", retrievedRealm.getUrl(), is("localhost"));
-      assertThat(
-          "Realm should have a usersource",
-          retrievedRealm.getUserStorages().get(0).getUserSource(),
-          is("ou=SSM,o=insee,c=fr"));
-      assertThat(
-          "Realm should have an organizationsource",
-          retrievedRealm.getUserStorages().get(0).getOrganizationSource(),
-          is("ou=organisations,ou=clients_domaine2,o=insee,c=fr"));
-      assertThat(
-          "Realm should have a groupfilterpattern",
-          retrievedRealm.getUserStorages().get(0).getProperties().get("group_filter_pattern"),
-          is("toto"));
-    }
+    assertThat(
+        "toadd should not exist yet", ldapRealmProviderDAOImpl.load("toadd"), is(nullValue()));
+    ldapRealmProviderDAOImpl.createRealm(realmToAdd);
+    Realm retrievedRealm = ldapRealmProviderDAOImpl.load("toadd");
+    assertThat("Realm should be present", retrievedRealm.getName(), is("toadd"));
+    assertThat("Realm should have an url", retrievedRealm.getUrl(), is("localhost"));
+    assertThat(
+        "Realm should have a usersource",
+        retrievedRealm.getUserStorages().get(0).getUserSource(),
+        is("ou=SSM,o=insee,c=fr"));
+    assertThat(
+        "Realm should have an organizationsource",
+        retrievedRealm.getUserStorages().get(0).getOrganizationSource(),
+        is("ou=organisations,ou=clients_domaine2,o=insee,c=fr"));
+    assertThat(
+        "Realm should have a groupfilterpattern",
+        retrievedRealm.getUserStorages().get(0).getProperties().get("group_filter_pattern"),
+        is("toto"));
   }
 
   @Test
@@ -86,24 +81,23 @@ public class LdapRealmProviderWriteTest {
     userStorages.add(userStorage1);
     userStorages.add(userStorage2);
     realmToAdd.setUserStorages(userStorages);
-    try {
-      ldapRealmProviderDAOImpl.load("multistorage");
-      fail();
-    } catch (RealmNotFoundException e) {
-      ldapRealmProviderDAOImpl.createRealm(realmToAdd);
-      Realm retrievedRealm = ldapRealmProviderDAOImpl.load("multistorage");
-      assertThat("Realm should be present", retrievedRealm.getName(), is("multistorage"));
-      assertThat(
-          "Realm should have two userstorages", retrievedRealm.getUserStorages().size(), is(2));
-      assertThat(
-          "First realm has usersource",
-          retrievedRealm.getUserStorages().get(0).getUserSource(),
-          is("ou=SSM,o=insee,c=fr"));
-      assertThat(
-          "Realm should have a groupfilterpattern",
-          retrievedRealm.getUserStorages().get(0).getProperties().get("group_filter_pattern"),
-          is("toto"));
-    }
+    assertThat(
+        "multistorage should not exist yet",
+        ldapRealmProviderDAOImpl.load("multistorage"),
+        is(nullValue()));
+    ldapRealmProviderDAOImpl.createRealm(realmToAdd);
+    Realm retrievedRealm = ldapRealmProviderDAOImpl.load("multistorage");
+    assertThat("Realm should be present", retrievedRealm.getName(), is("multistorage"));
+    assertThat(
+        "Realm should have two userstorages", retrievedRealm.getUserStorages().size(), is(2));
+    assertThat(
+        "First realm has usersource",
+        retrievedRealm.getUserStorages().get(0).getUserSource(),
+        is("ou=SSM,o=insee,c=fr"));
+    assertThat(
+        "Realm should have a groupfilterpattern",
+        retrievedRealm.getUserStorages().get(0).getProperties().get("group_filter_pattern"),
+        is("toto"));
   }
 
   @Test
@@ -111,11 +105,8 @@ public class LdapRealmProviderWriteTest {
     assertThat(
         "Realm should be present", ldapRealmProviderDAOImpl.load("todelete"), is(not(nullValue())));
     ldapRealmProviderDAOImpl.deleteRealm("todelete");
-    try {
-      ldapRealmProviderDAOImpl.load("todelete");
-      fail();
-    } catch (RealmNotFoundException e) {
-    }
+    assertThat(
+        "todelete should be deleted", ldapRealmProviderDAOImpl.load("todelete"), is(nullValue()));
   }
 
   @Test
@@ -125,11 +116,10 @@ public class LdapRealmProviderWriteTest {
         ldapRealmProviderDAOImpl.load("todeletemulti"),
         is(not(nullValue())));
     ldapRealmProviderDAOImpl.deleteRealm("todeletemulti");
-    try {
-      ldapRealmProviderDAOImpl.load("todeletemulti");
-      fail();
-    } catch (RealmNotFoundException e) {
-    }
+    assertThat(
+        "todeletemulti should be deleted",
+        ldapRealmProviderDAOImpl.load("todeletemulti"),
+        is(nullValue()));
   }
 
   @Test
