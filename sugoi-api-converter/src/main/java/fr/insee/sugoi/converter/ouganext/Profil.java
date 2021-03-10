@@ -16,6 +16,7 @@ package fr.insee.sugoi.converter.ouganext;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import fr.insee.sugoi.converter.utils.MapFromAttribute;
 import java.util.Arrays;
 import java.util.List;
 
@@ -54,6 +55,7 @@ public class Profil {
   };
 
   @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
+  @MapFromAttribute(attributeName = "url")
   private String ldapUrl;
 
   @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
