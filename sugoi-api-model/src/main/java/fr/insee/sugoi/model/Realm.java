@@ -13,13 +13,16 @@
 */
 package fr.insee.sugoi.model;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Realm {
   private String name;
   private String url;
   private String appSource;
   private List<UserStorage> userStorages;
+  private Map<String, String> properties = new HashMap<>();
 
   public String getName() {
     return this.name;
@@ -51,6 +54,18 @@ public class Realm {
 
   public void setAppSource(String appSource) {
     this.appSource = appSource;
+  }
+
+  public void setProperties(Map<String, String> properties) {
+    this.properties = properties;
+  }
+
+  public void addProperty(String name, String value) {
+    this.properties.put(name, value);
+  }
+
+  public Map<String, String> getProperties() {
+    return properties;
   }
 
   @Override

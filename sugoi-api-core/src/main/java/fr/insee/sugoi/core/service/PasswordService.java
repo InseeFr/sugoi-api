@@ -17,7 +17,18 @@ public interface PasswordService {
 
   String generatePassword();
 
-  String generatePassword(int length);
+  String generatePassword(
+      Boolean withUpperCase,
+      Boolean withLowerCase,
+      Boolean withDigit,
+      Boolean withSpecial,
+      Integer size);
 
-  boolean validatePassword(String password);
+  boolean validatePassword(
+      String password,
+      Boolean withUpperCase,
+      Boolean withLowerCase,
+      Boolean withDigit,
+      Boolean withSpecial,
+      Integer size);
 }
