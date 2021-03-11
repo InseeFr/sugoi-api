@@ -17,7 +17,9 @@ import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.PasswordPolicyNotMetException;
 import fr.insee.sugoi.core.model.PasswordChangeRequest;
+import fr.insee.sugoi.core.model.PasswordPolicyConstants;
 import fr.insee.sugoi.core.model.SendMode;
+import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.core.service.CredentialsService;
 import fr.insee.sugoi.core.service.PasswordService;
 import fr.insee.sugoi.core.store.StoreProvider;
@@ -37,6 +39,8 @@ public class CredentialsServiceImpl implements CredentialsService {
 
   @Autowired private SugoiEventPublisher sugoiEventPublisher;
 
+  @Autowired private ConfigService configService;
+
   @Override
   public void reinitPassword(
       String realm,
@@ -45,7 +49,30 @@ public class CredentialsServiceImpl implements CredentialsService {
       PasswordChangeRequest pcr,
       List<SendMode> sendMode) {
     User user = storeProvider.getReaderStore(realm, userStorage).getUser(userId);
-    String password = passwordService.generatePassword();
+    Map<String, String> realmProperties = configService.getRealm(realm).getProperties();
+
+    String password =
+        passwordService.generatePassword(
+            realmProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE) != null
+                ? Boolean.parseBoolean(PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE)
+                : null,
+            realmProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_LOWERCASE) != null
+                ? Boolean.parseBoolean(
+                    realmProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_LOWERCASE))
+                : null,
+            realmProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_DIGITS) != null
+                ? Boolean.parseBoolean(
+                    realmProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_DIGITS))
+                : null,
+            realmProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_SPECIAL) != null
+                ? Boolean.parseBoolean(
+                    realmProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_SPECIAL))
+                : null,
+            realmProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_SIZE) != null
+                ? Integer.parseInt(
+                    realmProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_SIZE))
+                : null);
+
     WriterStore writerStore = storeProvider.getWriterStore(realm, userStorage);
     writerStore.reinitPassword(user, password, pcr, sendMode);
     writerStore.changePasswordResetStatus(
@@ -73,7 +100,10 @@ public class CredentialsServiceImpl implements CredentialsService {
         userStorage,
         SugoiEventTypeEnum.CHANGE_PASSWORD,
         Map.ofEntries(Map.entry("pcr", pcr), Map.entry("user", user)));
-    boolean newPasswordIsValid = passwordService.validatePassword(pcr.getNewPassword());
+    Map<String, String> realmProperties = configService.getRealm(realm).getProperties();
+
+    boolean newPasswordIsValid = validatePassword(pcr.getNewPassword(), realmProperties);
+
     if (newPasswordIsValid) {
       storeProvider
           .getWriterStore(realm, userStorage)
@@ -90,7 +120,8 @@ public class CredentialsServiceImpl implements CredentialsService {
       String userId,
       PasswordChangeRequest pcr,
       List<SendMode> sendMode) {
-    boolean newPasswordIsValid = passwordService.validatePassword(pcr.getNewPassword());
+    Map<String, String> realmProperties = configService.getRealm(realm).getProperties();
+    boolean newPasswordIsValid = validatePassword(pcr.getNewPassword(), realmProperties);
     if (newPasswordIsValid) {
       User user = storeProvider.getReaderStore(realm, userStorage).getUser(userId);
       storeProvider
@@ -120,5 +151,30 @@ public class CredentialsServiceImpl implements CredentialsService {
         SugoiEventTypeEnum.VALIDATE_CREDENTIAL,
         Map.ofEntries(Map.entry("user", user)));
     return storeProvider.getReaderStore(realm, userStorage).validateCredentials(user, password);
+  }
+
+  private Boolean validatePassword(String password, Map<String, String> realmProperties) {
+    return passwordService.validatePassword(
+        password,
+        realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE) != null
+            ? Boolean.parseBoolean(
+                realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE))
+            : null,
+        realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_LOWERCASE) != null
+            ? Boolean.parseBoolean(
+                realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_LOWERCASE))
+            : null,
+        realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_DIGITS) != null
+            ? Boolean.parseBoolean(
+                realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_DIGITS))
+            : null,
+        realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_SPECIAL) != null
+            ? Boolean.parseBoolean(
+                realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_SPECIAL))
+            : null,
+        realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_MIN_SIZE) != null
+            ? Integer.parseInt(
+                realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_MIN_SIZE))
+            : null);
   }
 }

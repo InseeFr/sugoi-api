@@ -9,7 +9,7 @@ Feature: Credential scenario
         When the client perform POST request with body on url /realms/domaine1/users/test_password/initPassword body:
             """
             {
-                "newPassword": "changeme"
+                "newPassword": "Changeme1%0000000000"
             }
             """
         And body received
@@ -20,7 +20,7 @@ Feature: Credential scenario
         When the client perform POST request with body on url /realms/domaine1/users/test_password/initPassword body:
             """
             {
-                "newPassword": "changeme"
+                "newPassword": "Changeme1%000000000000000"
             }
             """
         And body received
@@ -31,8 +31,8 @@ Feature: Credential scenario
         When the client perform POST request with body on url /realms/domaine1/users/test_password/changePassword body:
             """
             {
-                "oldPassword": "changeme2",
-                "newPassword": "changeme2"
+                "oldPassword": "Changeme1%00000000000000",
+                "newPassword": "Changeme1%000000000000001"
             }
             """
         And body received
@@ -43,8 +43,8 @@ Feature: Credential scenario
         When the client perform POST request with body on url /realms/domaine1/users/test_password/changePassword body:
             """
             {
-                "oldPassword": "changeme",
-                "newPassword": "changeme2"
+                "oldPassword": "Changeme1%000000000000000",
+                "newPassword": "Changeme1%000000000000001"
             }
             """
         And body received

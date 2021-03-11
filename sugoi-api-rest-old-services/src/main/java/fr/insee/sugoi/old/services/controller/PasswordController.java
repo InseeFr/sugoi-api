@@ -74,10 +74,10 @@ public class PasswordController {
     }
     StringBuilder listeMdp = new StringBuilder();
     for (int i = 0; i < nb - 1; i++) {
-      listeMdp.append(passwordService.generatePassword(length));
+      listeMdp.append(passwordService.generatePassword(true, true, true, true, length));
       listeMdp.append(System.getProperty("line.separator"));
     }
-    listeMdp.append(passwordService.generatePassword(length));
+    listeMdp.append(passwordService.generatePassword(true, true, true, true, length));
     return new ResponseEntity<>(listeMdp, HttpStatus.OK);
   }
 }
