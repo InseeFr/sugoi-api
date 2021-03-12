@@ -76,17 +76,17 @@ public class JmsRequestRouter {
       case Method.DELETE_GROUP:
         String appName = (String) request.getmethodParams().get(JmsAtttributes.APP_NAME);
         String groupName = (String) request.getmethodParams().get(JmsAtttributes.GROUP_NAME);
-        groupService.delete(realm, userStorage, appName, groupName);
+        groupService.delete(realm, appName, groupName);
         break;
       case Method.CREATE_GROUP:
         appName = (String) request.getmethodParams().get(JmsAtttributes.APP_NAME);
         Group group = converter.toGroup(request.getmethodParams().get(JmsAtttributes.GROUP));
-        groupService.create(realm, userStorage, appName, group);
+        groupService.create(realm, appName, group);
         break;
       case Method.UPDATE_GROUP:
         appName = (String) request.getmethodParams().get(JmsAtttributes.APP_NAME);
         Group updatedGroup = converter.toGroup(request.getmethodParams().get(JmsAtttributes.GROUP));
-        groupService.update(realm, userStorage, appName, updatedGroup);
+        groupService.update(realm, appName, updatedGroup);
         break;
       case Method.DELETE_ORGANIZATION:
         String name = (String) request.getmethodParams().get(JmsAtttributes.ORGANIZATION_NAME);

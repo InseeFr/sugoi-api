@@ -32,61 +32,59 @@ public class ApplicationServiceImpl implements ApplicationService {
   @Autowired private SugoiEventPublisher sugoiEventPublisher;
 
   @Override
-  public Application create(String realm, String storageName, Application application) {
+  public Application create(String realm, Application application) {
     sugoiEventPublisher.publishCustomEvent(
         realm,
-        storageName,
+        null,
         SugoiEventTypeEnum.CREATE_APPLICATION,
         Map.ofEntries(Map.entry("application", application)));
-    return storeProvider.getWriterStore(realm, storageName).createApplication(application);
+    return storeProvider.getWriterStore(realm, null).createApplication(application);
   }
 
   @Override
-  public void delete(String realm, String storageName, String id) {
+  public void delete(String realm, String id) {
     sugoiEventPublisher.publishCustomEvent(
         realm,
-        storageName,
+        null,
         SugoiEventTypeEnum.DELETE_APPLICATION,
         Map.ofEntries(Map.entry("applicationId", id)));
-    storeProvider.getWriterStore(realm, storageName).deleteApplication(id);
+    storeProvider.getWriterStore(realm, null).deleteApplication(id);
   }
 
   @Override
-  public void update(String realm, String storageName, Application application) {
+  public void update(String realm, Application application) {
     sugoiEventPublisher.publishCustomEvent(
         realm,
-        storageName,
+        null,
         SugoiEventTypeEnum.UPDATE_APPLICATION,
         Map.ofEntries(Map.entry("application", application)));
-    storeProvider.getWriterStore(realm, storageName).updateApplication(application);
+    storeProvider.getWriterStore(realm, null).updateApplication(application);
   }
 
   @Override
-  public Application findById(String realm, String storage, String id) {
+  public Application findById(String realm,  String id) {
     if (id == null) {
       id = "";
     }
+
     sugoiEventPublisher.publishCustomEvent(
         realm,
-        storage,
+        null,
         SugoiEventTypeEnum.FIND_APPLICATION_BY_ID,
         Map.ofEntries(Map.entry("applicationId", id)));
-    return storeProvider.getReaderStore(realm, storage).getApplication(id);
+    return storeProvider.getReaderStore(realm, null).getApplication(id);
   }
 
   @Override
   public PageResult<Application> findByProperties(
-      String realm,
-      String storageName,
-      Application applicationFilter,
-      PageableResult pageableResult) {
+      String realm, Application applicationFilter, PageableResult pageableResult) {
     sugoiEventPublisher.publishCustomEvent(
         realm,
-        storageName,
+        null,
         SugoiEventTypeEnum.FIND_APPLICATIONS,
         Map.ofEntries(Map.entry("applicationFilter", applicationFilter)));
     return storeProvider
-        .getReaderStore(realm, storageName)
+        .getReaderStore(realm, null)
         .searchApplications(applicationFilter, pageableResult, SearchType.AND.name());
   }
 }

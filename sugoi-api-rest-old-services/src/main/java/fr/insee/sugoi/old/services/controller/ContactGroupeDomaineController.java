@@ -148,7 +148,7 @@ public class ContactGroupeDomaineController {
       @Parameter(description = "Group name", required = true)
           @PathVariable(name = "nomgroupe", required = true)
           String nomGroupe) {
-    Group group = groupService.findById(domaine, null, nomAppli, nomGroupe);
+    Group group = groupService.findById(domaine, nomAppli, nomGroupe);
     if (group != null) {
       User user = userService.findById(domaine, null, identifiant);
       if (user != null) {

@@ -87,11 +87,7 @@ public class GroupControllerTest {
 
       Mockito.when(
               groupService.findByProperties(
-                  Mockito.anyString(),
-                  Mockito.isNull(),
-                  Mockito.anyString(),
-                  Mockito.any(),
-                  Mockito.any()))
+                  Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any()))
           .thenReturn(pageResult);
 
       RequestBuilder requestBuilder =
@@ -124,7 +120,7 @@ public class GroupControllerTest {
   public void shouldGetGroupByID() {
     try {
 
-      Mockito.when(groupService.findById("domaine1", null, "monApplication", "Group1"))
+      Mockito.when(groupService.findById("domaine1", "monApplication", "Group1"))
           .thenReturn(group1);
 
       RequestBuilder requestBuilder =
@@ -135,7 +131,7 @@ public class GroupControllerTest {
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
       Group res = objectMapper.readValue(response.getContentAsString(), Group.class);
 
-      verify(groupService).findById("domaine1", null, "monApplication", "Group1");
+      verify(groupService).findById("domaine1", "monApplication", "Group1");
       assertThat("Group returned should be Group1", res.getName(), is("Group1"));
 
     } catch (Exception e) {
@@ -151,7 +147,7 @@ public class GroupControllerTest {
   public void deleteShouldCallDeleteService() {
     try {
 
-      Mockito.when(groupService.findById("domaine1", null, "monApplication", "supprimemoi"))
+      Mockito.when(groupService.findById("domaine1", "monApplication", "supprimemoi"))
           .thenReturn(group1);
 
       RequestBuilder requestBuilder =
@@ -161,7 +157,7 @@ public class GroupControllerTest {
               .with(csrf());
 
       mockMvc.perform(requestBuilder).andReturn();
-      verify(groupService).delete("domaine1", null, "monApplication", "supprimemoi");
+      verify(groupService).delete("domaine1", "monApplication", "supprimemoi");
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -174,7 +170,7 @@ public class GroupControllerTest {
   public void updateShouldCallUpdateServiceAndReturnNewApp() {
     try {
 
-      Mockito.when(groupService.findById("domaine1", null, "monApplication", "Group2"))
+      Mockito.when(groupService.findById("domaine1", "monApplication", "Group2"))
           .thenReturn(group2)
           .thenReturn(group2Updated);
 
@@ -188,8 +184,7 @@ public class GroupControllerTest {
 
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
-      verify(groupService)
-          .update(Mockito.anyString(), Mockito.isNull(), Mockito.anyString(), Mockito.any());
+      verify(groupService).update(Mockito.anyString(), Mockito.anyString(), Mockito.any());
       assertThat(
           "Should get updated group",
           objectMapper.readValue(response.getContentAsString(), Group.class).getDescription(),
@@ -211,7 +206,7 @@ public class GroupControllerTest {
   public void postShouldCallPostServiceAndReturnNewApp() {
 
     try {
-      Mockito.when(groupService.findById("domaine1", null, "monApplication", "Group1"))
+      Mockito.when(groupService.findById("domaine1", "monApplication", "Group1"))
           .thenReturn(null)
           .thenReturn(group1);
 
@@ -224,8 +219,7 @@ public class GroupControllerTest {
               .with(csrf());
 
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-      verify(groupService)
-          .create(Mockito.anyString(), Mockito.isNull(), Mockito.anyString(), Mockito.any());
+      verify(groupService).create(Mockito.anyString(), Mockito.anyString(), Mockito.any());
       assertThat(
           "Should get new group",
           objectMapper.readValue(response.getContentAsString(), Group.class).getName(),
@@ -247,11 +241,7 @@ public class GroupControllerTest {
 
       Mockito.when(
               groupService.findByProperties(
-                  Mockito.anyString(),
-                  Mockito.any(),
-                  Mockito.anyString(),
-                  Mockito.any(),
-                  Mockito.any()))
+                  Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any()))
           .thenReturn(pageResult);
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.get("/realms/domaine1/groups?size=2")
@@ -274,11 +264,8 @@ public class GroupControllerTest {
   public void getObjectLocationInGroupCreationResponse() {
     try {
 
-      Mockito.when(groupService.findById("domaine1", null, "monApplication", "Group1"))
-          .thenReturn(null);
-      Mockito.when(
-              groupService.create(
-                  Mockito.anyString(), Mockito.isNull(), Mockito.anyString(), Mockito.any()))
+      Mockito.when(groupService.findById("domaine1", "monApplication", "Group1")).thenReturn(null);
+      Mockito.when(groupService.create(Mockito.anyString(), Mockito.anyString(), Mockito.any()))
           .thenReturn(group1);
 
       RequestBuilder requestBuilder =
@@ -373,7 +360,7 @@ public class GroupControllerTest {
   public void get409WhenCreatingAlreadyExistingGroup() {
     try {
 
-      Mockito.when(groupService.findById("domaine1", null, "monApplication", "Group1"))
+      Mockito.when(groupService.findById("domaine1", "monApplication", "Group1"))
           .thenReturn(group1);
 
       RequestBuilder requestBuilder =
@@ -400,7 +387,7 @@ public class GroupControllerTest {
   public void get404WhenNoGroupIsFoundWhenGetById() {
     try {
 
-      Mockito.when(groupService.findById("domaine1", null, "monApplication", "dontexist"))
+      Mockito.when(groupService.findById("domaine1", "monApplication", "dontexist"))
           .thenReturn(null);
 
       RequestBuilder requestBuilder =
@@ -448,8 +435,7 @@ public class GroupControllerTest {
   public void get404WhenNoGroupIsFoundWhenUpdate() {
     try {
 
-      Mockito.when(groupService.findById("domaine1", null, "monApplication", "Group1"))
-          .thenReturn(null);
+      Mockito.when(groupService.findById("domaine1", "monApplication", "Group1")).thenReturn(null);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.put("/realms/domaine1/groups/Group1")
@@ -475,8 +461,7 @@ public class GroupControllerTest {
   public void get404WhenNoGroupIsFoundWhenDelete() {
     try {
 
-      Mockito.when(groupService.findById("domaine1", null, "monApplication", "Group1"))
-          .thenReturn(null);
+      Mockito.when(groupService.findById("domaine1", "monApplication", "Group1")).thenReturn(null);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.delete("/realms/domaine1/groups/dontexist")

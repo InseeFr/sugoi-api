@@ -19,14 +19,14 @@ import fr.insee.sugoi.model.Application;
 
 public interface ApplicationService {
 
-  Application create(String realm, String storage, Application application);
+  Application create(String realm, Application application);
 
-  void update(String realm, String storage, Application application);
+  void update(String realm, Application application);
 
-  void delete(String realm, String storage, String id);
+  void delete(String realm, String id);
 
-  Application findById(String realm, String storage, String id);
+  Application findById(String realm, String id);
 
   PageResult<Application> findByProperties(
-      String realm, String storage, Application applicationFilter, PageableResult pageableResult);
+      String realm, Application applicationFilter, PageableResult pageableResult);
 }
