@@ -13,11 +13,33 @@
 */
 package fr.insee.sugoi.core.store;
 
+import java.util.List;
+
 public interface StoreProvider {
 
   public Store getStoreForUserStorage(String realmName, String userStorageName);
 
   public ReaderStore getReaderStore(String realm, String storage);
 
+  public List<ReaderStore> getReaderStores(String realm);
+
   public WriterStore getWriterStore(String realm, String storage);
+
+  /**
+   * Get a random writer store for a realm, be aware use only if userStorage is not used for the
+   * writing operation
+   *
+   * @param realm
+   * @return
+   */
+  public WriterStore getWriterStore(String realm);
+
+  /**
+   * Get a random writer store for a realm, be aware use only if userStorage is not used for the
+   * reading operation
+   *
+   * @param realm
+   * @return
+   */
+  public ReaderStore getReaderStore(String realm);
 }

@@ -38,14 +38,14 @@ public class GroupServiceImpl implements GroupService {
   public Group create(String realm, String appName, Group group) {
     sugoiEventPublisher.publishCustomEvent(realm, null, SugoiEventTypeEnum.CREATE_GROUP,
         Map.ofEntries(Map.entry("group", group), Map.entry("appName", appName)));
-    return storeProvider.getWriterStore(realm, null).createGroup(appName, group);
+    return storeProvider.getWriterStore(realm).createGroup(appName, group);
   }
 
   @Override
   public void delete(String realm, String appName, String id) {
     sugoiEventPublisher.publishCustomEvent(realm, null, SugoiEventTypeEnum.DELETE_GROUP,
         Map.ofEntries(Map.entry("groupId", id)));
-    storeProvider.getWriterStore(realm, null).deleteGroup(appName, id);
+    storeProvider.getWriterStore(realm).deleteGroup(appName, id);
   }
 
   @Override
@@ -55,7 +55,7 @@ public class GroupServiceImpl implements GroupService {
     }
     sugoiEventPublisher.publishCustomEvent(realm, null, SugoiEventTypeEnum.FIND_GROUP_BY_ID,
         Map.ofEntries(Map.entry("groupId", id), Map.entry("appName", appName)));
-    return storeProvider.getReaderStore(realm, null).getGroup(appName, id);
+    return storeProvider.getReaderStore(realm).getGroup(appName, id);
   }
 
   @Override
@@ -63,7 +63,7 @@ public class GroupServiceImpl implements GroupService {
       PageableResult pageableResult) {
     sugoiEventPublisher.publishCustomEvent(realm, null, SugoiEventTypeEnum.FIND_GROUPS,
         Map.ofEntries(Map.entry("appName", appName), Map.entry("groupFilter", groupFilter)));
-    return storeProvider.getReaderStore(realm, null).searchGroups(appName, groupFilter, pageableResult,
+    return storeProvider.getReaderStore(realm).searchGroups(appName, groupFilter, pageableResult,
         SearchType.AND.name());
   }
 
@@ -71,6 +71,6 @@ public class GroupServiceImpl implements GroupService {
   public void update(String realm, String appName, Group group) {
     sugoiEventPublisher.publishCustomEvent(realm, null, SugoiEventTypeEnum.UPDATE_GROUP,
         Map.ofEntries(Map.entry("group", group), Map.entry("appName", appName)));
-    storeProvider.getWriterStore(realm, null).updateGroup(appName, group);
+    storeProvider.getWriterStore(realm).updateGroup(appName, group);
   }
 }
