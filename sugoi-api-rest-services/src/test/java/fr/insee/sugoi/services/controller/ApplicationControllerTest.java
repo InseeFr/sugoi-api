@@ -87,7 +87,7 @@ public class ApplicationControllerTest {
 
       Mockito.when(
               applicationService.findByProperties(
-                  Mockito.anyString(), Mockito.isNull(), Mockito.any(), Mockito.any()))
+                  Mockito.anyString(), Mockito.any(), Mockito.any()))
           .thenReturn(pageResult);
 
       RequestBuilder requestBuilder =
@@ -131,8 +131,7 @@ public class ApplicationControllerTest {
   public void shouldGetApplicationByID() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "SuperAppli"))
-          .thenReturn(application1);
+      Mockito.when(applicationService.findById("domaine1", "SuperAppli")).thenReturn(application1);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.get("/realms/domaine1/applications/SuperAppli")
@@ -141,7 +140,7 @@ public class ApplicationControllerTest {
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
       Application res = objectMapper.readValue(response.getContentAsString(), Application.class);
 
-      verify(applicationService).findById("domaine1", null, "SuperAppli");
+      verify(applicationService).findById("domaine1", "SuperAppli");
       assertThat("Application returned should be SuperAppli", res.getName(), is("SuperAppli"));
       assertThat("Application returned should be owned by Amoi", res.getOwner(), is("Amoi"));
 
@@ -158,8 +157,7 @@ public class ApplicationControllerTest {
   public void deleteShouldCallDeleteService() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "supprimemoi"))
-          .thenReturn(application1);
+      Mockito.when(applicationService.findById("domaine1", "supprimemoi")).thenReturn(application1);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.delete("/realms/domaine1/applications/supprimemoi")
@@ -167,7 +165,7 @@ public class ApplicationControllerTest {
               .with(csrf());
 
       mockMvc.perform(requestBuilder).andReturn();
-      verify(applicationService).delete("domaine1", null, "supprimemoi");
+      verify(applicationService).delete("domaine1", "supprimemoi");
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -180,7 +178,7 @@ public class ApplicationControllerTest {
   public void updateShouldCallUpdateServiceAndReturnNewApp() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "SuperAppli"))
+      Mockito.when(applicationService.findById("domaine1", "SuperAppli"))
           .thenReturn(application1)
           .thenReturn(application1Updated);
 
@@ -193,7 +191,7 @@ public class ApplicationControllerTest {
 
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
-      verify(applicationService).update(Mockito.anyString(), Mockito.isNull(), Mockito.any());
+      verify(applicationService).update(Mockito.anyString(), Mockito.any());
       assertThat(
           "Should get updated application",
           objectMapper.readValue(response.getContentAsString(), Application.class).getOwner(),
@@ -215,7 +213,7 @@ public class ApplicationControllerTest {
   public void postShouldCallPostServiceAndReturnNewApp() {
 
     try {
-      Mockito.when(applicationService.findById("domaine1", null, "SuperAppli"))
+      Mockito.when(applicationService.findById("domaine1", "SuperAppli"))
           .thenReturn(null)
           .thenReturn(application1);
 
@@ -227,7 +225,7 @@ public class ApplicationControllerTest {
               .with(csrf());
 
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-      verify(applicationService).create(Mockito.anyString(), Mockito.isNull(), Mockito.any());
+      verify(applicationService).create(Mockito.anyString(), Mockito.any());
       assertThat(
           "Should get new application",
           objectMapper.readValue(response.getContentAsString(), Application.class).getName(),
@@ -249,7 +247,7 @@ public class ApplicationControllerTest {
 
       Mockito.when(
               applicationService.findByProperties(
-                  Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any()))
+                  Mockito.anyString(), Mockito.any(), Mockito.any()))
           .thenReturn(pageResult);
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.get("/realms/domaine1/applications?size=2")
@@ -271,8 +269,8 @@ public class ApplicationControllerTest {
   public void getObjectLocationInApplicationCreationResponse() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "SuperAppli")).thenReturn(null);
-      Mockito.when(applicationService.create(Mockito.anyString(), Mockito.isNull(), Mockito.any()))
+      Mockito.when(applicationService.findById("domaine1", "SuperAppli")).thenReturn(null);
+      Mockito.when(applicationService.create(Mockito.anyString(), Mockito.any()))
           .thenReturn(application1);
 
       RequestBuilder requestBuilder =
@@ -363,8 +361,7 @@ public class ApplicationControllerTest {
   public void get409WhenCreatingAlreadyExistingApplication() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "SuperAppli"))
-          .thenReturn(application1);
+      Mockito.when(applicationService.findById("domaine1", "SuperAppli")).thenReturn(application1);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.post("/realms/domaine1/applications")
@@ -389,7 +386,7 @@ public class ApplicationControllerTest {
   public void get404WhenNoApplicationIsFoundWhenGetById() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "dontexist")).thenReturn(null);
+      Mockito.when(applicationService.findById("domaine1", "dontexist")).thenReturn(null);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.get("/realms/domaine1/applications/dontexist")
@@ -434,7 +431,7 @@ public class ApplicationControllerTest {
   public void get404WhenNoApplicationIsFoundWhenUpdate() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "SuperAppli")).thenReturn(null);
+      Mockito.when(applicationService.findById("domaine1", "SuperAppli")).thenReturn(null);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.put("/realms/domaine1/applications/SuperAppli")
@@ -459,7 +456,7 @@ public class ApplicationControllerTest {
   public void get404WhenNoApplicationIsFoundWhenDelete() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", null, "dontexist")).thenReturn(null);
+      Mockito.when(applicationService.findById("domaine1", "dontexist")).thenReturn(null);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.delete("/realms/domaine1/applications/dontexist")

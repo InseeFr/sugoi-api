@@ -28,67 +28,49 @@ import org.springframework.stereotype.Service;
 @Service
 public class GroupServiceImpl implements GroupService {
 
-  @Autowired private StoreProvider storeProvider;
+  @Autowired
+  private StoreProvider storeProvider;
 
-  @Autowired private SugoiEventPublisher sugoiEventPublisher;
+  @Autowired
+  private SugoiEventPublisher sugoiEventPublisher;
 
   @Override
-  public Group create(String realm, String storageName, String appName, Group group) {
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        storageName,
-        SugoiEventTypeEnum.CREATE_GROUP,
+  public Group create(String realm, String appName, Group group) {
+    sugoiEventPublisher.publishCustomEvent(realm, null, SugoiEventTypeEnum.CREATE_GROUP,
         Map.ofEntries(Map.entry("group", group), Map.entry("appName", appName)));
-    return storeProvider.getWriterStore(realm, storageName).createGroup(appName, group);
+    return storeProvider.getWriterStore(realm, null).createGroup(appName, group);
   }
 
   @Override
-  public void delete(String realm, String storageName, String appName, String id) {
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        storageName,
-        SugoiEventTypeEnum.DELETE_GROUP,
+  public void delete(String realm, String appName, String id) {
+    sugoiEventPublisher.publishCustomEvent(realm, null, SugoiEventTypeEnum.DELETE_GROUP,
         Map.ofEntries(Map.entry("groupId", id)));
-    storeProvider.getWriterStore(realm, storageName).deleteGroup(appName, id);
+    storeProvider.getWriterStore(realm, null).deleteGroup(appName, id);
   }
 
   @Override
-  public Group findById(String realm, String storage, String appName, String id) {
+  public Group findById(String realm, String appName, String id) {
     if (id == null) {
       id = "";
     }
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        storage,
-        SugoiEventTypeEnum.FIND_GROUP_BY_ID,
+    sugoiEventPublisher.publishCustomEvent(realm, null, SugoiEventTypeEnum.FIND_GROUP_BY_ID,
         Map.ofEntries(Map.entry("groupId", id), Map.entry("appName", appName)));
-    return storeProvider.getReaderStore(realm, storage).getGroup(appName, id);
+    return storeProvider.getReaderStore(realm, null).getGroup(appName, id);
   }
 
   @Override
-  public PageResult<Group> findByProperties(
-      String realm,
-      String storageName,
-      String appName,
-      Group groupFilter,
+  public PageResult<Group> findByProperties(String realm, String appName, Group groupFilter,
       PageableResult pageableResult) {
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        storageName,
-        SugoiEventTypeEnum.FIND_GROUPS,
+    sugoiEventPublisher.publishCustomEvent(realm, null, SugoiEventTypeEnum.FIND_GROUPS,
         Map.ofEntries(Map.entry("appName", appName), Map.entry("groupFilter", groupFilter)));
-    return storeProvider
-        .getReaderStore(realm, storageName)
-        .searchGroups(appName, groupFilter, pageableResult, SearchType.AND.name());
+    return storeProvider.getReaderStore(realm, null).searchGroups(appName, groupFilter, pageableResult,
+        SearchType.AND.name());
   }
 
   @Override
-  public void update(String realm, String storageName, String appName, Group group) {
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        storageName,
-        SugoiEventTypeEnum.UPDATE_GROUP,
+  public void update(String realm, String appName, Group group) {
+    sugoiEventPublisher.publishCustomEvent(realm, null, SugoiEventTypeEnum.UPDATE_GROUP,
         Map.ofEntries(Map.entry("group", group), Map.entry("appName", appName)));
-    storeProvider.getWriterStore(realm, storageName).updateGroup(appName, group);
+    storeProvider.getWriterStore(realm, null).updateGroup(appName, group);
   }
 }

@@ -88,7 +88,7 @@ public class GroupeController {
       @Parameter(description = "Group where collect contacts", required = true)
           @PathVariable(name = "groupe", required = true)
           String groupe) {
-    Group group = groupService.findById(domaine, null, application, groupe);
+    Group group = groupService.findById(domaine, application, groupe);
     if (group.getUsers() != null) {
       if (group.getUsers().isEmpty()) {
         return new ResponseEntity<>("No users in group", HttpStatus.NOT_FOUND);
