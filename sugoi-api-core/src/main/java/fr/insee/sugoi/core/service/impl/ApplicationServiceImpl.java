@@ -38,7 +38,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         null,
         SugoiEventTypeEnum.CREATE_APPLICATION,
         Map.ofEntries(Map.entry("application", application)));
-    return storeProvider.getWriterStore(realm, null).createApplication(application);
+    return storeProvider.getWriterStore(realm).createApplication(application);
   }
 
   @Override
@@ -48,7 +48,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         null,
         SugoiEventTypeEnum.DELETE_APPLICATION,
         Map.ofEntries(Map.entry("applicationId", id)));
-    storeProvider.getWriterStore(realm, null).deleteApplication(id);
+    storeProvider.getWriterStore(realm).deleteApplication(id);
   }
 
   @Override
@@ -58,7 +58,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         null,
         SugoiEventTypeEnum.UPDATE_APPLICATION,
         Map.ofEntries(Map.entry("application", application)));
-    storeProvider.getWriterStore(realm, null).updateApplication(application);
+    storeProvider.getWriterStore(realm).updateApplication(application);
   }
 
   @Override
@@ -72,7 +72,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         null,
         SugoiEventTypeEnum.FIND_APPLICATION_BY_ID,
         Map.ofEntries(Map.entry("applicationId", id)));
-    return storeProvider.getReaderStore(realm, null).getApplication(id);
+    return storeProvider.getReaderStore(realm).getApplication(id);
   }
 
   @Override
@@ -84,7 +84,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         SugoiEventTypeEnum.FIND_APPLICATIONS,
         Map.ofEntries(Map.entry("applicationFilter", applicationFilter)));
     return storeProvider
-        .getReaderStore(realm, null)
+        .getReaderStore(realm)
         .searchApplications(applicationFilter, pageableResult, SearchType.AND.name());
   }
 }
