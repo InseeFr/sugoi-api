@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 @Component
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class Converter {
 
   private static final Logger logger = LogManager.getLogger(Converter.class);

@@ -13,10 +13,8 @@
 */
 package fr.insee.sugoi.jms.listener;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.core.model.PasswordChangeRequest;
 import fr.insee.sugoi.core.model.SendMode;
-import fr.insee.sugoi.core.service.ApplicationService;
 import fr.insee.sugoi.core.service.CredentialsService;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.core.service.OrganizationService;
@@ -49,13 +47,9 @@ public class JmsRequestRouter {
 
   @Autowired private CredentialsService credentialsService;
 
-  @Autowired private ApplicationService appService;
-
   @Autowired private GroupService groupService;
 
   @Autowired private OrganizationService orgService;
-
-  private static ObjectMapper mapper = new ObjectMapper();
 
   public void exec(BrokerRequest request) throws Exception {
     String realm = (String) request.getmethodParams().get("realm");

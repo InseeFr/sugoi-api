@@ -42,6 +42,7 @@ public class SugoiEventWebHookProducer {
   @Autowired private WebHookService webHookService;
 
   @EventListener
+  @SuppressWarnings("unchecked")
   public void handleContextStart(SugoiEvent cse) {
     SugoiEventTypeEnum eventType = cse.getEventType();
     switch (eventType) {
