@@ -41,10 +41,27 @@ public class User {
   private Map<String, Object> metadatas = new HashMap<>();
   private Map<String, Object> attributes = new HashMap<>();
 
-  public User() {}
+  public User() {
+  }
 
   public User(String username) {
     this.username = username;
+  }
+
+  public String getRealm() {
+    return (String) this.getMetadatas().get("realm");
+  }
+
+  public String getUserStorage() {
+    return (String) this.getMetadatas().get("userStorage");
+  }
+
+  public void setRealm(String realm) {
+    this.addMetadatas("realm", realm);
+  }
+
+  public void setUserStorage(String us) {
+    this.addMetadatas("userStorage", us);
   }
 
   public List<Habilitation> getHabilitations() {
@@ -152,20 +169,14 @@ public class User {
   }
 
   public void removeFromHabilitations(String appName, String role, String property) {
-    this.habilitations =
-        this.habilitations.stream()
-            .filter(
-                habilitation ->
-                    !(habilitation.getApplication().equals(appName)
-                        && habilitation.getRole().equals(role)
-                        && habilitation.getProperty().equals(property)))
-            .collect(Collectors.toList());
+    this.habilitations = this.habilitations
+        .stream().filter(habilitation -> !(habilitation.getApplication().equals(appName)
+            && habilitation.getRole().equals(role) && habilitation.getProperty().equals(property)))
+        .collect(Collectors.toList());
   }
 
   public void removeFromHabilitations(String habilitationId) {
-    this.habilitations =
-        this.habilitations.stream()
-            .filter(habilitation -> !(habilitation.getId().equals(habilitationId)))
-            .collect(Collectors.toList());
+    this.habilitations = this.habilitations.stream()
+        .filter(habilitation -> !(habilitation.getId().equals(habilitationId))).collect(Collectors.toList());
   }
 }
