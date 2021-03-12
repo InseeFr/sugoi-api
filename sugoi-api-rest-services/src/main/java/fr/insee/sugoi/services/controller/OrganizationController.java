@@ -209,38 +209,6 @@ public class OrganizationController {
     }
   }
 
-  @PostMapping(
-      value = {"/realms/{realm}/organizations"},
-      consumes = {MediaType.APPLICATION_JSON_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Operation(summary = "Create a new organization")
-  @ApiResponses(
-      value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Organization created",
-            content = {
-              @Content(
-                  mediaType = "application/json",
-                  schema = @Schema(implementation = Organization.class))
-            }),
-        @ApiResponse(
-            responseCode = "409",
-            description = "Organization already exist",
-            content = {@Content(mediaType = "application/json")})
-      })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
-  public ResponseEntity<Organization> createOrganizations(
-      @Parameter(
-              description = "Name of the realm where the operation will be made",
-              required = true)
-          @PathVariable("realm")
-          String realm,
-      @Parameter(description = "Organization to create", required = false) @RequestBody
-          Organization organization) {
-    return createOrganizations(realm, null, organization);
-  }
-
   @PutMapping(
       value = {"/realms/{realm}/storages/{storage}/organizations/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
