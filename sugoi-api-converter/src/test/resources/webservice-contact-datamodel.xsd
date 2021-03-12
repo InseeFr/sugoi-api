@@ -5,7 +5,7 @@
 	xmlns:ie="http://xml.insee.fr/schema">
 
 	<xs:import namespace="http://xml.insee.fr/schema"
-		schemaLocation="adresse.xsd" />
+		schemaLocation="http://xml.insee.fr/schema/adresse.xsd" />
 	<xs:element name="Contact" type="ContactType">
 	</xs:element>
 	<xs:element name="Organisation" type="OrganisationType" />
