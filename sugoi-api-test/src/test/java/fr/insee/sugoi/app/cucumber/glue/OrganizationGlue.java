@@ -41,6 +41,7 @@ public class OrganizationGlue {
   }
 
   @Then("the client expect to receive a list of organizations")
+  @SuppressWarnings("unchecked")
   public void expect_to_receive_a_list_of_organizations() {
     Boolean isOrga = false;
     ObjectMapper mapper = new ObjectMapper();

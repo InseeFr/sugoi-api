@@ -48,6 +48,7 @@ public class JmsBrokerTests {
   @Autowired JmsTemplate jmsTemplate;
 
   @Test
+  @SuppressWarnings("unchecked")
   public void testSender()
       throws InterruptedException, JsonMappingException, JsonProcessingException, JMSException {
     // Start Listener

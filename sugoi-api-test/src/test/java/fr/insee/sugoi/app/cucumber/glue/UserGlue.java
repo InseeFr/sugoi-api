@@ -41,6 +41,7 @@ public class UserGlue {
   }
 
   @Then("the client expect to receive a list of users")
+  @SuppressWarnings("unchecked")
   public void expect_to_receive_a_list_of_users() {
     Boolean isUsers = false;
     ObjectMapper mapper = new ObjectMapper();

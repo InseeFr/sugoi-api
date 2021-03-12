@@ -35,12 +35,6 @@ public class JmsWriterStore implements WriterStore {
 
   private String queueRequestName;
 
-  private String queueResponseName;
-
-  private String queueUrgentRequestName;
-
-  private String queueUrgentResponseName;
-
   private Realm realm;
 
   private UserStorage userStorage;
@@ -57,9 +51,6 @@ public class JmsWriterStore implements WriterStore {
     this.userStorage = userStorage;
     this.jmsWriter = jmsWriter;
     this.queueRequestName = queueRequestName;
-    this.queueResponseName = queueResponseName;
-    this.queueUrgentRequestName = queueUrgentRequestName;
-    this.queueUrgentResponseName = queueUrgentResponseName;
   }
 
   @Override

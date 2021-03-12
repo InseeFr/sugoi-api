@@ -209,6 +209,8 @@ public class SugoiEventLogProducer {
         toLog.put("userStorage", userStorage);
         toLog.put("userId", (String) ((User) properties.get("user")).getUsername());
         break;
+      default:
+        break;
     }
     if (!toLog.isEmpty()) {
       String log = "";

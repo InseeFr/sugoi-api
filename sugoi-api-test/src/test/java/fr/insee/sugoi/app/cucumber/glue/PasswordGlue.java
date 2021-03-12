@@ -17,6 +17,7 @@ import fr.insee.sugoi.app.cucumber.utils.StepData;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 
+@SuppressWarnings("unused")
 public class PasswordGlue {
 
   private Scenario scenario;

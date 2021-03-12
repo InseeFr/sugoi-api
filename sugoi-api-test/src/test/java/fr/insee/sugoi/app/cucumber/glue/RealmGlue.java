@@ -26,6 +26,7 @@ import io.cucumber.java.en.Then;
 import java.util.Arrays;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class RealmGlue {
 
   private Scenario scenario;
