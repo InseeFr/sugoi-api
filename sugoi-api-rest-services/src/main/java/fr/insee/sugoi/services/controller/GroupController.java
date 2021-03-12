@@ -56,70 +56,6 @@ public class GroupController {
   @Autowired private GroupService groupService;
 
   @GetMapping(
-      path = {"/realms/{realm}/storages/{storage}/groups"},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Operation(summary = "Search groups by parameters")
-  @ApiResponses(
-      value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Groups found according to parameter",
-            content = {
-              @Content(
-                  mediaType = "application/json",
-                  schema = @Schema(implementation = PageResult.class))
-            })
-      })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
-  public ResponseEntity<PageResult<Group>> getGroups(
-      @Parameter(
-              description = "Name of the realm where the operation will be made",
-              required = true)
-          @PathVariable("realm")
-          String realm,
-      @Parameter(
-              description = "Name of the userStorage where the operation will be made",
-              required = false)
-          @PathVariable(name = "storage", required = false)
-          String storage,
-      @Parameter(description = "Name of application where to search group", required = false)
-          @RequestParam(value = "application")
-          String applicationName,
-      @Parameter(description = "Quick description of wanted group", required = false)
-          @RequestParam(value = "description", required = false)
-          String description,
-      @Parameter(description = "Group's name search", required = false)
-          @RequestParam(value = "name", required = false)
-          String name,
-      @Parameter(description = "Expected size of result", required = false)
-          @RequestParam(value = "size", defaultValue = "20")
-          int size,
-      @Parameter(description = "Offset to apply when searching", required = false)
-          @RequestParam(value = "offset", defaultValue = "0")
-          int offset) {
-    Group filterGroup = new Group();
-    filterGroup.setName(name);
-    filterGroup.setDescription(description);
-    PageableResult pageableResult = new PageableResult(size, offset);
-
-    PageResult<Group> foundGroups =
-        groupService.findByProperties(realm, storage, applicationName, filterGroup, pageableResult);
-
-    if (foundGroups.isHasMoreResult()) {
-      URI location =
-          ServletUriComponentsBuilder.fromCurrentRequest()
-              .replaceQueryParam("offset", offset + size)
-              .build()
-              .toUri();
-      return ResponseEntity.status(HttpStatus.OK)
-          .header(HttpHeaders.LOCATION, location.toString())
-          .body(foundGroups);
-    } else {
-      return ResponseEntity.status(HttpStatus.OK).body(foundGroups);
-    }
-  }
-
-  @GetMapping(
       path = {"/realms/{realm}/groups"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Search groups by parameters")
@@ -156,59 +92,25 @@ public class GroupController {
       @Parameter(description = "Offset to apply when searching", required = false)
           @RequestParam(value = "offset", defaultValue = "0")
           int offset) {
-    return getGroups(realm, null, applicationName, description, name, size, offset);
-  }
+    Group filterGroup = new Group();
+    filterGroup.setName(name);
+    filterGroup.setDescription(description);
+    PageableResult pageableResult = new PageableResult(size, offset);
 
-  @PostMapping(
-      value = {"/realms/{realm}/storages/{storage}/groups"},
-      consumes = {MediaType.APPLICATION_JSON_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Operation(summary = "Create group in application according to parameters")
-  @ApiResponses(
-      value = {
-        @ApiResponse(
-            responseCode = "201",
-            description = "Group created",
-            content = {
-              @Content(
-                  mediaType = "application/json",
-                  schema = @Schema(implementation = Group.class))
-            }),
-        @ApiResponse(
-            responseCode = "409",
-            description = "Group already exist",
-            content = {@Content(mediaType = "application/json")})
-      })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#storage,#applicationName)")
-  public ResponseEntity<?> createGroups(
-      @Parameter(
-              description = "Name of the realm where the operation will be made",
-              required = true)
-          @PathVariable("realm")
-          String realm,
-      @Parameter(
-              description = "Name of the userStorage where the operation will be made",
-              required = false)
-          @PathVariable(name = "storage", required = false)
-          String storage,
-      @Parameter(description = "Name of application where to add group", required = true)
-          @RequestParam(value = "application", required = true)
-          String applicationName,
-      @Parameter(description = "Group to create", required = true) @RequestBody Group group) {
+    PageResult<Group> foundGroups =
+        groupService.findByProperties(realm, applicationName, filterGroup, pageableResult);
 
-    if (groupService.findById(realm, storage, applicationName, group.getName()) == null) {
-      groupService.create(realm, storage, applicationName, group);
-
+    if (foundGroups.isHasMoreResult()) {
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()
-              .path("/" + group.getName())
+              .replaceQueryParam("offset", offset + size)
               .build()
               .toUri();
-
-      return ResponseEntity.created(location)
-          .body(groupService.findById(realm, storage, applicationName, group.getName()));
+      return ResponseEntity.status(HttpStatus.OK)
+          .header(HttpHeaders.LOCATION, location.toString())
+          .body(foundGroups);
     } else {
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+      return ResponseEntity.status(HttpStatus.OK).body(foundGroups);
     }
   }
 
@@ -244,11 +146,24 @@ public class GroupController {
           String applicationName,
       @Parameter(description = "Group to create", required = true) @RequestBody Group group) {
 
-    return createGroups(realm, null, applicationName, group);
+    if (groupService.findById(realm, applicationName, group.getName()) == null) {
+      groupService.create(realm, applicationName, group);
+
+      URI location =
+          ServletUriComponentsBuilder.fromCurrentRequest()
+              .path("/" + group.getName())
+              .build()
+              .toUri();
+
+      return ResponseEntity.created(location)
+          .body(groupService.findById(realm, applicationName, group.getName()));
+    } else {
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    }
   }
 
   @PutMapping(
-      value = {"/realms/{realm}/storages/{storage}/groups/{id}"},
+      value = {"/realms/{realm}/groups/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Update group in application according to parameters")
@@ -278,11 +193,6 @@ public class GroupController {
               required = true)
           @PathVariable("realm")
           String realm,
-      @Parameter(
-              description = "Name of the userStorage where the operation will be made",
-              required = false)
-          @PathVariable(name = "storage", required = false)
-          String storage,
       @Parameter(description = "Group's id to update", required = true) @PathVariable("id")
           String id,
       @Parameter(description = "Name of application which contains group", required = true)
@@ -294,59 +204,19 @@ public class GroupController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
-    if (groupService.findById(realm, storage, applicationName, id) != null) {
-      groupService.update(realm, storage, applicationName, group);
+    if (groupService.findById(realm, applicationName, id) != null) {
+      groupService.update(realm, applicationName, group);
       URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
       return ResponseEntity.status(HttpStatus.OK)
           .header(HttpHeaders.LOCATION, location.toString())
-          .body(groupService.findById(realm, storage, applicationName, id));
+          .body(groupService.findById(realm, applicationName, id));
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
-  @PutMapping(
-      value = {"/realms/{realm}/groups/{id}"},
-      consumes = {MediaType.APPLICATION_JSON_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Operation(summary = "Update group in application according to parameters")
-  @ApiResponses(
-      value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Group updated",
-            content = {
-              @Content(
-                  mediaType = "application/json",
-                  schema = @Schema(implementation = Group.class))
-            }),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Group and groupId are not equals",
-            content = {@Content(mediaType = "application/json")}),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Group didn't exist",
-            content = {@Content(mediaType = "application/json")})
-      })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#storage,#applicationName)")
-  public ResponseEntity<?> updateGroups(
-      @Parameter(
-              description = "Name of the realm where the operation will be made",
-              required = true)
-          @PathVariable("realm")
-          String realm,
-      @Parameter(description = "Group's id to update", required = true) @PathVariable("id")
-          String id,
-      @Parameter(description = "Name of application which contains group", required = true)
-          @RequestParam("application")
-          String applicationName,
-      @Parameter(description = "Group to update", required = true) @RequestBody Group group) {
-    return updateGroups(realm, null, id, applicationName, group);
-  }
-
   @DeleteMapping(
-      value = {"/realms/{realm}/storages/{storage}/groups/{id}"},
+      value = {"/realms/{realm}/groups/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete group in application")
   @ApiResponses(
@@ -371,57 +241,18 @@ public class GroupController {
               required = true)
           @PathVariable("realm")
           String realm,
-      @Parameter(
-              description = "Name of the userStorage where the operation will be made",
-              required = false)
-          @PathVariable(name = "storage", required = false)
-          String storage,
       @Parameter(description = "Name of application which contains group", required = true)
           @RequestParam("application")
           String applicationName,
       @Parameter(description = "Group's id to delete", required = true) @PathVariable("id")
           String id) {
 
-    if (groupService.findById(realm, storage, applicationName, id) != null) {
-      groupService.delete(realm, storage, applicationName, id);
+    if (groupService.findById(realm, applicationName, id) != null) {
+      groupService.delete(realm, applicationName, id);
       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
-  }
-
-  @DeleteMapping(
-      value = {"/realms/{realm}/groups/{id}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Operation(summary = "Delete group in application")
-  @ApiResponses(
-      value = {
-        @ApiResponse(
-            responseCode = "204",
-            description = "Group deleted",
-            content = {
-              @Content(
-                  mediaType = "application/json",
-                  schema = @Schema(implementation = Group.class))
-            }),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Group didn't exist",
-            content = {@Content(mediaType = "application/json")})
-      })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#storage,#applicationName)")
-  public ResponseEntity<String> deleteGroups(
-      @Parameter(
-              description = "Name of the realm where the operation will be made",
-              required = true)
-          @PathVariable("realm")
-          String realm,
-      @Parameter(description = "Name of application which contains group", required = true)
-          @RequestParam("application")
-          String applicationName,
-      @Parameter(description = "Group's id to delete", required = true) @PathVariable("id")
-          String id) {
-    return deleteGroups(realm, null, applicationName, id);
   }
 
   @GetMapping(
@@ -450,55 +281,16 @@ public class GroupController {
               required = true)
           @PathVariable("realm")
           String realm,
-      @Parameter(
-              description = "Name of the userStorage where the operation will be made",
-              required = false)
-          @PathVariable(name = "storage", required = false)
-          String storage,
       @Parameter(description = "Name of application which contains group", required = true)
           @RequestParam("application")
           String applicationName,
       @Parameter(description = "Group's name to search", required = true) @PathVariable("groupname")
           String id) {
-    Group group = groupService.findById(realm, storage, applicationName, id);
+    Group group = groupService.findById(realm, applicationName, id);
     if (group != null) {
       return ResponseEntity.status(HttpStatus.OK).body(group);
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
-  }
-
-  @GetMapping(
-      path = {"/realms/{realm}/groups/{groupname}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Operation(summary = "Get group by name in an application")
-  @ApiResponses(
-      value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Group found",
-            content = {
-              @Content(
-                  mediaType = "application/json",
-                  schema = @Schema(implementation = Group.class))
-            }),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Group didn't exist",
-            content = {@Content(mediaType = "application/json")})
-      })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
-  public ResponseEntity<Group> getGroupByGroupname(
-      @Parameter(
-              description = "Name of the realm where the operation will be made",
-              required = true)
-          @PathVariable("realm")
-          String realm,
-      @Parameter(description = "Name of application which contains group", required = true)
-          @RequestParam("application")
-          String applicationName,
-      @Parameter(description = "Group's name to search", required = true) @PathVariable("groupname")
-          String id) {
-    return getGroupByGroupname(realm, null, applicationName, id);
   }
 }

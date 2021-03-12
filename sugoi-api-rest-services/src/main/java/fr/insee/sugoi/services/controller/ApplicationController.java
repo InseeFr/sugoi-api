@@ -56,68 +56,6 @@ public class ApplicationController {
   @Autowired private ApplicationService applicationService;
 
   @GetMapping(
-      path = {"/realms/{realm}/storages/{storage}/applications"},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Operation(summary = "Search applications by parameter")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
-  @ApiResponses(
-      value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Applications found according to parameter",
-            content = {
-              @Content(
-                  mediaType = "application/json",
-                  schema = @Schema(implementation = PageResult.class))
-            })
-      })
-  public ResponseEntity<PageResult<Application>> getApplications(
-      @Parameter(
-              description = "Name of the realm where the operation will be made",
-              required = true)
-          @PathVariable("realm")
-          String realm,
-      @Parameter(
-              description = "Name of the userStorage where the operation will be made",
-              required = false)
-          @PathVariable(name = "storage", required = false)
-          String storage,
-      @Parameter(description = "Expected size of result", required = false)
-          @RequestParam(name = "size", defaultValue = "20")
-          int size,
-      @Parameter(description = "Offset to apply when searching", required = false)
-          @RequestParam(name = "offset", required = false, defaultValue = "0")
-          int offset,
-      @Parameter(description = "Name of the app searched", required = false)
-          @RequestParam(value = "name", required = false)
-          String name,
-      @Parameter(description = "Name of the owner of the app searched", required = false)
-          @RequestParam(value = "owner", required = false)
-          String owner) {
-    Application applicationFilter = new Application();
-    applicationFilter.setName(name);
-    applicationFilter.setOwner(owner);
-
-    PageableResult pageableResult = new PageableResult(size, offset);
-
-    PageResult<Application> foundApplications =
-        applicationService.findByProperties(realm, storage, applicationFilter, pageableResult);
-
-    if (foundApplications.isHasMoreResult()) {
-      URI location =
-          ServletUriComponentsBuilder.fromCurrentRequest()
-              .replaceQueryParam("offset", offset + size)
-              .build()
-              .toUri();
-      return ResponseEntity.status(HttpStatus.OK)
-          .header(HttpHeaders.LOCATION, location.toString())
-          .body(foundApplications);
-    } else {
-      return ResponseEntity.status(HttpStatus.OK).body(foundApplications);
-    }
-  }
-
-  @GetMapping(
       path = {"/realms/{realm}/applications"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Search applications by parameter")
@@ -151,57 +89,26 @@ public class ApplicationController {
       @Parameter(description = "Name of the owner of the app searched", required = false)
           @RequestParam(value = "owner", required = false)
           String owner) {
-    return getApplications(realm, null, size, offset, name, owner);
-  }
+    Application applicationFilter = new Application();
+    applicationFilter.setName(name);
+    applicationFilter.setOwner(owner);
 
-  @PostMapping(
-      value = {"/realms/{realm}/storages/{storage}/applications"},
-      consumes = {MediaType.APPLICATION_JSON_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Operation(summary = "Create application")
-  @ApiResponses(
-      value = {
-        @ApiResponse(
-            responseCode = "201",
-            description = "Application created",
-            content = {
-              @Content(
-                  mediaType = "application/json",
-                  schema = @Schema(implementation = Application.class))
-            }),
-        @ApiResponse(
-            responseCode = "409",
-            description = "Application already exist",
-            content = {@Content(mediaType = "application/json")})
-      })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
-  public ResponseEntity<Application> createApplication(
-      @Parameter(
-              description = "Name of the realm where the operation will be made",
-              required = true)
-          @PathVariable("realm")
-          String realm,
-      @Parameter(
-              description = "Name of the userStorage where the operation will be made",
-              required = false)
-          @PathVariable(name = "storage", required = false)
-          String storage,
-      @Parameter(description = "Application to create", required = true) @RequestBody
-          Application application) {
+    PageableResult pageableResult = new PageableResult(size, offset);
 
-    if (applicationService.findById(realm, storage, application.getName()) == null) {
-      applicationService.create(realm, storage, application);
+    PageResult<Application> foundApplications =
+        applicationService.findByProperties(realm, applicationFilter, pageableResult);
 
+    if (foundApplications.isHasMoreResult()) {
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()
-              .path("/" + application.getName())
+              .replaceQueryParam("offset", offset + size)
               .build()
               .toUri();
-
-      return ResponseEntity.created(location)
-          .body(applicationService.findById(realm, storage, application.getName()));
+      return ResponseEntity.status(HttpStatus.OK)
+          .header(HttpHeaders.LOCATION, location.toString())
+          .body(foundApplications);
     } else {
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+      return ResponseEntity.status(HttpStatus.OK).body(foundApplications);
     }
   }
 
@@ -234,11 +141,25 @@ public class ApplicationController {
           String realm,
       @Parameter(description = "Application to create", required = true) @RequestBody
           Application application) {
-    return createApplication(realm, null, application);
+
+    if (applicationService.findById(realm, application.getName()) == null) {
+      applicationService.create(realm, application);
+
+      URI location =
+          ServletUriComponentsBuilder.fromCurrentRequest()
+              .path("/" + application.getName())
+              .build()
+              .toUri();
+
+      return ResponseEntity.created(location)
+          .body(applicationService.findById(realm, application.getName()));
+    } else {
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    }
   }
 
   @PutMapping(
-      value = {"/realms/{realm}/storages/{storage}/applications/{id}"},
+      value = {"/realms/{realm}}/applications/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Update application")
@@ -264,11 +185,6 @@ public class ApplicationController {
               required = true)
           @PathVariable("realm")
           String realm,
-      @Parameter(
-              description = "Name of the userStorage where the operation will be made",
-              required = false)
-          @PathVariable(name = "storage", required = false)
-          String storage,
       @Parameter(description = "Id of the app to update", required = true) @PathVariable("id")
           String id,
       @Parameter(description = "Application to update", required = true) @RequestBody
@@ -278,55 +194,21 @@ public class ApplicationController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
-    if (applicationService.findById(realm, storage, id) != null) {
-      applicationService.update(realm, storage, application);
+    if (applicationService.findById(realm, id) != null) {
+      applicationService.update(realm, application);
 
       URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
 
       return ResponseEntity.status(HttpStatus.OK)
           .header(HttpHeaders.LOCATION, location.toString())
-          .body(applicationService.findById(realm, storage, id));
+          .body(applicationService.findById(realm, id));
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
-  @PutMapping(
-      value = {"/realms/{realm}/applications/{id}"},
-      consumes = {MediaType.APPLICATION_JSON_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Operation(summary = "Update application")
-  @ApiResponses(
-      value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Application updated",
-            content = {
-              @Content(
-                  mediaType = "application/json",
-                  schema = @Schema(implementation = Application.class))
-            }),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Application does'nt exist",
-            content = {@Content(mediaType = "application/json")})
-      })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
-  public ResponseEntity<Application> updateApplication(
-      @Parameter(
-              description = "Name of the realm where the operation will be made",
-              required = true)
-          @PathVariable("realm")
-          String realm,
-      @Parameter(description = "Id of the app to update", required = true) @PathVariable("id")
-          String id,
-      @Parameter(description = "Application to update", required = true) @RequestBody
-          Application application) {
-    return updateApplication(realm, null, id, application);
-  }
-
   @DeleteMapping(
-      value = {"/realms/{realm}/storages/{storage}/applications/{id}"},
+      value = {"/realms/{realm}/applications/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete application")
   @ApiResponses(
@@ -347,47 +229,15 @@ public class ApplicationController {
               required = true)
           @PathVariable("realm")
           String realm,
-      @Parameter(
-              description = "Name of the userStorage where the operation will be made",
-              required = false)
-          @PathVariable(name = "storage", required = false)
-          String storage,
       @Parameter(description = "Application's id to delete", required = false) @PathVariable("id")
           String id) {
 
-    if (applicationService.findById(realm, storage, id) != null) {
-      applicationService.delete(realm, storage, id);
+    if (applicationService.findById(realm, id) != null) {
+      applicationService.delete(realm, id);
       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
-  }
-
-  @DeleteMapping(
-      value = {"/realms/{realm}/applications/{id}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Operation(summary = "Delete application")
-  @ApiResponses(
-      value = {
-        @ApiResponse(
-            responseCode = "204",
-            description = "Application deleted",
-            content = {@Content(mediaType = "application/json")}),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Application does'nt exist",
-            content = {@Content(mediaType = "application/json")})
-      })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
-  public ResponseEntity<String> deleteApplication(
-      @Parameter(
-              description = "Name of the realm where the operation will be made",
-              required = true)
-          @PathVariable("realm")
-          String realm,
-      @Parameter(description = "Application's id to delete", required = false) @PathVariable("id")
-          String id) {
-    return deleteApplication(realm, null, id);
   }
 
   @GetMapping(
@@ -416,49 +266,13 @@ public class ApplicationController {
               required = true)
           @PathVariable("realm")
           String realm,
-      @Parameter(
-              description = "Name of the userStorage where the operation will be made",
-              required = false)
-          @PathVariable(name = "storage", required = false)
-          String storage,
       @Parameter(description = "Name of the app searched", required = true) @PathVariable("name")
           String name) {
-    Application application = applicationService.findById(realm, storage, name);
+    Application application = applicationService.findById(realm, name);
     if (application != null) {
       return ResponseEntity.status(HttpStatus.OK).body(application);
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
-  }
-
-  @GetMapping(
-      path = {"/realms/{realm}/applications/{name}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Operation(summary = "Get application by name")
-  @ApiResponses(
-      value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Application found according to parameter",
-            content = {
-              @Content(
-                  mediaType = "application/json",
-                  schema = @Schema(implementation = Application.class))
-            }),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Application does'nt exist",
-            content = {@Content(mediaType = "application/json")})
-      })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
-  public ResponseEntity<Application> getApplicationByName(
-      @Parameter(
-              description = "Name of the realm where the operation will be made",
-              required = true)
-          @PathVariable("realm")
-          String realm,
-      @Parameter(description = "Name of the app searched", required = true) @PathVariable("name")
-          String name) {
-    return getApplicationByName(realm, null, name);
   }
 }

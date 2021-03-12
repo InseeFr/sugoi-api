@@ -271,37 +271,6 @@ public class UserController {
     }
   }
 
-  @PostMapping(
-      value = {"/realms/{realm}/users"},
-      consumes = {MediaType.APPLICATION_JSON_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Operation(summary = "Create user")
-  @ApiResponses(
-      value = {
-        @ApiResponse(
-            responseCode = "201",
-            description = "User created",
-            content = {
-              @Content(
-                  mediaType = "application/json",
-                  schema = @Schema(implementation = User.class))
-            }),
-        @ApiResponse(
-            responseCode = "409",
-            description = "User already exist",
-            content = {@Content(mediaType = "application/json")})
-      })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
-  public ResponseEntity<?> createUsers(
-      @Parameter(
-              description = "Name of the realm where the operation will be made",
-              required = true)
-          @PathVariable("realm")
-          String realm,
-      @Parameter(description = "User to create", required = true) @RequestBody User user) {
-    return createUsers(realm, null, user);
-  }
-
   @PutMapping(
       value = {"/realms/{realm}/storages/{storage}/users/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
