@@ -81,7 +81,10 @@ public class RealmController {
     List<Realm> realmsFiltered = new ArrayList<>();
 
     if (id != null) {
-      realms.add(configService.getRealm(id));
+      Realm retrievedRealm = configService.getRealm(id);
+      if (retrievedRealm != null) {
+        realms.add(retrievedRealm);
+      }
     } else {
       realms.addAll(configService.getRealms());
     }
