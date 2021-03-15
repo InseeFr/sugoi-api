@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping(value = {"/v2", "/"})
@@ -105,9 +107,28 @@ public class RealmController {
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Create realm")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAdmin()")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "409",
+            description = "Realm already exist",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "201",
+            description = "Realm created",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Realm.class))
+            })
+      })
   public ResponseEntity<Realm> createRealm(@RequestBody Realm realm) {
-    // TODO: process POST request
-    return new ResponseEntity<Realm>(realm, HttpStatus.CREATED);
+    if (configService.getRealm(realm.getName()) != null) {
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    }
+    configService.createRealm(realm);
+    return ResponseEntity.created(createRealmURI(realm.getName()))
+        .body(configService.getRealm(realm.getName()));
   }
 
   @PutMapping(
@@ -116,19 +137,64 @@ public class RealmController {
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isAdmin()")
   @Operation(summary = "Update realm")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "400",
+            description = "Bad request",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Realm not found",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "200",
+            description = "Realm updated",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = Realm.class))
+            })
+      })
   public ResponseEntity<Realm> updateRealm(
       @RequestBody Realm realm, @PathVariable("id") String id) {
-    // TODO: process PUT request
-    return new ResponseEntity<Realm>(realm, HttpStatus.OK);
+    if (!realm.getName().equalsIgnoreCase(id)) {
+      return ResponseEntity.badRequest().build();
+    }
+    if (configService.getRealm(realm.getName()) == null) {
+      return ResponseEntity.notFound().build();
+    }
+    configService.updateRealm(realm);
+    return ResponseEntity.ok()
+        .location(createRealmURI(realm.getName()))
+        .body(configService.getRealm(realm.getName()));
   }
 
   @DeleteMapping(
       value = "/realms/{id}",
-      consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete Realm")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAdmin()")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "404",
+            description = "Realm not found",
+            content = {@Content(mediaType = "application/json")}),
+        @ApiResponse(
+            responseCode = "204",
+            description = "Realm deleted",
+            content = {@Content(mediaType = "application/json")})
+      })
   public ResponseEntity<String> deleteRealm(@PathVariable("id") String id) {
-    return new ResponseEntity<String>(id, HttpStatus.OK);
+    if (configService.getRealm(id) == null) {
+      return ResponseEntity.notFound().build();
+    }
+    configService.deleteRealm(id);
+    return ResponseEntity.noContent().build();
+  }
+
+  private URI createRealmURI(String realmName) {
+    return ServletUriComponentsBuilder.fromCurrentRequest().path("/" + realmName).build().toUri();
   }
 }
