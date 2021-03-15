@@ -12,7 +12,7 @@ Feature: User scenario
         Then the client want to see the users list
 
     Scenario: Post users
-        When the client perform POST request with body on url /realms/domaine1/users body:
+        When the client perform POST request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users body:
             """
             {
                 "lastName": "string",

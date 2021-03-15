@@ -13,12 +13,13 @@
 */
 package fr.insee.sugoi.core.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PageResult<T> {
   private static final int TAILLE_RECHERCHE_DEFAUT = 20;
 
-  private List<T> results;
+  private List<T> results = new ArrayList<>();
   private int totalElements;
   private int nextStart;
   private boolean hasMoreResult = false;

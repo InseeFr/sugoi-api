@@ -159,7 +159,7 @@ public class ApplicationController {
   }
 
   @PutMapping(
-      value = {"/realms/{realm}}/applications/{id}"},
+      value = {"/realms/{realm}/applications/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Update application")
@@ -241,7 +241,7 @@ public class ApplicationController {
   }
 
   @GetMapping(
-      path = {"/realms/{realm}/storages/{storage}/applications/{name}"},
+      path = {"/realms/{realm}/applications/{name}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get application by name")
   @ApiResponses(

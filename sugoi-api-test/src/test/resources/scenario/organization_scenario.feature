@@ -12,7 +12,7 @@ Feature: Organization scenario
         Then the client expect to receive a list of organizations
 
     Scenario: Post organization
-        When the client perform POST request with body on url /realms/domaine1/organizations body:
+        When the client perform POST request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/organizations body:
             """
             {
                 "identifiant": "identifiant"

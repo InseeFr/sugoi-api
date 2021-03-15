@@ -301,7 +301,12 @@ public class OrganizationController {
           String id,
       @Parameter(description = "Organization to update", required = false) @RequestBody
           Organization organization) {
-    return updateOrganizations(realm, null, id, organization);
+    if (!organization.getIdentifiant().equals(id)) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+    Organization org = organizationService.findById(realm, null, id);
+    return updateOrganizations(
+        realm, (String) org.getMetadatas().get("userStorage"), id, organization);
   }
 
   @DeleteMapping(
@@ -366,7 +371,9 @@ public class OrganizationController {
           String realm,
       @Parameter(description = "Organization's id to delete", required = false) @PathVariable("id")
           String id) {
-    return deleteOrganizations(realm, null, id);
+
+    Organization org = organizationService.findById(realm, null, id);
+    return deleteOrganizations(realm, (String) org.getMetadatas().get("userStorage"), id);
   }
 
   @GetMapping(
