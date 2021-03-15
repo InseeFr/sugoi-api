@@ -17,6 +17,7 @@ import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.List;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
 /**
@@ -68,9 +69,18 @@ public interface RealmProvider {
   @Cacheable("Realms")
   public List<Realm> findAll();
 
+  @CacheEvict(
+      value = {"Realms", "Realm"},
+      allEntries = true)
   public void createRealm(Realm realm);
 
+  @CacheEvict(
+      value = {"Realms", "Realm"},
+      allEntries = true)
   public void updateRealm(Realm realm);
 
+  @CacheEvict(
+      value = {"Realms", "Realm"},
+      allEntries = true)
   public void deleteRealm(String realmName);
 }
