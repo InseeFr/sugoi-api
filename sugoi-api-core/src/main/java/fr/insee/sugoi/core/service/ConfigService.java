@@ -18,13 +18,13 @@ import java.util.List;
 
 public interface ConfigService {
 
-  Realm getRealm(String name);
+  Realm getRealm(String realmName);
 
   List<Realm> getRealms();
 
-  void deleteRealm(String nom);
+  void deleteRealm(String realmName);
 
-  void updateRealm(Realm serializeToSugoi);
+  void updateRealm(Realm realm);
 
-  void createRealm(Realm serializeToSugoi);
+  void createRealm(Realm realm);
 }
