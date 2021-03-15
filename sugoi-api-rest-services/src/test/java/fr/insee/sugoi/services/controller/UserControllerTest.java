@@ -21,6 +21,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.User;
@@ -214,19 +215,20 @@ public class UserControllerTest {
   public void postShouldCallPostServiceAndReturnNewApp() {
 
     try {
-      Mockito.when(userService.findById("domaine1", null, "Toto"))
+      Mockito.when(userService.findById("domaine1", "Profil_domaine1_WebServiceLdap", "Toto"))
           .thenReturn(null)
           .thenReturn(user1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/realms/domaine1/users")
+          MockMvcRequestBuilders.post(
+                  "/realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(user1))
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-      verify(userService).create(Mockito.anyString(), Mockito.isNull(), Mockito.any());
+      verify(userService).create(Mockito.anyString(), Mockito.anyString(), Mockito.any());
       assertThat(
           "Should get new user",
           objectMapper.readValue(response.getContentAsString(), User.class).getUsername(),
@@ -276,7 +278,8 @@ public class UserControllerTest {
           .thenReturn(user1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/realms/domaine1/users")
+          MockMvcRequestBuilders.post(
+                  "/realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(user1))
               .accept(MediaType.APPLICATION_JSON)
@@ -285,7 +288,8 @@ public class UserControllerTest {
       assertThat(
           "Location header gives get uri",
           mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
-          is("http://localhost/realms/domaine1/users/Toto"));
+          is(
+              "http://localhost/realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users/Toto"));
 
     } catch (Exception e1) {
       e1.printStackTrace();
@@ -299,7 +303,8 @@ public class UserControllerTest {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/realms/domaine1/users")
+          MockMvcRequestBuilders.post(
+                  "/realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(user1))
               .accept(MediaType.APPLICATION_JSON)
@@ -363,11 +368,13 @@ public class UserControllerTest {
   public void get409WhenCreatingAlreadyExistingUser() {
     try {
 
-      Mockito.when(userService.findById(Mockito.anyString(), Mockito.isNull(), Mockito.anyString()))
+      Mockito.when(
+              userService.findById(Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
           .thenReturn(user1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/realms/domaine1/users")
+          MockMvcRequestBuilders.post(
+                  "/realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(user1))
               .accept(MediaType.APPLICATION_JSON)
@@ -418,7 +425,6 @@ public class UserControllerTest {
               .content(objectMapper.writeValueAsString(user1))
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
-
       assertThat(
           "Should respond 404",
           mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
@@ -435,9 +441,8 @@ public class UserControllerTest {
   public void get404WhenNoUserIsFoundWhenUpdate() {
     try {
 
-      Mockito.when(userService.findById(Mockito.anyString(), Mockito.isNull(), Mockito.anyString()))
-          .thenReturn(null);
-
+      Mockito.when(userService.findById(Mockito.anyString(), Mockito.any(), Mockito.anyString()))
+          .thenThrow(EntityNotFoundException.class);
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.put("/realms/domaine1/users/Toto")
               .contentType(MediaType.APPLICATION_JSON)
@@ -461,8 +466,8 @@ public class UserControllerTest {
   public void get404WhenNoUserIsFoundWhenDelete() {
     try {
 
-      Mockito.when(userService.findById(Mockito.anyString(), Mockito.isNull(), Mockito.anyString()))
-          .thenReturn(null);
+      Mockito.when(userService.findById(Mockito.anyString(), Mockito.any(), Mockito.anyString()))
+          .thenThrow(EntityNotFoundException.class);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.delete("/realms/domaine1/users/dontexist")

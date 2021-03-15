@@ -19,77 +19,83 @@ import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.model.SearchType;
+import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.core.store.StoreProvider;
+import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
-
-import java.util.List;
+import fr.insee.sugoi.model.UserStorage;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-  @Autowired
-  private StoreProvider storeProvider;
+  @Autowired private StoreProvider storeProvider;
 
-  @Autowired
-  private SugoiEventPublisher sugoiEventPublisher;
+  @Autowired private RealmProvider realmProvider;
+
+  @Autowired private SugoiEventPublisher sugoiEventPublisher;
 
   protected static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
 
   @Override
   public User create(String realm, String storage, User user) {
-    sugoiEventPublisher.publishCustomEvent(realm, storage, SugoiEventTypeEnum.CREATE_USER,
-        Map.ofEntries(Map.entry("user", user)));
+    sugoiEventPublisher.publishCustomEvent(
+        realm, storage, SugoiEventTypeEnum.CREATE_USER, Map.ofEntries(Map.entry("user", user)));
     return storeProvider.getWriterStore(realm, storage).createUser(user);
   }
 
   @Override
   public void update(String realm, String storage, User user) {
-    sugoiEventPublisher.publishCustomEvent(realm, storage, SugoiEventTypeEnum.UPDATE_USER,
-        Map.ofEntries(Map.entry("user", user)));
+    sugoiEventPublisher.publishCustomEvent(
+        realm, storage, SugoiEventTypeEnum.UPDATE_USER, Map.ofEntries(Map.entry("user", user)));
     storeProvider.getWriterStore(realm, storage).updateUser(user);
   }
 
   @Override
   public void delete(String realmName, String storage, String id) {
-    sugoiEventPublisher.publishCustomEvent(realmName, storage, SugoiEventTypeEnum.DELETE_USER,
-        Map.ofEntries(Map.entry("userId", id)));
+    sugoiEventPublisher.publishCustomEvent(
+        realmName, storage, SugoiEventTypeEnum.DELETE_USER, Map.ofEntries(Map.entry("userId", id)));
     storeProvider.getWriterStore(realmName, storage).deleteUser(id);
   }
 
   @Override
   public User findById(String realmName, String storage, String id) {
     if (id != null) {
-      sugoiEventPublisher.publishCustomEvent(realmName, storage, SugoiEventTypeEnum.FIND_USER_BY_ID,
+      sugoiEventPublisher.publishCustomEvent(
+          realmName,
+          storage,
+          SugoiEventTypeEnum.FIND_USER_BY_ID,
           Map.ofEntries(Map.entry("userId", id)));
     }
-    User user = null;
     if (storage != null) {
       try {
-        user = storeProvider.getReaderStore(realmName, storage).getUser(id);
+        User user = storeProvider.getReaderStore(realmName, storage).getUser(id);
         user.addMetadatas("realm", realmName.toLowerCase());
         user.addMetadatas("userStorage", storage.toLowerCase());
         return user;
       } catch (Exception e) {
-        throw new UserNotFoundException("User not found in realm " + realmName + " and userStorage " + storage);
+        throw new UserNotFoundException(
+            "User not found in realm " + realmName + " and userStorage " + storage);
       }
     } else {
-      List<ReaderStore> readersStore = storeProvider.getReaderStores(realmName);
-      for (ReaderStore readerStore : readersStore) {
+      Realm r = realmProvider.load(realmName);
+      for (UserStorage us : r.getUserStorages()) {
         try {
-          user = readerStore.getUser(id);
+          User user = storeProvider.getReaderStore(realmName, us.getName()).getUser(id);
           if (user != null) {
-            user.addMetadatas("realm", realmName.toLowerCase());
-            user.addMetadatas("userStorage", storage.toLowerCase());
+            user.addMetadatas("realm", realmName);
+            user.addMetadatas("userStorage", us.getName());
             return user;
           }
         } catch (Exception e) {
+          logger.info(
+              "User " + id + "not in realm " + realmName + " and userstorage " + us.getName());
         }
       }
     }
@@ -97,33 +103,59 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public PageResult<User> findByProperties(String realm, String storage, User userProperties, PageableResult pageable,
+  public PageResult<User> findByProperties(
+      String realm,
+      String storage,
+      User userProperties,
+      PageableResult pageable,
       SearchType typeRecherche) {
 
-    sugoiEventPublisher.publishCustomEvent(realm, storage, SugoiEventTypeEnum.FIND_USERS,
-        Map.ofEntries(Map.entry("userProperties", userProperties), Map.entry("pageable", pageable),
+    sugoiEventPublisher.publishCustomEvent(
+        realm,
+        storage,
+        SugoiEventTypeEnum.FIND_USERS,
+        Map.ofEntries(
+            Map.entry("userProperties", userProperties),
+            Map.entry("pageable", pageable),
             Map.entry("typeRecherche", typeRecherche)));
     PageResult<User> result = new PageResult<>();
+    result.setPageSize(pageable.getSize());
     try {
       if (storage != null) {
-        result = storeProvider.getReaderStore(realm, storage).searchUsers(userProperties, pageable,
-            typeRecherche.name());
+        result =
+            storeProvider
+                .getReaderStore(realm, storage)
+                .searchUsers(userProperties, pageable, typeRecherche.name());
+        result
+            .getResults()
+            .forEach(
+                user -> {
+                  user.addMetadatas("realm", realm);
+                  user.addMetadatas("userStorage", storage);
+                });
       } else {
-        List<ReaderStore> readersStore = storeProvider.getReaderStores(realm);
-        for (ReaderStore readerStore : readersStore) {
-          try {
-            pageable
-                .setSize(pageable.getSize() - result.getPageSize() > 0 ? pageable.getSize() - result.getPageSize() : 0);
-            PageResult<User> temResult = readerStore.searchUsers(userProperties, pageable, typeRecherche.name());
-            result.getResults().addAll(temResult.getResults());
-            result.setPageSize(result.getResults().size());
-            if (result.getPageSize() < pageable.getSize()) {
-              return result;
-            }
-          } catch (Exception e) {
+        Realm r = realmProvider.load(realm);
+        for (UserStorage us : r.getUserStorages()) {
+          ReaderStore readerStore =
+              storeProvider.getStoreForUserStorage(realm, us.getName()).getReader();
+          PageResult<User> temResult =
+              readerStore.searchUsers(userProperties, pageable, typeRecherche.name());
+          temResult
+              .getResults()
+              .forEach(
+                  user -> {
+                    user.addMetadatas("realm", realm);
+                    user.addMetadatas("userStorage", us.getName());
+                  });
+          result.getResults().addAll(temResult.getResults());
+          result.setTotalElements(result.getResults().size());
+          if (result.getTotalElements() >= result.getPageSize()) {
+            return result;
           }
+          pageable.setSize(pageable.getSize() - result.getTotalElements());
         }
       }
+
     } catch (Exception e) {
       throw new RuntimeException("Erreur lors de la récupération des utilisateurs", e);
     }
@@ -131,16 +163,30 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void addUserToGroup(String realm, String storage, String userId, String appName, String groupName) {
-    sugoiEventPublisher.publishCustomEvent(realm, storage, SugoiEventTypeEnum.ADD_USER_TO_GROUP,
-        Map.ofEntries(Map.entry("user", userId), Map.entry("appName", appName), Map.entry("groupName", groupName)));
+  public void addUserToGroup(
+      String realm, String storage, String userId, String appName, String groupName) {
+    sugoiEventPublisher.publishCustomEvent(
+        realm,
+        storage,
+        SugoiEventTypeEnum.ADD_USER_TO_GROUP,
+        Map.ofEntries(
+            Map.entry("user", userId),
+            Map.entry("appName", appName),
+            Map.entry("groupName", groupName)));
     storeProvider.getWriterStore(realm, storage).addUserToGroup(appName, groupName, userId);
   }
 
   @Override
-  public void deleteUserFromGroup(String realm, String storage, String userId, String appName, String groupName) {
-    sugoiEventPublisher.publishCustomEvent(realm, storage, SugoiEventTypeEnum.DELETE_USER_FROM_GROUP,
-        Map.ofEntries(Map.entry("user", userId), Map.entry("appName", appName), Map.entry("groupName", groupName)));
+  public void deleteUserFromGroup(
+      String realm, String storage, String userId, String appName, String groupName) {
+    sugoiEventPublisher.publishCustomEvent(
+        realm,
+        storage,
+        SugoiEventTypeEnum.DELETE_USER_FROM_GROUP,
+        Map.ofEntries(
+            Map.entry("user", userId),
+            Map.entry("appName", appName),
+            Map.entry("groupName", groupName)));
     storeProvider.getWriterStore(realm, storage).deleteUserFromGroup(appName, groupName, userId);
   }
 }

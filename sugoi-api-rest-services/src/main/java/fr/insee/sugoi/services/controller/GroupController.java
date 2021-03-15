@@ -256,7 +256,7 @@ public class GroupController {
   }
 
   @GetMapping(
-      path = {"/realms/{realm}/storages/{storage}/groups/{groupname}"},
+      path = {"/realms/{realm}/groups/{groupname}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get group by name in an application")
   @ApiResponses(
