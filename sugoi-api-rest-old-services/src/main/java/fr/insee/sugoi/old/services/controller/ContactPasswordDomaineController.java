@@ -121,7 +121,7 @@ public class ContactPasswordDomaineController {
    * @param domaine
    * @param pcr a PCR containting the new password
    * @return NO_CONTENT if password is initialized, CONFLICT if a password already exist or if new
-   *     password does not respect password policy TODO : check if user already has password
+   *     password does not respect password policy
    */
   @PreAuthorize("@OldAuthorizeMethodDecider.isAtLeastGestionnaire(#domaine)")
   @PostMapping(

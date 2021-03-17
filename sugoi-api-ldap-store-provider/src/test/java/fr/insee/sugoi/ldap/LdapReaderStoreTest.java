@@ -271,7 +271,6 @@ public class LdapReaderStoreTest {
         ldapReaderStore.getUsersInGroup("Applitest", "Utilisateurs_Applitest").getResults();
     assertThat("Should find 2 elements", users.size(), is(2));
     // for now if a user in a group is not in the current realm, the user is null
-    // TODO : decide what to do
     assertThat("Is null, maybe not the expected behavior", users.get(0), is(nullValue()));
     assertThat("Should be administrateurs", users.get(1).getUsername(), is("testc"));
   }

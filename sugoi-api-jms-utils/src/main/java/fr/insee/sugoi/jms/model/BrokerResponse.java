@@ -54,7 +54,6 @@ public class BrokerResponse {
 
   @Override
   public String toString() {
-    // TODO Auto-generated method stub
     return "{uuid: " + uuid.toString() + " comment: " + comment + "}";
   }
 }
