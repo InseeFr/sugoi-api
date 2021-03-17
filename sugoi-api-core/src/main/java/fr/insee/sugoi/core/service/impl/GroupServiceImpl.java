@@ -54,6 +54,9 @@ public class GroupServiceImpl implements GroupService {
 
   @Override
   public Group findById(String realm, String storage, String appName, String id) {
+    if (id == null) {
+      id = "";
+    }
     sugoiEventPublisher.publishCustomEvent(
         realm,
         storage,

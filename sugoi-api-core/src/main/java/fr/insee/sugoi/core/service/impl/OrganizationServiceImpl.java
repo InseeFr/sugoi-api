@@ -55,6 +55,9 @@ public class OrganizationServiceImpl implements OrganizationService {
 
   @Override
   public Organization findById(String realm, String storage, String id) {
+    if (id == null) {
+      id = "";
+    }
     sugoiEventPublisher.publishCustomEvent(
         realm,
         storage,

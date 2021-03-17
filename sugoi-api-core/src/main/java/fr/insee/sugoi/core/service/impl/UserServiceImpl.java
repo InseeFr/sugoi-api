@@ -55,13 +55,14 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public User findById(String realmName, String storage, String id) {
-    if (id != null) {
-      sugoiEventPublisher.publishCustomEvent(
-          realmName,
-          storage,
-          SugoiEventTypeEnum.FIND_USER_BY_ID,
-          Map.ofEntries(Map.entry("userId", id)));
+    if (id == null) {
+      id = "";
     }
+    sugoiEventPublisher.publishCustomEvent(
+        realmName,
+        storage,
+        SugoiEventTypeEnum.FIND_USER_BY_ID,
+        Map.ofEntries(Map.entry("userId", id)));
     try {
       return storeProvider.getReaderStore(realmName, storage).getUser(id);
     } catch (Exception e) {

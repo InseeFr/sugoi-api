@@ -63,6 +63,9 @@ public class ApplicationServiceImpl implements ApplicationService {
 
   @Override
   public Application findById(String realm, String storage, String id) {
+    if (id == null) {
+      id = "";
+    }
     sugoiEventPublisher.publishCustomEvent(
         realm,
         storage,
