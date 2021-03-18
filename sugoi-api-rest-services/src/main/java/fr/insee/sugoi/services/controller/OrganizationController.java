@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.services.controller;
 
+import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.model.SearchType;
@@ -192,20 +193,19 @@ public class OrganizationController {
           String storage,
       @Parameter(description = "Organization to create", required = false) @RequestBody
           Organization organization) {
-
-    if (organizationService.findById(realm, storage, organization.getIdentifiant()) == null) {
+    try {
+      organizationService.findById(realm, storage, organization.getIdentifiant());
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    } catch (EntityNotFoundException e) {
+      // TODO: handle exception
       organizationService.create(realm, storage, organization);
-
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()
               .path("/" + organization.getIdentifiant())
               .build()
               .toUri();
-
       return ResponseEntity.created(location)
           .body(organizationService.findById(realm, storage, organization.getIdentifiant()));
-    } else {
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
   }
 

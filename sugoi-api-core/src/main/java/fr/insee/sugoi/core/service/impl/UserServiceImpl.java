@@ -15,7 +15,7 @@ package fr.insee.sugoi.core.service.impl;
 
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
-import fr.insee.sugoi.core.exceptions.UserNotFoundException;
+import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.model.SearchType;
@@ -80,7 +80,7 @@ public class UserServiceImpl implements UserService {
         user.addMetadatas("userStorage", storage.toLowerCase());
         return user;
       } catch (Exception e) {
-        throw new UserNotFoundException(
+        throw new EntityNotFoundException(
             "User not found in realm " + realmName + " and userStorage " + storage);
       }
     } else {
@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService {
         }
       }
     }
-    throw new UserNotFoundException("User not found in realm " + realmName);
+    throw new EntityNotFoundException("User not found in realm " + realmName);
   }
 
   @Override
