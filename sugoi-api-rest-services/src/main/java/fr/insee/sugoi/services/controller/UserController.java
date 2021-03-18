@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.services.controller;
 
+import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.model.SearchType;
@@ -257,7 +258,10 @@ public class UserController {
           @PathVariable(name = "storage", required = false)
           String storage,
       @Parameter(description = "User to create", required = true) @RequestBody User user) {
-    if (userService.findById(realm, storage, user.getUsername()) == null) {
+    try {
+      userService.findById(realm, storage, user.getUsername());
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    } catch (EntityNotFoundException e) {
       userService.create(realm, storage, user);
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()
@@ -266,8 +270,6 @@ public class UserController {
               .toUri();
       return ResponseEntity.created(location)
           .body(userService.findById(realm, storage, user.getUsername()));
-    } else {
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
   }
 

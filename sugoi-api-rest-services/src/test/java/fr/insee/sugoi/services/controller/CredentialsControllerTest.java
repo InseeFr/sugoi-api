@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 
 import fr.insee.sugoi.core.service.CredentialsService;
+import fr.insee.sugoi.core.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -45,6 +46,10 @@ public class CredentialsControllerTest {
 
   @MockBean private CredentialsService credentialService;
 
+  @MockBean private UserService userService;
+
+  // User user1;
+
   @BeforeEach
   public void setup() {}
 
@@ -52,6 +57,10 @@ public class CredentialsControllerTest {
   @WithMockUser(roles = "Admin_Sugoi")
   public void testWrongCredential() {
     try {
+      Mockito.when(
+              credentialService.validateCredential(
+                  Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any()))
+          .thenReturn(false);
 
       Mockito.when(
               credentialService.validateCredential(

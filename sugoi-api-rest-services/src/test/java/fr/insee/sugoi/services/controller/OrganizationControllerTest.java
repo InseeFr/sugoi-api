@@ -216,7 +216,7 @@ public class OrganizationControllerTest {
     try {
       Mockito.when(
               organizationService.findById("domaine1", "Profil_domaine1_WebServiceLdap", "BigOrga"))
-          .thenReturn(null)
+          .thenThrow(EntityNotFoundException.class)
           .thenReturn(organization1);
 
       RequestBuilder requestBuilder =
@@ -228,7 +228,8 @@ public class OrganizationControllerTest {
               .with(csrf());
 
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-      verify(organizationService).create(Mockito.anyString(), Mockito.any(), Mockito.any());
+      verify(organizationService).create(Mockito.anyString(), Mockito.anyString(), Mockito.any());
+      System.out.println(response.getContentAsString());
       assertThat(
           "Should get new organization",
           objectMapper
@@ -276,7 +277,8 @@ public class OrganizationControllerTest {
 
       Mockito.when(
               organizationService.findById("domaine1", "Profil_domaine1_WebServiceLdap", "BigOrga"))
-          .thenReturn(null);
+          .thenThrow(EntityNotFoundException.class)
+          .thenReturn(organization1);
       Mockito.when(organizationService.create(Mockito.anyString(), Mockito.any(), Mockito.any()))
           .thenReturn(organization1);
 

@@ -16,6 +16,8 @@ package fr.insee.sugoi.services.controller;
 import fr.insee.sugoi.core.model.PasswordChangeRequest;
 import fr.insee.sugoi.core.model.SendMode;
 import fr.insee.sugoi.core.service.CredentialsService;
+import fr.insee.sugoi.core.service.UserService;
+import fr.insee.sugoi.model.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -49,6 +51,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CredentialsController {
 
   @Autowired private CredentialsService credentialsService;
+  @Autowired private UserService userService;
 
   @PostMapping(path = {"/realms/{realm}/storages/{storage}/users/{id}/reinitPassword"})
   @Operation(summary = "Reinitialize the password of the user")
@@ -118,7 +121,9 @@ public class CredentialsController {
       @Parameter(description = "Way to send password", required = false)
           @RequestParam(value = "sendModes", required = false)
           List<SendMode> sendMode) {
-    return reinitPassword(pcr, realm, null, id, sendMode);
+    User user = userService.findById(realm, null, id);
+    return reinitPassword(
+        pcr, realm, (String) user.getMetadatas().get("userStorage"), id, sendMode);
   }
 
   @PostMapping(path = {"/realms/{realm}/storages/{storage}/users/{id}/changePassword"})
@@ -182,7 +187,9 @@ public class CredentialsController {
           String realm,
       @Parameter(description = "User's id to change password", required = true) @PathVariable("id")
           String id) {
-    return changePassword(pcr, realm, null, id);
+    User user = userService.findById(realm, null, id);
+
+    return changePassword(pcr, realm, (String) user.getMetadatas().get("userStorage"), id);
   }
 
   @PostMapping(path = {"/realms/{realm}/storages/{storage}/users/{id}/initPassword"})
@@ -255,7 +262,8 @@ public class CredentialsController {
       @Parameter(description = "Way to send password", required = false)
           @RequestParam(value = "sendModes", required = false)
           List<SendMode> sendMode) {
-    return initPassword(realm, null, id, pcr, sendMode);
+    User user = userService.findById(realm, null, id);
+    return initPassword(realm, (String) user.getMetadatas().get("userStorage"), id, pcr, sendMode);
   }
 
   @PostMapping(
@@ -333,6 +341,7 @@ public class CredentialsController {
               required = true)
           @RequestParam
           MultiValueMap<String, String> params) {
-    return validatePassword(realm, null, id, params);
+    User user = userService.findById(realm, null, id);
+    return validatePassword(realm, (String) user.getMetadatas().get("userStorage"), id, params);
   }
 }

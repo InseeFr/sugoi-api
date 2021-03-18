@@ -216,7 +216,7 @@ public class UserControllerTest {
 
     try {
       Mockito.when(userService.findById("domaine1", "Profil_domaine1_WebServiceLdap", "Toto"))
-          .thenReturn(null)
+          .thenThrow(EntityNotFoundException.class)
           .thenReturn(user1);
 
       RequestBuilder requestBuilder =
@@ -272,9 +272,10 @@ public class UserControllerTest {
   public void getObjectLocationInUserCreationResponse() {
     try {
 
-      Mockito.when(userService.findById(Mockito.anyString(), Mockito.isNull(), Mockito.anyString()))
-          .thenReturn(null);
-      Mockito.when(userService.create(Mockito.anyString(), Mockito.isNull(), Mockito.any()))
+      Mockito.when(userService.findById(Mockito.anyString(), Mockito.any(), Mockito.anyString()))
+          .thenThrow(EntityNotFoundException.class)
+          .thenReturn(user1);
+      Mockito.when(userService.create(Mockito.anyString(), Mockito.any(), Mockito.any()))
           .thenReturn(user1);
 
       RequestBuilder requestBuilder =

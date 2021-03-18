@@ -75,10 +75,16 @@ public class OrganizationServiceImpl implements OrganizationService {
         SugoiEventTypeEnum.FIND_ORGANIZATION_BY_ID,
         Map.ofEntries(Map.entry("organizationId", id)));
     if (storage != null) {
-      Organization org = storeProvider.getReaderStore(realm, storage).getOrganization(id);
-      org.addMetadatas("realm", realm.toLowerCase());
-      org.addMetadatas("userStorage", storage.toLowerCase());
-      return org;
+      try {
+
+        Organization org = storeProvider.getReaderStore(realm, storage).getOrganization(id);
+        org.addMetadatas("realm", realm.toLowerCase());
+        org.addMetadatas("userStorage", storage.toLowerCase());
+        return org;
+      } catch (Exception e) {
+        throw new EntityNotFoundException(
+            "Organization not found in realm " + realm + " and userStorage " + storage);
+      }
     } else {
       Realm r = realmProvider.load(realm);
       for (UserStorage us : r.getUserStorages()) {
@@ -90,7 +96,8 @@ public class OrganizationServiceImpl implements OrganizationService {
             return org;
           }
         } catch (Exception e) {
-          logger.info("User " + id + "not in realm " + realm + " and userstorage " + us.getName());
+          logger.info(
+              "Organization " + id + "not in realm " + realm + " and userstorage " + us.getName());
         }
       }
     }

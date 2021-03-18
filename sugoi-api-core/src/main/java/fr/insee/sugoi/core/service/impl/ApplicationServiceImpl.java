@@ -62,7 +62,7 @@ public class ApplicationServiceImpl implements ApplicationService {
   }
 
   @Override
-  public Application findById(String realm,  String id) {
+  public Application findById(String realm, String id) {
     if (id == null) {
       id = "";
     }
