@@ -96,7 +96,7 @@ public class OrganizationServiceImpl implements OrganizationService {
             return org;
           }
         } catch (Exception e) {
-          logger.info(
+          logger.debug(
               "Organization " + id + "not in realm " + realm + " and userstorage " + us.getName());
         }
       }

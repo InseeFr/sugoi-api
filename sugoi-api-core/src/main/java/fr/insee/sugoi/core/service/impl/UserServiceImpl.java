@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
             return user;
           }
         } catch (Exception e) {
-          logger.info(
+          logger.debug(
               "User " + id + "not in realm " + realmName + " and userstorage " + us.getName());
         }
       }
