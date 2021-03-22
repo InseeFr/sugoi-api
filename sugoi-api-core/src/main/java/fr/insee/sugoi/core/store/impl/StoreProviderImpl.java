@@ -64,7 +64,7 @@ public class StoreProviderImpl implements StoreProvider {
     if (storage != null) {
       return this.getStoreForUserStorage(realm, storage).getWriter();
     }
-    logger.info("User storage can not be null");
+    logger.error("User storage can not be null");
     throw new InvalidUserStorage("User storage can not be null");
   }
 
