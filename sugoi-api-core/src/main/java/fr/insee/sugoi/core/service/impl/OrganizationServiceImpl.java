@@ -66,38 +66,47 @@ public class OrganizationServiceImpl implements OrganizationService {
 
   @Override
   public Organization findById(String realm, String storage, String id) {
-    if (id == null) {
-      id = "";
-    }
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        storage,
-        SugoiEventTypeEnum.FIND_ORGANIZATION_BY_ID,
-        Map.ofEntries(Map.entry("organizationId", id)));
-    if (storage != null) {
-      try {
-
-        Organization org = storeProvider.getReaderStore(realm, storage).getOrganization(id);
-        org.addMetadatas("realm", realm.toLowerCase());
-        org.addMetadatas("userStorage", storage.toLowerCase());
-        return org;
-      } catch (Exception e) {
-        throw new EntityNotFoundException(
-            "Organization not found in realm " + realm + " and userStorage " + storage);
-      }
-    } else {
-      Realm r = realmProvider.load(realm);
-      for (UserStorage us : r.getUserStorages()) {
+    if (id != null) {
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          storage,
+          SugoiEventTypeEnum.FIND_ORGANIZATION_BY_ID,
+          Map.ofEntries(Map.entry("organizationId", id)));
+      if (storage != null) {
         try {
-          Organization org = storeProvider.getReaderStore(realm, us.getName()).getOrganization(id);
+
+          Organization org = storeProvider.getReaderStore(realm, storage).getOrganization(id);
           if (org != null) {
-            org.addMetadatas("realm", realm);
-            org.addMetadatas("userStorage", us.getName());
+            org.addMetadatas("realm", realm.toLowerCase());
+            org.addMetadatas("userStorage", storage.toLowerCase());
             return org;
           }
         } catch (Exception e) {
-          logger.debug(
-              "Organization " + id + "not in realm " + realm + " and userstorage " + us.getName());
+          throw new EntityNotFoundException(
+              "Error while finding organization in realm " + realm + " and userStorage " + storage);
+        }
+        throw new EntityNotFoundException(
+            "Organization not found in realm " + realm + " and userStorage " + storage);
+      } else {
+        Realm r = realmProvider.load(realm);
+        for (UserStorage us : r.getUserStorages()) {
+          try {
+            Organization org =
+                storeProvider.getReaderStore(realm, us.getName()).getOrganization(id);
+            if (org != null) {
+              org.addMetadatas("realm", realm);
+              org.addMetadatas("userStorage", us.getName());
+              return org;
+            }
+          } catch (Exception e) {
+            logger.debug(
+                "Organization "
+                    + id
+                    + "not in realm "
+                    + realm
+                    + " and userstorage "
+                    + us.getName());
+          }
         }
       }
     }

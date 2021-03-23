@@ -13,14 +13,15 @@
 */
 package fr.insee.sugoi.services.controller;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.verify;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
 import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.service.OrganizationService;
@@ -44,7 +45,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @SpringBootTest(
-    classes = OrganizationController.class,
+    classes = {OrganizationController.class, SugoiAdviceController.class},
     properties = "spring.config.location=classpath:/controller/application.properties")
 @AutoConfigureMockMvc
 @EnableWebMvc
@@ -214,8 +215,7 @@ public class OrganizationControllerTest {
   public void postShouldCallPostServiceAndReturnNewApp() {
 
     try {
-      Mockito.when(
-              organizationService.findById("domaine1", "Profil_domaine1_WebServiceLdap", "BigOrga"))
+      Mockito.when(organizationService.findById(Mockito.any(), Mockito.any(), Mockito.any()))
           .thenThrow(EntityNotFoundException.class)
           .thenReturn(organization1);
 
@@ -275,8 +275,7 @@ public class OrganizationControllerTest {
   public void getObjectLocationInOrganizationCreationResponse() {
     try {
 
-      Mockito.when(
-              organizationService.findById("domaine1", "Profil_domaine1_WebServiceLdap", "BigOrga"))
+      Mockito.when(organizationService.findById(Mockito.any(), Mockito.any(), Mockito.any()))
           .thenThrow(EntityNotFoundException.class)
           .thenReturn(organization1);
       Mockito.when(organizationService.create(Mockito.anyString(), Mockito.any(), Mockito.any()))
@@ -395,27 +394,27 @@ public class OrganizationControllerTest {
     }
   }
 
-  // @Test
-  // @WithMockUser
-  // public void get404WhenNoOrganizationIsFoundWhenGetById() {
-  // try {
+  @Test
+  @WithMockUser
+  public void get404WhenNoOrganizationIsFoundWhenGetById() {
+    try {
 
-  // Mockito.when(organizationService.findById("domaine1", null,
-  // "dontexist")).thenReturn(null);
+      Mockito.when(organizationService.findById("domaine1", null, "dontexist")).thenReturn(null);
 
-  // RequestBuilder requestBuilder =
-  // MockMvcRequestBuilders.get("/realms/domaine1/organizations/dontexist")
-  // .accept(MediaType.APPLICATION_JSON);
+      RequestBuilder requestBuilder =
+          MockMvcRequestBuilders.get("/realms/domaine1/organizations/dontexist")
+              .accept(MediaType.APPLICATION_JSON);
 
-  // assertThat("Should respond 404",
-  // mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
-  // is(404));
+      assertThat(
+          "Should respond 404",
+          mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
+          is(404));
 
-  // } catch (Exception e) {
-  // e.printStackTrace();
-  // fail();
-  // }
-  // }
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail();
+    }
+  }
 
   @Test
   @WithMockUser
@@ -440,49 +439,52 @@ public class OrganizationControllerTest {
     }
   }
 
-  // @Test
-  // @WithMockUser
-  // public void get404WhenNoOrganizationIsFoundWhenUpdate() {
-  // try {
+  @Test
+  @WithMockUser
+  public void get404WhenNoOrganizationIsFoundWhenUpdate() {
+    try {
 
-  // Mockito.when(organizationService.findById("domaine1", null,
-  // "BigOrga")).thenThrow(EntityNotFoundException.class);
-  // RequestBuilder requestBuilder =
-  // MockMvcRequestBuilders.put("/realms/domaine1/organizations/BigOrga")
-  // .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(organization1))
-  // .accept(MediaType.APPLICATION_JSON).with(csrf());
+      Mockito.when(organizationService.findById("domaine1", null, "BigOrga"))
+          .thenThrow(EntityNotFoundException.class);
+      RequestBuilder requestBuilder =
+          MockMvcRequestBuilders.put("/realms/domaine1/organizations/BigOrga")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(organization1))
+              .accept(MediaType.APPLICATION_JSON)
+              .with(csrf());
 
-  // assertThat("Should respond 404",
-  // mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
-  // is(404));
+      assertThat(
+          "Should respond 404",
+          mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
+          is(404));
 
-  // } catch (Exception e) {
-  // e.printStackTrace();
-  // fail();
-  // }
-  // }
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail();
+    }
+  }
 
-  // @Test
-  // @WithMockUser
-  // public void get404WhenNoOrganizationIsFoundWhenDelete() {
-  // try {
+  @Test
+  @WithMockUser
+  public void get404WhenNoOrganizationIsFoundWhenDelete() {
+    try {
 
-  // Mockito.when(organizationService.findById("domaine1", null, "dontexist"))
-  // .thenThrow(EntityNotFoundException.class);
+      Mockito.when(organizationService.findById("domaine1", null, "dontexist"))
+          .thenThrow(EntityNotFoundException.class);
 
-  // RequestBuilder requestBuilder =
-  // MockMvcRequestBuilders.delete("/realms/domaine1/organizations/dontexist")
-  // .accept(MediaType.APPLICATION_JSON)
-  // .with(csrf());
+      RequestBuilder requestBuilder =
+          MockMvcRequestBuilders.delete("/realms/domaine1/organizations/dontexist")
+              .accept(MediaType.APPLICATION_JSON)
+              .with(csrf());
 
-  // assertThat(
-  // "Should respond 404",
-  // mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
-  // is(404));
+      assertThat(
+          "Should respond 404",
+          mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
+          is(404));
 
-  // } catch (Exception e) {
-  // e.printStackTrace();
-  // fail();
-  // }
-  // }
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail();
+    }
+  }
 }

@@ -194,10 +194,9 @@ public class OrganizationController {
       @Parameter(description = "Organization to create", required = false) @RequestBody
           Organization organization) {
     try {
-      organizationService.findById(realm, storage, organization.getIdentifiant());
+      organizationService.findById(realm, null, organization.getIdentifiant());
       return ResponseEntity.status(HttpStatus.CONFLICT).build();
     } catch (EntityNotFoundException e) {
-      // TODO: handle exception
       organizationService.create(realm, storage, organization);
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()

@@ -78,7 +78,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
         realm.setUserStorages(loadUserStorages(realmEntry, ldapConnection));
         return realm;
       }
-      return null;
+      throw new RealmNotFoundException("Erreur lors du chargement du realm " + realmName);
     } catch (Exception e) {
       e.printStackTrace();
       throw new RealmNotFoundException("Erreur lors du chargement du realm " + realmName);
