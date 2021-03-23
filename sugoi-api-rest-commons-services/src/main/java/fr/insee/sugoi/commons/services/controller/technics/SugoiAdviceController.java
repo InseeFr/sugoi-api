@@ -15,6 +15,7 @@ package fr.insee.sugoi.commons.services.controller.technics;
 
 import fr.insee.sugoi.commons.services.view.ErrorView;
 import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
+import fr.insee.sugoi.core.exceptions.InvalidUserStorageException;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +54,16 @@ public class SugoiAdviceController {
     errorView.setMessage(e.getMessage());
     final ResponseEntity<ErrorView> response =
         new ResponseEntity<ErrorView>(errorView, HttpStatus.FORBIDDEN);
+    return response;
+  }
+
+  @ExceptionHandler(InvalidUserStorageException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(InvalidUserStorageException e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    final ResponseEntity<ErrorView> response =
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
     return response;
   }
 }

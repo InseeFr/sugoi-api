@@ -13,9 +13,13 @@
 */
 package fr.insee.sugoi.config;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.ArrayList;
@@ -42,8 +46,11 @@ public class LdapRealmProviderWriteTest {
     uniqueUserStorage.setOrganizationSource("ou=organisations,ou=clients_domaine2,o=insee,c=fr");
     uniqueUserStorage.addProperty("group_filter_pattern", "toto");
     realmToAdd.setUserStorages(List.of(uniqueUserStorage));
-    assertThat(
-        "toadd should not exist yet", ldapRealmProviderDAOImpl.load("toadd"), is(nullValue()));
+    assertThrows(
+        RealmNotFoundException.class,
+        () -> ldapRealmProviderDAOImpl.load("toadd"),
+        "Realm should not exist");
+
     ldapRealmProviderDAOImpl.createRealm(realmToAdd);
     Realm retrievedRealm = ldapRealmProviderDAOImpl.load("toadd");
     assertThat("Realm should be present", retrievedRealm.getName(), is("toadd"));
@@ -81,10 +88,10 @@ public class LdapRealmProviderWriteTest {
     userStorages.add(userStorage1);
     userStorages.add(userStorage2);
     realmToAdd.setUserStorages(userStorages);
-    assertThat(
-        "multistorage should not exist yet",
-        ldapRealmProviderDAOImpl.load("multistorage"),
-        is(nullValue()));
+    assertThrows(
+        RealmNotFoundException.class,
+        () -> ldapRealmProviderDAOImpl.load("multistorage"),
+        "Realm should not exist");
     ldapRealmProviderDAOImpl.createRealm(realmToAdd);
     Realm retrievedRealm = ldapRealmProviderDAOImpl.load("multistorage");
     assertThat("Realm should be present", retrievedRealm.getName(), is("multistorage"));
@@ -105,8 +112,10 @@ public class LdapRealmProviderWriteTest {
     assertThat(
         "Realm should be present", ldapRealmProviderDAOImpl.load("todelete"), is(not(nullValue())));
     ldapRealmProviderDAOImpl.deleteRealm("todelete");
-    assertThat(
-        "todelete should be deleted", ldapRealmProviderDAOImpl.load("todelete"), is(nullValue()));
+    assertThrows(
+        RealmNotFoundException.class,
+        () -> ldapRealmProviderDAOImpl.load("todelete"),
+        "todelete should be deleted");
   }
 
   @Test
@@ -116,10 +125,10 @@ public class LdapRealmProviderWriteTest {
         ldapRealmProviderDAOImpl.load("todeletemulti"),
         is(not(nullValue())));
     ldapRealmProviderDAOImpl.deleteRealm("todeletemulti");
-    assertThat(
-        "todeletemulti should be deleted",
-        ldapRealmProviderDAOImpl.load("todeletemulti"),
-        is(nullValue()));
+    assertThrows(
+        RealmNotFoundException.class,
+        () -> ldapRealmProviderDAOImpl.load("todeletemulti"),
+        "todeletemulti should be deleted");
   }
 
   @Test

@@ -15,8 +15,10 @@ package fr.insee.sugoi.config.file;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import java.io.File;
@@ -81,7 +83,10 @@ public class LocalFileWriteRealmTest {
     uniqueUserStorage.setOrganizationSource("ou=organisations,ou=clients_domaine2,o=insee,c=fr");
     uniqueUserStorage.addProperty("group_filter_pattern", "toto");
     realmToAdd.setUserStorages(List.of(uniqueUserStorage));
-    assertThat("Realm should not exist", localFileConfig.load("toadd"), is(nullValue()));
+    assertThrows(
+        RealmNotFoundException.class,
+        () -> localFileConfig.load("toadd"),
+        "Realm should not exist");
     localFileConfig.createRealm(realmToAdd);
     Realm retrievedRealm = localFileConfig.load("toadd");
     assertThat("Realm should be present", retrievedRealm.getName(), is("toadd"));
@@ -119,7 +124,10 @@ public class LocalFileWriteRealmTest {
     userStorages.add(userStorage1);
     userStorages.add(userStorage2);
     realmToAdd.setUserStorages(userStorages);
-    assertThat("Realm should not be present", localFileConfig.load("toadd"), is(nullValue()));
+    assertThrows(
+        RealmNotFoundException.class,
+        () -> localFileConfig.load("toadd"),
+        "Realm should not exist");
     localFileConfig.createRealm(realmToAdd);
     Realm retrievedRealm = localFileConfig.load("multistorage");
     assertThat("Realm should be present", retrievedRealm.getName(), is("multistorage"));
@@ -139,7 +147,10 @@ public class LocalFileWriteRealmTest {
   public void deleteRealmWithOneStorageTest() {
     assertThat("Realm should be present", localFileConfig.load("todelete"), is(not(nullValue())));
     localFileConfig.deleteRealm("todelete");
-    assertThat("Realm should not be present", localFileConfig.load("todelete"), is(nullValue()));
+    assertThrows(
+        RealmNotFoundException.class,
+        () -> localFileConfig.load("toadd"),
+        "Realm should not exist");
   }
 
   @Test

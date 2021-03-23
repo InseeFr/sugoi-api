@@ -13,7 +13,7 @@
 */
 package fr.insee.sugoi.core.store.impl;
 
-import fr.insee.sugoi.core.exceptions.InvalidUserStorage;
+import fr.insee.sugoi.core.exceptions.InvalidUserStorageException;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.core.store.Store;
@@ -22,8 +22,6 @@ import fr.insee.sugoi.core.store.StoreStorage;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +54,7 @@ public class StoreProviderImpl implements StoreProvider {
           .getReader();
     }
     logger.info("User storage can not be null");
-    throw new InvalidUserStorage("User storage can not be null");
+    throw new InvalidUserStorageException("User storage can not be null");
   }
 
   @Override
@@ -65,15 +63,7 @@ public class StoreProviderImpl implements StoreProvider {
       return this.getStoreForUserStorage(realm, storage).getWriter();
     }
     logger.error("User storage can not be null");
-    throw new InvalidUserStorage("User storage can not be null");
-  }
-
-  @Override
-  public List<ReaderStore> getReaderStores(String realm) {
-    Realm r = realmProvider.load(realm);
-    return r.getUserStorages().stream()
-        .map(us -> storeStorage.getStore(r, us).getReader())
-        .collect(Collectors.toList());
+    throw new InvalidUserStorageException("User storage can not be null");
   }
 
   @Override

@@ -259,7 +259,7 @@ public class UserController {
           String storage,
       @Parameter(description = "User to create", required = true) @RequestBody User user) {
     try {
-      userService.findById(realm, storage, user.getUsername());
+      userService.findById(realm, null, user.getUsername());
       return ResponseEntity.status(HttpStatus.CONFLICT).build();
     } catch (EntityNotFoundException e) {
       userService.create(realm, storage, user);

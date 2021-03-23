@@ -13,13 +13,13 @@
 */
 package fr.insee.sugoi.core.exceptions;
 
-public class InvalidUserStorage extends RuntimeException {
+public class InvalidUserStorageException extends RuntimeException {
   /** */
   private static final long serialVersionUID = 1L;
 
   private String message;
 
-  public InvalidUserStorage(String message) {
+  public InvalidUserStorageException(String message) {
     this.message = message;
   }
 

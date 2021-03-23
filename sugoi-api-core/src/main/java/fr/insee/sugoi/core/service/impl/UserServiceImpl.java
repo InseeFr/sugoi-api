@@ -72,30 +72,35 @@ public class UserServiceImpl implements UserService {
           storage,
           SugoiEventTypeEnum.FIND_USER_BY_ID,
           Map.ofEntries(Map.entry("userId", id)));
-    }
-    if (storage != null) {
-      try {
-        User user = storeProvider.getReaderStore(realmName, storage).getUser(id);
-        user.addMetadatas("realm", realmName.toLowerCase());
-        user.addMetadatas("userStorage", storage.toLowerCase());
-        return user;
-      } catch (Exception e) {
-        throw new EntityNotFoundException(
-            "User not found in realm " + realmName + " and userStorage " + storage);
-      }
-    } else {
-      Realm r = realmProvider.load(realmName);
-      for (UserStorage us : r.getUserStorages()) {
+
+      if (storage != null) {
         try {
-          User user = storeProvider.getReaderStore(realmName, us.getName()).getUser(id);
+          User user = storeProvider.getReaderStore(realmName, storage).getUser(id);
           if (user != null) {
-            user.addMetadatas("realm", realmName);
-            user.addMetadatas("userStorage", us.getName());
+            user.addMetadatas("realm", realmName.toLowerCase());
+            user.addMetadatas("userStorage", storage.toLowerCase());
             return user;
           }
         } catch (Exception e) {
-          logger.debug(
-              "User " + id + "not in realm " + realmName + " and userstorage " + us.getName());
+          throw new EntityNotFoundException(
+              "Error while finding user in " + realmName + " and userStorage " + storage);
+        }
+        throw new EntityNotFoundException(
+            "User not found in realm " + realmName + " and userStorage " + storage);
+      } else {
+        Realm r = realmProvider.load(realmName);
+        for (UserStorage us : r.getUserStorages()) {
+          try {
+            User user = storeProvider.getReaderStore(realmName, us.getName()).getUser(id);
+            if (user != null) {
+              user.addMetadatas("realm", realmName);
+              user.addMetadatas("userStorage", us.getName());
+              return user;
+            }
+          } catch (Exception e) {
+            logger.debug(
+                "User " + id + "not in realm " + realmName + " and userstorage " + us.getName());
+          }
         }
       }
     }
