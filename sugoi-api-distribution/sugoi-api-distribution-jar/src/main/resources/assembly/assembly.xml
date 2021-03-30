@@ -7,17 +7,36 @@
     <includeBaseDirectory>false</includeBaseDirectory>
 
     <files>
-        <!-- Archive .war du projet -->
+        <!-- Archive .jar du projet -->
         <file>
-            <source>target/sugoi-api.war</source>
+            <source>target/sugoi-api-distribution-jar-${project.version}.jar</source>
             <outputDirectory />
-            <destName>sugoi-api.war</destName>
+            <destName>sugoi-api.jar</destName>
         </file>
 
+        <file>
+            <source>src/main/resources/application-local.properties</source>
+        </file>
+
+        <file>
+            <source>src/main/resources/start.sh</source>
+            <fileMode>0700</fileMode>
+        </file>
+
+        <file>
+            <source>src/main/resources/start.bat</source>
+        </file>
         <!-- properties -->
 
         <!-- Fichier de configuration de log4j -->
 
     </files>
+
+    <fileSets>
+        <fileSet>
+            <directory>src/main/resources/data</directory>
+            <outputDirectory>data</outputDirectory>
+        </fileSet>
+    </fileSets>
 
 </assembly>

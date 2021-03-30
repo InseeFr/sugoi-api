@@ -169,37 +169,19 @@
             </execution>
        </executions>
       </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+          <appendAssemblyId>false</appendAssemblyId>
+          <finalName>sugoi-api</finalName>
+          <descriptors>
+            <descriptor>src/main/resources/assembly/assembly.xml</descriptor>
+          </descriptors>
+        </configuration>
+      </plugin>
     </plugins>
-  </build>
 
-  <profiles>
-    <profile>
-      <id>livrable</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <version>3.3.0</version>
-            <executions>
-              <execution>
-                <id>livrable</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>single</goal>
-                </goals>
-                <configuration>
-                  <appendAssemblyId>false</appendAssemblyId>
-                  <finalName>sugoi-api</finalName>
-                  <descriptors>
-                    <descriptor>src/main/resources/assembly/assembly.xml</descriptor>
-                  </descriptors>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+  </build>
 
 </project>
