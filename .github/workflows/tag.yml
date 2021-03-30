@@ -1,0 +1,104 @@
+name: Sugoi API Tag
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.VERSION }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache Maven Packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2-
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
+      - name: Set current version
+        run: mvn -B versions:set -DnewVersion=${{ steps.get_version.outputs.VERSION }}
+
+      - name: Build with Maven
+        run: |
+          mvn -B clean install 
+          cd sugoi-api-distribution/sugoi-api-distribution-jar/
+          mvn -B assembly:single
+
+      - name: Upload jar
+        uses: actions/upload-artifact@v2
+        with:
+          name: jar
+          path: sugoi-api-distribution/sugoi-api-distribution-jar/target/sugoi-api.zip
+
+      - name: Upload war
+        uses: actions/upload-artifact@v2
+        with:
+          name: war
+          path: sugoi-api-distribution/sugoi-api-distribution-war/target/*.war
+
+  release:
+    needs: build
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout jar artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: jar
+          path: sugoi-api-distribution/sugoi-api-distribution-jar/target
+
+      - name: Checkout war artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: war
+          path: sugoi-api-distribution/sugoi-api-distribution-war/target
+
+      - name: Create a release
+        id: create_release
+        run: |
+          echo ::set-output name=upload_url::$(curl --request POST \
+          --header "Accept: application/vnd.github.v3+json" \
+          --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+          --url https://api.github.com/repos/${{ github.repository }}/releases \
+          -d '{"tag_name":"${{ needs.build.outputs.version }}"}' | jq '.upload_url' | cut -d { -f 1)
+
+      - name: Upload Jar Release 
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
+          gh release upload --repo ${{ github.repository }} "${{ needs.build.outputs.version }}" \
+          ./sugoi-api-distribution/sugoi-api-distribution-jar/target/sugoi-api.zip
+
+      - name: Upload War Release 
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
+          gh release upload --repo ${{ github.repository }} "${{ needs.build.outputs.version }}" \
+          ./sugoi-api-distribution/sugoi-api-distribution-war/target/sugoi-api.war 
+
+      - name: Update version in github repository
+        run: |
+          git clone https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{github.repository}}.git
+          cd sugoi-api
+          git config --global user.name "Insee - Domaine Outils Transverses"
+          git config --global user.email "dg75-dsi-domaine-outils-transverses@insee.fr"
+          git checkout main
+          old_version=${{ needs.build.outputs.version }}
+          new_version=$(echo $old_version | cut -d. -f1).$(($(echo $old_version | cut -d. -f2) + 1)).0-SNAPSHOT 
+          mvn -B versions:set -DnewVersion=$new_version -DgenerateBackupPoms=false
+          git add .
+          git commit -m"Prepare new version"
+          git push
