@@ -157,7 +157,7 @@ public class ContactGroupeDomaineController {
                 .anyMatch(g -> g.getName().equals(nomGroupe) && g.getAppName().equals(nomAppli))) {
           return new ResponseEntity<String>("Contact already in group", HttpStatus.CONFLICT);
         } else {
-          userService.addUserToGroup(domaine, null, identifiant, nomAppli, nomGroupe);
+          groupService.addUserToGroup(domaine, identifiant, nomAppli, nomGroupe);
           return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
       } else {
@@ -228,7 +228,7 @@ public class ContactGroupeDomaineController {
               .anyMatch(
                   group ->
                       group.getAppName().equals(nomAppli) && group.getName().equals(nomGroupe))) {
-        userService.deleteUserFromGroup(domaine, null, identifiant, nomAppli, nomGroupe);
+        groupService.deleteUserFromGroup(domaine, identifiant, nomAppli, nomGroupe);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
       } else {
         return new ResponseEntity<>("Contact doesn't belong to group", HttpStatus.CONFLICT);

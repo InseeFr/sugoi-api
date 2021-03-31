@@ -20,7 +20,6 @@ import fr.insee.sugoi.ldap.utils.mapper.properties.AddressLdap;
 import fr.insee.sugoi.ldap.utils.mapper.properties.GroupLdap;
 import fr.insee.sugoi.ldap.utils.mapper.properties.LdapObjectClass;
 import fr.insee.sugoi.ldap.utils.mapper.properties.OrganizationLdap;
-import fr.insee.sugoi.ldap.utils.mapper.properties.UserLdap;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.AttributeLdapName;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToAttribute;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToMapElement;
@@ -285,20 +284,7 @@ public class GenericLdapMapper {
                     .map(habilitation -> new Attribute(attributeName, habilitation.getId()))
                     .collect(Collectors.toList());
           case LIST_USER:
-            return ((List<User>) attributeValue)
-                .stream()
-                    .map(
-                        user ->
-                            new Attribute(
-                                attributeName,
-                                String.format(
-                                    "%s=%s,%s",
-                                    UserLdap.class
-                                        .getAnnotation(LdapObjectClass.class)
-                                        .rdnAttributeName(),
-                                    user.getUsername(),
-                                    config.get("user_source"))))
-                    .collect(Collectors.toList());
+            return new ArrayList<>();
           case LIST_GROUP:
             return ((List<Group>) attributeValue)
                 .stream()

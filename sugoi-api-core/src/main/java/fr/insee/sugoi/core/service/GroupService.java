@@ -29,4 +29,8 @@ public interface GroupService {
 
   PageResult<Group> findByProperties(
       String realm, String appName, Group groupFilter, PageableResult pageableResult);
+
+  void addUserToGroup(String realm, String userId, String appName, String groupName);
+
+  void deleteUserFromGroup(String realm, String userId, String appName, String groupName);
 }

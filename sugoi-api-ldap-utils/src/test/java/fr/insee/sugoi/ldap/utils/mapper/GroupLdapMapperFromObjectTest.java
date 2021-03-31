@@ -78,18 +78,18 @@ public class GroupLdapMapperFromObjectTest {
     List<Attribute> mappedAttributes = groupLdapMapper.mapToAttributes(group);
 
     assertThat(
-        "Should have user user1",
-        mappedAttributes.stream()
+        "Should not have user user1",
+        !(mappedAttributes.stream()
             .anyMatch(
                 attribute ->
                     attribute.getName().equals("uniquemember")
-                        && attribute.getValue().equals("uid=user1,ou=contacts,o=insee,c=fr")));
+                        && attribute.getValue().equals("uid=user1,ou=contacts,o=insee,c=fr"))));
     assertThat(
-        "Should have user user2",
-        mappedAttributes.stream()
+        "Should not have user user2",
+        !(mappedAttributes.stream()
             .anyMatch(
                 attribute ->
                     attribute.getName().equals("uniquemember")
-                        && attribute.getValue().equals("uid=user2,ou=contacts,o=insee,c=fr")));
+                        && attribute.getValue().equals("uid=user2,ou=contacts,o=insee,c=fr"))));
   }
 }

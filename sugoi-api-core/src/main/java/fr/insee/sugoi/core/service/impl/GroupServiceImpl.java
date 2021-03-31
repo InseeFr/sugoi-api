@@ -21,6 +21,7 @@ import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Group;
+import java.util.ArrayList;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ public class GroupServiceImpl implements GroupService {
 
   @Override
   public Group create(String realm, String appName, Group group) {
+    group.setUsers(new ArrayList<>());
     sugoiEventPublisher.publishCustomEvent(
         realm,
         null,
@@ -77,11 +79,38 @@ public class GroupServiceImpl implements GroupService {
 
   @Override
   public void update(String realm, String appName, Group group) {
+    group.setUsers(new ArrayList<>());
     sugoiEventPublisher.publishCustomEvent(
         realm,
         null,
         SugoiEventTypeEnum.UPDATE_GROUP,
         Map.ofEntries(Map.entry("group", group), Map.entry("appName", appName)));
     storeProvider.getWriterStore(realm).updateGroup(appName, group);
+  }
+
+  @Override
+  public void addUserToGroup(String realm, String userId, String appName, String groupName) {
+    sugoiEventPublisher.publishCustomEvent(
+        realm,
+        null,
+        SugoiEventTypeEnum.ADD_USER_TO_GROUP,
+        Map.ofEntries(
+            Map.entry("user", userId),
+            Map.entry("appName", appName),
+            Map.entry("groupName", groupName)));
+    storeProvider.getWriterStore(realm).addUserToGroup(appName, groupName, userId);
+  }
+
+  @Override
+  public void deleteUserFromGroup(String realm, String userId, String appName, String groupName) {
+    sugoiEventPublisher.publishCustomEvent(
+        realm,
+        null,
+        SugoiEventTypeEnum.DELETE_USER_FROM_GROUP,
+        Map.ofEntries(
+            Map.entry("user", userId),
+            Map.entry("appName", appName),
+            Map.entry("groupName", groupName)));
+    storeProvider.getWriterStore(realm).deleteUserFromGroup(appName, groupName, userId);
   }
 }
