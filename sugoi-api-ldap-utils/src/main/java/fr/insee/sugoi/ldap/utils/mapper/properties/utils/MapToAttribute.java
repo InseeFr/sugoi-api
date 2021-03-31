@@ -28,4 +28,6 @@ public @interface MapToAttribute {
 
   /** Type d'objet */
   ModelType type() default ModelType.STRING;
+
+  boolean readonly() default false;
 }
