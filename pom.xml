@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.insee.sugoi</groupId>
 	<artifactId>sugoi-api-parent</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0-SNAPSHOT</version>
 	<name>sugoi-api-parent</name>
 	<description>User services management</description>
 	<packaging>pom</packaging>
