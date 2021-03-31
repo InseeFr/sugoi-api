@@ -206,6 +206,7 @@ public class GroupController {
 
     if (groupService.findById(realm, applicationName, id) != null) {
       groupService.update(realm, applicationName, group);
+
       URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
       return ResponseEntity.status(HttpStatus.OK)
           .header(HttpHeaders.LOCATION, location.toString())
@@ -289,6 +290,52 @@ public class GroupController {
     Group group = groupService.findById(realm, applicationName, id);
     if (group != null) {
       return ResponseEntity.status(HttpStatus.OK).body(group);
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+  }
+
+  @PutMapping(
+      value = {"/realms/{realm}/groups/{group_id}/members/{user_id}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Add user to group")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#storage,#applicationName)")
+  public ResponseEntity<?> addUserToGroup(
+      @PathVariable("realm") String realm,
+      @PathVariable("group_id") String groupId,
+      @PathVariable("user_id") String userId,
+      @RequestParam("application") String applicationName) {
+
+    if (groupService.findById(realm, applicationName, groupId) != null) {
+
+      groupService.addUserToGroup(realm, userId, applicationName, groupId);
+      URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+      return ResponseEntity.status(HttpStatus.OK)
+          .header(HttpHeaders.LOCATION, location.toString())
+          .build();
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+  }
+
+  @DeleteMapping(
+      value = {"/realms/{realm}/groups/{group_id}/members/{user_id}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Delete user from group")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#storage,#applicationName)")
+  public ResponseEntity<?> deleteUserFromGroup(
+      @PathVariable("realm") String realm,
+      @PathVariable("group_id") String groupId,
+      @PathVariable("user_id") String userId,
+      @RequestParam("application") String applicationName) {
+
+    if (groupService.findById(realm, applicationName, groupId) != null) {
+
+      groupService.deleteUserFromGroup(realm, userId, applicationName, groupId);
+      URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+      return ResponseEntity.status(HttpStatus.OK)
+          .header(HttpHeaders.LOCATION, location.toString())
+          .build();
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }

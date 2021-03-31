@@ -106,13 +106,13 @@ public class JmsRequestRouter {
         appName = (String) request.getmethodParams().get(JmsAtttributes.APP_NAME);
         groupName = (String) request.getmethodParams().get(JmsAtttributes.GROUP_NAME);
         String userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
-        userService.deleteUserFromGroup(realm, userStorage, userId, appName, groupName);
+        groupService.deleteUserFromGroup(realm, userId, appName, groupName);
         break;
       case Method.ADD_USER_TO_GROUP:
         appName = (String) request.getmethodParams().get(JmsAtttributes.APP_NAME);
         groupName = (String) request.getmethodParams().get(JmsAtttributes.GROUP_NAME);
         userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
-        userService.addUserToGroup(realm, userStorage, userId, appName, groupName);
+        groupService.addUserToGroup(realm, userId, appName, groupName);
         break;
       case Method.REINIT_PASSWORD:
         user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));

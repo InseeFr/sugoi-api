@@ -34,10 +34,4 @@ public interface UserService {
       User userProperties,
       PageableResult pageable,
       SearchType typeRecherche);
-
-  void addUserToGroup(
-      String realm, String storage, String userId, String appName, String groupName);
-
-  void deleteUserFromGroup(
-      String realm, String storage, String userId, String appName, String groupName);
 }
