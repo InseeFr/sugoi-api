@@ -97,8 +97,10 @@ jobs:
           git config --global user.email "dg75-dsi-domaine-outils-transverses@insee.fr"
           git checkout main
           old_version=${{ needs.build.outputs.version }}
-          new_version=$(echo $old_version | cut -d. -f1).$(($(echo $old_version | cut -d. -f2) + 1)).0-SNAPSHOT 
-          mvn -B versions:set -DnewVersion=$new_version -DgenerateBackupPoms=false
+          new_version=$(echo $old_version | cut -d. -f1).$(($(echo $old_version | cut -d. -f2) + 1)).0
+          git checkout -b prepare-version-$new_version
+          mvn -B versions:set -DnewVersion=$new_version-SNAPSHOT -DgenerateBackupPoms=false
           git add .
-          git commit -m"Prepare new version"
-          git push
+          git commit -sm"Prepare new version"
+          git push origin prepare-version-$new_version
+          gh pr create --title "Prepare new version" --body "Prepare new version"
