@@ -92,7 +92,8 @@ public class GenericLdapMapper {
           .filter(
               ldapField ->
                   ldapField.getDeclaredAnnotationsByType(AttributeLdapName.class).length > 0
-                      && ldapField.getDeclaredAnnotationsByType(MapToAttribute.class).length > 0)
+                      && ldapField.getDeclaredAnnotationsByType(MapToAttribute.class).length > 0
+                      && !ldapField.getAnnotation(MapToAttribute.class).readonly())
           .forEach(
               ldapField -> {
                 List<Attribute> createdAttributeList =
@@ -297,7 +298,7 @@ public class GenericLdapMapper {
                                         .getAnnotation(LdapObjectClass.class)
                                         .rdnAttributeName(),
                                     group.getName(),
-                                    config.get("appli_source"))))
+                                    config.get("app_source"))))
                     .collect(Collectors.toList());
           case ADDRESS:
             List<Attribute> addressAttributeList = new ArrayList<>();

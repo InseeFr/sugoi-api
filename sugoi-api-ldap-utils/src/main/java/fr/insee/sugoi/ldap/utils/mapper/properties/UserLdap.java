@@ -134,6 +134,6 @@ public class UserLdap {
   private String habilitations;
 
   @AttributeLdapName("memberOf")
-  @MapToAttribute(value = "groups", type = ModelType.LIST_GROUP)
+  @MapToAttribute(value = "groups", type = ModelType.LIST_GROUP, readonly = true)
   private String groups;
 }
