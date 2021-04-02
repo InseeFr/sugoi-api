@@ -91,8 +91,7 @@ public class GroupControllerTest {
           .thenReturn(pageResult);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/realms/domaine1/groups")
-              .param("application", "monApplication")
+          MockMvcRequestBuilders.get("/realms/domaine1/applications/monApplication/groups")
               .accept(MediaType.APPLICATION_JSON);
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
       TypeReference<PageResult<Group>> mapType = new TypeReference<PageResult<Group>>() {};
@@ -124,8 +123,7 @@ public class GroupControllerTest {
           .thenReturn(group1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/realms/domaine1/groups/Group1")
-              .param("application", "monApplication")
+          MockMvcRequestBuilders.get("/realms/domaine1/applications/monApplication/groups/Group1")
               .accept(MediaType.APPLICATION_JSON);
 
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
@@ -151,9 +149,9 @@ public class GroupControllerTest {
           .thenReturn(group1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/realms/domaine1/groups/supprimemoi")
+          MockMvcRequestBuilders.delete(
+                  "/realms/domaine1/applications/monApplication/groups/supprimemoi")
               .accept(MediaType.APPLICATION_JSON)
-              .param("application", "monApplication")
               .with(csrf());
 
       mockMvc.perform(requestBuilder).andReturn();
@@ -175,8 +173,7 @@ public class GroupControllerTest {
           .thenReturn(group2Updated);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/realms/domaine1/groups/Group2")
-              .param("application", "monApplication")
+          MockMvcRequestBuilders.put("/realms/domaine1/applications/monApplication/groups/Group2")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(group2Updated))
               .accept(MediaType.APPLICATION_JSON)
@@ -193,7 +190,7 @@ public class GroupControllerTest {
       assertThat(
           "Should get location",
           response.getHeader("Location"),
-          is("http://localhost/realms/domaine1/groups/Group2"));
+          is("http://localhost/realms/domaine1/applications/monApplication/groups/Group2"));
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -211,8 +208,7 @@ public class GroupControllerTest {
           .thenReturn(group1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/realms/domaine1/groups")
-              .param("application", "monApplication")
+          MockMvcRequestBuilders.post("/realms/domaine1/applications/monApplication/groups")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(group1))
               .accept(MediaType.APPLICATION_JSON)
@@ -244,14 +240,14 @@ public class GroupControllerTest {
                   Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any()))
           .thenReturn(pageResult);
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/realms/domaine1/groups?size=2")
-              .param("application", "monApplication")
+          MockMvcRequestBuilders.get("/realms/domaine1/applications/monApplication/groups?size=2")
               .accept(MediaType.APPLICATION_JSON);
 
       assertThat(
           "Location header gives next page",
           mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
-          is("http://localhost/realms/domaine1/groups?size=2&offset=2"));
+          is(
+              "http://localhost/realms/domaine1/applications/monApplication/groups?size=2&offset=2"));
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -269,8 +265,7 @@ public class GroupControllerTest {
           .thenReturn(group1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/realms/domaine1/groups")
-              .param("application", "monApplication")
+          MockMvcRequestBuilders.post("/realms/domaine1/applications/monApplication/groups")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(group1))
               .accept(MediaType.APPLICATION_JSON)
@@ -279,7 +274,7 @@ public class GroupControllerTest {
       assertThat(
           "Location header gives get uri",
           mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
-          is("http://localhost/realms/domaine1/groups/Group1"));
+          is("http://localhost/realms/domaine1/applications/monApplication/groups/Group1"));
 
     } catch (Exception e1) {
       e1.printStackTrace();
@@ -293,8 +288,7 @@ public class GroupControllerTest {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/realms/domaine1/groups")
-              .param("application", "monApplication")
+          MockMvcRequestBuilders.post("/realms/domaine1/applications/monApplication/groups")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(group1))
               .accept(MediaType.APPLICATION_JSON)
@@ -316,8 +310,8 @@ public class GroupControllerTest {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/realms/domaine1/groups/supprimemoi")
-              .param("application", "monApplication")
+          MockMvcRequestBuilders.delete(
+                  "/realms/domaine1/applications/monApplication/groups/supprimemoi")
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
@@ -337,8 +331,7 @@ public class GroupControllerTest {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/realms/domaine1/groups/Group1")
-              .param("application", "monApplication")
+          MockMvcRequestBuilders.put("/realms/domaine1/application/monApplication/groups/Group1")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(group1))
               .accept(MediaType.APPLICATION_JSON)
@@ -364,8 +357,7 @@ public class GroupControllerTest {
           .thenReturn(group1);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post("/realms/domaine1/groups")
-              .param("application", "monApplication")
+          MockMvcRequestBuilders.post("/realms/domaine1/applications/monApplication/groups")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(group1))
               .accept(MediaType.APPLICATION_JSON)
@@ -391,8 +383,7 @@ public class GroupControllerTest {
           .thenReturn(null);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/realms/domaine1/groups/dontexist")
-              .param("application", "monApplication")
+          MockMvcRequestBuilders.get("/realms/domaine1/application/monApplication/groups/dontexist")
               .accept(MediaType.APPLICATION_JSON);
 
       assertThat(
@@ -412,8 +403,8 @@ public class GroupControllerTest {
     try {
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/realms/domaine1/groups/dontexist")
-              .param("application", "monApplication")
+          MockMvcRequestBuilders.put(
+                  "/realms/domaine1/applications/monApplication/groups/dontexist")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(group1))
               .accept(MediaType.APPLICATION_JSON)
@@ -438,8 +429,7 @@ public class GroupControllerTest {
       Mockito.when(groupService.findById("domaine1", "monApplication", "Group1")).thenReturn(null);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/realms/domaine1/groups/Group1")
-              .param("application", "monApplication")
+          MockMvcRequestBuilders.put("/realms/domaine1/applications/monApplication/groups/Group1")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(group1))
               .accept(MediaType.APPLICATION_JSON)
@@ -464,8 +454,8 @@ public class GroupControllerTest {
       Mockito.when(groupService.findById("domaine1", "monApplication", "Group1")).thenReturn(null);
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/realms/domaine1/groups/dontexist")
-              .param("application", "monApplication")
+          MockMvcRequestBuilders.delete(
+                  "/realms/domaine1/groups/application/monApplication/dontexist")
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
