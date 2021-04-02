@@ -19,8 +19,10 @@ import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.GroupService;
+import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.User;
 import java.util.ArrayList;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,8 @@ public class GroupServiceImpl implements GroupService {
   @Autowired private StoreProvider storeProvider;
 
   @Autowired private SugoiEventPublisher sugoiEventPublisher;
+
+  @Autowired private UserService userService;
 
   @Override
   public Group create(String realm, String appName, Group group) {
@@ -90,27 +94,33 @@ public class GroupServiceImpl implements GroupService {
 
   @Override
   public void addUserToGroup(String realm, String userId, String appName, String groupName) {
+    User user = userService.findById(realm, null, userId);
     sugoiEventPublisher.publishCustomEvent(
         realm,
-        null,
+        (String) user.getMetadatas().get("userStorage"),
         SugoiEventTypeEnum.ADD_USER_TO_GROUP,
         Map.ofEntries(
             Map.entry("user", userId),
             Map.entry("appName", appName),
             Map.entry("groupName", groupName)));
-    storeProvider.getWriterStore(realm).addUserToGroup(appName, groupName, userId);
+    storeProvider
+        .getWriterStore(realm, (String) user.getMetadatas().get("userStorage"))
+        .addUserToGroup(appName, groupName, userId);
   }
 
   @Override
   public void deleteUserFromGroup(String realm, String userId, String appName, String groupName) {
+    User user = userService.findById(realm, null, userId);
     sugoiEventPublisher.publishCustomEvent(
         realm,
-        null,
+        (String) user.getMetadatas().get("userStorage"),
         SugoiEventTypeEnum.DELETE_USER_FROM_GROUP,
         Map.ofEntries(
             Map.entry("user", userId),
             Map.entry("appName", appName),
             Map.entry("groupName", groupName)));
-    storeProvider.getWriterStore(realm).deleteUserFromGroup(appName, groupName, userId);
+    storeProvider
+        .getWriterStore(realm, (String) user.getMetadatas().get("userStorage"))
+        .deleteUserFromGroup(appName, groupName, userId);
   }
 }
