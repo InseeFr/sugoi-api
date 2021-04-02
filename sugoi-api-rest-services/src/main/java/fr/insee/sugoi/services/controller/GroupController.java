@@ -56,7 +56,7 @@ public class GroupController {
   @Autowired private GroupService groupService;
 
   @GetMapping(
-      path = {"/realms/{realm}/groups"},
+      path = {"/realms/{realm}/applications/{application}/groups"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Search groups by parameters")
   @ApiResponses(
@@ -78,7 +78,7 @@ public class GroupController {
           @PathVariable("realm")
           String realm,
       @Parameter(description = "Name of application where to search group", required = false)
-          @RequestParam(value = "application")
+          @PathVariable(value = "application")
           String applicationName,
       @Parameter(description = "Quick description of wanted group", required = false)
           @RequestParam(value = "description", required = false)
@@ -115,7 +115,7 @@ public class GroupController {
   }
 
   @PostMapping(
-      value = {"/realms/{realm}/groups"},
+      value = {"/realms/{realm}/applications/{application}/groups"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Create group in application according to parameters")
@@ -142,7 +142,7 @@ public class GroupController {
           @PathVariable("realm")
           String realm,
       @Parameter(description = "Name of application where to add group", required = true)
-          @RequestParam(value = "application", required = true)
+          @PathVariable(value = "application", required = true)
           String applicationName,
       @Parameter(description = "Group to create", required = true) @RequestBody Group group) {
 
@@ -163,7 +163,7 @@ public class GroupController {
   }
 
   @PutMapping(
-      value = {"/realms/{realm}/groups/{id}"},
+      value = {"/realms/{realm}/applications/{application}/groups/{id}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Update group in application according to parameters")
@@ -196,7 +196,7 @@ public class GroupController {
       @Parameter(description = "Group's id to update", required = true) @PathVariable("id")
           String id,
       @Parameter(description = "Name of application which contains group", required = true)
-          @RequestParam("application")
+          @PathVariable("application")
           String applicationName,
       @Parameter(description = "Group to update", required = true) @RequestBody Group group) {
 
@@ -217,7 +217,7 @@ public class GroupController {
   }
 
   @DeleteMapping(
-      value = {"/realms/{realm}/groups/{id}"},
+      value = {"/realms/{realm}/applications/{application}/groups/{id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete group in application")
   @ApiResponses(
@@ -243,7 +243,7 @@ public class GroupController {
           @PathVariable("realm")
           String realm,
       @Parameter(description = "Name of application which contains group", required = true)
-          @RequestParam("application")
+          @PathVariable("application")
           String applicationName,
       @Parameter(description = "Group's id to delete", required = true) @PathVariable("id")
           String id) {
@@ -257,7 +257,7 @@ public class GroupController {
   }
 
   @GetMapping(
-      path = {"/realms/{realm}/groups/{groupname}"},
+      path = {"/realms/{realm}/applications/{application}/groups/{groupname}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get group by name in an application")
   @ApiResponses(
@@ -283,7 +283,7 @@ public class GroupController {
           @PathVariable("realm")
           String realm,
       @Parameter(description = "Name of application which contains group", required = true)
-          @RequestParam("application")
+          @PathVariable("application")
           String applicationName,
       @Parameter(description = "Group's name to search", required = true) @PathVariable("groupname")
           String id) {
@@ -296,7 +296,7 @@ public class GroupController {
   }
 
   @PutMapping(
-      value = {"/realms/{realm}/groups/{group_id}/members/{user_id}"},
+      value = {"/realms/{realm}/applications/{application}/groups/{group_id}/members/{user_id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Add user to group")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#storage,#applicationName)")
@@ -304,7 +304,7 @@ public class GroupController {
       @PathVariable("realm") String realm,
       @PathVariable("group_id") String groupId,
       @PathVariable("user_id") String userId,
-      @RequestParam("application") String applicationName) {
+      @PathVariable("application") String applicationName) {
 
     if (groupService.findById(realm, applicationName, groupId) != null) {
 
@@ -319,7 +319,7 @@ public class GroupController {
   }
 
   @DeleteMapping(
-      value = {"/realms/{realm}/groups/{group_id}/members/{user_id}"},
+      value = {"/realms/{realm}/applications/{application}/groups/{group_id}/members/{user_id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete user from group")
   @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#storage,#applicationName)")
@@ -327,7 +327,7 @@ public class GroupController {
       @PathVariable("realm") String realm,
       @PathVariable("group_id") String groupId,
       @PathVariable("user_id") String userId,
-      @RequestParam("application") String applicationName) {
+      @PathVariable("application") String applicationName) {
 
     if (groupService.findById(realm, applicationName, groupId) != null) {
 
