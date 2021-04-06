@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.core.service.impl;
 
+import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.model.PageResult;
@@ -44,14 +45,19 @@ public class GroupServiceImpl implements GroupService {
         realm,
         null,
         SugoiEventTypeEnum.CREATE_GROUP,
-        Map.ofEntries(Map.entry("group", group), Map.entry("appName", appName)));
+        Map.ofEntries(
+            Map.entry(EventKeysConfig.GROUP, group),
+            Map.entry(EventKeysConfig.APPLICATION_NAME, appName)));
     return storeProvider.getWriterStore(realm).createGroup(appName, group);
   }
 
   @Override
   public void delete(String realm, String appName, String id) {
     sugoiEventPublisher.publishCustomEvent(
-        realm, null, SugoiEventTypeEnum.DELETE_GROUP, Map.ofEntries(Map.entry("groupId", id)));
+        realm,
+        null,
+        SugoiEventTypeEnum.DELETE_GROUP,
+        Map.ofEntries(Map.entry(EventKeysConfig.GROUP_ID, id)));
     storeProvider.getWriterStore(realm).deleteGroup(appName, id);
   }
 
@@ -64,7 +70,9 @@ public class GroupServiceImpl implements GroupService {
         realm,
         null,
         SugoiEventTypeEnum.FIND_GROUP_BY_ID,
-        Map.ofEntries(Map.entry("groupId", id), Map.entry("appName", appName)));
+        Map.ofEntries(
+            Map.entry(EventKeysConfig.GROUP_ID, id),
+            Map.entry(EventKeysConfig.APPLICATION_NAME, appName)));
     return storeProvider.getReaderStore(realm).getGroup(appName, id);
   }
 
@@ -75,7 +83,9 @@ public class GroupServiceImpl implements GroupService {
         realm,
         null,
         SugoiEventTypeEnum.FIND_GROUPS,
-        Map.ofEntries(Map.entry("appName", appName), Map.entry("groupFilter", groupFilter)));
+        Map.ofEntries(
+            Map.entry(EventKeysConfig.APPLICATION_NAME, appName),
+            Map.entry(EventKeysConfig.GROUP_FILTER, groupFilter)));
     return storeProvider
         .getReaderStore(realm)
         .searchGroups(appName, groupFilter, pageableResult, SearchType.AND.name());
@@ -88,7 +98,9 @@ public class GroupServiceImpl implements GroupService {
         realm,
         null,
         SugoiEventTypeEnum.UPDATE_GROUP,
-        Map.ofEntries(Map.entry("group", group), Map.entry("appName", appName)));
+        Map.ofEntries(
+            Map.entry(EventKeysConfig.GROUP, group),
+            Map.entry(EventKeysConfig.APPLICATION_NAME, appName)));
     storeProvider.getWriterStore(realm).updateGroup(appName, group);
   }
 
@@ -97,14 +109,14 @@ public class GroupServiceImpl implements GroupService {
     User user = userService.findById(realm, null, userId);
     sugoiEventPublisher.publishCustomEvent(
         realm,
-        (String) user.getMetadatas().get("userStorage"),
+        (String) user.getMetadatas().get(EventKeysConfig.USERSTORAGE),
         SugoiEventTypeEnum.ADD_USER_TO_GROUP,
         Map.ofEntries(
-            Map.entry("user", userId),
-            Map.entry("appName", appName),
-            Map.entry("groupName", groupName)));
+            Map.entry(EventKeysConfig.USER, userId),
+            Map.entry(EventKeysConfig.APPLICATION_NAME, appName),
+            Map.entry(EventKeysConfig.GROUP_NAME, groupName)));
     storeProvider
-        .getWriterStore(realm, (String) user.getMetadatas().get("userStorage"))
+        .getWriterStore(realm, (String) user.getMetadatas().get(EventKeysConfig.USERSTORAGE))
         .addUserToGroup(appName, groupName, userId);
   }
 
@@ -113,14 +125,14 @@ public class GroupServiceImpl implements GroupService {
     User user = userService.findById(realm, null, userId);
     sugoiEventPublisher.publishCustomEvent(
         realm,
-        (String) user.getMetadatas().get("userStorage"),
+        (String) user.getMetadatas().get(EventKeysConfig.USERSTORAGE),
         SugoiEventTypeEnum.DELETE_USER_FROM_GROUP,
         Map.ofEntries(
-            Map.entry("user", userId),
-            Map.entry("appName", appName),
-            Map.entry("groupName", groupName)));
+            Map.entry(EventKeysConfig.USER, userId),
+            Map.entry(EventKeysConfig.APPLICATION_NAME, appName),
+            Map.entry(EventKeysConfig.GROUP_NAME, groupName)));
     storeProvider
-        .getWriterStore(realm, (String) user.getMetadatas().get("userStorage"))
+        .getWriterStore(realm, (String) user.getMetadatas().get(EventKeysConfig.USERSTORAGE))
         .deleteUserFromGroup(appName, groupName, userId);
   }
 }

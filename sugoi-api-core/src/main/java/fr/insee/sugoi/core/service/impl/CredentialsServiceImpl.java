@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.core.service.impl;
 
+import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.PasswordPolicyNotMetException;
@@ -77,18 +78,19 @@ public class CredentialsServiceImpl implements CredentialsService {
     writerStore.reinitPassword(user, password, pcr, sendMode);
     writerStore.changePasswordResetStatus(
         user,
-        (pcr.getProperties() != null && pcr.getProperties().get("mustChangePassword") != null)
-            ? Boolean.parseBoolean(pcr.getProperties().get("mustChangePassword"))
+        (pcr.getProperties() != null
+                && pcr.getProperties().get(EventKeysConfig.MUST_CHANGE_PASSWORD) != null)
+            ? Boolean.parseBoolean(pcr.getProperties().get(EventKeysConfig.MUST_CHANGE_PASSWORD))
             : false);
     sugoiEventPublisher.publishCustomEvent(
         realm,
         userStorage,
         SugoiEventTypeEnum.RESET_PASSWORD,
         Map.ofEntries(
-            Map.entry("pcr", pcr),
-            Map.entry("user", user),
-            Map.entry("password", password),
-            Map.entry("sendModes", sendMode)));
+            Map.entry(EventKeysConfig.PASSWORD_CHANGE_REQUEST, pcr),
+            Map.entry(EventKeysConfig.USER, user),
+            Map.entry(EventKeysConfig.PASSWORD, password),
+            Map.entry(EventKeysConfig.SENDMODES, sendMode)));
   }
 
   @Override
@@ -99,7 +101,9 @@ public class CredentialsServiceImpl implements CredentialsService {
         realm,
         userStorage,
         SugoiEventTypeEnum.CHANGE_PASSWORD,
-        Map.ofEntries(Map.entry("pcr", pcr), Map.entry("user", user)));
+        Map.ofEntries(
+            Map.entry(EventKeysConfig.PASSWORD_CHANGE_REQUEST, pcr),
+            Map.entry(EventKeysConfig.USER, user)));
     Map<String, String> realmProperties = configService.getRealm(realm).getProperties();
 
     boolean newPasswordIsValid = validatePassword(pcr.getNewPassword(), realmProperties);
@@ -132,10 +136,10 @@ public class CredentialsServiceImpl implements CredentialsService {
           userStorage,
           SugoiEventTypeEnum.INIT_PASSWORD,
           Map.ofEntries(
-              Map.entry("pcr", pcr),
-              Map.entry("sendModes", sendMode),
-              Map.entry("user", user),
-              Map.entry("password", pcr.getNewPassword())));
+              Map.entry(EventKeysConfig.PASSWORD_CHANGE_REQUEST, pcr),
+              Map.entry(EventKeysConfig.SENDMODES, sendMode),
+              Map.entry(EventKeysConfig.USER, user),
+              Map.entry(EventKeysConfig.PASSWORD, pcr.getNewPassword())));
     } else {
       throw new PasswordPolicyNotMetException("New password is not valid");
     }
@@ -149,7 +153,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         realm,
         userStorage,
         SugoiEventTypeEnum.VALIDATE_CREDENTIAL,
-        Map.ofEntries(Map.entry("user", user)));
+        Map.ofEntries(Map.entry(EventKeysConfig.USER, user)));
     return storeProvider.getReaderStore(realm, userStorage).validateCredentials(user, password);
   }
 

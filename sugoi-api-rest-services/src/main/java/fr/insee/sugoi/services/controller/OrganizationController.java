@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.services.controller;
 
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
@@ -305,7 +306,7 @@ public class OrganizationController {
     }
     Organization org = organizationService.findById(realm, null, id);
     return updateOrganizations(
-        realm, (String) org.getMetadatas().get("userStorage"), id, organization);
+        realm, (String) org.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id, organization);
   }
 
   @DeleteMapping(
@@ -372,7 +373,8 @@ public class OrganizationController {
           String id) {
 
     Organization org = organizationService.findById(realm, null, id);
-    return deleteOrganizations(realm, (String) org.getMetadatas().get("userStorage"), id);
+    return deleteOrganizations(
+        realm, (String) org.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id);
   }
 
   @GetMapping(

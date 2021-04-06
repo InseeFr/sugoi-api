@@ -30,6 +30,7 @@ import fr.insee.sugoi.core.model.PasswordChangeRequest;
 import fr.insee.sugoi.core.model.SendMode;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
+import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.GroupLdapMapper;
@@ -281,7 +282,8 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     Modification mod =
         new Modification(ModificationType.REPLACE, "userPassword", generatedPassword);
     try {
-      ldapPoolConnection.modify("uid=" + user.getUsername() + "," + config.get("user_source"), mod);
+      ldapPoolConnection.modify(
+          "uid=" + user.getUsername() + "," + config.get(LdapConfigKeys.USER_SOURCE), mod);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to reinit password for user " + user.getUsername(), e);
     }
@@ -292,7 +294,8 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       User user, String password, PasswordChangeRequest pcr, List<SendMode> sendMode) {
     Modification mod = new Modification(ModificationType.REPLACE, "userPassword", password);
     try {
-      ldapPoolConnection.modify("uid=" + user.getUsername() + "," + config.get("user_source"), mod);
+      ldapPoolConnection.modify(
+          "uid=" + user.getUsername() + "," + config.get(LdapConfigKeys.USER_SOURCE), mod);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to init password for user " + user.getUsername(), e);
     }
@@ -304,7 +307,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     try {
       PasswordModifyExtendedRequest pmer =
           new PasswordModifyExtendedRequest(
-              "uid=" + user.getUsername() + "," + config.get("user_source"),
+              "uid=" + user.getUsername() + "," + config.get(LdapConfigKeys.USER_SOURCE),
               oldPassword,
               newPassword);
       ExtendedResult result = ldapPoolConnection.processExtendedOperation(pmer);
@@ -324,7 +327,8 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
         new Modification(
             ModificationType.REPLACE, "pwdReset", Boolean.toString(isReset).toUpperCase());
     try {
-      ldapPoolConnection.modify("uid=" + user.getUsername() + "," + config.get("user_source"), mod);
+      ldapPoolConnection.modify(
+          "uid=" + user.getUsername() + "," + config.get(LdapConfigKeys.USER_SOURCE), mod);
     } catch (LDAPException e) {
       e.printStackTrace();
     }

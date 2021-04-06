@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.core.service.impl;
 
+import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.realm.RealmProvider;
@@ -37,7 +38,7 @@ public class ConfigServiceImpl implements ConfigService {
         null,
         null,
         SugoiEventTypeEnum.FIND_REALM_BY_ID,
-        Map.ofEntries(Map.entry("realmName", name)));
+        Map.ofEntries(Map.entry(EventKeysConfig.REALM_NAME, name)));
     return realmProvider.load(name);
   }
 

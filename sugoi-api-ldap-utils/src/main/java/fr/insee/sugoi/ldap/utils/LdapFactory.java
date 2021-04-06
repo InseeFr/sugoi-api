@@ -17,6 +17,7 @@ import com.unboundid.ldap.sdk.BindResult;
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
 import com.unboundid.ldap.sdk.LDAPException;
+import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -40,23 +41,28 @@ public class LdapFactory {
       throws LDAPException {
     // Check if a ldap connection pool already exist for this userStorage and create
     // it if it doesn't exist
-    String key = config.get("realm_name") + "_" + config.get("name") + "_R";
+    String key =
+        config.get(LdapConfigKeys.REALM_NAME) + "_" + config.get(LdapConfigKeys.NAME) + "_R";
     if (!openLdapPoolConnection.containsKey(key)) {
       openLdapPoolConnection.put(
           key,
           new LDAPConnectionPool(
-              new LDAPConnection(config.get("url"), Integer.valueOf(config.get("port"))),
-              Integer.valueOf(config.get("pool_size"))));
+              new LDAPConnection(
+                  config.get(LdapConfigKeys.URL), Integer.valueOf(config.get(LdapConfigKeys.PORT))),
+              Integer.valueOf(config.get(LdapConfigKeys.POOL_SIZE))));
     }
     return openLdapPoolConnection.get(key);
   }
 
   public static LDAPConnection getSingleConnection(Map<String, String> config)
       throws LDAPException {
-    String key = config.get("realm_name") + "_" + config.get("name") + "_R";
+    String key =
+        config.get(LdapConfigKeys.REALM_NAME) + "_" + config.get(LdapConfigKeys.NAME) + "_R";
     if (!openLdapMonoConnection.containsKey(key)) {
       openLdapMonoConnection.put(
-          key, new LDAPConnection(config.get("url"), Integer.valueOf(config.get("port"))));
+          key,
+          new LDAPConnection(
+              config.get(LdapConfigKeys.URL), Integer.valueOf(config.get(LdapConfigKeys.PORT))));
     }
     return openLdapMonoConnection.get(key);
   }
@@ -72,32 +78,34 @@ public class LdapFactory {
       throws LDAPException {
     // Check if a ldap connection pool already exist for this userStorage and create
     // it if it doesn't exist
-    String key = config.get("realm_name") + "_" + config.get("name") + "_RW";
+    String key =
+        config.get(LdapConfigKeys.REALM_NAME) + "_" + config.get(LdapConfigKeys.NAME) + "_RW";
     if (!openLdapPoolConnection.containsKey(key)) {
       openLdapPoolConnection.put(
           key,
           new LDAPConnectionPool(
               new LDAPConnection(
-                  config.get("url"),
-                  Integer.valueOf(config.get("port")),
-                  config.get("username"),
-                  config.get("password")),
-              Integer.valueOf(config.get("pool_size"))));
+                  config.get(LdapConfigKeys.URL),
+                  Integer.valueOf(config.get(LdapConfigKeys.PORT)),
+                  config.get(LdapConfigKeys.USERNAME),
+                  config.get(LdapConfigKeys.PASSWORD)),
+              Integer.valueOf(config.get(LdapConfigKeys.POOL_SIZE))));
     }
     return openLdapPoolConnection.get(key);
   }
 
   public static LDAPConnection getSingleConnectionAuthenticated(Map<String, String> config)
       throws LDAPException {
-    String key = config.get("realm_name") + "_" + config.get("name") + "_RW";
+    String key =
+        config.get(LdapConfigKeys.REALM_NAME) + "_" + config.get(LdapConfigKeys.NAME) + "_RW";
     if (!openLdapMonoConnection.containsKey(key)) {
       openLdapMonoConnection.put(
           key,
           new LDAPConnection(
-              config.get("url"),
-              Integer.valueOf(config.get("port")),
-              config.get("username"),
-              config.get("password")));
+              config.get(LdapConfigKeys.URL),
+              Integer.valueOf(config.get(LdapConfigKeys.PORT)),
+              config.get(LdapConfigKeys.USERNAME),
+              config.get(LdapConfigKeys.PASSWORD)));
     }
     return openLdapMonoConnection.get(key);
   }
@@ -105,7 +113,8 @@ public class LdapFactory {
   public static boolean validateUserPassword(
       Map<String, String> config, String userdn, String password) throws LDAPException {
     try (LDAPConnection conn =
-        new LDAPConnection(config.get("url"), Integer.valueOf(config.get("port")))) {
+        new LDAPConnection(
+            config.get(LdapConfigKeys.URL), Integer.valueOf(config.get(LdapConfigKeys.PORT)))) {
       BindResult result = conn.bind(userdn, password);
       if (result.getResultCode().intValue() != 0) {
         return false;

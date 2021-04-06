@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.event.listener.webhook.service.impl;
 
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.event.listener.webhook.service.WebHookService;
 import freemarker.template.Configuration;
@@ -87,8 +88,14 @@ public class WebHookServiceImpl implements WebHookService {
     String template = null;
     try {
       template =
-          configService.getRealm((String) values.get("realm")).getUserStorages().stream()
-              .filter(us -> us.getName().equalsIgnoreCase((String) values.get("userStorage")))
+          configService
+              .getRealm((String) values.get(GlobalKeysConfig.REALM))
+              .getUserStorages()
+              .stream()
+              .filter(
+                  us ->
+                      us.getName()
+                          .equalsIgnoreCase((String) values.get(GlobalKeysConfig.USERSTORAGE)))
               .findFirst()
               .get()
               .getProperties()
@@ -117,8 +124,14 @@ public class WebHookServiceImpl implements WebHookService {
     String template = null;
     try {
       template =
-          configService.getRealm((String) values.get("realm")).getUserStorages().stream()
-              .filter(us -> us.getName().equalsIgnoreCase((String) values.get("userStorage")))
+          configService
+              .getRealm((String) values.get(GlobalKeysConfig.REALM))
+              .getUserStorages()
+              .stream()
+              .filter(
+                  us ->
+                      us.getName()
+                          .equalsIgnoreCase((String) values.get(GlobalKeysConfig.USERSTORAGE)))
               .findFirst()
               .get()
               .getProperties()

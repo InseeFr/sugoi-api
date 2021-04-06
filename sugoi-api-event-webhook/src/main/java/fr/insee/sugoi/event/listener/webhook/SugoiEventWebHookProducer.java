@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.event.listener.webhook;
 
+import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEvent;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.model.PasswordChangeRequest;
@@ -47,21 +48,24 @@ public class SugoiEventWebHookProducer {
     SugoiEventTypeEnum eventType = cse.getEventType();
     switch (eventType) {
       case INIT_PASSWORD:
-        List<SendMode> sendModes = (List<SendMode>) cse.getProperties().get("sendModes");
-        User user = (User) cse.getProperties().get("user");
-        String password = (String) cse.getProperties().get("password");
-        PasswordChangeRequest pcr = (PasswordChangeRequest) cse.getProperties().get("pcr");
+        List<SendMode> sendModes =
+            (List<SendMode>) cse.getProperties().get(EventKeysConfig.SENDMODES);
+        User user = (User) cse.getProperties().get(EventKeysConfig.USER);
+        String password = (String) cse.getProperties().get(EventKeysConfig.PASSWORD);
+        PasswordChangeRequest pcr =
+            (PasswordChangeRequest)
+                cse.getProperties().get(EventKeysConfig.PASSWORD_CHANGE_REQUEST);
         String realm = cse.getRealm();
         String userStorage = cse.getUserStorage() != null ? cse.getUserStorage() : "default";
         Map<String, Object> values = new HashMap<>();
-        values.put("realm", realm);
-        values.put("userStorage", userStorage);
-        values.put("user", user);
-        values.put("mail", pcr.getEmail() != null ? pcr.getEmail() : user.getMail());
-        values.put("password", password);
-        values.put("address", pcr.getAddress());
+        values.put(EventKeysConfig.REALM, realm);
+        values.put(EventKeysConfig.USERSTORAGE, userStorage);
+        values.put(EventKeysConfig.USER, user);
+        values.put(EventKeysConfig.MAIL, pcr.getEmail() != null ? pcr.getEmail() : user.getMail());
+        values.put(EventKeysConfig.PASSWORD, password);
+        values.put(EventKeysConfig.ADDRESS, pcr.getAddress());
         values.put(
-            "properties",
+            EventKeysConfig.PROPERTIES,
             pcr.getProperties() != null ? pcr.getProperties() : new HashMap<String, String>());
         webHookNames.stream()
             .filter(
@@ -75,21 +79,23 @@ public class SugoiEventWebHookProducer {
             .forEach(webHookName -> webHookService.initPassword(webHookName, values));
         break;
       case RESET_PASSWORD:
-        sendModes = (List<SendMode>) cse.getProperties().get("sendModes");
-        user = (User) cse.getProperties().get("user");
-        password = (String) cse.getProperties().get("password");
-        pcr = (PasswordChangeRequest) cse.getProperties().get("pcr");
+        sendModes = (List<SendMode>) cse.getProperties().get(EventKeysConfig.SENDMODES);
+        user = (User) cse.getProperties().get(EventKeysConfig.USER);
+        password = (String) cse.getProperties().get(EventKeysConfig.PASSWORD);
+        pcr =
+            (PasswordChangeRequest)
+                cse.getProperties().get(EventKeysConfig.PASSWORD_CHANGE_REQUEST);
         realm = cse.getRealm();
         userStorage = cse.getUserStorage() != null ? cse.getUserStorage() : "default";
         values = new HashMap<>();
-        values.put("realm", realm);
-        values.put("userStorage", userStorage);
-        values.put("user", user);
-        values.put("mail", pcr.getEmail() != null ? pcr.getEmail() : user.getMail());
-        values.put("password", password);
-        values.put("address", pcr.getAddress());
+        values.put(EventKeysConfig.REALM, realm);
+        values.put(EventKeysConfig.USERSTORAGE, userStorage);
+        values.put(EventKeysConfig.USER, user);
+        values.put(EventKeysConfig.MAIL, pcr.getEmail() != null ? pcr.getEmail() : user.getMail());
+        values.put(EventKeysConfig.PASSWORD, password);
+        values.put(EventKeysConfig.ADDRESS, pcr.getAddress());
         values.put(
-            "properties",
+            EventKeysConfig.PROPERTIES,
             pcr.getProperties() != null ? pcr.getProperties() : new HashMap<String, String>());
         webHookNames.stream()
             .filter(

@@ -22,6 +22,7 @@ import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.store.file.configuration.FileKeysConfig;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -47,14 +48,16 @@ public class FileWriterStore implements WriterStore {
 
   @Override
   public void deleteUser(String id) {
-    deleteResourceFile(config.get("user_source"), id);
+    deleteResourceFile(config.get(FileKeysConfig.USER_SOURCE), id);
   }
 
   @Override
   public User createUser(User user) {
     try {
       createResourceFile(
-          config.get("user_source"), user.getUsername(), mapper.writeValueAsString(user));
+          config.get(FileKeysConfig.USER_SOURCE),
+          user.getUsername(),
+          mapper.writeValueAsString(user));
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Error mapping user" + user.getUsername(), e);
     }
@@ -65,7 +68,7 @@ public class FileWriterStore implements WriterStore {
   public User updateUser(User updatedUser) {
     try {
       updateResourceFile(
-          config.get("user_source"),
+          config.get(FileKeysConfig.USER_SOURCE),
           updatedUser.getUsername(),
           mapper.writeValueAsString(updatedUser));
       return updatedUser;
@@ -153,14 +156,14 @@ public class FileWriterStore implements WriterStore {
 
   @Override
   public void deleteOrganization(String name) {
-    deleteResourceFile(config.get("organization_source"), name);
+    deleteResourceFile(config.get(FileKeysConfig.ORGANIZATION_SOURCE), name);
   }
 
   @Override
   public Organization createOrganization(Organization organization) {
     try {
       createResourceFile(
-          config.get("organization_source"),
+          config.get(FileKeysConfig.ORGANIZATION_SOURCE),
           organization.getIdentifiant(),
           mapper.writeValueAsString(organization));
     } catch (JsonProcessingException e) {
@@ -173,7 +176,7 @@ public class FileWriterStore implements WriterStore {
   public Organization updateOrganization(Organization updatedOrganization) {
     try {
       updateResourceFile(
-          config.get("organization_source"),
+          config.get(FileKeysConfig.ORGANIZATION_SOURCE),
           updatedOrganization.getIdentifiant(),
           mapper.writeValueAsString(updatedOrganization));
       return updatedOrganization;
@@ -279,7 +282,9 @@ public class FileWriterStore implements WriterStore {
   public Application createApplication(Application application) {
     try {
       createResourceFile(
-          config.get("app_source"), application.getName(), mapper.writeValueAsString(application));
+          config.get(FileKeysConfig.APP_SOURCE),
+          application.getName(),
+          mapper.writeValueAsString(application));
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Error mapping application " + application.getName(), e);
     }
@@ -290,7 +295,7 @@ public class FileWriterStore implements WriterStore {
   public Application updateApplication(Application updatedApplication) {
     try {
       updateResourceFile(
-          config.get("app_source"),
+          config.get(FileKeysConfig.APP_SOURCE),
           updatedApplication.getName(),
           mapper.writeValueAsString(updatedApplication));
       return updatedApplication;
@@ -301,7 +306,7 @@ public class FileWriterStore implements WriterStore {
 
   @Override
   public void deleteApplication(String applicationName) {
-    deleteResourceFile(config.get("app_source"), applicationName);
+    deleteResourceFile(config.get(FileKeysConfig.APP_SOURCE), applicationName);
   }
 
   @Override

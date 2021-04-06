@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.store.ldap;
 
+import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.HashMap;
@@ -54,20 +55,25 @@ public class LdapStoreBeans {
 
   public Map<String, String> generateConfig(Realm realm, UserStorage userStorage) {
     Map<String, String> config = new HashMap<>();
-    config.put("name", userStorage.getName() != null ? userStorage.getName() : realm.getName());
-    config.put("url", realm.getUrl());
-    config.put("port", defaultPort);
-    config.put("username", defaultUsername);
-    config.put("password", defaultPassword);
-    config.put("pool_size", defaultPoolSize);
-    config.put("user_source", userStorage.getUserSource());
-    config.put("app_source", realm.getAppSource());
-    config.put("organization_source", userStorage.getOrganizationSource());
-    config.put("address_source", userStorage.getAddressSource());
-    config.put("group_source_pattern", userStorage.getProperties().get("group_source_pattern"));
-    config.put("group_filter_pattern", userStorage.getProperties().get("group_filter_pattern"));
-    config.put("realm_name", realm.getName());
-    config.put("type", "ldap");
+    config.put(
+        LdapConfigKeys.NAME,
+        userStorage.getName() != null ? userStorage.getName() : realm.getName());
+    config.put(LdapConfigKeys.URL, realm.getUrl());
+    config.put(LdapConfigKeys.PORT, defaultPort);
+    config.put(LdapConfigKeys.USERNAME, defaultUsername);
+    config.put(LdapConfigKeys.PASSWORD, defaultPassword);
+    config.put(LdapConfigKeys.POOL_SIZE, defaultPoolSize);
+    config.put(LdapConfigKeys.USER_SOURCE, userStorage.getUserSource());
+    config.put(LdapConfigKeys.APP_SOURCE, realm.getAppSource());
+    config.put(LdapConfigKeys.ORGANIZATION_SOURCE, userStorage.getOrganizationSource());
+    config.put(LdapConfigKeys.ADDRESS_SOURCE, userStorage.getAddressSource());
+    config.put(
+        LdapConfigKeys.GROUP_SOURCE_PATTERN,
+        userStorage.getProperties().get("group_source_pattern"));
+    config.put(
+        LdapConfigKeys.GROUP_FILTER_PATTERN,
+        userStorage.getProperties().get("group_filter_pattern"));
+    config.put(LdapConfigKeys.REALM_NAME, realm.getName());
     return config;
   }
 }

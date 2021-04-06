@@ -21,6 +21,7 @@ import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.store.file.configuration.FileKeysConfig;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -49,7 +50,8 @@ public class FileReaderStore implements ReaderStore {
 
   @Override
   public User getUser(String id) {
-    Resource realmsResource = resourceLoader.getResource(config.get("user_source") + id);
+    Resource realmsResource =
+        resourceLoader.getResource(config.get(FileKeysConfig.USER_SOURCE) + id);
     if (realmsResource.exists()) {
       User user = loadResourceContent(realmsResource, User.class);
       // suborganization is loaded as an independant resource
@@ -70,7 +72,7 @@ public class FileReaderStore implements ReaderStore {
       User searchUser, PageableResult pageable, String searchOperator) {
     PageResult<User> pageResult = new PageResult<>();
     pageResult.setResults(
-        Arrays.stream(getFilenamesFromSource(config.get("user_source")))
+        Arrays.stream(getFilenamesFromSource(config.get(FileKeysConfig.USER_SOURCE)))
             .map(resource -> loadResourceContent(resource, User.class))
             .filter(user -> checkIfMatches(user, searchUser))
             .collect(Collectors.toList()));
@@ -79,7 +81,8 @@ public class FileReaderStore implements ReaderStore {
 
   @Override
   public Organization getOrganization(String id) {
-    Resource realmsResource = resourceLoader.getResource(config.get("organization_source") + id);
+    Resource realmsResource =
+        resourceLoader.getResource(config.get(FileKeysConfig.ORGANIZATION_SOURCE) + id);
     if (realmsResource.exists()) {
       Organization organization = loadResourceContent(realmsResource, Organization.class);
       // suborganization is loaded as an independant resource
@@ -109,7 +112,7 @@ public class FileReaderStore implements ReaderStore {
       Organization organizationFilter, PageableResult pageable, String searchOperator) {
     PageResult<Organization> pageResult = new PageResult<>();
     pageResult.setResults(
-        Arrays.stream(getFilenamesFromSource(config.get("organization_source")))
+        Arrays.stream(getFilenamesFromSource(config.get(FileKeysConfig.ORGANIZATION_SOURCE)))
             .map(resource -> loadResourceContent(resource, Organization.class))
             .filter(org -> checkIfMatches(org, organizationFilter))
             .collect(Collectors.toList()));
@@ -136,7 +139,7 @@ public class FileReaderStore implements ReaderStore {
       String appName, Group groupFilter, PageableResult pageable, String searchOperator) {
     PageResult<Group> pageResult = new PageResult<>();
     pageResult.setResults(
-        Arrays.stream(getFilenamesFromSource(config.get("app_source")))
+        Arrays.stream(getFilenamesFromSource(config.get(FileKeysConfig.APP_SOURCE)))
             .map(resource -> loadResourceContent(resource, Application.class).getGroups())
             .filter(groups -> groups != null)
             .flatMap(groups -> groups.stream())
@@ -153,7 +156,7 @@ public class FileReaderStore implements ReaderStore {
   @Override
   public Application getApplication(String applicationName) {
     Resource realmsResource =
-        resourceLoader.getResource(config.get("app_source") + applicationName);
+        resourceLoader.getResource(config.get(FileKeysConfig.APP_SOURCE) + applicationName);
     if (realmsResource.exists()) {
       return loadResourceContent(realmsResource, Application.class);
     }
@@ -165,7 +168,7 @@ public class FileReaderStore implements ReaderStore {
       Application applicationFilter, PageableResult pageable, String searchOperator) {
     PageResult<Application> pageResult = new PageResult<>();
     pageResult.setResults(
-        Arrays.stream(getFilenamesFromSource(config.get("app_source")))
+        Arrays.stream(getFilenamesFromSource(config.get(FileKeysConfig.APP_SOURCE)))
             .map(resource -> loadResourceContent(resource, Application.class))
             .filter(app -> checkIfMatches(app, applicationFilter))
             .collect(Collectors.toList()));

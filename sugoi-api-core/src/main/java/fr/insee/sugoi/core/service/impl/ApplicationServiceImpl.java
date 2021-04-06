@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.core.service.impl;
 
+import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.model.PageResult;
@@ -37,7 +38,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         realm,
         null,
         SugoiEventTypeEnum.CREATE_APPLICATION,
-        Map.ofEntries(Map.entry("application", application)));
+        Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION, application)));
     return storeProvider.getWriterStore(realm).createApplication(application);
   }
 
@@ -47,7 +48,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         realm,
         null,
         SugoiEventTypeEnum.DELETE_APPLICATION,
-        Map.ofEntries(Map.entry("applicationId", id)));
+        Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION_ID, id)));
     storeProvider.getWriterStore(realm).deleteApplication(id);
   }
 
@@ -57,7 +58,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         realm,
         null,
         SugoiEventTypeEnum.UPDATE_APPLICATION,
-        Map.ofEntries(Map.entry("application", application)));
+        Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION, application)));
     storeProvider.getWriterStore(realm).updateApplication(application);
   }
 
@@ -71,7 +72,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         realm,
         null,
         SugoiEventTypeEnum.FIND_APPLICATION_BY_ID,
-        Map.ofEntries(Map.entry("applicationId", id)));
+        Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION_ID, id)));
     return storeProvider.getReaderStore(realm).getApplication(id);
   }
 
@@ -82,7 +83,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         realm,
         null,
         SugoiEventTypeEnum.FIND_APPLICATIONS,
-        Map.ofEntries(Map.entry("applicationFilter", applicationFilter)));
+        Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION_FILTER, applicationFilter)));
     return storeProvider
         .getReaderStore(realm)
         .searchApplications(applicationFilter, pageableResult, SearchType.AND.name());
