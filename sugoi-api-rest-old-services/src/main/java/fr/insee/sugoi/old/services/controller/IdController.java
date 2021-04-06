@@ -13,9 +13,23 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
+import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
+import fr.insee.sugoi.converter.ouganext.Contact;
+import fr.insee.sugoi.converter.ouganext.Organisation;
+import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
+import fr.insee.sugoi.core.service.ConfigService;
+import fr.insee.sugoi.core.service.OrganizationService;
+import fr.insee.sugoi.core.service.UserService;
+import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.old.services.decider.AuthorizeMethodDecider;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,11 +43,68 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "basic")
 public class IdController {
 
+  @Autowired private UserService userService;
+  @Autowired private OrganizationService organizationService;
+  @Autowired private ConfigService configService;
+
+  @Autowired private OuganextSugoiMapper ouganextSugoiMapper;
+
+  @Autowired AuthorizeMethodDecider authorizeDecider;
+
+  /**
+   * Search an entity (contact or organisation) by its id on all domains. First contact found is
+   * returned and if no contact is found the first organisation found.
+   *
+   * @param id Username of a contact or id of an organisation
+   * @return a contact or an organisation
+   */
   @GetMapping(
       value = "/{id}",
       produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  @Operation(deprecated = true)
-  public ResponseEntity<?> getById(@PathVariable("id") String id) {
-    return null;
+  @Operation(summary = "Search an entity (contact or organisation) by its id", deprecated = true)
+  public ResponseEntity<?> getById(
+      @Parameter(description = "Username of a contact or id of an organisation", required = true)
+          @PathVariable(name = "id", required = true)
+          String id) {
+
+    List<Realm> realms =
+        configService.getRealms().stream()
+            .filter(realm -> authorizeDecider.isAtLeastConsultant(realm.getName()))
+            .collect(Collectors.toList());
+
+    Optional<Contact> contact =
+        realms.stream().map(realm -> findContact(realm, id)).filter(c -> c != null).findFirst();
+    if (contact.isPresent()) {
+      return ResponseEntity.ok().body(contact.get());
+    } else {
+      Optional<Organisation> organisation =
+          realms.stream()
+              .map(realm -> findOrganisation(realm, id))
+              .filter(o -> o != null)
+              .findFirst();
+      if (organisation.isPresent()) {
+        return ResponseEntity.ok().body(organisation.get());
+      } else {
+        return ResponseEntity.notFound().build();
+      }
+    }
+  }
+
+  private Contact findContact(Realm realm, String id) {
+    try {
+      return ouganextSugoiMapper.serializeToOuganext(
+          userService.findById(realm.getName(), null, id), Contact.class);
+    } catch (EntityNotFoundException e) {
+      return null;
+    }
+  }
+
+  private Organisation findOrganisation(Realm realm, String id) {
+    try {
+      return ouganextSugoiMapper.serializeToOuganext(
+          organizationService.findById(realm.getName(), null, id), Organisation.class);
+    } catch (EntityNotFoundException e) {
+      return null;
+    }
   }
 }
