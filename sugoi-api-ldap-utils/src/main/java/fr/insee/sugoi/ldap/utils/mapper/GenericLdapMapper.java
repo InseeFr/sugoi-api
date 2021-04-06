@@ -16,6 +16,7 @@ package fr.insee.sugoi.ldap.utils.mapper;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
+import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.ldap.utils.mapper.properties.AddressLdap;
 import fr.insee.sugoi.ldap.utils.mapper.properties.GroupLdap;
 import fr.insee.sugoi.ldap.utils.mapper.properties.LdapObjectClass;
@@ -182,7 +183,7 @@ public class GenericLdapMapper {
                           Pattern pattern =
                               Pattern.compile(
                                   config
-                                      .get("group_source_pattern")
+                                      .get(LdapConfigKeys.GROUP_SOURCE_PATTERN)
                                       .replace("{appliname}", "(.*)"));
                           Matcher matcher =
                               pattern.matcher(
@@ -272,7 +273,7 @@ public class GenericLdapMapper {
                             .getAnnotation(LdapObjectClass.class)
                             .rdnAttributeName(),
                         ((Organization) attributeValue).getIdentifiant(),
-                        config.get("organization_source")));
+                        config.get(LdapConfigKeys.ORGANIZATION_SOURCE)));
             List<Attribute> organizationAttributeList = new ArrayList<>();
             organizationAttributeList.add(organizationAttribute);
             return organizationAttributeList;
@@ -298,12 +299,12 @@ public class GenericLdapMapper {
                                         .getAnnotation(LdapObjectClass.class)
                                         .rdnAttributeName(),
                                     group.getName(),
-                                    config.get("app_source"))))
+                                    config.get(LdapConfigKeys.APP_SOURCE))))
                     .collect(Collectors.toList());
           case ADDRESS:
             List<Attribute> addressAttributeList = new ArrayList<>();
             if (((Map<String, String>) attributeValue).containsKey("id")
-                && config.get("address_source") != null) {
+                && config.get(LdapConfigKeys.ADDRESS_SOURCE) != null) {
               Attribute addressAttribute =
                   new Attribute(
                       attributeName,
@@ -311,7 +312,7 @@ public class GenericLdapMapper {
                           "%s=%s,%s",
                           AddressLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
                           ((Map<String, String>) attributeValue).get("id"),
-                          config.get("address_source")));
+                          config.get(LdapConfigKeys.ADDRESS_SOURCE)));
               addressAttributeList.add(addressAttribute);
             }
             return addressAttributeList;

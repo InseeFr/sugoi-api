@@ -26,6 +26,7 @@ import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.LdapFilter;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
+import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.GroupLdapMapper;
@@ -108,7 +109,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       User userFilter, PageableResult pageable, String typeRecherche) {
     try {
       return searchOnLdap(
-          config.get("user_source"),
+          config.get(LdapConfigKeys.USER_SOURCE),
           SearchScope.SUBORDINATE_SUBTREE,
           getFilterFromObject(userFilter, userLdapMapper, typeRecherche),
           pageable,
@@ -140,7 +141,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       Organization organizationFilter, PageableResult pageable, String searchOperator) {
     try {
       return searchOnLdap(
-          config.get("organization_source"),
+          config.get(LdapConfigKeys.ORGANIZATION_SOURCE),
           SearchScope.SUBORDINATE_SUBTREE,
           getFilterFromObject(organizationFilter, organizationLdapMapper, searchOperator),
           pageable,
@@ -215,7 +216,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       Application applicationFilter, PageableResult pageable, String searchOperator) {
     try {
       return searchOnLdap(
-          config.get("app_source"),
+          config.get(LdapConfigKeys.APP_SOURCE),
           SearchScope.ONE,
           getFilterFromObject(applicationFilter, applicationLdapMapper, searchOperator),
           pageable,

@@ -13,6 +13,8 @@
 */
 package fr.insee.sugoi.core.service.impl;
 
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
+import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
@@ -49,7 +51,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         realm,
         storageName,
         SugoiEventTypeEnum.CREATE_ORGANIZATION,
-        Map.ofEntries(Map.entry("organization", organization)));
+        Map.ofEntries(Map.entry(EventKeysConfig.ORGANIZATION, organization)));
     return storeProvider.getWriterStore(realm, storageName).createOrganization(organization);
   }
 
@@ -59,7 +61,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         realm,
         storageName,
         SugoiEventTypeEnum.DELETE_ORGANIZATION,
-        Map.ofEntries(Map.entry("organizationId", id)));
+        Map.ofEntries(Map.entry(EventKeysConfig.ORGANIZATION_ID, id)));
 
     storeProvider.getWriterStore(realm, storageName).deleteOrganization(id);
   }
@@ -71,14 +73,14 @@ public class OrganizationServiceImpl implements OrganizationService {
           realm,
           storage,
           SugoiEventTypeEnum.FIND_ORGANIZATION_BY_ID,
-          Map.ofEntries(Map.entry("organizationId", id)));
+          Map.ofEntries(Map.entry(EventKeysConfig.ORGANIZATION_ID, id)));
       if (storage != null) {
         try {
 
           Organization org = storeProvider.getReaderStore(realm, storage).getOrganization(id);
           if (org != null) {
-            org.addMetadatas("realm", realm.toLowerCase());
-            org.addMetadatas("userStorage", storage.toLowerCase());
+            org.addMetadatas(EventKeysConfig.REALM, realm.toLowerCase());
+            org.addMetadatas(EventKeysConfig.USERSTORAGE, storage.toLowerCase());
             return org;
           }
         } catch (Exception e) {
@@ -94,8 +96,8 @@ public class OrganizationServiceImpl implements OrganizationService {
             Organization org =
                 storeProvider.getReaderStore(realm, us.getName()).getOrganization(id);
             if (org != null) {
-              org.addMetadatas("realm", realm);
-              org.addMetadatas("userStorage", us.getName());
+              org.addMetadatas(GlobalKeysConfig.REALM, realm);
+              org.addMetadatas(EventKeysConfig.USERSTORAGE, us.getName());
               return org;
             }
           } catch (Exception e) {
@@ -126,9 +128,9 @@ public class OrganizationServiceImpl implements OrganizationService {
         storageName,
         SugoiEventTypeEnum.FIND_ORGANIZATIONS,
         Map.ofEntries(
-            Map.entry("organizationFilter", organizationFilter),
-            Map.entry("pageableResult", pageableResult),
-            Map.entry("typeRecherche", typeRecherche)));
+            Map.entry(EventKeysConfig.ORGANIZATION_FILTER, organizationFilter),
+            Map.entry(EventKeysConfig.PAGEABLE_RESULT, pageableResult),
+            Map.entry(EventKeysConfig.TYPE_RECHERCHE, typeRecherche)));
     PageResult<Organization> result = new PageResult<>();
     result.setPageSize(pageableResult.getSize());
     try {
@@ -149,8 +151,8 @@ public class OrganizationServiceImpl implements OrganizationService {
               .getResults()
               .forEach(
                   org -> {
-                    org.addMetadatas("realm", realm);
-                    org.addMetadatas("userStorage", us.getName());
+                    org.addMetadatas(GlobalKeysConfig.REALM, realm);
+                    org.addMetadatas(GlobalKeysConfig.USERSTORAGE, us.getName());
                   });
           result.getResults().addAll(temResult.getResults());
           result.setTotalElements(result.getResults().size());
@@ -172,7 +174,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         realm,
         storageName,
         SugoiEventTypeEnum.UPDATE_ORGANIZATION,
-        Map.ofEntries(Map.entry("organization", organization)));
+        Map.ofEntries(Map.entry(EventKeysConfig.ORGANIZATION, organization)));
     storeProvider.getWriterStore(realm, storageName).updateOrganization(organization);
   }
 }

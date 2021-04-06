@@ -13,6 +13,8 @@
 */
 package fr.insee.sugoi.core.service.impl;
 
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
+import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
@@ -46,21 +48,30 @@ public class UserServiceImpl implements UserService {
   @Override
   public User create(String realm, String storage, User user) {
     sugoiEventPublisher.publishCustomEvent(
-        realm, storage, SugoiEventTypeEnum.CREATE_USER, Map.ofEntries(Map.entry("user", user)));
+        realm,
+        storage,
+        SugoiEventTypeEnum.CREATE_USER,
+        Map.ofEntries(Map.entry(EventKeysConfig.USER, user)));
     return storeProvider.getWriterStore(realm, storage).createUser(user);
   }
 
   @Override
   public void update(String realm, String storage, User user) {
     sugoiEventPublisher.publishCustomEvent(
-        realm, storage, SugoiEventTypeEnum.UPDATE_USER, Map.ofEntries(Map.entry("user", user)));
+        realm,
+        storage,
+        SugoiEventTypeEnum.UPDATE_USER,
+        Map.ofEntries(Map.entry(EventKeysConfig.USER, user)));
     storeProvider.getWriterStore(realm, storage).updateUser(user);
   }
 
   @Override
   public void delete(String realmName, String storage, String id) {
     sugoiEventPublisher.publishCustomEvent(
-        realmName, storage, SugoiEventTypeEnum.DELETE_USER, Map.ofEntries(Map.entry("userId", id)));
+        realmName,
+        storage,
+        SugoiEventTypeEnum.DELETE_USER,
+        Map.ofEntries(Map.entry(EventKeysConfig.USER_ID, id)));
     storeProvider.getWriterStore(realmName, storage).deleteUser(id);
   }
 
@@ -71,14 +82,14 @@ public class UserServiceImpl implements UserService {
           realmName,
           storage,
           SugoiEventTypeEnum.FIND_USER_BY_ID,
-          Map.ofEntries(Map.entry("userId", id)));
+          Map.ofEntries(Map.entry(EventKeysConfig.USER_ID, id)));
 
       if (storage != null) {
         try {
           User user = storeProvider.getReaderStore(realmName, storage).getUser(id);
           if (user != null) {
-            user.addMetadatas("realm", realmName.toLowerCase());
-            user.addMetadatas("userStorage", storage.toLowerCase());
+            user.addMetadatas(GlobalKeysConfig.REALM, realmName.toLowerCase());
+            user.addMetadatas(GlobalKeysConfig.USERSTORAGE, storage.toLowerCase());
             return user;
           }
         } catch (Exception e) {
@@ -93,8 +104,8 @@ public class UserServiceImpl implements UserService {
           try {
             User user = storeProvider.getReaderStore(realmName, us.getName()).getUser(id);
             if (user != null) {
-              user.addMetadatas("realm", realmName);
-              user.addMetadatas("userStorage", us.getName());
+              user.addMetadatas(GlobalKeysConfig.REALM, realmName);
+              user.addMetadatas(GlobalKeysConfig.USERSTORAGE, us.getName());
               return user;
             }
           } catch (Exception e) {
@@ -120,9 +131,9 @@ public class UserServiceImpl implements UserService {
         storage,
         SugoiEventTypeEnum.FIND_USERS,
         Map.ofEntries(
-            Map.entry("userProperties", userProperties),
-            Map.entry("pageable", pageable),
-            Map.entry("typeRecherche", typeRecherche)));
+            Map.entry(EventKeysConfig.USER_PROPERTIES, userProperties),
+            Map.entry(EventKeysConfig.PAGEABLE, pageable),
+            Map.entry(EventKeysConfig.TYPE_RECHERCHE, typeRecherche)));
     PageResult<User> result = new PageResult<>();
     result.setPageSize(pageable.getSize());
     try {
@@ -135,8 +146,8 @@ public class UserServiceImpl implements UserService {
             .getResults()
             .forEach(
                 user -> {
-                  user.addMetadatas("realm", realm);
-                  user.addMetadatas("userStorage", storage);
+                  user.addMetadatas(EventKeysConfig.REALM, realm);
+                  user.addMetadatas(EventKeysConfig.USERSTORAGE, storage);
                 });
       } else {
         Realm r = realmProvider.load(realm);
@@ -149,8 +160,8 @@ public class UserServiceImpl implements UserService {
               .getResults()
               .forEach(
                   user -> {
-                    user.addMetadatas("realm", realm);
-                    user.addMetadatas("userStorage", us.getName());
+                    user.addMetadatas(EventKeysConfig.REALM, realm);
+                    user.addMetadatas(EventKeysConfig.USERSTORAGE, us.getName());
                   });
           result.getResults().addAll(temResult.getResults());
           result.setTotalElements(result.getResults().size());

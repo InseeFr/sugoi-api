@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.services.controller;
 
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.model.PasswordChangeRequest;
 import fr.insee.sugoi.core.model.SendMode;
 import fr.insee.sugoi.core.service.CredentialsService;
@@ -123,7 +124,7 @@ public class CredentialsController {
           List<SendMode> sendMode) {
     User user = userService.findById(realm, null, id);
     return reinitPassword(
-        pcr, realm, (String) user.getMetadatas().get("userStorage"), id, sendMode);
+        pcr, realm, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id, sendMode);
   }
 
   @PostMapping(path = {"/realms/{realm}/storages/{storage}/users/{id}/changePassword"})
@@ -189,7 +190,8 @@ public class CredentialsController {
           String id) {
     User user = userService.findById(realm, null, id);
 
-    return changePassword(pcr, realm, (String) user.getMetadatas().get("userStorage"), id);
+    return changePassword(
+        pcr, realm, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id);
   }
 
   @PostMapping(path = {"/realms/{realm}/storages/{storage}/users/{id}/initPassword"})
@@ -263,7 +265,8 @@ public class CredentialsController {
           @RequestParam(value = "sendModes", required = false)
           List<SendMode> sendMode) {
     User user = userService.findById(realm, null, id);
-    return initPassword(realm, (String) user.getMetadatas().get("userStorage"), id, pcr, sendMode);
+    return initPassword(
+        realm, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id, pcr, sendMode);
   }
 
   @PostMapping(
@@ -342,6 +345,7 @@ public class CredentialsController {
           @RequestParam
           MultiValueMap<String, String> params) {
     User user = userService.findById(realm, null, id);
-    return validatePassword(realm, (String) user.getMetadatas().get("userStorage"), id, params);
+    return validatePassword(
+        realm, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id, params);
   }
 }

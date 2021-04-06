@@ -14,6 +14,7 @@
 package fr.insee.sugoi.store.ldap;
 
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
+import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.GroupLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
@@ -42,12 +43,12 @@ public class LdapStore {
   protected Map<String, String> config;
 
   protected String getGroupSource(String appName) {
-    return config.get("group_source_pattern").replace("{appliname}", appName);
+    return config.get(LdapConfigKeys.GROUP_SOURCE_PATTERN).replace("{appliname}", appName);
   }
 
   protected String getGroupWildcardFilter(String appName) {
     return config
-        .get("group_filter_pattern")
+        .get(LdapConfigKeys.GROUP_FILTER_PATTERN)
         .replace("{appliname}", appName)
         .replace("{group}", "*");
   }
@@ -57,7 +58,7 @@ public class LdapStore {
         "%s=%s,%s",
         ApplicationLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
         applicationName,
-        config.get("app_source"));
+        config.get(LdapConfigKeys.APP_SOURCE));
   }
 
   protected String getGroupDN(String applicationName, String groupName) {
@@ -73,7 +74,7 @@ public class LdapStore {
         "%s=%s,%s",
         OrganizationLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
         organizationId,
-        config.get("organization_source"));
+        config.get(LdapConfigKeys.ORGANIZATION_SOURCE));
   }
 
   protected String getUserDN(String username) {
@@ -81,7 +82,7 @@ public class LdapStore {
         "%s=%s,%s",
         UserLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
         username,
-        config.get("user_source"));
+        config.get(LdapConfigKeys.USER_SOURCE));
   }
 
   protected String getAddressDN(String addressId) {
@@ -89,6 +90,6 @@ public class LdapStore {
         "%s=%s,%s",
         AddressLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
         addressId,
-        config.get("address_source"));
+        config.get(LdapConfigKeys.ADDRESS_SOURCE));
   }
 }
