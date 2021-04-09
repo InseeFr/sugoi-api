@@ -22,3 +22,4 @@ Feature: User scenario
             }
             """
         Then the client receives status code 201
+        Then the metric CREATE_USER is 1
