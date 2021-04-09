@@ -15,7 +15,9 @@ package fr.insee.sugoi.app.cucumber.glue;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.fail;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.app.cucumber.utils.ResponseResults;
 import fr.insee.sugoi.app.cucumber.utils.StepData;
@@ -150,6 +152,30 @@ public class GenericGlue {
   @And("body received")
   public void body_received() throws Throwable {
     scenario.log(stepData.getLatestResponse().getBody());
+  }
+
+  // the metric CREATE_USER is 1
+  @Then("the metric {} is {}")
+  public void metrics_value(String metricName, int metricValue) {
+    ObjectMapper mapper = new ObjectMapper();
+    WebRequest webRequest = new WebRequest();
+    String auth = "appli_sugoi:sugoi";
+    byte[] encodedAuth = Base64.encodeBase64(auth.getBytes());
+    String authHeader = "Basic " + new String(encodedAuth);
+    Map<String, String> headers = new HashMap<>();
+    headers.put("Authorization", authHeader);
+    try {
+      String url =
+          stepData.getDefaultTomcatUrl() + "/actuator/metrics/" + metricName; // + "?" + tags;
+      ResponseResults response = webRequest.executeGet(url, headers, null);
+      JsonNode metricJson = mapper.readTree(response.getBody());
+
+      int value = metricJson.at("/measurements/0/value").asInt();
+      assertThat("The metric value is the good one", value, is(metricValue));
+
+    } catch (IOException e) {
+      fail();
+    }
   }
 
   @Given("app is ready")
