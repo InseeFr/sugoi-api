@@ -16,6 +16,7 @@ package fr.insee.sugoi.old.services.controller;
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
 import fr.insee.sugoi.converter.ouganext.Contact;
 import fr.insee.sugoi.converter.ouganext.Contacts;
+import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.model.Group;
 import io.swagger.v3.oas.annotations.Operation;
@@ -88,7 +89,13 @@ public class GroupeController {
       @Parameter(description = "Group where collect contacts", required = true)
           @PathVariable(name = "groupe", required = true)
           String groupe) {
-    Group group = groupService.findById(domaine, application, groupe);
+    Group group =
+        groupService
+            .findById(domaine, application, groupe)
+            .orElseThrow(
+                () ->
+                    new GroupNotFoundException(
+                        "Cannot find group " + groupe + " in domaine " + domaine));
     if (group.getUsers() != null) {
       if (group.getUsers().isEmpty()) {
         return new ResponseEntity<>("No users in group", HttpStatus.NOT_FOUND);

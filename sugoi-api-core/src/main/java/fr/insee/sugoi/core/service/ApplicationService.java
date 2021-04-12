@@ -16,32 +16,38 @@ package fr.insee.sugoi.core.service;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.model.Application;
+import java.util.Optional;
 
 public interface ApplicationService {
 
   /**
-   * Creates an application in the realm
+   * Verify if the application already exist in the realm (by it's name) and create if it does'nt
+   * exist
    *
    * @param realm
    * @param application
    * @return The created application
+   * @throws ApplicationAlreadyExistException if application already exist in realm
    */
   Application create(String realm, Application application);
 
   /**
-   * Updates application, if the application has groups, they are also updated. Warning, this is not
-   * an atomic process (an app can be updated and not the groups)
+   * if application exist, updates application, and if the application has groups, they are also
+   * updated. Warning, this is not an atomic process (an app can be updated and not the groups).
    *
    * @param realm
    * @param application
+   * @throws ApplicationNotFoundException if application does'nt exist in realm
    */
   void update(String realm, Application application);
 
   /**
-   * Deletes the application from the realm, all the groups from the application are also deleted.
+   * if application exist, deletes the application from the realm, all the groups from the
+   * application are also deleted.
    *
    * @param realm
    * @param id
+   * @throws ApplicationNotFoundException if application does'nt exist in realm
    */
   void delete(String realm, String id);
 
@@ -50,9 +56,9 @@ public interface ApplicationService {
    *
    * @param realm
    * @param id
-   * @return the app found (with list of members for each groups)
+   * @return an Optional with the app found (with list of members for each groups)
    */
-  Application findById(String realm, String id);
+  Optional<Application> findById(String realm, String id);
 
   /**
    * Finds an application by some properties

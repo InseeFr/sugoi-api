@@ -15,9 +15,10 @@ package fr.insee.sugoi.old.services.controller;
 
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
 import fr.insee.sugoi.converter.ouganext.Groupe;
+import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
+import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.core.service.UserService;
-import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -87,7 +88,13 @@ public class ContactGroupeDomaineController {
               required = true)
           @PathVariable(name = "domaine", required = true)
           String domaine) {
-    User user = userService.findById(domaine, null, identifiant);
+    User user =
+        userService
+            .findById(domaine, null, identifiant)
+            .orElseThrow(
+                () ->
+                    new UserNotFoundException(
+                        "Cannot find user " + identifiant + " in domaine " + domaine));
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             user.getGroups().stream()
@@ -148,23 +155,31 @@ public class ContactGroupeDomaineController {
       @Parameter(description = "Group name", required = true)
           @PathVariable(name = "nomgroupe", required = true)
           String nomGroupe) {
-    Group group = groupService.findById(domaine, nomAppli, nomGroupe);
-    if (group != null) {
-      User user = userService.findById(domaine, null, identifiant);
-      if (user != null) {
-        if (user.getGroups() != null
-            && user.getGroups().stream()
-                .anyMatch(g -> g.getName().equals(nomGroupe) && g.getAppName().equals(nomAppli))) {
-          return new ResponseEntity<String>("Contact already in group", HttpStatus.CONFLICT);
-        } else {
-          groupService.addUserToGroup(domaine, identifiant, nomAppli, nomGroupe);
-          return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-      } else {
-        return new ResponseEntity<String>("Contact not found", HttpStatus.NOT_FOUND);
-      }
+    groupService
+        .findById(domaine, nomAppli, nomGroupe)
+        .orElseThrow(
+            () ->
+                new GroupNotFoundException(
+                    "Cannot find group "
+                        + nomGroupe
+                        + " in app "
+                        + nomAppli
+                        + "in domaine "
+                        + domaine));
+    User user =
+        userService
+            .findById(domaine, null, identifiant)
+            .orElseThrow(
+                () ->
+                    new UserNotFoundException(
+                        "Cannot find user " + identifiant + " in domaine " + domaine));
+    if (user.getGroups() != null
+        && user.getGroups().stream()
+            .anyMatch(g -> g.getName().equals(nomGroupe) && g.getAppName().equals(nomAppli))) {
+      return new ResponseEntity<String>("Contact already in group", HttpStatus.CONFLICT);
     } else {
-      return new ResponseEntity<String>("Group not found", HttpStatus.NOT_FOUND);
+      groupService.addUserToGroup(domaine, identifiant, nomAppli, nomGroupe);
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
   }
 
@@ -221,20 +236,22 @@ public class ContactGroupeDomaineController {
       @Parameter(description = "Group name", required = true)
           @PathVariable(name = "nomgroupe", required = true)
           String nomGroupe) {
-    User user = userService.findById(domaine, null, identifiant);
-    if (user != null) {
-      if (user.getGroups() != null
-          && user.getGroups().stream()
-              .anyMatch(
-                  group ->
-                      group.getAppName().equals(nomAppli) && group.getName().equals(nomGroupe))) {
-        groupService.deleteUserFromGroup(domaine, identifiant, nomAppli, nomGroupe);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-      } else {
-        return new ResponseEntity<>("Contact doesn't belong to group", HttpStatus.CONFLICT);
-      }
+    User user =
+        userService
+            .findById(domaine, null, identifiant)
+            .orElseThrow(
+                () ->
+                    new UserNotFoundException(
+                        "Cannot find user " + identifiant + " in domaine " + domaine));
+    if (user.getGroups() != null
+        && user.getGroups().stream()
+            .anyMatch(
+                group ->
+                    group.getAppName().equals(nomAppli) && group.getName().equals(nomGroupe))) {
+      groupService.deleteUserFromGroup(domaine, identifiant, nomAppli, nomGroupe);
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     } else {
-      return new ResponseEntity<>("Contact not found", HttpStatus.NOT_FOUND);
+      return new ResponseEntity<>("Contact doesn't belong to group", HttpStatus.CONFLICT);
     }
   }
 }

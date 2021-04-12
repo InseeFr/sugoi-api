@@ -17,7 +17,8 @@ import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
-import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
+import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
+import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.model.SearchType;
@@ -29,6 +30,7 @@ import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.Map;
+import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,75 +49,77 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public User create(String realm, String storage, User user) {
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        storage,
-        SugoiEventTypeEnum.CREATE_USER,
-        Map.ofEntries(Map.entry(EventKeysConfig.USER, user)));
-    return storeProvider.getWriterStore(realm, storage).createUser(user);
+    if (!findById(realm, storage, user.getUsername()).isPresent()) {
+      String userName = storeProvider.getWriterStore(realm, storage).createUser(user).getUsername();
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          storage,
+          SugoiEventTypeEnum.CREATE_USER,
+          Map.ofEntries(Map.entry(EventKeysConfig.USER, user)));
+      return findById(realm, storage, userName)
+          .orElseThrow(
+              () ->
+                  new UserNotFoundException("Cannot find user " + userName + " in realm " + realm));
+    }
+    throw new UserAlreadyExistException(
+        "User " + user.getUsername() + " already exist in realm " + realm);
   }
 
   @Override
   public void update(String realm, String storage, User user) {
+    findById(realm, storage, user.getUsername())
+        .orElseThrow(
+            () ->
+                new UserNotFoundException(
+                    "Cannot find user " + user.getUsername() + " in realm " + realm));
+    storeProvider.getWriterStore(realm, storage).updateUser(user);
     sugoiEventPublisher.publishCustomEvent(
         realm,
         storage,
         SugoiEventTypeEnum.UPDATE_USER,
         Map.ofEntries(Map.entry(EventKeysConfig.USER, user)));
-    storeProvider.getWriterStore(realm, storage).updateUser(user);
   }
 
   @Override
   public void delete(String realmName, String storage, String id) {
+    findById(realmName, storage, id)
+        .orElseThrow(
+            () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realmName));
+    storeProvider.getWriterStore(realmName, storage).deleteUser(id);
     sugoiEventPublisher.publishCustomEvent(
         realmName,
         storage,
         SugoiEventTypeEnum.DELETE_USER,
         Map.ofEntries(Map.entry(EventKeysConfig.USER_ID, id)));
-    storeProvider.getWriterStore(realmName, storage).deleteUser(id);
   }
 
   @Override
-  public User findById(String realmName, String storage, String id) {
-    if (id != null) {
-      sugoiEventPublisher.publishCustomEvent(
-          realmName,
-          storage,
-          SugoiEventTypeEnum.FIND_USER_BY_ID,
-          Map.ofEntries(Map.entry(EventKeysConfig.USER_ID, id)));
-
-      if (storage != null) {
-        try {
-          User user = storeProvider.getReaderStore(realmName, storage).getUser(id);
-          if (user != null) {
-            user.addMetadatas(GlobalKeysConfig.REALM, realmName.toLowerCase());
-            user.addMetadatas(GlobalKeysConfig.USERSTORAGE, storage.toLowerCase());
-            return user;
-          }
-        } catch (Exception e) {
-          throw new EntityNotFoundException(
-              "Error while finding user in " + realmName + " and userStorage " + storage);
-        }
-        throw new EntityNotFoundException(
-            "User not found in realm " + realmName + " and userStorage " + storage);
-      } else {
-        Realm r = realmProvider.load(realmName);
-        for (UserStorage us : r.getUserStorages()) {
-          try {
-            User user = storeProvider.getReaderStore(realmName, us.getName()).getUser(id);
-            if (user != null) {
-              user.addMetadatas(GlobalKeysConfig.REALM, realmName);
-              user.addMetadatas(GlobalKeysConfig.USERSTORAGE, us.getName());
-              return user;
-            }
-          } catch (Exception e) {
-            logger.debug(
-                "User " + id + "not in realm " + realmName + " and userstorage " + us.getName());
+  public Optional<User> findById(String realmName, String storage, String id) {
+    try {
+      User user = null;
+      if (id != null) {
+        if (storage != null) {
+          user = storeProvider.getReaderStore(realmName, storage).getUser(id);
+          user.addMetadatas(GlobalKeysConfig.REALM, realmName.toLowerCase());
+          user.addMetadatas(GlobalKeysConfig.USERSTORAGE, storage.toLowerCase());
+        } else {
+          Realm r = realmProvider.load(realmName);
+          for (UserStorage us : r.getUserStorages()) {
+            user = storeProvider.getReaderStore(realmName, us.getName()).getUser(id);
+            user.addMetadatas(GlobalKeysConfig.REALM, realmName);
+            user.addMetadatas(GlobalKeysConfig.USERSTORAGE, us.getName());
           }
         }
+        sugoiEventPublisher.publishCustomEvent(
+            realmName,
+            storage,
+            SugoiEventTypeEnum.FIND_USER_BY_ID,
+            Map.ofEntries(Map.entry(EventKeysConfig.USER_ID, id)));
       }
+      return Optional.ofNullable(user);
+    } catch (Exception e) {
+      return Optional.empty();
     }
-    throw new EntityNotFoundException("User not found in realm " + realmName);
   }
 
   @Override

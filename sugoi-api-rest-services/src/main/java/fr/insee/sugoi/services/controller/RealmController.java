@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.services.controller;
 
+import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.services.decider.AuthorizeMethodDecider;
@@ -83,7 +84,10 @@ public class RealmController {
     List<Realm> realmsFiltered = new ArrayList<>();
 
     if (id != null) {
-      Realm retrievedRealm = configService.getRealm(id);
+      Realm retrievedRealm =
+          configService
+              .getRealm(id)
+              .orElseThrow(() -> new RealmNotFoundException("Realm " + id + " not found"));
       if (retrievedRealm != null) {
         realms.add(retrievedRealm);
       }
@@ -128,7 +132,10 @@ public class RealmController {
     }
     configService.createRealm(realm);
     return ResponseEntity.created(createRealmURI(realm.getName()))
-        .body(configService.getRealm(realm.getName()));
+        .body(
+            configService
+                .getRealm(realm.getName())
+                .orElseThrow(() -> new RealmNotFoundException("Cannot found realm " + realm)));
   }
 
   @PutMapping(
@@ -161,13 +168,10 @@ public class RealmController {
     if (!realm.getName().equalsIgnoreCase(id)) {
       return ResponseEntity.badRequest().build();
     }
-    if (configService.getRealm(realm.getName()) == null) {
-      return ResponseEntity.notFound().build();
-    }
     configService.updateRealm(realm);
     return ResponseEntity.ok()
         .location(createRealmURI(realm.getName()))
-        .body(configService.getRealm(realm.getName()));
+        .body(configService.getRealm(realm.getName()).get());
   }
 
   @DeleteMapping(

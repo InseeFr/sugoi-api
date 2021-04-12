@@ -22,12 +22,13 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
-import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
+import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.service.OrganizationService;
 import fr.insee.sugoi.model.Organization;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -130,7 +131,7 @@ public class OrganizationControllerTest {
     try {
 
       Mockito.when(organizationService.findById("domaine1", null, "BigOrga"))
-          .thenReturn(organization1);
+          .thenReturn(Optional.of(organization1));
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.get("/realms/domaine1/organizations/BigOrga")
@@ -156,7 +157,7 @@ public class OrganizationControllerTest {
     try {
 
       Mockito.when(organizationService.findById("domaine1", null, "supprimemoi"))
-          .thenReturn(organization1);
+          .thenReturn(Optional.of(organization1));
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.delete("/realms/domaine1/organizations/supprimemoi")
@@ -178,8 +179,8 @@ public class OrganizationControllerTest {
     try {
 
       Mockito.when(organizationService.findById("domaine1", null, "SimpleOrga"))
-          .thenReturn(organization2)
-          .thenReturn(organization2Updated);
+          .thenReturn(Optional.of(organization2))
+          .thenReturn(Optional.of(organization2Updated));
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.put("/realms/domaine1/organizations/SimpleOrga")
@@ -216,8 +217,8 @@ public class OrganizationControllerTest {
 
     try {
       Mockito.when(organizationService.findById(Mockito.any(), Mockito.any(), Mockito.any()))
-          .thenThrow(EntityNotFoundException.class)
-          .thenReturn(organization1);
+          .thenThrow(OrganizationNotFoundException.class)
+          .thenReturn(Optional.of(organization1));
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.post(
@@ -276,8 +277,8 @@ public class OrganizationControllerTest {
     try {
 
       Mockito.when(organizationService.findById(Mockito.any(), Mockito.any(), Mockito.any()))
-          .thenThrow(EntityNotFoundException.class)
-          .thenReturn(organization1);
+          .thenThrow(OrganizationNotFoundException.class)
+          .thenReturn(Optional.of(organization1));
       Mockito.when(organizationService.create(Mockito.anyString(), Mockito.any(), Mockito.any()))
           .thenReturn(organization1);
 
@@ -373,7 +374,7 @@ public class OrganizationControllerTest {
 
       Mockito.when(
               organizationService.findById("domaine1", "Profil_domaine1_WebServiceLdap", "BigOrga"))
-          .thenReturn(organization1);
+          .thenReturn(Optional.of(organization1));
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.post(
@@ -445,7 +446,7 @@ public class OrganizationControllerTest {
     try {
 
       Mockito.when(organizationService.findById("domaine1", null, "BigOrga"))
-          .thenThrow(EntityNotFoundException.class);
+          .thenThrow(OrganizationNotFoundException.class);
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.put("/realms/domaine1/organizations/BigOrga")
               .contentType(MediaType.APPLICATION_JSON)
@@ -470,7 +471,7 @@ public class OrganizationControllerTest {
     try {
 
       Mockito.when(organizationService.findById("domaine1", null, "dontexist"))
-          .thenThrow(EntityNotFoundException.class);
+          .thenThrow(OrganizationNotFoundException.class);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.delete("/realms/domaine1/organizations/dontexist")
