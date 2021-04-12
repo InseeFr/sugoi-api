@@ -17,7 +17,8 @@ import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
-import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
+import fr.insee.sugoi.core.exceptions.OrganizationAlreadyExistException;
+import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.model.SearchType;
@@ -29,6 +30,7 @@ import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.Map;
+import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,72 +49,69 @@ public class OrganizationServiceImpl implements OrganizationService {
 
   @Override
   public Organization create(String realm, String storageName, Organization organization) {
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        storageName,
-        SugoiEventTypeEnum.CREATE_ORGANIZATION,
-        Map.ofEntries(Map.entry(EventKeysConfig.ORGANIZATION, organization)));
-    return storeProvider.getWriterStore(realm, storageName).createOrganization(organization);
+    if (!findById(realm, storageName, organization.getIdentifiant()).isPresent()) {
+      String orgName =
+          storeProvider
+              .getWriterStore(realm, storageName)
+              .createOrganization(organization)
+              .getIdentifiant();
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          storageName,
+          SugoiEventTypeEnum.CREATE_ORGANIZATION,
+          Map.ofEntries(Map.entry(EventKeysConfig.ORGANIZATION, organization)));
+      return findById(realm, storageName, orgName)
+          .orElseThrow(
+              () ->
+                  new OrganizationNotFoundException(
+                      "Cannot find organization " + orgName + " in realm " + realm));
+    }
+    throw new OrganizationAlreadyExistException(
+        "Organization " + organization.getIdentifiant() + " already exist in realm " + realm);
   }
 
   @Override
   public void delete(String realm, String storageName, String id) {
+    findById(realm, storageName, id)
+        .orElseThrow(
+            () ->
+                new OrganizationNotFoundException(
+                    "Cannot find organization " + id + " in realm " + realm));
+    storeProvider.getWriterStore(realm, storageName).deleteOrganization(id);
     sugoiEventPublisher.publishCustomEvent(
         realm,
         storageName,
         SugoiEventTypeEnum.DELETE_ORGANIZATION,
         Map.ofEntries(Map.entry(EventKeysConfig.ORGANIZATION_ID, id)));
-
-    storeProvider.getWriterStore(realm, storageName).deleteOrganization(id);
   }
 
   @Override
-  public Organization findById(String realm, String storage, String id) {
-    if (id != null) {
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          storage,
-          SugoiEventTypeEnum.FIND_ORGANIZATION_BY_ID,
-          Map.ofEntries(Map.entry(EventKeysConfig.ORGANIZATION_ID, id)));
-      if (storage != null) {
-        try {
-
-          Organization org = storeProvider.getReaderStore(realm, storage).getOrganization(id);
-          if (org != null) {
-            org.addMetadatas(EventKeysConfig.REALM, realm.toLowerCase());
-            org.addMetadatas(EventKeysConfig.USERSTORAGE, storage.toLowerCase());
-            return org;
-          }
-        } catch (Exception e) {
-          throw new EntityNotFoundException(
-              "Error while finding organization in realm " + realm + " and userStorage " + storage);
-        }
-        throw new EntityNotFoundException(
-            "Organization not found in realm " + realm + " and userStorage " + storage);
-      } else {
-        Realm r = realmProvider.load(realm);
-        for (UserStorage us : r.getUserStorages()) {
-          try {
-            Organization org =
-                storeProvider.getReaderStore(realm, us.getName()).getOrganization(id);
-            if (org != null) {
-              org.addMetadatas(GlobalKeysConfig.REALM, realm);
-              org.addMetadatas(EventKeysConfig.USERSTORAGE, us.getName());
-              return org;
-            }
-          } catch (Exception e) {
-            logger.debug(
-                "Organization "
-                    + id
-                    + "not in realm "
-                    + realm
-                    + " and userstorage "
-                    + us.getName());
+  public Optional<Organization> findById(String realm, String storage, String id) {
+    try {
+      Organization org = null;
+      if (id != null) {
+        if (storage != null) {
+          org = storeProvider.getReaderStore(realm, storage).getOrganization(id);
+          org.addMetadatas(EventKeysConfig.REALM, realm.toLowerCase());
+          org.addMetadatas(EventKeysConfig.USERSTORAGE, storage.toLowerCase());
+        } else {
+          Realm r = realmProvider.load(realm);
+          for (UserStorage us : r.getUserStorages()) {
+            org = storeProvider.getReaderStore(realm, us.getName()).getOrganization(id);
+            org.addMetadatas(GlobalKeysConfig.REALM, realm);
+            org.addMetadatas(EventKeysConfig.USERSTORAGE, us.getName());
           }
         }
+        sugoiEventPublisher.publishCustomEvent(
+            realm,
+            storage,
+            SugoiEventTypeEnum.FIND_ORGANIZATION_BY_ID,
+            Map.ofEntries(Map.entry(EventKeysConfig.ORGANIZATION_ID, id)));
       }
+      return Optional.ofNullable(org);
+    } catch (Exception e) {
+      return Optional.empty();
     }
-    throw new EntityNotFoundException("Organization not found in realm " + realm);
   }
 
   @Override
@@ -122,15 +121,6 @@ public class OrganizationServiceImpl implements OrganizationService {
       Organization organizationFilter,
       PageableResult pageableResult,
       SearchType typeRecherche) {
-
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        storageName,
-        SugoiEventTypeEnum.FIND_ORGANIZATIONS,
-        Map.ofEntries(
-            Map.entry(EventKeysConfig.ORGANIZATION_FILTER, organizationFilter),
-            Map.entry(EventKeysConfig.PAGEABLE_RESULT, pageableResult),
-            Map.entry(EventKeysConfig.TYPE_RECHERCHE, typeRecherche)));
     PageResult<Organization> result = new PageResult<>();
     result.setPageSize(pageableResult.getSize());
     try {
@@ -165,16 +155,32 @@ public class OrganizationServiceImpl implements OrganizationService {
     } catch (Exception e) {
       throw new RuntimeException("Erreur lors de la récupération des organizations", e);
     }
+    sugoiEventPublisher.publishCustomEvent(
+        realm,
+        storageName,
+        SugoiEventTypeEnum.FIND_ORGANIZATIONS,
+        Map.ofEntries(
+            Map.entry(EventKeysConfig.ORGANIZATION_FILTER, organizationFilter),
+            Map.entry(EventKeysConfig.PAGEABLE_RESULT, pageableResult),
+            Map.entry(EventKeysConfig.TYPE_RECHERCHE, typeRecherche)));
     return result;
   }
 
   @Override
   public void update(String realm, String storageName, Organization organization) {
+    findById(realm, storageName, organization.getIdentifiant())
+        .orElseThrow(
+            () ->
+                new OrganizationNotFoundException(
+                    "Cannot find organization "
+                        + organization.getIdentifiant()
+                        + " in realm "
+                        + realm));
+    storeProvider.getWriterStore(realm, storageName).updateOrganization(organization);
     sugoiEventPublisher.publishCustomEvent(
         realm,
         storageName,
         SugoiEventTypeEnum.UPDATE_ORGANIZATION,
         Map.ofEntries(Map.entry(EventKeysConfig.ORGANIZATION, organization)));
-    storeProvider.getWriterStore(realm, storageName).updateOrganization(organization);
   }
 }

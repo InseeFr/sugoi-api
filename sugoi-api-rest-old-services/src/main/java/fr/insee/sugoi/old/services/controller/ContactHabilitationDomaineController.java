@@ -14,6 +14,7 @@
 package fr.insee.sugoi.old.services.controller;
 
 import fr.insee.sugoi.converter.ouganext.Habilitations;
+import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -85,7 +86,14 @@ public class ContactHabilitationDomaineController {
           String domaine) {
     return ResponseEntity.status(HttpStatus.OK)
         .body(
-            new Habilitations(userService.findById(domaine, null, identifiant).getHabilitations()));
+            new Habilitations(
+                userService
+                    .findById(domaine, null, identifiant)
+                    .orElseThrow(
+                        () ->
+                            new UserNotFoundException(
+                                "Cannot find user " + identifiant + " in domaine " + domaine))
+                    .getHabilitations()));
   }
 
   /**
@@ -131,7 +139,13 @@ public class ContactHabilitationDomaineController {
       @Parameter(description = "Name of role to add on the app to the user", required = true)
           @RequestParam(name = "role", required = true)
           List<String> nomRoles) {
-    User user = userService.findById(domaine, null, identifiant);
+    User user =
+        userService
+            .findById(domaine, null, identifiant)
+            .orElseThrow(
+                () ->
+                    new UserNotFoundException(
+                        "Cannot find user " + identifiant + " in domaine " + domaine));
     Habilitations habilitations = new Habilitations(user.getHabilitations());
     habilitations.addHabilitation(appName, nomRoles);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
@@ -186,7 +200,13 @@ public class ContactHabilitationDomaineController {
       @Parameter(description = "List of properties to add on the app to the user", required = true)
           @RequestParam(name = "propriete", required = true)
           List<String> proprietes) {
-    User user = userService.findById(domaine, null, identifiant);
+    User user =
+        userService
+            .findById(domaine, null, identifiant)
+            .orElseThrow(
+                () ->
+                    new UserNotFoundException(
+                        "Cannot find user " + identifiant + " in domaine " + domaine));
     Habilitations habilitations = new Habilitations(user.getHabilitations());
     habilitations.addHabilitations(appName, role, proprietes);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
@@ -233,7 +253,13 @@ public class ContactHabilitationDomaineController {
       @Parameter(description = "List of roles to delete on the app for the user", required = true)
           @RequestParam(name = "role", required = true)
           List<String> nomRoles) {
-    User user = userService.findById(domaine, null, identifiant);
+    User user =
+        userService
+            .findById(domaine, null, identifiant)
+            .orElseThrow(
+                () ->
+                    new UserNotFoundException(
+                        "Cannot find user " + identifiant + " in domaine " + domaine));
     Habilitations habilitations = new Habilitations(user.getHabilitations());
     habilitations.removeHabilitation(appName, nomRoles);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
@@ -287,7 +313,13 @@ public class ContactHabilitationDomaineController {
               required = true)
           @RequestParam(name = "propriete", required = true)
           List<String> proprietes) {
-    User user = userService.findById(domaine, null, identifiant);
+    User user =
+        userService
+            .findById(domaine, null, identifiant)
+            .orElseThrow(
+                () ->
+                    new UserNotFoundException(
+                        "Cannot find user " + identifiant + " in domaine " + domaine));
     Habilitations habilitations = new Habilitations(user.getHabilitations());
     habilitations.removeHabilitation(appName, nomRole, proprietes);
     user.setHabilitations(habilitations.convertSugoiHabilitation());

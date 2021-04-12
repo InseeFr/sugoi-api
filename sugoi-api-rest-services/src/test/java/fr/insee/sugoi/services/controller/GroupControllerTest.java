@@ -26,6 +26,7 @@ import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.model.Group;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -120,7 +121,7 @@ public class GroupControllerTest {
     try {
 
       Mockito.when(groupService.findById("domaine1", "monApplication", "Group1"))
-          .thenReturn(group1);
+          .thenReturn(Optional.of(group1));
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.get("/realms/domaine1/applications/monApplication/groups/Group1")
@@ -146,7 +147,7 @@ public class GroupControllerTest {
     try {
 
       Mockito.when(groupService.findById("domaine1", "monApplication", "supprimemoi"))
-          .thenReturn(group1);
+          .thenReturn(Optional.of(group1));
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.delete(
@@ -169,8 +170,8 @@ public class GroupControllerTest {
     try {
 
       Mockito.when(groupService.findById("domaine1", "monApplication", "Group2"))
-          .thenReturn(group2)
-          .thenReturn(group2Updated);
+          .thenReturn(Optional.of(group2))
+          .thenReturn(Optional.of(group2Updated));
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.put("/realms/domaine1/applications/monApplication/groups/Group2")
@@ -205,7 +206,7 @@ public class GroupControllerTest {
     try {
       Mockito.when(groupService.findById("domaine1", "monApplication", "Group1"))
           .thenReturn(null)
-          .thenReturn(group1);
+          .thenReturn(Optional.of(group1));
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.post("/realms/domaine1/applications/monApplication/groups")
@@ -354,7 +355,7 @@ public class GroupControllerTest {
     try {
 
       Mockito.when(groupService.findById("domaine1", "monApplication", "Group1"))
-          .thenReturn(group1);
+          .thenReturn(Optional.of(group1));
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.post("/realms/domaine1/applications/monApplication/groups")

@@ -14,6 +14,7 @@
 package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
+import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.PasswordChangeRequest;
 import fr.insee.sugoi.core.model.SendMode;
 import fr.insee.sugoi.core.service.CredentialsService;
@@ -86,13 +87,10 @@ public class CredentialsController {
       @Parameter(description = "Way to send password", required = false)
           @RequestParam(value = "sendModes", required = false)
           List<SendMode> sendMode) {
-    try {
-      credentialsService.reinitPassword(
-          realm, userStorage, id, pcr, sendMode != null ? sendMode : new ArrayList<>());
-      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
+
+    credentialsService.reinitPassword(
+        realm, userStorage, id, pcr, sendMode != null ? sendMode : new ArrayList<>());
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   @PostMapping(path = {"/realms/{realm}/users/{id}/reinitPassword"})
@@ -122,7 +120,12 @@ public class CredentialsController {
       @Parameter(description = "Way to send password", required = false)
           @RequestParam(value = "sendModes", required = false)
           List<SendMode> sendMode) {
-    User user = userService.findById(realm, null, id);
+
+    User user =
+        userService
+            .findById(realm, null, id)
+            .orElseThrow(
+                () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
     return reinitPassword(
         pcr, realm, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id, sendMode);
   }
@@ -156,12 +159,9 @@ public class CredentialsController {
           String userStorage,
       @Parameter(description = "User's id to change password", required = true) @PathVariable("id")
           String id) {
-    try {
-      credentialsService.changePassword(realm, userStorage, id, pcr);
-      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
+
+    credentialsService.changePassword(realm, userStorage, id, pcr);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   @PostMapping(path = {"/realms/{realm}/users/{id}/changePassword"})
@@ -188,8 +188,12 @@ public class CredentialsController {
           String realm,
       @Parameter(description = "User's id to change password", required = true) @PathVariable("id")
           String id) {
-    User user = userService.findById(realm, null, id);
 
+    User user =
+        userService
+            .findById(realm, null, id)
+            .orElseThrow(
+                () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
     return changePassword(
         pcr, realm, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id);
   }
@@ -227,13 +231,10 @@ public class CredentialsController {
       @Parameter(description = "Way to send password", required = false)
           @RequestParam(value = "sendModes", required = false)
           List<SendMode> sendMode) {
-    try {
-      credentialsService.initPassword(
-          realm, userStorage, id, pcr, sendMode != null ? sendMode : new ArrayList<>());
-      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
+
+    credentialsService.initPassword(
+        realm, userStorage, id, pcr, sendMode != null ? sendMode : new ArrayList<>());
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   @PostMapping(path = {"/realms/{realm}/users/{id}/initPassword"})
@@ -264,7 +265,12 @@ public class CredentialsController {
       @Parameter(description = "Way to send password", required = false)
           @RequestParam(value = "sendModes", required = false)
           List<SendMode> sendMode) {
-    User user = userService.findById(realm, null, id);
+
+    User user =
+        userService
+            .findById(realm, null, id)
+            .orElseThrow(
+                () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
     return initPassword(
         realm, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id, pcr, sendMode);
   }
@@ -304,11 +310,11 @@ public class CredentialsController {
               required = true)
           @RequestParam
           MultiValueMap<String, String> params) {
+
     if (params.containsKey("password")
         && credentialsService.validateCredential(
             realm, userStorage, id, params.getFirst("password"))) {
       return ResponseEntity.ok().build();
-
     } else {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -344,7 +350,11 @@ public class CredentialsController {
               required = true)
           @RequestParam
           MultiValueMap<String, String> params) {
-    User user = userService.findById(realm, null, id);
+    User user =
+        userService
+            .findById(realm, null, id)
+            .orElseThrow(
+                () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
     return validatePassword(
         realm, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id, params);
   }

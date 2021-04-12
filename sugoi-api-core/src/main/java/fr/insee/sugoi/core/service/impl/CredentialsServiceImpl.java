@@ -17,12 +17,15 @@ import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.PasswordPolicyNotMetException;
+import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
+import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.PasswordChangeRequest;
 import fr.insee.sugoi.core.model.PasswordPolicyConstants;
 import fr.insee.sugoi.core.model.SendMode;
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.core.service.CredentialsService;
 import fr.insee.sugoi.core.service.PasswordService;
+import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.model.User;
@@ -42,6 +45,8 @@ public class CredentialsServiceImpl implements CredentialsService {
 
   @Autowired private ConfigService configService;
 
+  @Autowired private UserService userService;
+
   @Override
   public void reinitPassword(
       String realm,
@@ -49,8 +54,18 @@ public class CredentialsServiceImpl implements CredentialsService {
       String userId,
       PasswordChangeRequest pcr,
       List<SendMode> sendMode) {
-    User user = storeProvider.getReaderStore(realm, userStorage).getUser(userId);
-    Map<String, String> realmProperties = configService.getRealm(realm).getProperties();
+    Map<String, String> realmProperties =
+        configService
+            .getRealm(realm)
+            .orElseThrow(
+                () -> new RealmNotFoundException("Cannot load properties for realm " + realm))
+            .getProperties();
+
+    User user =
+        userService
+            .findById(realm, userStorage, userId)
+            .orElseThrow(
+                () -> new UserNotFoundException("User " + userId + " not found in realm" + realm));
 
     String password =
         passwordService.generatePassword(
@@ -96,15 +111,18 @@ public class CredentialsServiceImpl implements CredentialsService {
   @Override
   public void changePassword(
       String realm, String userStorage, String userId, PasswordChangeRequest pcr) {
-    User user = storeProvider.getReaderStore(realm, userStorage).getUser(userId);
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        userStorage,
-        SugoiEventTypeEnum.CHANGE_PASSWORD,
-        Map.ofEntries(
-            Map.entry(EventKeysConfig.PASSWORD_CHANGE_REQUEST, pcr),
-            Map.entry(EventKeysConfig.USER, user)));
-    Map<String, String> realmProperties = configService.getRealm(realm).getProperties();
+    Map<String, String> realmProperties =
+        configService
+            .getRealm(realm)
+            .orElseThrow(
+                () -> new RealmNotFoundException("Cannot load properties for realm " + realm))
+            .getProperties();
+
+    User user =
+        userService
+            .findById(realm, userStorage, userId)
+            .orElseThrow(
+                () -> new UserNotFoundException("User " + userId + " not found in realm" + realm));
 
     boolean newPasswordIsValid = validatePassword(pcr.getNewPassword(), realmProperties);
 
@@ -112,6 +130,13 @@ public class CredentialsServiceImpl implements CredentialsService {
       storeProvider
           .getWriterStore(realm, userStorage)
           .changePassword(user, pcr.getOldPassword(), pcr.getNewPassword(), pcr);
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          userStorage,
+          SugoiEventTypeEnum.CHANGE_PASSWORD,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.PASSWORD_CHANGE_REQUEST, pcr),
+              Map.entry(EventKeysConfig.USER, user)));
     } else {
       throw new PasswordPolicyNotMetException("New password is not valid");
     }
@@ -124,10 +149,21 @@ public class CredentialsServiceImpl implements CredentialsService {
       String userId,
       PasswordChangeRequest pcr,
       List<SendMode> sendMode) {
-    Map<String, String> realmProperties = configService.getRealm(realm).getProperties();
+    Map<String, String> realmProperties =
+        configService
+            .getRealm(realm)
+            .orElseThrow(
+                () -> new RealmNotFoundException("Cannot load properties for realm " + realm))
+            .getProperties();
+
     boolean newPasswordIsValid = validatePassword(pcr.getNewPassword(), realmProperties);
     if (newPasswordIsValid) {
-      User user = storeProvider.getReaderStore(realm, userStorage).getUser(userId);
+      User user =
+          userService
+              .findById(realm, userStorage, userId)
+              .orElseThrow(
+                  () ->
+                      new UserNotFoundException("User " + userId + " not found in realm" + realm));
       storeProvider
           .getWriterStore(realm, userStorage)
           .initPassword(user, pcr.getNewPassword(), pcr, sendMode);
@@ -148,13 +184,20 @@ public class CredentialsServiceImpl implements CredentialsService {
   @Override
   public boolean validateCredential(
       String realm, String userStorage, String userName, String password) {
-    User user = storeProvider.getReaderStore(realm, userStorage).getUser(userName);
+    User user =
+        userService
+            .findById(realm, userStorage, userName)
+            .orElseThrow(
+                () ->
+                    new UserNotFoundException("User " + userName + " not found in realm" + realm));
+    boolean valid =
+        storeProvider.getReaderStore(realm, userStorage).validateCredentials(user, password);
     sugoiEventPublisher.publishCustomEvent(
         realm,
         userStorage,
         SugoiEventTypeEnum.VALIDATE_CREDENTIAL,
         Map.ofEntries(Map.entry(EventKeysConfig.USER, user)));
-    return storeProvider.getReaderStore(realm, userStorage).validateCredentials(user, password);
+    return valid;
   }
 
   private Boolean validatePassword(String password, Map<String, String> realmProperties) {

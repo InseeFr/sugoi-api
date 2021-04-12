@@ -15,6 +15,7 @@ package fr.insee.sugoi.old.services.controller;
 
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
 import fr.insee.sugoi.converter.ouganext.Profil;
+import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.old.services.utils.ResponseUtils;
@@ -77,7 +78,10 @@ public class ProfilController {
       @Parameter(description = "Name of the profil to search", required = true)
           @PathVariable(name = "nom", required = true)
           String nom) {
-    Realm realm = configService.getRealm(nom);
+    Realm realm =
+        configService
+            .getRealm(nom)
+            .orElseThrow(() -> new RealmNotFoundException("Cannot load domaine " + nom));
     Profil profil = ResponseUtils.convertRealmToProfils(realm).get(0);
     return new ResponseEntity<>(profil, HttpStatus.OK);
   }

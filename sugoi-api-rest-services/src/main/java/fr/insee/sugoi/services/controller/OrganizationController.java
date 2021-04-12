@@ -14,7 +14,7 @@
 package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
-import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
+import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.model.SearchType;
@@ -194,19 +194,14 @@ public class OrganizationController {
           String storage,
       @Parameter(description = "Organization to create", required = false) @RequestBody
           Organization organization) {
-    try {
-      organizationService.findById(realm, null, organization.getIdentifiant());
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
-    } catch (EntityNotFoundException e) {
-      organizationService.create(realm, storage, organization);
-      URI location =
-          ServletUriComponentsBuilder.fromCurrentRequest()
-              .path("/" + organization.getIdentifiant())
-              .build()
-              .toUri();
-      return ResponseEntity.created(location)
-          .body(organizationService.findById(realm, storage, organization.getIdentifiant()));
-    }
+
+    Organization orgCreated = organizationService.create(realm, storage, organization);
+    URI location =
+        ServletUriComponentsBuilder.fromCurrentRequest()
+            .path("/" + orgCreated.getIdentifiant())
+            .build()
+            .toUri();
+    return ResponseEntity.created(location).body(orgCreated);
   }
 
   @PutMapping(
@@ -253,17 +248,11 @@ public class OrganizationController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
-    if (organizationService.findById(realm, storage, id) != null) {
-      organizationService.update(realm, storage, organization);
-
-      URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
-
-      return ResponseEntity.status(HttpStatus.OK)
-          .header(HttpHeaders.LOCATION, location.toString())
-          .body(organizationService.findById(realm, storage, id));
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    organizationService.update(realm, storage, organization);
+    URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+    return ResponseEntity.status(HttpStatus.OK)
+        .header(HttpHeaders.LOCATION, location.toString())
+        .body(organizationService.findById(realm, storage, id).get());
   }
 
   @PutMapping(
@@ -304,7 +293,16 @@ public class OrganizationController {
     if (!organization.getIdentifiant().equals(id)) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
-    Organization org = organizationService.findById(realm, null, id);
+    Organization org =
+        organizationService
+            .findById(realm, null, id)
+            .orElseThrow(
+                () ->
+                    new OrganizationNotFoundException(
+                        "Cannot find organization "
+                            + organization.getIdentifiant()
+                            + " in realm "
+                            + realm));
     return updateOrganizations(
         realm, (String) org.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id, organization);
   }
@@ -338,13 +336,8 @@ public class OrganizationController {
           String storage,
       @Parameter(description = "Organization's id to delete", required = false) @PathVariable("id")
           String id) {
-
-    if (organizationService.findById(realm, storage, id) != null) {
-      organizationService.delete(realm, storage, id);
-      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    organizationService.delete(realm, storage, id);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   @DeleteMapping(
@@ -372,7 +365,13 @@ public class OrganizationController {
       @Parameter(description = "Organization's id to delete", required = false) @PathVariable("id")
           String id) {
 
-    Organization org = organizationService.findById(realm, null, id);
+    Organization org =
+        organizationService
+            .findById(realm, null, id)
+            .orElseThrow(
+                () ->
+                    new OrganizationNotFoundException(
+                        "Cannot find organization " + id + " in realm " + realm));
     return deleteOrganizations(
         realm, (String) org.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id);
   }
@@ -407,12 +406,18 @@ public class OrganizationController {
       @Parameter(description = "Organization's id to search", required = false)
           @PathVariable("orgId")
           String id) {
-    Organization organization = organizationService.findById(realm, storage, id);
-    if (organization != null) {
-      return ResponseEntity.status(HttpStatus.OK).body(organization);
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    Organization organization =
+        organizationService
+            .findById(realm, storage, id)
+            .orElseThrow(
+                () ->
+                    new OrganizationNotFoundException(
+                        "Cannot find organization "
+                            + id
+                            + (storage != null ? " in userStorage " + storage : "")
+                            + " in realm "
+                            + realm));
+    return ResponseEntity.status(HttpStatus.OK).body(organization);
   }
 
   @GetMapping(
