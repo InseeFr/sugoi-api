@@ -159,6 +159,10 @@ public class LdapReaderStoreTest {
         "Should have a group",
         user.getGroups().stream()
             .anyMatch(group -> group.getName().equals("Utilisateurs_Applitest")));
+    assertThat(
+        "Should have an alternative mail",
+        user.getAttributes().get("additionalMail"),
+        is("other@insee.fr"));
   }
 
   @Test

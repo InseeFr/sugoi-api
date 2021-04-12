@@ -136,4 +136,8 @@ public class UserLdap {
   @AttributeLdapName("memberOf")
   @MapToAttribute(value = "groups", type = ModelType.LIST_GROUP, readonly = true)
   private String groups;
+
+  @AttributeLdapName("inseeMailCorrespondant")
+  @MapToMapElement(name = "attributes", key = "additionalMail")
+  private String additionalMail;
 }

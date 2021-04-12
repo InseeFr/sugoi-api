@@ -149,10 +149,15 @@ public class LdapWriterStoreTest {
     address.put("Ligne1", "Toto");
     address.put("Ligne2", "Chez Toto");
     user.setAddress(address);
+    user.addAttributes("additionalMail", "other@insee.fr");
     ldapWriterStore.createUser(user);
     User retrievedUser = ldapReaderStore.getUser("Titi");
     assertThat("Titi should have been added", retrievedUser, not(nullValue()));
     assertThat("Titi should have an address", retrievedUser.getAddress().get("Ligne1"), is("Toto"));
+    assertThat(
+        "Should have an alternative mail",
+        retrievedUser.getAttributes().get("additionalMail"),
+        is("other@insee.fr"));
   }
 
   @Test
