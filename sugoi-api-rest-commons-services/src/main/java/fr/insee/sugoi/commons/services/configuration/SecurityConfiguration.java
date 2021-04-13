@@ -56,6 +56,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   private String ldapAccountManagmentUserBase;
   /** Group DN where are stored permissions for ldap accounts for managment */
   private String ldapAccountManagmentGroupeBase;
+  /** Search in subtree * */
+  private boolean ldapAccountManagmentGroupSubtree;
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
@@ -143,6 +145,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
           .userSearchBase(ldapAccountManagmentUserBase)
           .userSearchFilter("(uid={0})")
           .groupSearchBase(ldapAccountManagmentGroupeBase)
+          .groupSearchSubtree(ldapAccountManagmentGroupSubtree)
           .contextSource()
           .url(ldapAccountManagmentUrl);
     }
@@ -194,5 +197,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   public void setLdapAccountManagmentGroupeBase(String ldapAccountManagmentGroupeBase) {
     this.ldapAccountManagmentGroupeBase = ldapAccountManagmentGroupeBase;
+  }
+
+  public boolean getLdapAccountManagmentGroupSubtree() {
+    return ldapAccountManagmentGroupSubtree;
+  }
+
+  public void setLdapAccountManagmentGroupSubtree(boolean ldapAccountManagmentGroupSubtree) {
+    this.ldapAccountManagmentGroupSubtree = ldapAccountManagmentGroupSubtree;
   }
 }
