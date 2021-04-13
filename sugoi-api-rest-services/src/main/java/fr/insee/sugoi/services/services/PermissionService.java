@@ -48,7 +48,9 @@ public class PermissionService {
 
   public boolean isReader(String realm, String userStorage) {
     List<String> searchRoleList = getSearchRoleList(realm, userStorage, null, regexpReaderList);
-    return checkIfUserGetRoles(searchRoleList) || isWriter(realm, userStorage);
+    return checkIfUserGetRoles(searchRoleList)
+        || isWriter(realm, userStorage)
+        || isApplicationManager(realm);
   }
 
   public boolean isPasswordManager(String realm, String userStorage) {
@@ -59,7 +61,12 @@ public class PermissionService {
 
   public boolean isApplicationManager(String realm, String userStorage, String application) {
     List<String> searchRoleList =
-        getSearchRoleList(realm, userStorage, application, passwordManagerRoleList);
+        getSearchRoleList(realm, userStorage, application, applicationManagerRoleList);
+    return checkIfUserGetRoles(searchRoleList);
+  }
+
+  public boolean isApplicationManager(String realm) {
+    List<String> searchRoleList = getSearchRoleList(realm, "*", "*", applicationManagerRoleList);
     return checkIfUserGetRoles(searchRoleList);
   }
 
@@ -85,6 +92,11 @@ public class PermissionService {
       logger.trace(roleSearch);
       if (roles.contains(roleSearch.toUpperCase())) {
         return true;
+      }
+      for (String role : roles) {
+        if (role.toUpperCase().matches(roleSearch.replaceAll("\\*", ".*").toUpperCase())) {
+          return true;
+        }
       }
     }
     return false;
