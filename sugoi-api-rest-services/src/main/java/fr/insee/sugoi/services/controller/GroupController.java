@@ -70,7 +70,7 @@ public class GroupController {
                   schema = @Schema(implementation = PageResult.class))
             })
       })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#application)")
   public ResponseEntity<PageResult<Group>> getGroups(
       @Parameter(
               description = "Name of the realm where the operation will be made",
@@ -134,7 +134,7 @@ public class GroupController {
             description = "Group already exist",
             content = {@Content(mediaType = "application/json")})
       })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#storage,#applicationName)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#applicationName)")
   public ResponseEntity<?> createGroups(
       @Parameter(
               description = "Name of the realm where the operation will be made",
@@ -186,7 +186,7 @@ public class GroupController {
             description = "Group didn't exist",
             content = {@Content(mediaType = "application/json")})
       })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#storage,#applicationName)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#applicationName)")
   public ResponseEntity<?> updateGroups(
       @Parameter(
               description = "Name of the realm where the operation will be made",
@@ -235,7 +235,7 @@ public class GroupController {
             description = "Group didn't exist",
             content = {@Content(mediaType = "application/json")})
       })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#storage,#applicationName)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#applicationName)")
   public ResponseEntity<String> deleteGroups(
       @Parameter(
               description = "Name of the realm where the operation will be made",
@@ -299,7 +299,7 @@ public class GroupController {
       value = {"/realms/{realm}/applications/{application}/groups/{group_id}/members/{user_id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Add user to group")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#storage,#applicationName)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#applicationName)")
   public ResponseEntity<?> addUserToGroup(
       @PathVariable("realm") String realm,
       @PathVariable("group_id") String groupId,
@@ -322,7 +322,7 @@ public class GroupController {
       value = {"/realms/{realm}/applications/{application}/groups/{group_id}/members/{user_id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete user from group")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#storage,#applicationName)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#applicationName)")
   public ResponseEntity<?> deleteUserFromGroup(
       @PathVariable("realm") String realm,
       @PathVariable("group_id") String groupId,
