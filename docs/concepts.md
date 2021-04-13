@@ -20,6 +20,7 @@
     - [Services](#services)
       - [Rest Services](#rest-services)
       - [JMS Services](#jms-services)
+      
 ## Use cases
 
 - Read and write information on users and organization
@@ -49,7 +50,7 @@ Users, organizations and applications can come from multiple storages and can be
 
 Users can authenticate on sugoi with basic authentication, bearer authentication or ldap authentication. For now users will have rights on the application only by using ldap authentication. The permissions are checked from groups defined in security.ldap-account-managment-url property (see [configuration](configuration.md)).
 
-There are five profiles on sugoi permission model : admin, read and write, password and application manager. A user have a right when it belong to the corresonding ldap group. All profiles are scoped to realm except the admin group. Sugoi management groups are entirely configurable with regex.
+There are five profiles on sugoi permission model : admin, read and write, password and application manager. A user have a right when it belong to the corresonding ldap group. All profiles are scoped to realm except the admin group. Sugoi management groups are entirely configurable with patterns, those patterns accept the `*` wildcard. All the pattern configuration should be done in uppercase (as this is the way spring-security fills `Authorities`).
 
 ### Administrator
 
@@ -60,6 +61,7 @@ An administrator can :
 - read, create, modify or delete any realms.
 - read, create, modify or delete userstorages.
 - do whatever the writer can do on all realms.
+- request all actuator endpoints.
 
 ### Writer
 
@@ -82,13 +84,17 @@ A reader can :
 
 ### Password manager
 
-The password manager is defined via the regexp.role.password.manager property. It is scoped to one realm.
+The password manager role is defined via the regexp.role.password.manager property. It is scoped to one realm.
 
 Password manager can initialize passwords, update password (with a given password or not) or validate a password on its realm.
 
 ### Application manager
 
-Application manager can manage an application and the associated groups. This also enable reader rights on a realm.
+The application manager role is defined via the regexp.role.application.manager property. 
+
+Application manager can update an application and the associated groups (add or remove members, as well as create or delete groups). This also enable reader rights on a realm.
+
+Creating or deleting an application requires writer privileges.
 
 ## Providers
 
