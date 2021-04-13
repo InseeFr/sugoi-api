@@ -60,4 +60,49 @@ public class PermissionServiceTests {
       fail();
     }
   }
+
+  @Test
+  @WithMockUser(username = "appmanager_realm1_appli1", roles = "Asi_realm1_appli1")
+  public void testAppManager() {
+    try {
+      assertThat(
+          "user is app manager for appli1 in realm1",
+          permissions.isApplicationManager("realm1", null, "appli1"),
+          is(true));
+      assertThat("user is reader in realm1", permissions.isReader("realm1", null), is(true));
+
+    } catch (Exception e) {
+      fail();
+    }
+  }
+
+  @Test
+  @WithMockUser(username = "appmanager_appli1", roles = "Asi_appli1")
+  public void testAppManagerWithoutRealmInRoleName() {
+    try {
+      assertThat(
+          "user is app manager for appli1 in realm1",
+          permissions.isApplicationManager("realm1", null, "appli1"),
+          is(true));
+      assertThat("user is reader in realm1", permissions.isReader("realm1", null), is(true));
+      assertThat(
+          "user is app manager for appli1 in realm2",
+          permissions.isApplicationManager("realm2", null, "appli1"),
+          is(true));
+      assertThat("user is reader in realm2", permissions.isReader("realm2", null), is(true));
+
+    } catch (Exception e) {
+      fail();
+    }
+  }
+
+  @Test
+  @WithMockUser(username = "admin_wildcard", roles = "nimportequoi_admin")
+  public void testAdminWildcard() {
+    try {
+      assertThat("user is admin sugoi", permissions.isAdmin(), is(true));
+    } catch (Exception e) {
+      fail();
+    }
+  }
 }
