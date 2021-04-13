@@ -159,7 +159,7 @@ public class ApplicationController {
   }
 
   @PutMapping(
-      value = {"/realms/{realm}/applications/{id}"},
+      value = {"/realms/{realm}/applications/{applicationName}"},
       consumes = {MediaType.APPLICATION_JSON_VALUE},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Update application")
@@ -178,30 +178,31 @@ public class ApplicationController {
             description = "Application does'nt exist",
             content = {@Content(mediaType = "application/json")})
       })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#applicationName)")
   public ResponseEntity<Application> updateApplication(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
           @PathVariable("realm")
           String realm,
-      @Parameter(description = "Id of the app to update", required = true) @PathVariable("id")
-          String id,
+      @Parameter(description = "Id of the app to update", required = true)
+          @PathVariable("applicationName")
+          String applicationName,
       @Parameter(description = "Application to update", required = true) @RequestBody
           Application application) {
 
-    if (!application.getName().equals(id)) {
+    if (!application.getName().equals(applicationName)) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
-    if (applicationService.findById(realm, id) != null) {
+    if (applicationService.findById(realm, applicationName) != null) {
       applicationService.update(realm, application);
 
       URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
 
       return ResponseEntity.status(HttpStatus.OK)
           .header(HttpHeaders.LOCATION, location.toString())
-          .body(applicationService.findById(realm, id));
+          .body(applicationService.findById(realm, applicationName));
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
@@ -259,7 +260,7 @@ public class ApplicationController {
             description = "Application does'nt exist",
             content = {@Content(mediaType = "application/json")})
       })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#userStorage)")
   public ResponseEntity<Application> getApplicationByName(
       @Parameter(
               description = "Name of the realm where the operation will be made",

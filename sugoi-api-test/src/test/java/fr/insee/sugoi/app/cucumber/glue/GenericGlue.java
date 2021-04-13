@@ -193,6 +193,8 @@ public class GenericGlue {
         ResponseResults response =
             webRequest.executeGet(stepData.getDefaultTomcatUrl() + "/realms", headers, null);
         List<Realm> realms = Arrays.asList(mapper.readValue(response.getBody(), Realm[].class));
+        System.out.println(response.getBody());
+
         if (realms.size() > 0) {
           isReady = true;
         } else {
@@ -200,8 +202,9 @@ public class GenericGlue {
           Thread.sleep(20000);
           System.out.println("continue...");
         }
-      } catch (IOException e) {
+      } catch (Exception e) {
         System.out.println("App is not ready sleeping...");
+        System.out.println(e.getMessage());
         Thread.sleep(20000);
         System.out.println("continue...");
       }

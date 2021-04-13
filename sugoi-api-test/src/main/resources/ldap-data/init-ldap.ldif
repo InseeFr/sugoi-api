@@ -36,6 +36,13 @@ objectclass: top
 objectclass: organizationalUnit
 ou: Applitest_Objets
 
+dn: cn=ASI_Applitest,ou=Applitest,ou=Applications,o=insee,c=fr
+cn: ASI_Applitest
+objectclass: groupOfUniqueNames
+uniqueMember: uid=appli_applitest,ou=Applitest,ou=Applications,o=insee,c=fr
+
+
+
 dn: cn=Administrateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
 cn: Administrateurs_Applitest
 objectclass: groupOfUniqueNames
@@ -122,6 +129,8 @@ inseepropriete: brancheOrganisation$ou=organisations,ou=clients_domaine1,o=in
  see,c=fr
 inseepropriete: habilitationsPossibles$propriete_role_appli
 inseepropriete: branchesApplicativesPossibles$ou=Applications,o=insee,c=fr
+inseepropriete: groupFilterPattern$(cn={group}_{appliname})
+inseepropriete: groupSourcePattern$ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr
 description: domaine1
 
 dn: cn=Utilisateurs_contacts_domaine1_WebServicesLdap,ou=WebServicesLdap_Obje
