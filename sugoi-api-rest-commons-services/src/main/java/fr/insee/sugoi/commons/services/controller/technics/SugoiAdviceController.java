@@ -91,7 +91,7 @@ public class SugoiAdviceController {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
     final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.CONFLICT);
     return response;
   }
 
@@ -101,7 +101,7 @@ public class SugoiAdviceController {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
     final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.CONFLICT);
     return response;
   }
 
@@ -111,7 +111,7 @@ public class SugoiAdviceController {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
     final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.CONFLICT);
     return response;
   }
 
@@ -121,7 +121,7 @@ public class SugoiAdviceController {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
     final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.CONFLICT);
     return response;
   }
 
@@ -131,7 +131,7 @@ public class SugoiAdviceController {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
     final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.CONFLICT);
     return response;
   }
 

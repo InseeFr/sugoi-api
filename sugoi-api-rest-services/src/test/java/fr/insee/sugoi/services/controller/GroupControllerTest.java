@@ -13,14 +13,17 @@
 */
 package fr.insee.sugoi.services.controller;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.verify;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
+import fr.insee.sugoi.core.exceptions.GroupAlreadyExistException;
+import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.model.Group;
@@ -44,7 +47,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @SpringBootTest(
-    classes = GroupController.class,
+    classes = {GroupController.class, SugoiAdviceController.class},
     properties = "spring.config.location=classpath:/controller/application.properties")
 @AutoConfigureMockMvc
 @EnableWebMvc
@@ -146,9 +149,6 @@ public class GroupControllerTest {
   public void deleteShouldCallDeleteService() {
     try {
 
-      Mockito.when(groupService.findById("domaine1", "monApplication", "supprimemoi"))
-          .thenReturn(Optional.of(group1));
-
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.delete(
                   "/realms/domaine1/applications/monApplication/groups/supprimemoi")
@@ -170,7 +170,6 @@ public class GroupControllerTest {
     try {
 
       Mockito.when(groupService.findById("domaine1", "monApplication", "Group2"))
-          .thenReturn(Optional.of(group2))
           .thenReturn(Optional.of(group2Updated));
 
       RequestBuilder requestBuilder =
@@ -204,9 +203,8 @@ public class GroupControllerTest {
   public void postShouldCallPostServiceAndReturnNewApp() {
 
     try {
-      Mockito.when(groupService.findById("domaine1", "monApplication", "Group1"))
-          .thenReturn(null)
-          .thenReturn(Optional.of(group1));
+      Mockito.when(groupService.create(Mockito.anyString(), Mockito.any(), Mockito.any()))
+          .thenReturn(group1);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.post("/realms/domaine1/applications/monApplication/groups")
@@ -261,7 +259,6 @@ public class GroupControllerTest {
   public void getObjectLocationInGroupCreationResponse() {
     try {
 
-      Mockito.when(groupService.findById("domaine1", "monApplication", "Group1")).thenReturn(null);
       Mockito.when(groupService.create(Mockito.anyString(), Mockito.anyString(), Mockito.any()))
           .thenReturn(group1);
 
@@ -354,8 +351,8 @@ public class GroupControllerTest {
   public void get409WhenCreatingAlreadyExistingGroup() {
     try {
 
-      Mockito.when(groupService.findById("domaine1", "monApplication", "Group1"))
-          .thenReturn(Optional.of(group1));
+      Mockito.when(groupService.create(Mockito.anyString(), Mockito.anyString(), Mockito.any()))
+          .thenThrow(new GroupAlreadyExistException(""));
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.post("/realms/domaine1/applications/monApplication/groups")
@@ -381,7 +378,7 @@ public class GroupControllerTest {
     try {
 
       Mockito.when(groupService.findById("domaine1", "monApplication", "dontexist"))
-          .thenReturn(null);
+          .thenReturn(Optional.empty());
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.get("/realms/domaine1/application/monApplication/groups/dontexist")
@@ -427,8 +424,9 @@ public class GroupControllerTest {
   public void get404WhenNoGroupIsFoundWhenUpdate() {
     try {
 
-      Mockito.when(groupService.findById("domaine1", "monApplication", "Group1")).thenReturn(null);
-
+      Mockito.doThrow(new GroupNotFoundException(""))
+          .when(groupService)
+          .update(Mockito.anyString(), Mockito.any(), Mockito.any());
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.put("/realms/domaine1/applications/monApplication/groups/Group1")
               .contentType(MediaType.APPLICATION_JSON)
@@ -452,7 +450,9 @@ public class GroupControllerTest {
   public void get404WhenNoGroupIsFoundWhenDelete() {
     try {
 
-      Mockito.when(groupService.findById("domaine1", "monApplication", "Group1")).thenReturn(null);
+      Mockito.doThrow(new GroupNotFoundException(""))
+          .when(groupService)
+          .delete(Mockito.anyString(), Mockito.any(), Mockito.any());
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.delete(

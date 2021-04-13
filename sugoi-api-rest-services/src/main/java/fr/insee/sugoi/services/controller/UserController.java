@@ -260,14 +260,13 @@ public class UserController {
           String storage,
       @Parameter(description = "User to create", required = true) @RequestBody User user) {
 
-    userService.create(realm, storage, user);
+    User userCreated = userService.create(realm, storage, user);
     URI location =
         ServletUriComponentsBuilder.fromCurrentRequest()
             .path("/" + user.getUsername())
             .build()
             .toUri();
-    return ResponseEntity.created(location)
-        .body(userService.findById(realm, storage, user.getUsername()));
+    return ResponseEntity.created(location).body(userCreated);
   }
 
   @PutMapping(

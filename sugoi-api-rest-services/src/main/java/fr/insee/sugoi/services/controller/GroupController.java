@@ -154,7 +154,7 @@ public class GroupController {
     group.setDescription(groupView.getDescription());
     group.setName(groupView.getName());
 
-    groupService.create(realm, applicationName, group);
+    Group groupCreated = groupService.create(realm, applicationName, group);
 
     URI location =
         ServletUriComponentsBuilder.fromCurrentRequest()
@@ -162,8 +162,7 @@ public class GroupController {
             .build()
             .toUri();
 
-    return ResponseEntity.created(location)
-        .body(groupService.findById(realm, applicationName, group.getName()));
+    return ResponseEntity.created(location).body(groupCreated);
   }
 
   @PutMapping(
