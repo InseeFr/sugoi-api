@@ -51,7 +51,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                       "Application " + appName + " doesn't exist in realm " + realm));
     }
     throw new ApplicationAlreadyExistException(
-        "Application " + application + " already exist in realm " + realm);
+        "Application " + application.getName() + " already exist in realm " + realm);
   }
 
   @Override

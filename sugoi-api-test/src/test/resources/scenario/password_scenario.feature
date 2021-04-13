@@ -36,7 +36,7 @@ Feature: Credential scenario
             }
             """
         And body received
-        Then the client receives status code 500
+        Then the client receives status code 401
 
     Scenario: Change password
         Given the client authentified with username appli_sugoi and password sugoi
