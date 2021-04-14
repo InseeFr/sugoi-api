@@ -17,6 +17,7 @@ import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.GroupAlreadyExistException;
+import fr.insee.sugoi.core.exceptions.GroupNotCreatedException;
 import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
@@ -55,7 +56,7 @@ public class GroupServiceImpl implements GroupService {
       return findById(realm, appName, group.getName())
           .orElseThrow(
               () ->
-                  new GroupNotFoundException(
+                  new GroupNotCreatedException(
                       "Cannot find group " + group + " in app " + appName + " in realm " + realm));
     }
     throw new GroupAlreadyExistException(

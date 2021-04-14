@@ -41,7 +41,7 @@ public interface CredentialsService {
       List<SendMode> sendMode);
 
   /**
-   * Change the password of an user, check if the new password met the realm password policy and
+   * Change the password of an user, check if the new password meets the realm password policy and
    * change it
    *
    * @param realm

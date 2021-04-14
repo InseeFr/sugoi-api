@@ -14,6 +14,7 @@
 package fr.insee.sugoi.core.service;
 
 import fr.insee.sugoi.core.exceptions.RealmAlreadyExistException;
+import fr.insee.sugoi.core.exceptions.RealmNotCreatedException;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.Realm;
 import java.util.List;
@@ -38,24 +39,25 @@ public interface ConfigService {
   List<Realm> getRealms();
 
   /**
-   * [NotYetImplemented] Check if the realm exist (by name) and delete realm using the name
+   * [NotYetImplemented] Check if the realm exists (by name) and delete realm using the name
    *
    * @throws RealmNotFoundException if realmName does'nt match with the name of an existing realm
    */
   void deleteRealm(String realmName);
 
   /**
-   * [NotYetImplemented] Check if the realm exist and update realm
+   * [NotYetImplemented] Check if the realm exists and update realm
    *
    * @throws RealmNotFoundException if realm does'nt match (by name) with an existing realm
    */
   void updateRealm(Realm realm);
 
   /**
-   * [NotYetImplemented] Check if a realm with the same name already exist, and create it if it
+   * [NotYetImplemented] Check if a realm with the same name already exists, and creates it if it
    * doesn't exist
    *
-   * @throws RealmAlreadyExistException if realm already exist
+   * @throws RealmAlreadyExistException if realm already exists
+   * @throws RealmNotCreatedException if fail to create realm
    */
   void createRealm(Realm realm);
 }

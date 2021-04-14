@@ -17,6 +17,7 @@ import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.ApplicationAlreadyExistException;
+import fr.insee.sugoi.core.exceptions.ApplicationNotCreatedException;
 import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
@@ -47,7 +48,7 @@ public class ApplicationServiceImpl implements ApplicationService {
       return findById(realm, appName)
           .orElseThrow(
               () ->
-                  new ApplicationNotFoundException(
+                  new ApplicationNotCreatedException(
                       "Application " + appName + " doesn't exist in realm " + realm));
     }
     throw new ApplicationAlreadyExistException(

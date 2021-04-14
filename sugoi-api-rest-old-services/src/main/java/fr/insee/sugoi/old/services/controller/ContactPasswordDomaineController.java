@@ -16,7 +16,6 @@ package fr.insee.sugoi.old.services.controller;
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
 import fr.insee.sugoi.converter.ouganext.PasswordChangeRequest;
 import fr.insee.sugoi.core.service.CredentialsService;
-import fr.insee.sugoi.core.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -48,7 +47,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ContactPasswordDomaineController {
 
   @Autowired private CredentialsService credentialsService;
-  @Autowired private UserService userService;
+
   @Autowired private OuganextSugoiMapper ouganextSugoiMapper;
 
   /**
@@ -100,18 +99,14 @@ public class ContactPasswordDomaineController {
               required = true)
           @RequestBody
           PasswordChangeRequest pcr) {
-    if (userService.findById(domaine, null, identifiant) != null) {
-      credentialsService.reinitPassword(
-          domaine,
-          null,
-          identifiant,
-          ouganextSugoiMapper.serializeToSugoi(
-              pcr, fr.insee.sugoi.core.model.PasswordChangeRequest.class),
-          new ArrayList<>());
-      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    credentialsService.reinitPassword(
+        domaine,
+        null,
+        identifiant,
+        ouganextSugoiMapper.serializeToSugoi(
+            pcr, fr.insee.sugoi.core.model.PasswordChangeRequest.class),
+        new ArrayList<>());
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   /**
@@ -158,18 +153,14 @@ public class ContactPasswordDomaineController {
       @Parameter(description = "Other infos to reset password: new password", required = true)
           @RequestBody
           PasswordChangeRequest pcr) {
-    if (userService.findById(domaine, null, identifiant) != null) {
-      credentialsService.initPassword(
-          domaine,
-          null,
-          identifiant,
-          ouganextSugoiMapper.serializeToSugoi(
-              pcr, fr.insee.sugoi.core.model.PasswordChangeRequest.class),
-          new ArrayList<>());
-      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    credentialsService.initPassword(
+        domaine,
+        null,
+        identifiant,
+        ouganextSugoiMapper.serializeToSugoi(
+            pcr, fr.insee.sugoi.core.model.PasswordChangeRequest.class),
+        new ArrayList<>());
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   /**
@@ -224,16 +215,12 @@ public class ContactPasswordDomaineController {
               required = true)
           @RequestBody
           PasswordChangeRequest pcr) {
-    if (userService.findById(domaine, null, identifiant) != null) {
-      credentialsService.changePassword(
-          domaine,
-          null,
-          identifiant,
-          ouganextSugoiMapper.serializeToSugoi(
-              pcr, fr.insee.sugoi.core.model.PasswordChangeRequest.class));
-      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    credentialsService.changePassword(
+        domaine,
+        null,
+        identifiant,
+        ouganextSugoiMapper.serializeToSugoi(
+            pcr, fr.insee.sugoi.core.model.PasswordChangeRequest.class));
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }

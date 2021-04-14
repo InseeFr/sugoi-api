@@ -18,6 +18,7 @@ import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.OrganizationAlreadyExistException;
+import fr.insee.sugoi.core.exceptions.OrganizationNotCreatedException;
 import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
@@ -63,7 +64,7 @@ public class OrganizationServiceImpl implements OrganizationService {
       return findById(realm, storageName, orgName)
           .orElseThrow(
               () ->
-                  new OrganizationNotFoundException(
+                  new OrganizationNotCreatedException(
                       "Cannot find organization " + orgName + " in realm " + realm));
     }
     throw new OrganizationAlreadyExistException(
