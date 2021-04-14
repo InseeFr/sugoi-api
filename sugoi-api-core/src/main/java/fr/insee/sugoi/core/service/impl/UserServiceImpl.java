@@ -18,6 +18,7 @@ import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
+import fr.insee.sugoi.core.exceptions.UserNotCreatedException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
@@ -59,7 +60,8 @@ public class UserServiceImpl implements UserService {
       return findById(realm, storage, userName)
           .orElseThrow(
               () ->
-                  new UserNotFoundException("Cannot find user " + userName + " in realm " + realm));
+                  new UserNotCreatedException(
+                      "Cannot find user " + userName + " in realm " + realm));
     }
     throw new UserAlreadyExistException(
         "User " + user.getUsername() + " already exist in realm " + realm);

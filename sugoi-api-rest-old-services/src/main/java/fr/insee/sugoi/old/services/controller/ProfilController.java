@@ -116,7 +116,7 @@ public class ProfilController {
       @Parameter(description = "The profil to update/create", required = true) @RequestBody
           Profil profil) {
     Realm sugoiRealm = ouganextSugoiMapper.convertProfilToRealm(profil);
-    if (configService.getRealm(sugoiRealm.getName()) != null) {
+    if (configService.getRealm(sugoiRealm.getName()).isPresent()) {
       configService.updateRealm(sugoiRealm);
     } else {
       configService.createRealm(sugoiRealm);

@@ -105,7 +105,7 @@ public class ContactsDomaineController {
           String slug,
       @Parameter(description = "Contact to create", required = true) @RequestBody Contact contact) {
     User sugoiUser = ouganextSugoiMapper.serializeToSugoi(contact, User.class);
-    if (slug != null && userService.findById(domaine, null, slug) == null) {
+    if (slug != null && userService.findById(domaine, null, slug).isEmpty()) {
       sugoiUser.setUsername(slug);
     } else if (sugoiUser.getUsername() == null) {
       sugoiUser.setUsername(UUID.randomUUID().toString());

@@ -14,6 +14,7 @@
 package fr.insee.sugoi.core.service;
 
 import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
+import fr.insee.sugoi.core.exceptions.UserNotCreatedException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
@@ -24,19 +25,19 @@ import java.util.Optional;
 public interface UserService {
 
   /**
-   * Create an user if not already exist in the realm (check on the username).
+   * Create an user if not already exists in the realm (check on the username).
    *
    * @param realm
    * @param storage
    * @param user
    * @return the created user
    * @throws UserAlreadyExistException if an user with the same username already exist in the realm
-   * @throws UserNotFoundException if user is not found after create
+   * @throws UserNotCreatedException if user is not found after create
    */
   User create(String realm, String storage, User user);
 
   /**
-   * Update the user if the user already exist in the realm
+   * Update the user if the user already exists in the realm
    *
    * @param realm
    * @param storage
@@ -46,7 +47,7 @@ public interface UserService {
   void update(String realm, String storage, User user);
 
   /**
-   * Delete an existing user (if the user already exist in the realm)
+   * Delete an existing user (if the user already exists in the realm)
    *
    * @param realm
    * @param storage

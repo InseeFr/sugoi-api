@@ -16,6 +16,7 @@ package fr.insee.sugoi.old.services.controller;
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
 import fr.insee.sugoi.converter.ouganext.Organisation;
 import fr.insee.sugoi.converter.ouganext.Organisations;
+import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.model.SearchType;
@@ -116,22 +117,22 @@ public class OrganisationDomaineController {
           boolean creation,
       @Parameter(description = "Organization to create or modify", required = true) @RequestBody
           Organisation organisation) {
+
     organisation.setIdentifiant(id);
     Organization sugoiOrganization =
         ouganextSugoiMapper.serializeToSugoi(organisation, Organization.class);
 
-    if (organizationService.findById(domaine, null, id) != null) {
-      organizationService.update(domaine, null, sugoiOrganization);
-    } else if (creation) {
-      organizationService.create(domaine, null, sugoiOrganization);
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    if (creation) {
+      Organization orgCreated = organizationService.create(domaine, null, sugoiOrganization);
+      return ResponseEntity.status(HttpStatus.OK)
+          .body(ouganextSugoiMapper.serializeToOuganext(orgCreated, Organisation.class));
     }
 
+    organizationService.update(domaine, null, sugoiOrganization);
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             ouganextSugoiMapper.serializeToOuganext(
-                organizationService.findById(domaine, null, id), Organisation.class));
+                organizationService.findById(domaine, null, id).get(), Organisation.class));
   }
 
   /**
@@ -172,7 +173,13 @@ public class OrganisationDomaineController {
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             ouganextSugoiMapper.serializeToOuganext(
-                organizationService.findById(domaine, null, id), Organisation.class));
+                organizationService
+                    .findById(domaine, null, id)
+                    .orElseThrow(
+                        () ->
+                            new OrganizationNotFoundException(
+                                "Organization " + id + " not found in realm " + domaine)),
+                Organisation.class));
   }
 
   /**
@@ -214,12 +221,8 @@ public class OrganisationDomaineController {
           @PathVariable(name = "id", required = true)
           String id) {
 
-    if (organizationService.findById(domaine, null, id) != null) {
-      organizationService.delete(domaine, null, id);
-      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    organizationService.delete(domaine, null, id);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   /**
@@ -265,7 +268,7 @@ public class OrganisationDomaineController {
           String slug) {
     Organization sugoiOrganization =
         ouganextSugoiMapper.serializeToSugoi(organisation, Organization.class);
-    if (slug != null && organizationService.findById(domaine, null, slug) == null) {
+    if (slug != null && organizationService.findById(domaine, null, slug).isEmpty()) {
       sugoiOrganization.setIdentifiant(slug);
     } else if (sugoiOrganization.getIdentifiant() == null) {
       sugoiOrganization.setIdentifiant(UUID.randomUUID().toString());

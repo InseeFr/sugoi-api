@@ -92,20 +92,21 @@ public class IdController {
   }
 
   private Contact findContact(Realm realm, String id) {
-    try {
-      return ouganextSugoiMapper.serializeToOuganext(
-          userService.findById(realm.getName(), null, id), Contact.class);
-    } catch (UserNotFoundException e) {
-      return null;
-    }
+    return ouganextSugoiMapper.serializeToOuganext(
+        userService
+            .findById(realm.getName(), null, id)
+            .orElseThrow(() -> new UserNotFoundException("User" + id + " not found in " + realm)),
+        Contact.class);
   }
 
   private Organisation findOrganisation(Realm realm, String id) {
-    try {
-      return ouganextSugoiMapper.serializeToOuganext(
-          organizationService.findById(realm.getName(), null, id), Organisation.class);
-    } catch (OrganizationNotFoundException e) {
-      return null;
-    }
+    return ouganextSugoiMapper.serializeToOuganext(
+        organizationService
+            .findById(realm.getName(), null, id)
+            .orElseThrow(
+                () ->
+                    new OrganizationNotFoundException(
+                        "Organization" + id + " not found in " + realm)),
+        Organisation.class);
   }
 }

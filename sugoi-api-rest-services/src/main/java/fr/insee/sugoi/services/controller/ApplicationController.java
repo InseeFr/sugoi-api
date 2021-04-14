@@ -196,7 +196,7 @@ public class ApplicationController {
 
     return ResponseEntity.status(HttpStatus.OK)
         .header(HttpHeaders.LOCATION, location.toString())
-        .body(applicationService.findById(realm, id).get());
+        .body(applicationService.findById(realm, applicationName).get());
   }
 
   @DeleteMapping(

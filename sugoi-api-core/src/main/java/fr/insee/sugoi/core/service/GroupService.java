@@ -14,6 +14,7 @@
 package fr.insee.sugoi.core.service;
 
 import fr.insee.sugoi.core.exceptions.GroupAlreadyExistException;
+import fr.insee.sugoi.core.exceptions.GroupNotCreatedException;
 import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
@@ -24,18 +25,19 @@ import java.util.Optional;
 public interface GroupService {
 
   /**
-   * Check if the group exist in the app (by name) and create it if it doesn't exist
+   * Check if the group exists in the app (by name) and create it if it doesn't exist
    *
    * @param realm
    * @param appName
    * @param group
    * @return the created group
    * @throws GroupAlreadyExistException if the group already exist
+   * @throws GroupNotCreatedException if fail to create group
    */
   Group create(String realm, String appName, Group group);
 
   /**
-   * Check if the group exist in the app (by name) and update it
+   * Check if the group exists in the app (by name) and update it
    *
    * @param realm
    * @param appName
@@ -45,7 +47,7 @@ public interface GroupService {
   void update(String realm, String appName, Group group);
 
   /**
-   * Check if the group exist in the app (by name) and delete it
+   * Check if the group exists in the app (by name) and delete it
    *
    * @param realm
    * @param appName

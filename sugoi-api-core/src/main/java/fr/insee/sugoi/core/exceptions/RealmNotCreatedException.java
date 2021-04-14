@@ -13,15 +13,15 @@
 */
 package fr.insee.sugoi.core.exceptions;
 
-public class OrganizationNotFoundException extends RuntimeException {
+public class RealmNotCreatedException extends RuntimeException {
 
-  private static final long serialVersionUID = -986857865844865751L;
+  private static final long serialVersionUID = -1735193744573498943L;
 
-  public OrganizationNotFoundException(String message, Throwable cause) {
+  public RealmNotCreatedException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public OrganizationNotFoundException(String message) {
+  public RealmNotCreatedException(String message) {
     super(message);
   }
 }
