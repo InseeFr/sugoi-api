@@ -22,7 +22,7 @@ import java.util.Optional;
 public interface ApplicationService {
 
   /**
-   * Verify if the application does'nt already exist in the realm (by it's name) and create if it
+   * Verify if the application doesn't already exist in the realm (by its name) and create if it
    * does'nt exist
    *
    * @param realm
@@ -39,7 +39,7 @@ public interface ApplicationService {
    *
    * @param realm
    * @param application
-   * @throws ApplicationNotFoundException if application does'nt exist in realm
+   * @throws ApplicationNotFoundException if application doesn't exist in realm
    */
   void update(String realm, Application application);
 
@@ -49,7 +49,7 @@ public interface ApplicationService {
    *
    * @param realm
    * @param id
-   * @throws ApplicationNotFoundException if application does'nt exist in realm
+   * @throws ApplicationNotFoundException if application doesn't exist in realm
    */
   void delete(String realm, String id);
 

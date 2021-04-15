@@ -38,74 +38,149 @@ public class ApplicationServiceImpl implements ApplicationService {
 
   @Override
   public Application create(String realm, Application application) {
-    if (!findById(realm, application.getName()).isPresent()) {
-      String appName = storeProvider.getWriterStore(realm).createApplication(application).getName();
+    try {
+      if (findById(realm, application.getName()).isEmpty()) {
+        String appName =
+            storeProvider.getWriterStore(realm).createApplication(application).getName();
+        sugoiEventPublisher.publishCustomEvent(
+            realm,
+            null,
+            SugoiEventTypeEnum.CREATE_APPLICATION,
+            Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION, application)));
+        return findById(realm, appName)
+            .orElseThrow(
+                () ->
+                    new ApplicationNotCreatedException(
+                        "Application " + appName + " doesn't exist in realm " + realm));
+      }
+      throw new ApplicationAlreadyExistException(
+          "Application " + application.getName() + " already exist in realm " + realm);
+    } catch (Exception e) {
       sugoiEventPublisher.publishCustomEvent(
           realm,
           null,
-          SugoiEventTypeEnum.CREATE_APPLICATION,
-          Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION, application)));
-      return findById(realm, appName)
-          .orElseThrow(
-              () ->
-                  new ApplicationNotCreatedException(
-                      "Application " + appName + " doesn't exist in realm " + realm));
+          SugoiEventTypeEnum.CREATE_APPLICATION_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.APPLICATION, application),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
+
+      if (e instanceof ApplicationAlreadyExistException) {
+        throw (ApplicationAlreadyExistException) e;
+      } else if (e instanceof ApplicationNotCreatedException) {
+        throw (ApplicationNotCreatedException) e;
+      } else {
+        throw e;
+      }
     }
-    throw new ApplicationAlreadyExistException(
-        "Application " + application.getName() + " already exist in realm " + realm);
   }
 
   @Override
   public void delete(String realm, String id) {
-    if (findById(realm, id).isPresent()) {
-      storeProvider.getWriterStore(realm).deleteApplication(id);
+    try {
+
+      if (findById(realm, id).isPresent()) {
+        storeProvider.getWriterStore(realm).deleteApplication(id);
+        sugoiEventPublisher.publishCustomEvent(
+            realm,
+            null,
+            SugoiEventTypeEnum.DELETE_APPLICATION,
+            Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION_ID, id)));
+      }
+      throw new ApplicationNotFoundException(
+          "Application " + id + " doesn't exist in realm " + realm);
+    } catch (Exception e) {
       sugoiEventPublisher.publishCustomEvent(
           realm,
           null,
-          SugoiEventTypeEnum.DELETE_APPLICATION,
-          Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION_ID, id)));
+          SugoiEventTypeEnum.DELETE_APPLICATION_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.APPLICATION_ID, id),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
+      if (e instanceof ApplicationNotFoundException) {
+        throw (ApplicationNotFoundException) e;
+      } else {
+        throw e;
+      }
     }
-    throw new ApplicationNotFoundException(
-        "Application " + id + " doesn't exist in realm " + realm);
   }
 
   @Override
   public void update(String realm, Application application) {
-    if (findById(realm, application.getName()).isPresent()) {
-      storeProvider.getWriterStore(realm).updateApplication(application);
+    try {
+
+      if (findById(realm, application.getName()).isPresent()) {
+        storeProvider.getWriterStore(realm).updateApplication(application);
+        sugoiEventPublisher.publishCustomEvent(
+            realm,
+            null,
+            SugoiEventTypeEnum.UPDATE_APPLICATION,
+            Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION, application)));
+      }
+      throw new ApplicationNotFoundException(
+          "Application " + application + " doesn't exist in realm " + realm);
+    } catch (Exception e) {
       sugoiEventPublisher.publishCustomEvent(
           realm,
           null,
-          SugoiEventTypeEnum.UPDATE_APPLICATION,
-          Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION, application)));
+          SugoiEventTypeEnum.UPDATE_APPLICATION_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.APPLICATION, application),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
+      if (e instanceof ApplicationNotFoundException) {
+        throw (ApplicationNotFoundException) e;
+      } else {
+        throw e;
+      }
     }
-    throw new ApplicationNotFoundException(
-        "Application " + application + " doesn't exist in realm " + realm);
   }
 
   @Override
   public Optional<Application> findById(String realm, String id) {
-    Application app = storeProvider.getReaderStore(realm).getApplication(id);
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        null,
-        SugoiEventTypeEnum.FIND_APPLICATION_BY_ID,
-        Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION_ID, id)));
-    return Optional.ofNullable(app);
+    try {
+
+      Application app = storeProvider.getReaderStore(realm).getApplication(id);
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          null,
+          SugoiEventTypeEnum.FIND_APPLICATION_BY_ID,
+          Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION_ID, id)));
+      return Optional.ofNullable(app);
+    } catch (Exception e) {
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          null,
+          SugoiEventTypeEnum.FIND_APPLICATION_BY_ID_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.APPLICATION_ID, id),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
+      return Optional.empty();
+    }
   }
 
   @Override
   public PageResult<Application> findByProperties(
       String realm, Application applicationFilter, PageableResult pageableResult) {
-    PageResult<Application> apps =
-        storeProvider
-            .getReaderStore(realm)
-            .searchApplications(applicationFilter, pageableResult, SearchType.AND.name());
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        null,
-        SugoiEventTypeEnum.FIND_APPLICATIONS,
-        Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION_FILTER, applicationFilter)));
-    return apps;
+    try {
+
+      PageResult<Application> apps =
+          storeProvider
+              .getReaderStore(realm)
+              .searchApplications(applicationFilter, pageableResult, SearchType.AND.name());
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          null,
+          SugoiEventTypeEnum.FIND_APPLICATIONS,
+          Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION_FILTER, applicationFilter)));
+      return apps;
+    } catch (Exception e) {
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          null,
+          SugoiEventTypeEnum.FIND_APPLICATIONS_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.APPLICATION_FILTER, applicationFilter),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
+      throw e;
+    }
   }
 }

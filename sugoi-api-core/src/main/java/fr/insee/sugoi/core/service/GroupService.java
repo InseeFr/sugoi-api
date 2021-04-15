@@ -42,7 +42,7 @@ public interface GroupService {
    * @param realm
    * @param appName
    * @param group
-   * @throws GroupNotFoundException if group does'nt exist in app
+   * @throws GroupNotFoundException if group doesn't exist in app
    */
   void update(String realm, String appName, Group group);
 
@@ -52,7 +52,7 @@ public interface GroupService {
    * @param realm
    * @param appName
    * @param id
-   * @throws GroupNotFoundException if group does'nt exist in app
+   * @throws GroupNotFoundException if group doesn't exist in app
    */
   void delete(String realm, String appName, String id);
 
@@ -85,8 +85,8 @@ public interface GroupService {
    * @param userId
    * @param appName
    * @param groupName
-   * @throws GroupNotFoundException if group does'nt exist in app
-   * @throws UserNotFoundException if user does'nt exist realm
+   * @throws GroupNotFoundException if group doesn't exist in app
+   * @throws UserNotFoundException if user doesn't exist realm
    */
   void addUserToGroup(String realm, String userId, String appName, String groupName);
 
@@ -97,8 +97,8 @@ public interface GroupService {
    * @param userId
    * @param appName
    * @param groupName
-   * @throws GroupNotFoundException if group does'nt exist in app
-   * @throws UserNotFoundException if user does'nt exist realm
+   * @throws GroupNotFoundException if group doesn't exist in app
+   * @throws UserNotFoundException if user doesn't exist realm
    */
   void deleteUserFromGroup(String realm, String userId, String appName, String groupName);
 }

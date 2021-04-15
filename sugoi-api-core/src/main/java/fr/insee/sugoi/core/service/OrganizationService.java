@@ -47,7 +47,7 @@ public interface OrganizationService {
   void delete(String realm, String storage, String id);
 
   /**
-   * Find an organization by it's name in the realm
+   * Find an organization by its name in the realm
    *
    * @param realm
    * @param storage
