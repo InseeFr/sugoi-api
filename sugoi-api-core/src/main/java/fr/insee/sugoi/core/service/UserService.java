@@ -57,7 +57,7 @@ public interface UserService {
   void delete(String realm, String storage, String id);
 
   /**
-   * Find a user by it's username in a realm
+   * Find a user by its username in a realm
    *
    * @param realm
    * @param storageName

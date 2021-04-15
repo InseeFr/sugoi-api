@@ -30,8 +30,8 @@ public interface CredentialsService {
    * @param userId
    * @param pcr
    * @param sendMode
-   * @throws RealmNotFoundException if realm does'nt exist
-   * @throws UserNotFoundException if user does'nt exist in realm
+   * @throws RealmNotFoundException if realm doesn't exist
+   * @throws UserNotFoundException if user doesn't exist in realm
    */
   void reinitPassword(
       String realm,
@@ -48,9 +48,9 @@ public interface CredentialsService {
    * @param userStorage
    * @param userId
    * @param pcr
-   * @throws RealmNotFoundException if realm does'nt exist
-   * @throws UserNotFoundException if user does'nt exist in realm
-   * @throws PasswordPolicyNotMetException if password does'nt meet the password policy set for the
+   * @throws RealmNotFoundException if realm doesn't exist
+   * @throws UserNotFoundException if user doesn't exist in realm
+   * @throws PasswordPolicyNotMetException if password doesn't meet the password policy set for the
    *     realm
    */
   void changePassword(String realm, String userStorage, String userId, PasswordChangeRequest pcr);
@@ -64,9 +64,9 @@ public interface CredentialsService {
    * @param userId
    * @param pcr
    * @param sendMode
-   * @throws RealmNotFoundException if realm does'nt exist
-   * @throws UserNotFoundException if user does'nt exist in realm
-   * @throws PasswordPolicyNotMetException if password does'nt meet the password policy set for the
+   * @throws RealmNotFoundException if realm doesn't exist
+   * @throws UserNotFoundException if user doesn't exist in realm
+   * @throws PasswordPolicyNotMetException if password doesn't meet the password policy set for the
    *     realm
    */
   void initPassword(
@@ -83,7 +83,7 @@ public interface CredentialsService {
    * @param userStorage
    * @param userName
    * @param password
-   * @throws UserNotFoundException if user does'nt exist in realm
+   * @throws UserNotFoundException if user doesn't exist in realm
    * @return true if provided credentials are valid for user else false
    */
   boolean validateCredential(String realm, String userStorage, String userName, String password);

@@ -41,14 +41,14 @@ public interface ConfigService {
   /**
    * [NotYetImplemented] Check if the realm exists (by name) and delete realm using the name
    *
-   * @throws RealmNotFoundException if realmName does'nt match with the name of an existing realm
+   * @throws RealmNotFoundException if realmName doesn't match with the name of an existing realm
    */
   void deleteRealm(String realmName);
 
   /**
    * [NotYetImplemented] Check if the realm exists and update realm
    *
-   * @throws RealmNotFoundException if realm does'nt match (by name) with an existing realm
+   * @throws RealmNotFoundException if realm doesn't match (by name) with an existing realm
    */
   void updateRealm(Realm realm);
 

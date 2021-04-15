@@ -50,40 +50,73 @@ public class OrganizationServiceImpl implements OrganizationService {
 
   @Override
   public Organization create(String realm, String storageName, Organization organization) {
-    if (!findById(realm, storageName, organization.getIdentifiant()).isPresent()) {
-      String orgName =
-          storeProvider
-              .getWriterStore(realm, storageName)
-              .createOrganization(organization)
-              .getIdentifiant();
+    try {
+      if (findById(realm, storageName, organization.getIdentifiant()).isEmpty()) {
+        String orgName =
+            storeProvider
+                .getWriterStore(realm, storageName)
+                .createOrganization(organization)
+                .getIdentifiant();
+        sugoiEventPublisher.publishCustomEvent(
+            realm,
+            storageName,
+            SugoiEventTypeEnum.CREATE_ORGANIZATION,
+            Map.ofEntries(Map.entry(EventKeysConfig.ORGANIZATION, organization)));
+        return findById(realm, storageName, orgName)
+            .orElseThrow(
+                () ->
+                    new OrganizationNotCreatedException(
+                        "Cannot find organization " + orgName + " in realm " + realm));
+      }
+      throw new OrganizationAlreadyExistException(
+          "Organization " + organization.getIdentifiant() + " already exist in realm " + realm);
+    } catch (Exception e) {
       sugoiEventPublisher.publishCustomEvent(
           realm,
           storageName,
-          SugoiEventTypeEnum.CREATE_ORGANIZATION,
-          Map.ofEntries(Map.entry(EventKeysConfig.ORGANIZATION, organization)));
-      return findById(realm, storageName, orgName)
-          .orElseThrow(
-              () ->
-                  new OrganizationNotCreatedException(
-                      "Cannot find organization " + orgName + " in realm " + realm));
+          SugoiEventTypeEnum.CREATE_ORGANIZATION_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.ORGANIZATION, organization),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
+      if (e instanceof OrganizationNotCreatedException) {
+        throw (OrganizationNotCreatedException) e;
+      } else if (e instanceof OrganizationAlreadyExistException) {
+        throw (OrganizationAlreadyExistException) e;
+      } else {
+        throw e;
+      }
     }
-    throw new OrganizationAlreadyExistException(
-        "Organization " + organization.getIdentifiant() + " already exist in realm " + realm);
   }
 
   @Override
   public void delete(String realm, String storageName, String id) {
-    findById(realm, storageName, id)
-        .orElseThrow(
-            () ->
-                new OrganizationNotFoundException(
-                    "Cannot find organization " + id + " in realm " + realm));
-    storeProvider.getWriterStore(realm, storageName).deleteOrganization(id);
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        storageName,
-        SugoiEventTypeEnum.DELETE_ORGANIZATION,
-        Map.ofEntries(Map.entry(EventKeysConfig.ORGANIZATION_ID, id)));
+    try {
+
+      findById(realm, storageName, id)
+          .orElseThrow(
+              () ->
+                  new OrganizationNotFoundException(
+                      "Cannot find organization " + id + " in realm " + realm));
+      storeProvider.getWriterStore(realm, storageName).deleteOrganization(id);
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          storageName,
+          SugoiEventTypeEnum.DELETE_ORGANIZATION,
+          Map.ofEntries(Map.entry(EventKeysConfig.ORGANIZATION_ID, id)));
+    } catch (Exception e) {
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          storageName,
+          SugoiEventTypeEnum.DELETE_ORGANIZATION_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.ORGANIZATION_ID, id),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
+      if (e instanceof OrganizationNotFoundException) {
+        throw (OrganizationNotFoundException) e;
+      } else {
+        throw e;
+      }
+    }
   }
 
   @Override
@@ -111,6 +144,13 @@ public class OrganizationServiceImpl implements OrganizationService {
       }
       return Optional.ofNullable(org);
     } catch (Exception e) {
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          storage,
+          SugoiEventTypeEnum.FIND_ORGANIZATION_BY_ID_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.ORGANIZATION_ID, id),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
       return Optional.empty();
     }
   }
@@ -148,12 +188,29 @@ public class OrganizationServiceImpl implements OrganizationService {
           result.getResults().addAll(temResult.getResults());
           result.setTotalElements(result.getResults().size());
           if (result.getTotalElements() >= result.getPageSize()) {
+            sugoiEventPublisher.publishCustomEvent(
+                realm,
+                storageName,
+                SugoiEventTypeEnum.FIND_ORGANIZATIONS,
+                Map.ofEntries(
+                    Map.entry(EventKeysConfig.ORGANIZATION_FILTER, organizationFilter),
+                    Map.entry(EventKeysConfig.PAGEABLE_RESULT, pageableResult),
+                    Map.entry(EventKeysConfig.TYPE_RECHERCHE, typeRecherche)));
             return result;
           }
           pageableResult.setSize(pageableResult.getSize() - result.getTotalElements());
         }
       }
     } catch (Exception e) {
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          storageName,
+          SugoiEventTypeEnum.FIND_ORGANIZATIONS_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.ORGANIZATION_FILTER, organizationFilter),
+              Map.entry(EventKeysConfig.PAGEABLE_RESULT, pageableResult),
+              Map.entry(EventKeysConfig.TYPE_RECHERCHE, typeRecherche),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
       throw new RuntimeException("Erreur lors de la récupération des organizations", e);
     }
     sugoiEventPublisher.publishCustomEvent(
@@ -169,19 +226,34 @@ public class OrganizationServiceImpl implements OrganizationService {
 
   @Override
   public void update(String realm, String storageName, Organization organization) {
-    findById(realm, storageName, organization.getIdentifiant())
-        .orElseThrow(
-            () ->
-                new OrganizationNotFoundException(
-                    "Cannot find organization "
-                        + organization.getIdentifiant()
-                        + " in realm "
-                        + realm));
-    storeProvider.getWriterStore(realm, storageName).updateOrganization(organization);
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        storageName,
-        SugoiEventTypeEnum.UPDATE_ORGANIZATION,
-        Map.ofEntries(Map.entry(EventKeysConfig.ORGANIZATION, organization)));
+    try {
+      findById(realm, storageName, organization.getIdentifiant())
+          .orElseThrow(
+              () ->
+                  new OrganizationNotFoundException(
+                      "Cannot find organization "
+                          + organization.getIdentifiant()
+                          + " in realm "
+                          + realm));
+      storeProvider.getWriterStore(realm, storageName).updateOrganization(organization);
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          storageName,
+          SugoiEventTypeEnum.UPDATE_ORGANIZATION,
+          Map.ofEntries(Map.entry(EventKeysConfig.ORGANIZATION, organization)));
+    } catch (Exception e) {
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          storageName,
+          SugoiEventTypeEnum.UPDATE_ORGANIZATION_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.ORGANIZATION, organization),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
+      if (e instanceof OrganizationNotFoundException) {
+        throw (OrganizationNotFoundException) e;
+      } else {
+        throw e;
+      }
+    }
   }
 }
