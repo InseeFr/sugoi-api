@@ -13,9 +13,18 @@
 */
 package fr.insee.sugoi.jms;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.jms.JmsException;
+
 import fr.insee.sugoi.core.model.PasswordChangeRequest;
+import fr.insee.sugoi.core.model.ProviderResponse;
+import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.model.SendMode;
 import fr.insee.sugoi.core.store.WriterStore;
+import fr.insee.sugoi.jms.model.BrokerResponse;
 import fr.insee.sugoi.jms.utils.JmsAtttributes;
 import fr.insee.sugoi.jms.utils.Method;
 import fr.insee.sugoi.jms.writer.JmsWriter;
@@ -25,32 +34,29 @@ import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class JmsWriterStore implements WriterStore {
 
   private JmsWriter jmsWriter;
 
   private String queueRequestName;
+  private String queueResponseName;
+  private String queueUrgentRequestName;
+  private String queueUrgentResponseName;
 
   private Realm realm;
 
   private UserStorage userStorage;
 
-  public JmsWriterStore(
-      JmsWriter jmsWriter,
-      String queueRequestName,
-      String queueResponseName,
-      String queueUrgentRequestName,
-      String queueUrgentResponseName,
-      Realm realm,
-      UserStorage userStorage) {
+  public JmsWriterStore(JmsWriter jmsWriter, String queueRequestName, String queueResponseName,
+      String queueUrgentRequestName, String queueUrgentResponseName, Realm realm, UserStorage userStorage) {
     this.realm = realm;
     this.userStorage = userStorage;
     this.jmsWriter = jmsWriter;
     this.queueRequestName = queueRequestName;
+    this.queueResponseName = queueResponseName;
+    this.queueUrgentRequestName = queueUrgentRequestName;
+    this.queueUrgentResponseName = queueUrgentResponseName;
   }
 
   @Override
@@ -68,18 +74,41 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.USER, user);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    jmsWriter.writeRequestInQueue(queueRequestName, Method.CREATE_USER, params);
+    String correlationId = jmsWriter.writeRequestInQueue(queueRequestName, Method.CREATE_USER, params);
+    // WARN : on n'a pas forcément l'entity id ici
     return user;
   }
 
   @Override
-  public User updateUser(User updatedUser) {
+  public ProviderResponse updateUser(User updatedUser) {
     Map<String, Object> params = new HashMap<>();
     params.put(JmsAtttributes.USER, updatedUser);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    jmsWriter.writeRequestInQueue(queueRequestName, Method.UPDATE_USER, params);
-    return updatedUser;
+    String correlationId = jmsWriter.writeRequestInQueue(queueRequestName, Method.UPDATE_USER, params);
+
+    ProviderResponse response = new ProviderResponse();
+    // IF asynchronous : status must be requested in another request
+    // response.setEntityId(updatedUser.getUsername());
+    // response.setRequestId(correlationId);
+    // response.setStatus(ProviderResponseStatus.REQUESTED);
+
+    // IF synchronous
+    try {
+      BrokerResponse br = jmsWriter.checkResponseInQueue(queueResponseName, correlationId);
+      response = br.getProviderResponse();
+      if (response.getStatus() == ProviderResponseStatus.OK) {
+        response.setStatus(ProviderResponseStatus.ACCEPTED);
+      } else if (response.getStatus() == ProviderResponseStatus.KO) {
+        throw response.getException();
+      }
+    } catch (JmsException e) {
+      response.setStatus(ProviderResponseStatus.REQUESTED);
+      response.setRequestId(correlationId);
+    }
+
+    return response;
+
   }
 
   @Override
@@ -166,8 +195,7 @@ public class JmsWriterStore implements WriterStore {
   }
 
   @Override
-  public void reinitPassword(
-      User user, String password, PasswordChangeRequest pcr, List<SendMode> sendModes) {
+  public void reinitPassword(User user, String password, PasswordChangeRequest pcr, List<SendMode> sendModes) {
     Map<String, Object> params = new HashMap<>();
     params.put(JmsAtttributes.USER, user);
     params.put(JmsAtttributes.REALM, realm.getName());
@@ -179,8 +207,7 @@ public class JmsWriterStore implements WriterStore {
   }
 
   @Override
-  public void initPassword(
-      User user, String password, PasswordChangeRequest pcr, List<SendMode> sendModes) {
+  public void initPassword(User user, String password, PasswordChangeRequest pcr, List<SendMode> sendModes) {
     Map<String, Object> params = new HashMap<>();
     params.put(JmsAtttributes.USER, user);
     params.put(JmsAtttributes.PASSWORD, password);
@@ -231,8 +258,7 @@ public class JmsWriterStore implements WriterStore {
   }
 
   @Override
-  public void changePassword(
-      User user, String oldPassword, String newPassword, PasswordChangeRequest pcr) {
+  public void changePassword(User user, String oldPassword, String newPassword, PasswordChangeRequest pcr) {
     Map<String, Object> params = new HashMap<>();
     params.put(JmsAtttributes.USER, user);
     params.put(JmsAtttributes.NEW_PASSWORD, newPassword);

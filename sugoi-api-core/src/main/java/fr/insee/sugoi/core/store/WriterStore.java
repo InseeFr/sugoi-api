@@ -14,6 +14,7 @@
 package fr.insee.sugoi.core.store;
 
 import fr.insee.sugoi.core.model.PasswordChangeRequest;
+import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.SendMode;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
@@ -21,14 +22,17 @@ import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import java.util.List;
 
-/** Writer stores are responsible for all operations modifying the underlying store. */
+/**
+ * Writer stores are responsible for all operations modifying the underlying
+ * store.
+ */
 public interface WriterStore {
 
   void deleteUser(String id);
 
   User createUser(User user);
 
-  User updateUser(User updatedUser);
+  ProviderResponse updateUser(User updatedUser);
 
   void deleteGroup(String appName, String groupName);
 
@@ -52,11 +56,9 @@ public interface WriterStore {
 
   void addUserToGroup(String appName, String groupName, String userId);
 
-  void reinitPassword(
-      User user, String generatedPassword, PasswordChangeRequest pcr, List<SendMode> sendModes);
+  void reinitPassword(User user, String generatedPassword, PasswordChangeRequest pcr, List<SendMode> sendModes);
 
-  void initPassword(
-      User user, String initPassword, PasswordChangeRequest pcr, List<SendMode> sendModes);
+  void initPassword(User user, String initPassword, PasswordChangeRequest pcr, List<SendMode> sendModes);
 
   void changePassword(User user, String oldPassword, String newPassword, PasswordChangeRequest pcr);
 

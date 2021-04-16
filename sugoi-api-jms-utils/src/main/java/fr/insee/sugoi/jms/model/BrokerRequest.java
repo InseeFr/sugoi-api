@@ -13,15 +13,17 @@
 */
 package fr.insee.sugoi.jms.model;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class BrokerRequest implements Serializable {
+import javax.jms.JMSException;
 
-  /** */
-  private static final long serialVersionUID = 1L;
+import org.apache.activemq.command.Message;
+import org.apache.activemq.command.Response;
+import org.apache.activemq.state.CommandVisitor;
+
+public class BrokerRequest extends Message {
 
   private UUID uuid;
   private String method;
@@ -63,12 +65,36 @@ public class BrokerRequest implements Serializable {
 
   @Override
   public String toString() {
-    return "{uuid: "
-        + uuid.toString()
-        + " method: "
-        + method
-        + " params: "
-        + methodParams.toString()
-        + "}";
+    return "{uuid: " + uuid.toString() + " method: " + method + " params: " + methodParams.toString() + "}";
+  }
+
+  @Override
+  public Response visit(CommandVisitor visitor) throws Exception {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public byte getDataStructureType() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Message copy() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void clearBody() throws JMSException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void storeContent() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void storeContentAndClear() {
+    throw new UnsupportedOperationException();
   }
 }

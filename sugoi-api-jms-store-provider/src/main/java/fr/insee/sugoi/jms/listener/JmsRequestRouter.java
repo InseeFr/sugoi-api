@@ -13,8 +13,17 @@
 */
 package fr.insee.sugoi.jms.listener;
 
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import fr.insee.sugoi.core.model.PasswordChangeRequest;
+import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.SendMode;
+import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.service.CredentialsService;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.core.service.OrganizationService;
@@ -28,39 +37,39 @@ import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
-import java.util.List;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class JmsRequestRouter {
 
   private static final Logger logger = LogManager.getLogger(JmsReceiverRequest.class);
 
-  @Autowired private StoreProvider storeProvider;
+  @Autowired
+  private StoreProvider storeProvider;
 
-  @Autowired private Converter converter;
+  @Autowired
+  private Converter converter;
 
-  @Autowired private UserService userService;
+  @Autowired
+  private UserService userService;
 
-  @Autowired private CredentialsService credentialsService;
+  @Autowired
+  private CredentialsService credentialsService;
 
-  @Autowired private GroupService groupService;
+  @Autowired
+  private GroupService groupService;
 
-  @Autowired private OrganizationService orgService;
+  @Autowired
+  private OrganizationService orgService;
 
-  public void exec(BrokerRequest request) throws Exception {
-    String realm = (String) request.getmethodParams().get("realm");
-    String userStorage = (String) request.getmethodParams().get("userStorage");
-    String operation = request.getMethod();
-    logger.info(
-        "Receive request from Broker for realm {} and userStorage {} operation:{}",
-        realm,
-        userStorage,
-        operation);
-    switch (operation) {
+  public ProviderResponse exec(BrokerRequest request) {
+    ProviderResponse response = new ProviderResponse();
+    try {
+      String realm = (String) request.getmethodParams().get("realm");
+      String userStorage = (String) request.getmethodParams().get("userStorage");
+      String operation = request.getMethod();
+      logger.info("Receive request from Broker for realm {} and userStorage {} operation:{}", realm, userStorage,
+          operation);
+      switch (operation) {
       case Method.DELETE_USER:
         String id = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
         userService.delete(realm, userStorage, id);
@@ -93,13 +102,13 @@ public class JmsRequestRouter {
         orgService.delete(realm, userStorage, name);
         break;
       case Method.CREATE_ORGANIZATION:
-        Organization organization =
-            converter.toOrganization(request.getmethodParams().get(JmsAtttributes.ORGANIZATION));
+        Organization organization = converter
+            .toOrganization(request.getmethodParams().get(JmsAtttributes.ORGANIZATION));
         orgService.create(realm, userStorage, organization);
         break;
       case Method.UPDATE_ORGANIZATION:
-        Organization updatedOrganization =
-            converter.toOrganization(request.getmethodParams().get(JmsAtttributes.ORGANIZATION));
+        Organization updatedOrganization = converter
+            .toOrganization(request.getmethodParams().get(JmsAtttributes.ORGANIZATION));
         orgService.update(realm, userStorage, updatedOrganization);
         break;
       case Method.DELETE_USER_FROM_GROUP:
@@ -116,20 +125,15 @@ public class JmsRequestRouter {
         break;
       case Method.REINIT_PASSWORD:
         user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
-        PasswordChangeRequest pcr =
-            converter.toPasswordChangeRequest(
-                request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
-        List<SendMode> sendMode =
-            converter.toSendModeList(request.getmethodParams().get(JmsAtttributes.SEND_MODE));
+        PasswordChangeRequest pcr = converter
+            .toPasswordChangeRequest(request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
+        List<SendMode> sendMode = converter.toSendModeList(request.getmethodParams().get(JmsAtttributes.SEND_MODE));
         credentialsService.reinitPassword(realm, userStorage, user.getUsername(), pcr, sendMode);
         break;
       case Method.INIT_PASSWORD:
         user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
-        pcr =
-            converter.toPasswordChangeRequest(
-                request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
-        sendMode =
-            converter.toSendModeList(request.getmethodParams().get(JmsAtttributes.SEND_MODE));
+        pcr = converter.toPasswordChangeRequest(request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
+        sendMode = converter.toSendModeList(request.getmethodParams().get(JmsAtttributes.SEND_MODE));
         credentialsService.initPassword(realm, userStorage, user.getUsername(), pcr, sendMode);
         break;
       case Method.CHANGE_PASSWORD_RESET_STATUS:
@@ -138,13 +142,12 @@ public class JmsRequestRouter {
         storeProvider.getWriterStore(realm, userStorage).changePasswordResetStatus(user, isReset);
         break;
       case Method.CREATE_APPLICATION:
-        Application application =
-            converter.toApplication(request.getmethodParams().get(JmsAtttributes.APPLICATION));
+        Application application = converter.toApplication(request.getmethodParams().get(JmsAtttributes.APPLICATION));
         storeProvider.getWriterStore(realm, userStorage).createApplication(application);
         break;
       case Method.UPDATE_APPLICATION:
-        Application updatedApplication =
-            converter.toApplication(request.getmethodParams().get(JmsAtttributes.APPLICATION));
+        Application updatedApplication = converter
+            .toApplication(request.getmethodParams().get(JmsAtttributes.APPLICATION));
         storeProvider.getWriterStore(realm, userStorage).updateApplication(updatedApplication);
         break;
       case Method.DELETE_APPLICATION:
@@ -153,13 +156,17 @@ public class JmsRequestRouter {
         break;
       case Method.CHANGE_PASSWORD:
         user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
-        pcr =
-            converter.toPasswordChangeRequest(
-                request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
+        pcr = converter.toPasswordChangeRequest(request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
         credentialsService.changePassword(realm, userStorage, user.getUsername(), pcr);
         break;
       default:
-        throw new Exception("Invalid Operation");
+        throw new RuntimeException("Invalid Operation");
+      }
+      response.setStatus(ProviderResponseStatus.OK);
+    } catch (RuntimeException e) {
+      response.setStatus(ProviderResponseStatus.KO);
+      response.setException(e);
     }
+    return response;
   }
 }

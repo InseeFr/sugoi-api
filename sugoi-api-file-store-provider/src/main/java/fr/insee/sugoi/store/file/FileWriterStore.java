@@ -16,7 +16,9 @@ package fr.insee.sugoi.store.file;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.core.model.PasswordChangeRequest;
+import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.SendMode;
+import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
@@ -26,6 +28,7 @@ import fr.insee.sugoi.store.file.configuration.FileKeysConfig;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.security.Provider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +38,8 @@ import org.springframework.core.io.ResourceLoader;
 
 public class FileWriterStore implements WriterStore {
 
-  @Autowired ResourceLoader resourceLoader;
+  @Autowired
+  ResourceLoader resourceLoader;
 
   private Map<String, String> config;
   private ObjectMapper mapper = new ObjectMapper();
@@ -54,10 +58,7 @@ public class FileWriterStore implements WriterStore {
   @Override
   public User createUser(User user) {
     try {
-      createResourceFile(
-          config.get(FileKeysConfig.USER_SOURCE),
-          user.getUsername(),
-          mapper.writeValueAsString(user));
+      createResourceFile(config.get(FileKeysConfig.USER_SOURCE), user.getUsername(), mapper.writeValueAsString(user));
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Error mapping user" + user.getUsername(), e);
     }
@@ -65,13 +66,14 @@ public class FileWriterStore implements WriterStore {
   }
 
   @Override
-  public User updateUser(User updatedUser) {
+  public ProviderResponse updateUser(User updatedUser) {
     try {
-      updateResourceFile(
-          config.get(FileKeysConfig.USER_SOURCE),
-          updatedUser.getUsername(),
+      updateResourceFile(config.get(FileKeysConfig.USER_SOURCE), updatedUser.getUsername(),
           mapper.writeValueAsString(updatedUser));
-      return updatedUser;
+      ProviderResponse response = new ProviderResponse();
+      response.setEntityId(updatedUser.getUsername());
+      response.setStatus(ProviderResponseStatus.OK);
+      return response;
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Error mapping user" + updatedUser.getUsername(), e);
     }
@@ -97,8 +99,7 @@ public class FileWriterStore implements WriterStore {
       if (application.getGroups() == null) {
         application.setGroups(new ArrayList<>());
       }
-      if (!application.getGroups().stream()
-          .anyMatch(group -> group.getName().equalsIgnoreCase(appGroup.getName()))) {
+      if (!application.getGroups().stream().anyMatch(group -> group.getName().equalsIgnoreCase(appGroup.getName()))) {
         appGroup.setAppName(appName);
         application.getGroups().add(appGroup);
         updateApplication(application);
@@ -112,42 +113,33 @@ public class FileWriterStore implements WriterStore {
   }
 
   /**
-   * To avoid unconsistency between users and groups, group is recreated without users and then
-   * users are added
+   * To avoid unconsistency between users and groups, group is recreated without
+   * users and then users are added
    */
   @Override
   public Group updateGroup(String appName, Group updatedGroup) {
     fileReaderStore.setResourceLoader(resourceLoader);
     Application application = fileReaderStore.getApplication(appName);
     if (application != null) {
-      if (application.getGroups() != null
-          && application.getGroups().stream()
-              .anyMatch(
-                  filterGroup -> filterGroup.getName().equalsIgnoreCase(updatedGroup.getName()))) {
+      if (application.getGroups() != null && application.getGroups().stream()
+          .anyMatch(filterGroup -> filterGroup.getName().equalsIgnoreCase(updatedGroup.getName()))) {
 
         // simplify group and keep users
-        List<User> usersToAdd =
-            updatedGroup.getUsers() != null
-                ? new ArrayList<>(updatedGroup.getUsers())
-                : new ArrayList<>();
+        List<User> usersToAdd = updatedGroup.getUsers() != null ? new ArrayList<>(updatedGroup.getUsers())
+            : new ArrayList<>();
         updatedGroup.setUsers(new ArrayList<>());
 
         // update group in application
-        application
-            .getGroups()
-            .removeIf(
-                filterGroup -> filterGroup.getName().equalsIgnoreCase(updatedGroup.getName()));
+        application.getGroups().removeIf(filterGroup -> filterGroup.getName().equalsIgnoreCase(updatedGroup.getName()));
         application.getGroups().add(updatedGroup);
         updateApplication(application);
 
         // add each users in updated group
-        usersToAdd.forEach(
-            user -> addUserToGroup(appName, updatedGroup.getName(), user.getUsername()));
+        usersToAdd.forEach(user -> addUserToGroup(appName, updatedGroup.getName(), user.getUsername()));
         updatedGroup.setUsers(usersToAdd);
         return updatedGroup;
       } else {
-        throw new RuntimeException(
-            "Group " + updatedGroup.getName() + " doesn't exist in " + appName);
+        throw new RuntimeException("Group " + updatedGroup.getName() + " doesn't exist in " + appName);
       }
     } else {
       throw new RuntimeException("Application " + appName + " doesn't exist");
@@ -162,9 +154,7 @@ public class FileWriterStore implements WriterStore {
   @Override
   public Organization createOrganization(Organization organization) {
     try {
-      createResourceFile(
-          config.get(FileKeysConfig.ORGANIZATION_SOURCE),
-          organization.getIdentifiant(),
+      createResourceFile(config.get(FileKeysConfig.ORGANIZATION_SOURCE), organization.getIdentifiant(),
           mapper.writeValueAsString(organization));
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Error mapping organization " + organization.getIdentifiant(), e);
@@ -175,42 +165,34 @@ public class FileWriterStore implements WriterStore {
   @Override
   public Organization updateOrganization(Organization updatedOrganization) {
     try {
-      updateResourceFile(
-          config.get(FileKeysConfig.ORGANIZATION_SOURCE),
-          updatedOrganization.getIdentifiant(),
+      updateResourceFile(config.get(FileKeysConfig.ORGANIZATION_SOURCE), updatedOrganization.getIdentifiant(),
           mapper.writeValueAsString(updatedOrganization));
       return updatedOrganization;
     } catch (JsonProcessingException e) {
-      throw new RuntimeException(
-          "Error mapping organization" + updatedOrganization.getIdentifiant(), e);
+      throw new RuntimeException("Error mapping organization" + updatedOrganization.getIdentifiant(), e);
     }
   }
 
-  /** Group membership information is removed from the user object and from the group object */
+  /**
+   * Group membership information is removed from the user object and from the
+   * group object
+   */
   @Override
   public void deleteUserFromGroup(String appName, String groupName, String userId) {
     fileReaderStore.setResourceLoader(resourceLoader);
     Application application = fileReaderStore.getApplication(appName);
     if (application != null) {
-      Group group =
-          application.getGroups() != null
-              ? application.getGroups().stream()
-                  .filter(filterGroup -> filterGroup.getName().equalsIgnoreCase(groupName))
-                  .findFirst()
-                  .orElse(null)
-              : null;
+      Group group = application.getGroups() != null
+          ? application.getGroups().stream().filter(filterGroup -> filterGroup.getName().equalsIgnoreCase(groupName))
+              .findFirst().orElse(null)
+          : null;
       if (group != null) {
         User user = fileReaderStore.getUser(userId);
-        user.getGroups()
-            .removeIf(
-                groupFilter ->
-                    groupFilter.getAppName().equalsIgnoreCase(appName)
-                        && groupFilter.getName().equalsIgnoreCase(groupName));
+        user.getGroups().removeIf(groupFilter -> groupFilter.getAppName().equalsIgnoreCase(appName)
+            && groupFilter.getName().equalsIgnoreCase(groupName));
         updateUser(user);
         if (group.getUsers() != null) {
-          group
-              .getUsers()
-              .removeIf(userFilter -> userFilter.getUsername().equalsIgnoreCase(userId));
+          group.getUsers().removeIf(userFilter -> userFilter.getUsername().equalsIgnoreCase(userId));
           updateApplication(application);
         }
       } else {
@@ -222,21 +204,18 @@ public class FileWriterStore implements WriterStore {
   }
 
   /**
-   * Group membership information is added on the user object and on the group object, user's groups
-   * are simplified groups to avoid information loop
+   * Group membership information is added on the user object and on the group
+   * object, user's groups are simplified groups to avoid information loop
    */
   @Override
   public void addUserToGroup(String appName, String groupName, String userId) {
     fileReaderStore.setResourceLoader(resourceLoader);
     Application application = fileReaderStore.getApplication(appName);
     if (application != null) {
-      Group group =
-          application.getGroups() != null
-              ? application.getGroups().stream()
-                  .filter(filterGroup -> filterGroup.getName().equalsIgnoreCase(groupName))
-                  .findFirst()
-                  .orElse(null)
-              : null;
+      Group group = application.getGroups() != null
+          ? application.getGroups().stream().filter(filterGroup -> filterGroup.getName().equalsIgnoreCase(groupName))
+              .findFirst().orElse(null)
+          : null;
       if (group != null) {
         User user = fileReaderStore.getUser(userId);
         if (user != null) {
@@ -262,14 +241,12 @@ public class FileWriterStore implements WriterStore {
   }
 
   @Override
-  public void reinitPassword(
-      User user, String generatedPassword, PasswordChangeRequest pcr, List<SendMode> sendMode) {
+  public void reinitPassword(User user, String generatedPassword, PasswordChangeRequest pcr, List<SendMode> sendMode) {
     throw new NotImplementedException();
   }
 
   @Override
-  public void initPassword(
-      User user, String password, PasswordChangeRequest pcr, List<SendMode> sendMode) {
+  public void initPassword(User user, String password, PasswordChangeRequest pcr, List<SendMode> sendMode) {
     throw new NotImplementedException();
   }
 
@@ -281,9 +258,7 @@ public class FileWriterStore implements WriterStore {
   @Override
   public Application createApplication(Application application) {
     try {
-      createResourceFile(
-          config.get(FileKeysConfig.APP_SOURCE),
-          application.getName(),
+      createResourceFile(config.get(FileKeysConfig.APP_SOURCE), application.getName(),
           mapper.writeValueAsString(application));
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Error mapping application " + application.getName(), e);
@@ -294,9 +269,7 @@ public class FileWriterStore implements WriterStore {
   @Override
   public Application updateApplication(Application updatedApplication) {
     try {
-      updateResourceFile(
-          config.get(FileKeysConfig.APP_SOURCE),
-          updatedApplication.getName(),
+      updateResourceFile(config.get(FileKeysConfig.APP_SOURCE), updatedApplication.getName(),
           mapper.writeValueAsString(updatedApplication));
       return updatedApplication;
     } catch (JsonProcessingException e) {
@@ -310,8 +283,7 @@ public class FileWriterStore implements WriterStore {
   }
 
   @Override
-  public void changePassword(
-      User user, String oldPassword, String newPassword, PasswordChangeRequest pcr) {
+  public void changePassword(User user, String oldPassword, String newPassword, PasswordChangeRequest pcr) {
     throw new NotImplementedException();
   }
 

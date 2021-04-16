@@ -15,12 +15,20 @@ package fr.insee.sugoi.jms.model;
 
 import java.util.UUID;
 
+import javax.jms.JMSException;
+
+import org.apache.activemq.command.Message;
+import org.apache.activemq.command.Response;
+import org.apache.activemq.state.CommandVisitor;
+
+import fr.insee.sugoi.core.model.ProviderResponse;
+
 /** BrokerResponse */
-public class BrokerResponse {
+public class BrokerResponse extends Message {
 
   private String comment;
 
-  private Object object;
+  private ProviderResponse providerResponse;
 
   private UUID uuid;
 
@@ -32,16 +40,16 @@ public class BrokerResponse {
     return comment;
   }
 
-  public Object getObject() {
-    return object;
-  }
-
   public void setComment(String comment) {
     this.comment = comment;
   }
 
-  public void setObject(Object object) {
-    this.object = object;
+  public ProviderResponse getProviderResponse() {
+    return providerResponse;
+  }
+
+  public void setProviderResponse(ProviderResponse providerResponse) {
+    this.providerResponse = providerResponse;
   }
 
   public UUID getUuid() {
@@ -55,5 +63,35 @@ public class BrokerResponse {
   @Override
   public String toString() {
     return "{uuid: " + uuid.toString() + " comment: " + comment + "}";
+  }
+
+  @Override
+  public Response visit(CommandVisitor visitor) throws Exception {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public byte getDataStructureType() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Message copy() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void clearBody() throws JMSException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void storeContent() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void storeContentAndClear() {
+    throw new UnsupportedOperationException();
   }
 }
