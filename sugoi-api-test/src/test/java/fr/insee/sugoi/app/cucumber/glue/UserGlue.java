@@ -17,6 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.app.cucumber.utils.PageResult;
 import fr.insee.sugoi.app.cucumber.utils.StepData;
@@ -51,23 +52,25 @@ public class UserGlue {
       stepData.setUsers(users.getResults());
       isUsers = true;
     } catch (JsonProcessingException e) {
-      isUsers = false;
+      e.printStackTrace();
     }
     assertThat("Data receive is a list of user", isUsers, is(true));
   }
 
-  @Then("the client expect to receive a user")
+  @Then("the client expect to receive an user")
   public void expect_to_receive_a_user() {
     Boolean isUser = false;
-    ObjectMapper mapper = new ObjectMapper();
+    ObjectMapper mapper =
+        new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     User user;
     try {
       user = mapper.readValue(stepData.getLatestResponse().getBody(), User.class);
       stepData.setUser(user);
       isUser = true;
     } catch (JsonProcessingException e) {
+      e.printStackTrace();
     }
-    assertThat("Data receive is a user", isUser, is(false));
+    assertThat("Data receive is a user", isUser, is(true));
   }
 
   @Then("the client expect the username of user to be {}")

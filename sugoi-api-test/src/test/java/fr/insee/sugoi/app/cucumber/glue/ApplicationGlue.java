@@ -20,18 +20,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.app.cucumber.utils.PageResult;
 import fr.insee.sugoi.app.cucumber.utils.StepData;
-import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.Application;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Then;
 
-public class OrganizationGlue {
-
+public class ApplicationGlue {
   private Scenario scenario;
 
   private StepData stepData;
 
-  public OrganizationGlue(StepData stepData) {
+  public ApplicationGlue(StepData stepData) {
     this.stepData = stepData;
   }
 
@@ -40,45 +39,44 @@ public class OrganizationGlue {
     this.scenario = scenario;
   }
 
-  @Then("the client expect to receive a list of organizations")
+  @Then("the client expect to receive a list of applications")
   @SuppressWarnings("unchecked")
-  public void expect_to_receive_a_list_of_organizations() {
-    Boolean isOrga = false;
+  public void expect_to_receive_a_list_of_applications() {
+    Boolean isApplis = false;
     ObjectMapper mapper = new ObjectMapper();
     try {
-      PageResult<Organization> organizations =
+      PageResult<Application> applications =
           mapper.readValue(stepData.getLatestResponse().getBody(), PageResult.class);
-      stepData.setOrganizations(organizations.getResults());
-      isOrga = true;
+      stepData.setApplications(applications.getResults());
+      isApplis = true;
     } catch (JsonProcessingException e) {
       e.printStackTrace();
     }
-    assertThat("Data receive is a list of organizations", isOrga, is(true));
+    assertThat("Data receive is a list of applications", isApplis, is(true));
   }
 
-  @Then("the client expect to receive an organization")
-  public void expect_to_receive_a_organization() {
-    Boolean isOrga = false;
+  @Then("the client expect to receive an application")
+  public void expect_to_receive_an_application() {
+    Boolean isAppli = false;
     ObjectMapper mapper = new ObjectMapper();
-    Organization organization;
+    Application application;
     try {
-      organization = mapper.readValue(stepData.getLatestResponse().getBody(), Organization.class);
-      stepData.setOrganization(organization);
-      isOrga = true;
+      application = mapper.readValue(stepData.getLatestResponse().getBody(), Application.class);
+      stepData.setApplication(application);
+      isAppli = true;
     } catch (JsonProcessingException e) {
       e.printStackTrace();
     }
-    assertThat("Data receive is an organization", isOrga, is(true));
+    assertThat("Data receive is an application", isAppli, is(true));
   }
 
-  @Then("the client expect the identifiant of organization to be {}")
-  public void expect_organizationname_of_organization_to_be(String organizationname) {
-    assertThat(stepData.getUser().getUsername(), is(organizationname));
+  @Then("the client expect the name of application to be {}")
+  public void expect_name_of_application_to_be(String appName) {
+    assertThat(stepData.getApplication().getName(), is(appName));
   }
 
-  @Then("the client want to see the organization list")
+  @Then("the client want to see the application list")
   public void show_list() {
-    scenario.log(stepData.getOrganizations().toString());
-    System.out.println(stepData.getOrganizations());
+    scenario.log(stepData.getApplication().toString());
   }
 }

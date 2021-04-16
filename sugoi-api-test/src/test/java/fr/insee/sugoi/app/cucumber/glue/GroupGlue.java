@@ -20,18 +20,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.app.cucumber.utils.PageResult;
 import fr.insee.sugoi.app.cucumber.utils.StepData;
-import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.Group;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Then;
+import java.util.stream.Collectors;
 
-public class OrganizationGlue {
-
+public class GroupGlue {
   private Scenario scenario;
 
   private StepData stepData;
 
-  public OrganizationGlue(StepData stepData) {
+  public GroupGlue(StepData stepData) {
     this.stepData = stepData;
   }
 
@@ -40,45 +40,49 @@ public class OrganizationGlue {
     this.scenario = scenario;
   }
 
-  @Then("the client expect to receive a list of organizations")
+  @Then("the client expect to receive a list of groups")
   @SuppressWarnings("unchecked")
-  public void expect_to_receive_a_list_of_organizations() {
-    Boolean isOrga = false;
+  public void expect_to_receive_a_list_of_groups() {
+    Boolean isGroups = false;
     ObjectMapper mapper = new ObjectMapper();
     try {
-      PageResult<Organization> organizations =
+      PageResult<Group> groups =
           mapper.readValue(stepData.getLatestResponse().getBody(), PageResult.class);
-      stepData.setOrganizations(organizations.getResults());
-      isOrga = true;
+      stepData.setGroups(groups.getResults());
+      isGroups = true;
     } catch (JsonProcessingException e) {
       e.printStackTrace();
     }
-    assertThat("Data receive is a list of organizations", isOrga, is(true));
+    assertThat("Data receive is a list of groups", isGroups, is(true));
   }
 
-  @Then("the client expect to receive an organization")
-  public void expect_to_receive_a_organization() {
-    Boolean isOrga = false;
+  @Then("the client expect to receive a group")
+  public void expect_to_receive_a_group() {
+    Boolean isGroup = false;
     ObjectMapper mapper = new ObjectMapper();
-    Organization organization;
+    Group group;
     try {
-      organization = mapper.readValue(stepData.getLatestResponse().getBody(), Organization.class);
-      stepData.setOrganization(organization);
-      isOrga = true;
+      group = mapper.readValue(stepData.getLatestResponse().getBody(), Group.class);
+      stepData.setGroup(group);
+      isGroup = true;
     } catch (JsonProcessingException e) {
       e.printStackTrace();
     }
-    assertThat("Data receive is an organization", isOrga, is(true));
+    assertThat("Data receive is a group", isGroup, is(true));
   }
 
-  @Then("the client expect the identifiant of organization to be {}")
-  public void expect_organizationname_of_organization_to_be(String organizationname) {
-    assertThat(stepData.getUser().getUsername(), is(organizationname));
+  @Then("the client expect the name of group to be {}")
+  public void expect_name_of_group_to_be(String groupName) {
+    assertThat("name of group is", stepData.getGroup().getName(), is(groupName));
   }
 
-  @Then("the client want to see the organization list")
-  public void show_list() {
-    scenario.log(stepData.getOrganizations().toString());
-    System.out.println(stepData.getOrganizations());
+  @Then("the client expect the group contains user {}")
+  public void expect_group_contains(String user) {
+    Boolean in =
+        stepData.getGroup().getUsers().stream()
+            .map(u -> u.getUsername().toUpperCase())
+            .collect(Collectors.toList())
+            .contains(user);
+    assertThat("the client expect the group contains user " + user, in, is(true));
   }
 }

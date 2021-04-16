@@ -12,7 +12,7 @@ Feature: Credential scenario
                 "newPassword": "Changeme1%0000000000"
             }
             """
-        And body received
+        And show body received
         Then the client receives status code 204
 
     Scenario: Init password already init
@@ -23,7 +23,7 @@ Feature: Credential scenario
                 "newPassword": "Changeme1%000000000000000"
             }
             """
-        And body received
+        And show body received
         Then the client receives status code 204
 
     Scenario: Change password with bad oldPassword
@@ -35,7 +35,7 @@ Feature: Credential scenario
                 "newPassword": "Changeme1%000000000000001"
             }
             """
-        And body received
+        And show body received
         Then the client receives status code 401
 
     Scenario: Change password
@@ -47,7 +47,7 @@ Feature: Credential scenario
                 "newPassword": "Changeme1%000000000000001"
             }
             """
-        And body received
+        And show body received
         Then the client receives status code 204
 
     Scenario: ResetPassword
@@ -56,5 +56,5 @@ Feature: Credential scenario
             """
             {}
             """
-        And body received
+        And show body received
         Then the client receives status code 204

@@ -259,7 +259,9 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
               new Modification(ModificationType.DELETE, "uniqueMember", getUserDN(userId)));
       ldapPoolConnection.modify(mr);
     } catch (LDAPException e) {
-      throw new RuntimeException("Failed to delete user from group " + groupName, e);
+      if (!e.getResultCode().equals(ResultCode.NO_SUCH_ATTRIBUTE)) {
+        throw new RuntimeException("Failed to add user to group " + groupName, e);
+      }
     }
   }
 
@@ -272,7 +274,9 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
               new Modification(ModificationType.ADD, "uniqueMember", getUserDN(userId)));
       ldapPoolConnection.modify(mr);
     } catch (LDAPException e) {
-      throw new RuntimeException("Failed to add user to group " + groupName, e);
+      if (!e.getResultCode().equals(ResultCode.ATTRIBUTE_OR_VALUE_EXISTS)) {
+        throw new RuntimeException("Failed to remove user to group " + groupName, e);
+      }
     }
   }
 
