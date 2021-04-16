@@ -59,8 +59,8 @@ public class GroupServiceImpl implements GroupService {
             .orElseThrow(
                 () ->
                     new GroupNotCreatedException(
-                        "Cannot find group "
-                            + group
+                        "Cannot create group "
+                            + group.getName()
                             + " in app "
                             + appName
                             + " in realm "

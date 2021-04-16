@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(
                 () ->
                     new UserNotCreatedException(
-                        "Cannot find user " + userName + " in realm " + realm));
+                        "Cannot create user " + userName + " in realm " + realm));
       }
       throw new UserAlreadyExistException(
           "User " + user.getUsername() + " already exist in realm " + realm);

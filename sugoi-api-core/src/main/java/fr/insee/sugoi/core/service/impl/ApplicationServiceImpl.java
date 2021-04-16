@@ -51,7 +51,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             .orElseThrow(
                 () ->
                     new ApplicationNotCreatedException(
-                        "Application " + appName + " doesn't exist in realm " + realm));
+                        "Cannot create application " + appName + " in realm " + realm));
       }
       throw new ApplicationAlreadyExistException(
           "Application " + application.getName() + " already exist in realm " + realm);
@@ -77,17 +77,18 @@ public class ApplicationServiceImpl implements ApplicationService {
   @Override
   public void delete(String realm, String id) {
     try {
+      findById(realm, id)
+          .orElseThrow(
+              () ->
+                  new ApplicationNotFoundException(
+                      "Application " + id + " doesn't exist in realm " + realm));
+      storeProvider.getWriterStore(realm).deleteApplication(id);
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          null,
+          SugoiEventTypeEnum.DELETE_APPLICATION,
+          Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION_ID, id)));
 
-      if (findById(realm, id).isPresent()) {
-        storeProvider.getWriterStore(realm).deleteApplication(id);
-        sugoiEventPublisher.publishCustomEvent(
-            realm,
-            null,
-            SugoiEventTypeEnum.DELETE_APPLICATION,
-            Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION_ID, id)));
-      }
-      throw new ApplicationNotFoundException(
-          "Application " + id + " doesn't exist in realm " + realm);
     } catch (Exception e) {
       sugoiEventPublisher.publishCustomEvent(
           realm,
@@ -107,17 +108,17 @@ public class ApplicationServiceImpl implements ApplicationService {
   @Override
   public void update(String realm, Application application) {
     try {
-
-      if (findById(realm, application.getName()).isPresent()) {
-        storeProvider.getWriterStore(realm).updateApplication(application);
-        sugoiEventPublisher.publishCustomEvent(
-            realm,
-            null,
-            SugoiEventTypeEnum.UPDATE_APPLICATION,
-            Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION, application)));
-      }
-      throw new ApplicationNotFoundException(
-          "Application " + application + " doesn't exist in realm " + realm);
+      findById(realm, application.getName())
+          .orElseThrow(
+              () ->
+                  new ApplicationNotFoundException(
+                      "Application " + application.getName() + " doesn't exist in realm " + realm));
+      storeProvider.getWriterStore(realm).updateApplication(application);
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          null,
+          SugoiEventTypeEnum.UPDATE_APPLICATION,
+          Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION, application)));
     } catch (Exception e) {
       sugoiEventPublisher.publishCustomEvent(
           realm,

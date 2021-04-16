@@ -66,7 +66,7 @@ public class OrganizationServiceImpl implements OrganizationService {
             .orElseThrow(
                 () ->
                     new OrganizationNotCreatedException(
-                        "Cannot find organization " + orgName + " in realm " + realm));
+                        "Cannot create organization " + orgName + " in realm " + realm));
       }
       throw new OrganizationAlreadyExistException(
           "Organization " + organization.getIdentifiant() + " already exist in realm " + realm);
