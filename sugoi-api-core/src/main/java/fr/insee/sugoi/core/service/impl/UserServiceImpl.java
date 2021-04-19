@@ -24,12 +24,15 @@ import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.realm.RealmProvider;
+import fr.insee.sugoi.core.seealso.SeeAlsoService;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
@@ -45,6 +48,9 @@ public class UserServiceImpl implements UserService {
   @Autowired private RealmProvider realmProvider;
 
   @Autowired private SugoiEventPublisher sugoiEventPublisher;
+
+  @Autowired(required = false)
+  private SeeAlsoService seeAlsoService;
 
   protected static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
 
@@ -151,13 +157,13 @@ public class UserServiceImpl implements UserService {
     User user = null;
     try {
       if (id != null) {
+        Realm realm = realmProvider.load(realmName);
         if (storage != null) {
           user = storeProvider.getReaderStore(realmName, storage).getUser(id);
           user.addMetadatas(GlobalKeysConfig.REALM, realmName.toLowerCase());
           user.addMetadatas(GlobalKeysConfig.USERSTORAGE, storage.toLowerCase());
         } else {
-          Realm r = realmProvider.load(realmName);
-          for (UserStorage us : r.getUserStorages()) {
+          for (UserStorage us : realm.getUserStorages()) {
             try {
               user = storeProvider.getReaderStore(realmName, us.getName()).getUser(id);
               user.addMetadatas(GlobalKeysConfig.REALM, realmName);
@@ -174,6 +180,28 @@ public class UserServiceImpl implements UserService {
                       + " error "
                       + e.getMessage());
             }
+          }
+        }
+        if (seeAlsoService != null
+            && realm.getProperties().containsKey(GlobalKeysConfig.SEEALSO_ATTRIBUTES)) {
+          String[] seeAlsosAttributes =
+              realm
+                  .getProperties()
+                  .get(GlobalKeysConfig.SEEALSO_ATTRIBUTES)
+                  .replace(" ", "")
+                  .split(",");
+          List<String> seeAlsos = new ArrayList<>();
+          for (String seeAlsoAttribute : seeAlsosAttributes) {
+            Object seeAlsoAttributeValue = user.getAttributes().get(seeAlsoAttribute);
+            if (seeAlsoAttributeValue instanceof String) {
+              seeAlsos.add((String) seeAlsoAttributeValue);
+            } else if (seeAlsoAttributeValue instanceof List) {
+              ((List<?>) seeAlsoAttributeValue)
+                  .forEach(seeAlso -> seeAlsos.add(seeAlso.toString()));
+            }
+          }
+          for (String seeAlso : seeAlsos) {
+            seeAlsoService.decorateWithSeeAlso(user, seeAlso);
           }
         }
         sugoiEventPublisher.publishCustomEvent(

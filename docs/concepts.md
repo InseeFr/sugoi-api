@@ -160,3 +160,43 @@ Simple http rest services.
 #### JMS Services
 
 Listen to message on a JMS queue, made to work well with JMS write provider
+
+### SeeAlso
+
+Sometimes user informations that are not stored in the sugoi realm are needed. It can be for instance a logo or an information on another directory. If these informations are free to read it is possible to use the SeeAlso functionnality to fetch those informations.
+
+The SeeAlso functionnality will add attributes to user attributes when reading a seealso link. SeeAlso links can be described as :
+
+url|suboject|attributetoset
+
+with url being the url of the resource to fetch, suboject an instruction to take a subobject of the resource and attributetoset the name of the new attribute which will be added to the user attributes.
+Depending on the protocol defined in the url a different parser will be used. The parsers are pluggable.
+
+The resource fetch should be a string or a list of strings. If the resouce can't be retrieved or parsed the attribute will be created but set to null.
+
+To enable the SeeAlso functionality a realm property as to be set : seealso_attributes (see [realm-configuration](realm-configuration.md) for more details). It will enable looking for SeeAlso links in the named attribute. A good default for this property is seealso_attributes: SeeAlso . It is now possible to add SeeAlso links in the SeeAlso attribute of the users. All the links in this attribute will be parse as SeeAlso links.
+
+Two parsers exist for now but other can be added (see a future Development documentation). They have to be added as a module to the application.
+
+#### SeeAlso http+json
+
+If the protocol is http or https then the resource will be considered to be a valid json data.
+
+The url must be a valid http url to a webservice openly readable.
+The object describe how to parse the json with node separated by dots and array values chosen with []
+
+A valid seealso would be :
+
+`http://example.org/toto|items[3].name|http_string`
+
+The attribute http_string of the user would be set to the value of the name of the third item of the resource at `http://example.org/toto`
+
+#### SeeAlso ldap
+
+If the protocol is ldap, url is expected to be the value of a ldap url without attribute. The ldap server should be openly readable. The suboject should be the name of the attribute we want to get from the ldap resource.
+
+A valid seealso would be :
+
+ldap://localhost:10389/uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr|cn|ldap_string
+
+The user attribute ldap_string would be set to the cn of the testc resource on localhost:10389 ldap server.

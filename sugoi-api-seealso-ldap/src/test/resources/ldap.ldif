@@ -1,0 +1,37 @@
+dn: o=insee,c=fr
+objectclass: top
+objectclass: organization
+o: insee
+
+dn: ou=clients_domaine1,o=insee,c=fr
+description: domaine de gestion des clients de diffusion sirene
+objectclass: top
+objectclass: organizationalUnit
+ou: clients_domaine1
+
+dn: ou=contacts,ou=clients_domaine1,o=insee,c=fr
+description: contact du domaine de gestion des clients diffusion sirene
+objectclass: top
+objectclass: organizationalUnit
+ou: contacts
+
+dn: uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+inseeOrganisationDN: uid=testo,ou=organisations,ou=clients_domaine1,o=insee,c=fr
+userPassword: testc
+mail: test@test.fr
+uid: testc
+inseeAdressePostaleDN: l=testc,ou=adresses,ou=clients_domaine1,o=insee,c=fr
+telephoneNumber: 1209883940
+cn: Testy Test
+inseegroupedefaut: prop_role_applitest
+inseegroupedefaut: role2_applitest
+inseegroupedefaut: prop1_TestIgnoreCase_applitest
+inseegroupedefaut: Prop2_TestIgnoreCase_applitest
+memberOf: cn=Utilisateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
+inseeMailCorrespondant: other@insee.fr

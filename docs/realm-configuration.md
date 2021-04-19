@@ -36,8 +36,14 @@ These configurations are used for all type of Store Provider.
 | name | "myRealm" | no | | Name which identifies the realm. |
 | url | "example.org", "localhost" | no | | Url of the resource server. |
 | appSource | "ou=Applications,o=insee,c=fr", "/realm1/applications" | yes | | The location of the applications to read on the server. If appSource is not set then applications cannot be managed. |
-| userStorages | See next section | no, the realm should have at least one userstorage | | A list of all userstorages the realm is made of. |
-| properties | | yes | {} | A list of other options which can be specific to the type of Store Provider. This list is not being used for now. |
+| userStorages | See UserStorage section | no, the realm should have at least one userstorage | | A list of all userstorages the realm is made of. |
+| properties | See next section | yes | {} | A list of other options which can be specific to the type of Store Provider. |
+
+### Realm configuration properties
+
+| Field name | Example | Optional | Default | Description |
+| --------------- | :---------: | ------------: | ------: | ----- |
+| seealso_attributes | "seeAlso, otherSeeAlso" | no, set to enable seealso functionnality | | All values in the corresponding attributes will be parsed as [SeeAlso](concepts.md#SeeAlso) string to add a new attributes to a user. It can be a single attribute name or a list of attribute names separated by a comma. |
 
 ## UserStorage configuration
 

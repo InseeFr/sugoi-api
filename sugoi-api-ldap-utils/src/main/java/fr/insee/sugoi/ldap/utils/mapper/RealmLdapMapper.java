@@ -16,6 +16,7 @@ package fr.insee.sugoi.ldap.utils.mapper;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import com.unboundid.ldap.sdk.SearchResultEntry;
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.model.Realm;
 import java.util.ArrayList;
@@ -35,9 +36,10 @@ public class RealmLdapMapper {
       if (property.length == 2) {
         if (property[0].equalsIgnoreCase("ldapUrl")) {
           realm.setUrl(property[1]);
-        }
-        if (property[0].equalsIgnoreCase("branchesApplicativesPossibles")) {
+        } else if (property[0].equalsIgnoreCase("branchesApplicativesPossibles")) {
           realm.setAppSource(property[1]);
+        } else if (property[0].equalsIgnoreCase("seealso_attributes")) {
+          realm.addProperty(GlobalKeysConfig.SEEALSO_ATTRIBUTES, property[1]);
         }
       }
     }
@@ -57,6 +59,13 @@ public class RealmLdapMapper {
               "inseepropriete",
               String.format("branchesApplicativesPossibles$%s", realm.getAppSource())));
     }
+    realm
+        .getProperties()
+        .forEach(
+            (propertyName, propertyValue) ->
+                attributes.add(
+                    new Attribute(
+                        "inseepropriete", String.format("%s$%s", propertyName, propertyValue))));
     return attributes;
   }
 
