@@ -143,6 +143,7 @@ inseepropriete: habilitationsPossibles$propriete_role_appli
 inseepropriete: branchesApplicativesPossibles$ou=Applications,o=insee,c=fr
 inseepropriete: groupSourcePattern$ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr
 inseepropriete: groupFilterPattern$(cn={group}_{appliname})
+inseepropriete: seealso_attributes$seeAlsos,common_name
 description: domaine1
 
 dn: cn=Utilisateurs_contacts_domaine1_WebServicesLdap,ou=WebServicesLdap_Obje
@@ -212,6 +213,7 @@ inseegroupedefaut: Prop2_TestIgnoreCase_applitest
 inseeRoleApplicatif: toto
 inseeRoleApplicatif: tata
 memberOf: cn=Utilisateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
+seeAlso: ldap://localhost:10389/uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr|cn|ldap_see_also_example
 
 dn: uid=testo,ou=organisations,ou=clients_domaine1,o=insee,c=fr
 objectClass: top

@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-;
-
 @JsonInclude(Include.NON_NULL)
 public class User {
 
@@ -35,8 +33,8 @@ public class User {
   private Organization organization;
 
   private List<Group> groups = new ArrayList<>();
-
   private List<Habilitation> habilitations = new ArrayList<>();
+
   private Map<String, String> address = new HashMap<>();
   private Map<String, Object> metadatas = new HashMap<>();
   private Map<String, Object> attributes = new HashMap<>();

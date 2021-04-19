@@ -287,7 +287,21 @@
 				<artifactId>freemarker</artifactId>
 				<version>${freemarker.version}</version>
 			</dependency>
-
+		   	<dependency>
+			    <groupId>fr.insee.sugoi</groupId>
+		        <artifactId>sugoi-api-seealso-http</artifactId>
+		        <version>${project.version}</version>
+			</dependency>
+			<dependency>
+		        <groupId>fr.insee.sugoi</groupId>
+		        <artifactId>sugoi-api-seealso-ldap</artifactId>
+		        <version>${project.version}</version>
+			</dependency>
+			<dependency>
+		        <groupId>fr.insee.sugoi</groupId>
+		        <artifactId>sugoi-api-seealso</artifactId>
+		        <version>${project.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -309,8 +323,9 @@
 		<module>sugoi-api-ldap-utils</module>
 		<module>sugoi-api-jms-store-provider</module>
 		<module>sugoi-api-jms-utils</module>
+        <module>sugoi-api-seealso-http</module>
+        <module>sugoi-api-seealso-ldap</module>
 		<module>sugoi-api-test</module>
-
 	</modules>
 	<build>
 		<plugins>

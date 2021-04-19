@@ -151,6 +151,16 @@
       <artifactId>jansi</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>fr.insee.sugoi</groupId>
+      <artifactId>sugoi-api-seealso-http</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>fr.insee.sugoi</groupId>
+      <artifactId>sugoi-api-seealso-ldap</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>

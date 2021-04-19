@@ -23,4 +23,6 @@ public class GlobalKeysConfig {
   public static final String APP_SOURCE = "app_source";
   public static final String ORGANIZATION_SOURCE = "organization_source";
   public static final String ADDRESS_SOURCE = "address_source";
+
+  public static final String SEEALSO_ATTRIBUTES = "seealso_attributes";
 }

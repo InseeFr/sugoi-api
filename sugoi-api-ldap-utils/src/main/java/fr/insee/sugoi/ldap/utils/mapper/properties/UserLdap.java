@@ -140,4 +140,8 @@ public class UserLdap {
   @AttributeLdapName("inseeMailCorrespondant")
   @MapToMapElement(name = "attributes", key = "additionalMail")
   private String additionalMail;
+
+  @AttributeLdapName("seeAlso")
+  @MapToMapElement(name = "attributes", key = "seeAlsos", type = ModelType.LIST_STRING)
+  private String seeAlsos;
 }
