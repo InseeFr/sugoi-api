@@ -13,10 +13,12 @@
 */
 package fr.insee.sugoi.services.controller;
 
+import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.services.view.GroupView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -144,22 +146,23 @@ public class GroupController {
       @Parameter(description = "Name of application where to add group", required = true)
           @PathVariable(value = "application", required = true)
           String applicationName,
-      @Parameter(description = "Group to create", required = true) @RequestBody Group group) {
+      @Parameter(description = "Group to create", required = true) @RequestBody
+          GroupView groupView) {
 
-    if (groupService.findById(realm, applicationName, group.getName()) == null) {
-      groupService.create(realm, applicationName, group);
+    Group group = new Group();
+    group.setAppName(groupView.getAppName());
+    group.setDescription(groupView.getDescription());
+    group.setName(groupView.getName());
 
-      URI location =
-          ServletUriComponentsBuilder.fromCurrentRequest()
-              .path("/" + group.getName())
-              .build()
-              .toUri();
+    Group groupCreated = groupService.create(realm, applicationName, group);
 
-      return ResponseEntity.created(location)
-          .body(groupService.findById(realm, applicationName, group.getName()));
-    } else {
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
-    }
+    URI location =
+        ServletUriComponentsBuilder.fromCurrentRequest()
+            .path("/" + group.getName())
+            .build()
+            .toUri();
+
+    return ResponseEntity.created(location).body(groupCreated);
   }
 
   @PutMapping(
@@ -198,22 +201,24 @@ public class GroupController {
       @Parameter(description = "Name of application which contains group", required = true)
           @PathVariable("application")
           String applicationName,
-      @Parameter(description = "Group to update", required = true) @RequestBody Group group) {
+      @Parameter(description = "Group to update", required = true) @RequestBody
+          GroupView groupView) {
 
-    if (!group.getName().equalsIgnoreCase(id)) {
+    if (!groupView.getName().equalsIgnoreCase(id)) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
-    if (groupService.findById(realm, applicationName, id) != null) {
-      groupService.update(realm, applicationName, group);
+    Group group = new Group();
+    group.setAppName(groupView.getAppName());
+    group.setDescription(groupView.getDescription());
+    group.setName(groupView.getName());
 
-      URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
-      return ResponseEntity.status(HttpStatus.OK)
-          .header(HttpHeaders.LOCATION, location.toString())
-          .body(groupService.findById(realm, applicationName, id));
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    groupService.update(realm, applicationName, group);
+
+    URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+    return ResponseEntity.status(HttpStatus.OK)
+        .header(HttpHeaders.LOCATION, location.toString())
+        .body(groupService.findById(realm, applicationName, id));
   }
 
   @DeleteMapping(
@@ -248,12 +253,8 @@ public class GroupController {
       @Parameter(description = "Group's id to delete", required = true) @PathVariable("id")
           String id) {
 
-    if (groupService.findById(realm, applicationName, id) != null) {
-      groupService.delete(realm, applicationName, id);
-      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    groupService.delete(realm, applicationName, id);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   @GetMapping(
@@ -287,12 +288,20 @@ public class GroupController {
           String applicationName,
       @Parameter(description = "Group's name to search", required = true) @PathVariable("groupname")
           String id) {
-    Group group = groupService.findById(realm, applicationName, id);
-    if (group != null) {
-      return ResponseEntity.status(HttpStatus.OK).body(group);
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+
+    Group group =
+        groupService
+            .findById(realm, applicationName, id)
+            .orElseThrow(
+                () ->
+                    new GroupNotFoundException(
+                        "Cannot find group "
+                            + id
+                            + " in app "
+                            + applicationName
+                            + " in realm "
+                            + realm));
+    return ResponseEntity.status(HttpStatus.OK).body(group);
   }
 
   @PutMapping(
@@ -306,16 +315,11 @@ public class GroupController {
       @PathVariable("user_id") String userId,
       @PathVariable("application") String applicationName) {
 
-    if (groupService.findById(realm, applicationName, groupId) != null) {
-
-      groupService.addUserToGroup(realm, userId, applicationName, groupId);
-      URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
-      return ResponseEntity.status(HttpStatus.OK)
-          .header(HttpHeaders.LOCATION, location.toString())
-          .build();
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    groupService.addUserToGroup(realm, userId, applicationName, groupId);
+    URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+    return ResponseEntity.status(HttpStatus.OK)
+        .header(HttpHeaders.LOCATION, location.toString())
+        .build();
   }
 
   @DeleteMapping(
@@ -329,15 +333,10 @@ public class GroupController {
       @PathVariable("user_id") String userId,
       @PathVariable("application") String applicationName) {
 
-    if (groupService.findById(realm, applicationName, groupId) != null) {
-
-      groupService.deleteUserFromGroup(realm, userId, applicationName, groupId);
-      URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
-      return ResponseEntity.status(HttpStatus.OK)
-          .header(HttpHeaders.LOCATION, location.toString())
-          .build();
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    groupService.deleteUserFromGroup(realm, userId, applicationName, groupId);
+    URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+    return ResponseEntity.status(HttpStatus.OK)
+        .header(HttpHeaders.LOCATION, location.toString())
+        .build();
   }
 }

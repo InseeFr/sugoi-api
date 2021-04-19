@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.services.controller;
 
+import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.service.ApplicationService;
@@ -89,6 +90,7 @@ public class ApplicationController {
       @Parameter(description = "Name of the owner of the app searched", required = false)
           @RequestParam(value = "owner", required = false)
           String owner) {
+
     Application applicationFilter = new Application();
     applicationFilter.setName(name);
     applicationFilter.setOwner(owner);
@@ -142,20 +144,13 @@ public class ApplicationController {
       @Parameter(description = "Application to create", required = true) @RequestBody
           Application application) {
 
-    if (applicationService.findById(realm, application.getName()) == null) {
-      applicationService.create(realm, application);
-
-      URI location =
-          ServletUriComponentsBuilder.fromCurrentRequest()
-              .path("/" + application.getName())
-              .build()
-              .toUri();
-
-      return ResponseEntity.created(location)
-          .body(applicationService.findById(realm, application.getName()));
-    } else {
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
-    }
+    Application applicationCreated = applicationService.create(realm, application);
+    URI location =
+        ServletUriComponentsBuilder.fromCurrentRequest()
+            .path("/" + applicationCreated.getName())
+            .build()
+            .toUri();
+    return ResponseEntity.created(location).body(applicationCreated);
   }
 
   @PutMapping(
@@ -195,17 +190,13 @@ public class ApplicationController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
-    if (applicationService.findById(realm, applicationName) != null) {
-      applicationService.update(realm, application);
+    applicationService.update(realm, application);
 
-      URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+    URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
 
-      return ResponseEntity.status(HttpStatus.OK)
-          .header(HttpHeaders.LOCATION, location.toString())
-          .body(applicationService.findById(realm, applicationName));
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    return ResponseEntity.status(HttpStatus.OK)
+        .header(HttpHeaders.LOCATION, location.toString())
+        .body(applicationService.findById(realm, applicationName).get());
   }
 
   @DeleteMapping(
@@ -232,13 +223,8 @@ public class ApplicationController {
           String realm,
       @Parameter(description = "Application's id to delete", required = false) @PathVariable("id")
           String id) {
-
-    if (applicationService.findById(realm, id) != null) {
-      applicationService.delete(realm, id);
-      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    applicationService.delete(realm, id);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   @GetMapping(
@@ -269,11 +255,13 @@ public class ApplicationController {
           String realm,
       @Parameter(description = "Name of the app searched", required = true) @PathVariable("name")
           String name) {
-    Application application = applicationService.findById(realm, name);
-    if (application != null) {
-      return ResponseEntity.status(HttpStatus.OK).body(application);
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    Application application =
+        applicationService
+            .findById(realm, name)
+            .orElseThrow(
+                () ->
+                    new ApplicationNotFoundException(
+                        "Application " + name + " not found in realm " + realm));
+    return ResponseEntity.status(HttpStatus.OK).body(application);
   }
 }

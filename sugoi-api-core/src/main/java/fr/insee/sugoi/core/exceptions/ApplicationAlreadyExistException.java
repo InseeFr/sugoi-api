@@ -13,15 +13,15 @@
 */
 package fr.insee.sugoi.core.exceptions;
 
-public class RealmNotFoundException extends RuntimeException {
+public class ApplicationAlreadyExistException extends RuntimeException {
 
-  private static final long serialVersionUID = -6450377806626107202L;
+  private static final long serialVersionUID = 7747400812327879162L;
 
-  public RealmNotFoundException(String message, Throwable cause) {
+  public ApplicationAlreadyExistException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public RealmNotFoundException(String message) {
+  public ApplicationAlreadyExistException(String message) {
     super(message);
   }
 }

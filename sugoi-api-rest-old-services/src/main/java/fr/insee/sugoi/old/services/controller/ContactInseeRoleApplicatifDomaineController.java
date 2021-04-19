@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
+import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -87,6 +88,10 @@ public class ContactInseeRoleApplicatifDomaineController {
         .body(
             userService
                 .findById(domaine, null, identifiant)
+                .orElseThrow(
+                    () ->
+                        new UserNotFoundException(
+                            "Cannot find user " + identifiant + " in domaine " + domaine))
                 .getAttributes()
                 .get("insee_roles_applicatifs"));
   }
@@ -126,7 +131,13 @@ public class ContactInseeRoleApplicatifDomaineController {
       @Parameter(description = "Name of the inseeRoleApplicatif to add", required = true)
           @PathVariable(name = "inseerole", required = true)
           String inseeRole) {
-    User user = userService.findById(domaine, null, identifiant);
+    User user =
+        userService
+            .findById(domaine, null, identifiant)
+            .orElseThrow(
+                () ->
+                    new UserNotFoundException(
+                        "Cannot find user " + identifiant + " in domaine " + domaine));
     if (user.getAttributes().containsKey("insee_roles_applicatifs")) {
       @SuppressWarnings("unchecked")
       List<String> userRoles = (List<String>) user.getAttributes().get("insee_roles_applicatifs");
@@ -176,7 +187,13 @@ public class ContactInseeRoleApplicatifDomaineController {
       @Parameter(description = "Name of the inseeRoleApplicatif to delete", required = true)
           @PathVariable(name = "inseerole", required = true)
           String inseeRole) {
-    User user = userService.findById(domaine, null, identifiant);
+    User user =
+        userService
+            .findById(domaine, null, identifiant)
+            .orElseThrow(
+                () ->
+                    new UserNotFoundException(
+                        "Cannot find user " + identifiant + " in domaine " + domaine));
     if (user.getAttributes().containsKey("insee_roles_applicatifs")) {
       user.getAttributes()
           .put(

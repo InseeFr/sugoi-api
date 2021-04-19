@@ -14,7 +14,7 @@
 package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
-import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
+import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.model.SearchType;
@@ -259,19 +259,14 @@ public class UserController {
           @PathVariable(name = "storage", required = false)
           String storage,
       @Parameter(description = "User to create", required = true) @RequestBody User user) {
-    try {
-      userService.findById(realm, null, user.getUsername());
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
-    } catch (EntityNotFoundException e) {
-      userService.create(realm, storage, user);
-      URI location =
-          ServletUriComponentsBuilder.fromCurrentRequest()
-              .path("/" + user.getUsername())
-              .build()
-              .toUri();
-      return ResponseEntity.created(location)
-          .body(userService.findById(realm, storage, user.getUsername()));
-    }
+
+    User userCreated = userService.create(realm, storage, user);
+    URI location =
+        ServletUriComponentsBuilder.fromCurrentRequest()
+            .path("/" + user.getUsername())
+            .build()
+            .toUri();
+    return ResponseEntity.created(location).body(userCreated);
   }
 
   @PutMapping(
@@ -317,15 +312,12 @@ public class UserController {
     if (!user.getUsername().equals(id)) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
-    if (userService.findById(realm, storage, id) != null) {
-      userService.update(realm, storage, user);
-      URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
-      return ResponseEntity.status(HttpStatus.OK)
-          .header(HttpHeaders.LOCATION, location.toString())
-          .body(userService.findById(realm, storage, id));
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+
+    userService.update(realm, storage, user);
+    URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+    return ResponseEntity.status(HttpStatus.OK)
+        .header(HttpHeaders.LOCATION, location.toString())
+        .body(userService.findById(realm, storage, id));
   }
 
   @PutMapping(
@@ -362,10 +354,15 @@ public class UserController {
       @Parameter(description = "User's id to update", required = true) @PathVariable("id")
           String id,
       @Parameter(description = "User to update", required = true) @RequestBody User user) {
+
     if (!user.getUsername().equals(id)) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
-    User foundUser = userService.findById(realm, null, id);
+    User foundUser =
+        userService
+            .findById(realm, null, id)
+            .orElseThrow(
+                () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
     return updateUsers(
         realm, (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id, user);
   }
@@ -404,12 +401,8 @@ public class UserController {
       @Parameter(description = "User's id to delete", required = true) @PathVariable("id")
           String id) {
 
-    if (userService.findById(realm, storage, id) != null) {
-      userService.delete(realm, storage, id);
-      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    userService.delete(realm, storage, id);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   @DeleteMapping(
@@ -441,7 +434,11 @@ public class UserController {
       @Parameter(description = "User's id to delete", required = true) @PathVariable("id")
           String id) {
 
-    User foundUser = userService.findById(realm, null, id);
+    User foundUser =
+        userService
+            .findById(realm, null, id)
+            .orElseThrow(
+                () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
     return deleteUsers(
         realm, (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id);
   }
@@ -475,12 +472,12 @@ public class UserController {
           String storage,
       @Parameter(description = "Username to search", required = true) @PathVariable("username")
           String id) {
-    User user = userService.findById(realm, storage, id);
-    if (user != null) {
-      return ResponseEntity.status(HttpStatus.OK).body(user);
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    User user =
+        userService
+            .findById(realm, storage, id)
+            .orElseThrow(
+                () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
+    return ResponseEntity.status(HttpStatus.OK).body(user);
   }
 
   @GetMapping(

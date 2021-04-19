@@ -13,21 +13,15 @@
 */
 package fr.insee.sugoi.core.exceptions;
 
-public class EntityNotFoundException extends RuntimeException {
+public class GroupNotFoundException extends RuntimeException {
 
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -1230419093509057754L;
 
-  private String message;
-
-  public EntityNotFoundException(String message) {
-    this.message = message;
+  public GroupNotFoundException(String message, Throwable cause) {
+    super(message, cause);
   }
 
-  public String getMessage() {
-    return this.message;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
+  public GroupNotFoundException(String message) {
+    super(message);
   }
 }

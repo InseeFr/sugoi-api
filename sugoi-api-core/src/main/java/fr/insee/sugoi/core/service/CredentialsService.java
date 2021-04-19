@@ -13,12 +13,26 @@
 */
 package fr.insee.sugoi.core.service;
 
+import fr.insee.sugoi.core.exceptions.PasswordPolicyNotMetException;
+import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
+import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.PasswordChangeRequest;
 import fr.insee.sugoi.core.model.SendMode;
 import java.util.List;
 
 public interface CredentialsService {
 
+  /**
+   * Reinit password of the user according to the realm policy.
+   *
+   * @param realm
+   * @param userStorage
+   * @param userId
+   * @param pcr
+   * @param sendMode
+   * @throws RealmNotFoundException if realm doesn't exist
+   * @throws UserNotFoundException if user doesn't exist in realm
+   */
   void reinitPassword(
       String realm,
       String userStorage,
@@ -26,8 +40,35 @@ public interface CredentialsService {
       PasswordChangeRequest pcr,
       List<SendMode> sendMode);
 
+  /**
+   * Change the password of an user, check if the new password meets the realm password policy and
+   * change it
+   *
+   * @param realm
+   * @param userStorage
+   * @param userId
+   * @param pcr
+   * @throws RealmNotFoundException if realm doesn't exist
+   * @throws UserNotFoundException if user doesn't exist in realm
+   * @throws PasswordPolicyNotMetException if password doesn't meet the password policy set for the
+   *     realm
+   */
   void changePassword(String realm, String userStorage, String userId, PasswordChangeRequest pcr);
 
+  /**
+   * Init the password of an user, check if the provided password met the realm password policy and
+   * set it
+   *
+   * @param realm
+   * @param userStorage
+   * @param userId
+   * @param pcr
+   * @param sendMode
+   * @throws RealmNotFoundException if realm doesn't exist
+   * @throws UserNotFoundException if user doesn't exist in realm
+   * @throws PasswordPolicyNotMetException if password doesn't meet the password policy set for the
+   *     realm
+   */
   void initPassword(
       String realm,
       String userStorage,
@@ -35,5 +76,15 @@ public interface CredentialsService {
       PasswordChangeRequest pcr,
       List<SendMode> sendMode);
 
+  /**
+   * Check if the provided credentials allow to authenticate the current user
+   *
+   * @param realm
+   * @param userStorage
+   * @param userName
+   * @param password
+   * @throws UserNotFoundException if user doesn't exist in realm
+   * @return true if provided credentials are valid for user else false
+   */
   boolean validateCredential(String realm, String userStorage, String userName, String password);
 }

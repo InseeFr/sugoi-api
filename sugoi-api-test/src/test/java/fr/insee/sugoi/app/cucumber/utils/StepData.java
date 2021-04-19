@@ -13,6 +13,8 @@
 */
 package fr.insee.sugoi.app.cucumber.utils;
 
+import fr.insee.sugoi.model.Application;
+import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
@@ -25,6 +27,10 @@ public class StepData {
   List<User> users = null;
   Organization organization = null;
   List<Organization> organizations = null;
+  List<Application> applications = null;
+  Application application = null;
+  List<Group> groups = null;
+  Group group = null;
   String defaultTomcatUrl = "/tomcat1";
   Realm realm = null;
   List<Realm> realms = null;
@@ -93,5 +99,37 @@ public class StepData {
 
   public void setRealms(List<Realm> realms) {
     this.realms = realms;
+  }
+
+  public Application getApplication() {
+    return application;
+  }
+
+  public List<Application> getApplications() {
+    return applications;
+  }
+
+  public void setApplication(Application application) {
+    this.application = application;
+  }
+
+  public void setApplications(List<Application> applications) {
+    this.applications = applications;
+  }
+
+  public Group getGroup() {
+    return group;
+  }
+
+  public void setGroup(Group group) {
+    this.group = group;
+  }
+
+  public List<Group> getGroups() {
+    return groups;
+  }
+
+  public void setGroups(List<Group> groups) {
+    this.groups = groups;
   }
 }

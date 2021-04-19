@@ -55,5 +55,7 @@ public class EventKeysConfig extends GlobalKeysConfig {
   public static final String PASSWORD_CHANGE_REQUEST = "pcr";
   public static final String PASSWORD = "password";
 
+  public static final String ERROR = "error";
+
   public static final String TYPE = "type";
 }

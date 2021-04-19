@@ -13,21 +13,69 @@
 */
 package fr.insee.sugoi.core.service;
 
+import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
+import fr.insee.sugoi.core.exceptions.UserNotCreatedException;
+import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.model.User;
+import java.util.Optional;
 
 public interface UserService {
 
+  /**
+   * Create an user if not already exists in the realm (check on the username).
+   *
+   * @param realm
+   * @param storage
+   * @param user
+   * @return the created user
+   * @throws UserAlreadyExistException if an user with the same username already exist in the realm
+   * @throws UserNotCreatedException if user is not found after create
+   */
   User create(String realm, String storage, User user);
 
+  /**
+   * Update the user if the user already exists in the realm
+   *
+   * @param realm
+   * @param storage
+   * @param user
+   * @throws UserNotFoundException if user is not found in the realm
+   */
   void update(String realm, String storage, User user);
 
+  /**
+   * Delete an existing user (if the user already exists in the realm)
+   *
+   * @param realm
+   * @param storage
+   * @param id
+   * @throws UserNotFoundException if user is not found in the realm
+   */
   void delete(String realm, String storage, String id);
 
-  User findById(String realm, String storageName, String idep);
+  /**
+   * Find a user by its username in a realm
+   *
+   * @param realm
+   * @param storageName
+   * @param idep
+   * @return an optional of user
+   */
+  Optional<User> findById(String realm, String storageName, String idep);
 
+  /**
+   * Find users by criterias in a realm
+   *
+   * @param realm
+   * @param storageName
+   * @param userProperties
+   * @param pageable
+   * @param typeRecherche
+   * @return a list of users
+   */
   PageResult<User> findByProperties(
       String realm,
       String storageName,
