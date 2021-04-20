@@ -16,6 +16,8 @@ package fr.insee.sugoi.old.services.controller;
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
 import fr.insee.sugoi.converter.ouganext.PasswordChangeRequest;
 import fr.insee.sugoi.core.service.CredentialsService;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm.RealmStorage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -49,6 +51,8 @@ public class ContactPasswordDomaineController {
   @Autowired private CredentialsService credentialsService;
 
   @Autowired private OuganextSugoiMapper ouganextSugoiMapper;
+
+  @Autowired private ConverterDomainRealm converterDomainRealm;
 
   /**
    * Reinitialize a password with a random new password
@@ -99,9 +103,11 @@ public class ContactPasswordDomaineController {
               required = true)
           @RequestBody
           PasswordChangeRequest pcr) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
     credentialsService.reinitPassword(
-        domaine,
-        null,
+        realmUserStorage.getRealm(),
+        realmUserStorage.getUserStorage(),
         identifiant,
         ouganextSugoiMapper.serializeToSugoi(
             pcr, fr.insee.sugoi.core.model.PasswordChangeRequest.class),
@@ -153,9 +159,11 @@ public class ContactPasswordDomaineController {
       @Parameter(description = "Other infos to reset password: new password", required = true)
           @RequestBody
           PasswordChangeRequest pcr) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
     credentialsService.initPassword(
-        domaine,
-        null,
+        realmUserStorage.getRealm(),
+        realmUserStorage.getUserStorage(),
         identifiant,
         ouganextSugoiMapper.serializeToSugoi(
             pcr, fr.insee.sugoi.core.model.PasswordChangeRequest.class),
@@ -215,9 +223,11 @@ public class ContactPasswordDomaineController {
               required = true)
           @RequestBody
           PasswordChangeRequest pcr) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
     credentialsService.changePassword(
-        domaine,
-        null,
+        realmUserStorage.getRealm(),
+        realmUserStorage.getUserStorage(),
         identifiant,
         ouganextSugoiMapper.serializeToSugoi(
             pcr, fr.insee.sugoi.core.model.PasswordChangeRequest.class));
