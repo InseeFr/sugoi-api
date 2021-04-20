@@ -14,6 +14,8 @@
 package fr.insee.sugoi.old.services.controller;
 
 import fr.insee.sugoi.core.service.CredentialsService;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm.RealmStorage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -41,6 +43,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class CredentialsDomaineController {
 
   @Autowired CredentialsService credentialsService;
+
+  @Autowired ConverterDomainRealm converterDomainRealm;
 
   /**
    * Validate credentials of a contact
@@ -83,7 +87,10 @@ public class CredentialsDomaineController {
           String id,
       @Parameter(description = "Contact's password", required = true) @RequestBody
           String motDePasse) {
-    if (credentialsService.validateCredential(domaine, null, id, motDePasse)) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
+    if (credentialsService.validateCredential(
+        realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), id, motDePasse)) {
       return ResponseEntity.ok().build();
     } else {
       return new ResponseEntity<>(HttpStatus.FORBIDDEN);

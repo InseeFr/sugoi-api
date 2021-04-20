@@ -19,6 +19,8 @@ import fr.insee.sugoi.converter.ouganext.InfoFormattage;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm.RealmStorage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -52,6 +54,8 @@ public class ContactDomaineController {
   @Autowired private UserService userService;
 
   @Autowired private OuganextSugoiMapper ouganextSugoiMapper;
+
+  @Autowired private ConverterDomainRealm converterDomainRealm;
 
   /**
    * Update or create a contact.
@@ -106,11 +110,14 @@ public class ContactDomaineController {
               required = false)
           @RequestParam(name = "creation")
           boolean creation) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
     contact.setIdentifiant(identifiant);
     User sugoiUser = ouganextSugoiMapper.serializeToSugoi(contact, User.class);
 
     if (creation) {
-      User userCreated = userService.create(domaine, null, sugoiUser);
+      User userCreated =
+          userService.create(
+              realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), sugoiUser);
       return ResponseEntity.status(HttpStatus.OK)
           .body(ouganextSugoiMapper.serializeToOuganext(userCreated, Contact.class));
     }
@@ -119,7 +126,11 @@ public class ContactDomaineController {
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             ouganextSugoiMapper.serializeToOuganext(
-                userService.findById(domaine, null, identifiant).get(), Contact.class));
+                userService
+                    .findById(
+                        realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
+                    .get(),
+                Contact.class));
   }
 
   /**
@@ -157,11 +168,14 @@ public class ContactDomaineController {
               required = true)
           @PathVariable(name = "domaine", required = true)
           String domaine) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             ouganextSugoiMapper.serializeToOuganext(
                 userService
-                    .findById(domaine, null, identifiant)
+                    .findById(
+                        realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
                     .orElseThrow(
                         () ->
                             new UserNotFoundException(
@@ -206,8 +220,9 @@ public class ContactDomaineController {
               required = true)
           @PathVariable("domaine")
           String domaine) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
-    userService.delete(domaine, null, identifiant);
+    userService.delete(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 

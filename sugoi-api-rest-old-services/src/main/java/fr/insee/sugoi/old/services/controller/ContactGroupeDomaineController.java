@@ -20,6 +20,8 @@ import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm.RealmStorage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -52,6 +54,7 @@ public class ContactGroupeDomaineController {
   @Autowired private GroupService groupService;
 
   @Autowired private OuganextSugoiMapper ouganextSugoiMapper;
+  @Autowired private ConverterDomainRealm converterDomainRealm;
 
   /**
    * Get the groups of a contact
@@ -88,9 +91,11 @@ public class ContactGroupeDomaineController {
               required = true)
           @PathVariable(name = "domaine", required = true)
           String domaine) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
     User user =
         userService
-            .findById(domaine, null, identifiant)
+            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
             .orElseThrow(
                 () ->
                     new UserNotFoundException(
@@ -155,8 +160,10 @@ public class ContactGroupeDomaineController {
       @Parameter(description = "Group name", required = true)
           @PathVariable(name = "nomgroupe", required = true)
           String nomGroupe) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
     groupService
-        .findById(domaine, nomAppli, nomGroupe)
+        .findById(realmUserStorage.getRealm(), nomAppli, nomGroupe)
         .orElseThrow(
             () ->
                 new GroupNotFoundException(
@@ -168,7 +175,7 @@ public class ContactGroupeDomaineController {
                         + domaine));
     User user =
         userService
-            .findById(domaine, null, identifiant)
+            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
             .orElseThrow(
                 () ->
                     new UserNotFoundException(
@@ -178,7 +185,7 @@ public class ContactGroupeDomaineController {
             .anyMatch(g -> g.getName().equals(nomGroupe) && g.getAppName().equals(nomAppli))) {
       return new ResponseEntity<String>("Contact already in group", HttpStatus.CONFLICT);
     } else {
-      groupService.addUserToGroup(domaine, identifiant, nomAppli, nomGroupe);
+      groupService.addUserToGroup(realmUserStorage.getRealm(), identifiant, nomAppli, nomGroupe);
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
   }
@@ -236,9 +243,11 @@ public class ContactGroupeDomaineController {
       @Parameter(description = "Group name", required = true)
           @PathVariable(name = "nomgroupe", required = true)
           String nomGroupe) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
     User user =
         userService
-            .findById(domaine, null, identifiant)
+            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
             .orElseThrow(
                 () ->
                     new UserNotFoundException(
@@ -248,7 +257,8 @@ public class ContactGroupeDomaineController {
             .anyMatch(
                 group ->
                     group.getAppName().equals(nomAppli) && group.getName().equals(nomGroupe))) {
-      groupService.deleteUserFromGroup(domaine, identifiant, nomAppli, nomGroupe);
+      groupService.deleteUserFromGroup(
+          realmUserStorage.getRealm(), identifiant, nomAppli, nomGroupe);
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     } else {
       return new ResponseEntity<>("Contact doesn't belong to group", HttpStatus.CONFLICT);

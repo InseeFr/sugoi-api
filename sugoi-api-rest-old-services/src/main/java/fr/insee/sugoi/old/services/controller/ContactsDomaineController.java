@@ -23,6 +23,8 @@ import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm.RealmStorage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -61,6 +63,8 @@ public class ContactsDomaineController {
   @Autowired private UserService userService;
 
   @Autowired private OuganextSugoiMapper ouganextSugoiMapper;
+
+  @Autowired private ConverterDomainRealm converterDomainRealm;
 
   /**
    * Create a contact. The contact id is slug if filled and not already used. Otherwise the id is
@@ -104,13 +108,18 @@ public class ContactsDomaineController {
           @RequestHeader(value = "Slug", required = false)
           String slug,
       @Parameter(description = "Contact to create", required = true) @RequestBody Contact contact) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
     User sugoiUser = ouganextSugoiMapper.serializeToSugoi(contact, User.class);
-    if (slug != null && userService.findById(domaine, null, slug).isEmpty()) {
+    if (slug != null
+        && userService
+            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), slug)
+            .isEmpty()) {
       sugoiUser.setUsername(slug);
     } else if (sugoiUser.getUsername() == null) {
       sugoiUser.setUsername(UUID.randomUUID().toString());
     }
-    userService.create(domaine, null, sugoiUser);
+    userService.create(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), sugoiUser);
     String request = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toString();
     String location =
         request.substring(0, request.lastIndexOf("/")) + "/contact/" + sugoiUser.getUsername();
@@ -225,6 +234,8 @@ public class ContactsDomaineController {
       @Parameter(description = "Find a contact by it's certificate", required = false)
           @RequestParam(name = "certificat", required = false)
           String certificat) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
     Contact searchContact = new Contact();
     searchContact.setIdentifiant(identifiant);
     searchContact.setNomCommun(nomCommun);
@@ -260,7 +271,12 @@ public class ContactsDomaineController {
     pageable.setSize(size);
 
     PageResult<User> foundUsers =
-        userService.findByProperties(domaine, null, searchSugoiUser, pageable, SearchType.AND);
+        userService.findByProperties(
+            realmUserStorage.getRealm(),
+            realmUserStorage.getUserStorage(),
+            searchSugoiUser,
+            pageable,
+            SearchType.AND);
 
     HttpHeaders headers = new HttpHeaders();
     headers.add("X-Total-Size", String.valueOf(foundUsers.getTotalElements()));
@@ -376,9 +392,16 @@ public class ContactsDomaineController {
               required = true)
           @PathVariable(name = "domaine", required = true)
           String domaine) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
     PageableResult pageable = new PageableResult();
     PageResult<User> foundUsers =
-        userService.findByProperties(domaine, null, new User(), pageable, SearchType.AND);
+        userService.findByProperties(
+            realmUserStorage.getRealm(),
+            realmUserStorage.getUserStorage(),
+            new User(),
+            pageable,
+            SearchType.AND);
     return ResponseEntity.status(HttpStatus.NO_CONTENT)
         .header("X-Total-Size", String.valueOf(foundUsers.getTotalElements()))
         .build();

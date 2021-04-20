@@ -16,6 +16,8 @@ package fr.insee.sugoi.old.services.controller;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm.RealmStorage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -48,6 +50,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ContactInseeRoleApplicatifDomaineController {
 
   @Autowired private UserService userService;
+
+  @Autowired private ConverterDomainRealm converterDomainRealm;
 
   /**
    * Get inseeroleapplicatif for a contact
@@ -84,10 +88,13 @@ public class ContactInseeRoleApplicatifDomaineController {
               required = true)
           @PathVariable(name = "domaine", required = true)
           String domaine) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             userService
-                .findById(domaine, null, identifiant)
+                .findById(
+                    realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
                 .orElseThrow(
                     () ->
                         new UserNotFoundException(
@@ -131,9 +138,11 @@ public class ContactInseeRoleApplicatifDomaineController {
       @Parameter(description = "Name of the inseeRoleApplicatif to add", required = true)
           @PathVariable(name = "inseerole", required = true)
           String inseeRole) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
     User user =
         userService
-            .findById(domaine, null, identifiant)
+            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
             .orElseThrow(
                 () ->
                     new UserNotFoundException(
@@ -147,7 +156,7 @@ public class ContactInseeRoleApplicatifDomaineController {
       userRoles.add(inseeRole);
       user.getAttributes().put("insee_roles_applicatifs", userRoles);
     }
-    userService.update(domaine, null, user);
+    userService.update(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), user);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -187,9 +196,11 @@ public class ContactInseeRoleApplicatifDomaineController {
       @Parameter(description = "Name of the inseeRoleApplicatif to delete", required = true)
           @PathVariable(name = "inseerole", required = true)
           String inseeRole) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
     User user =
         userService
-            .findById(domaine, null, identifiant)
+            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
             .orElseThrow(
                 () ->
                     new UserNotFoundException(
@@ -203,7 +214,7 @@ public class ContactInseeRoleApplicatifDomaineController {
                       .filter(role -> !role.equalsIgnoreCase(inseeRole))
                       .collect(Collectors.toList()));
     }
-    userService.update(domaine, null, user);
+    userService.update(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), user);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }

@@ -19,6 +19,8 @@ import fr.insee.sugoi.converter.ouganext.Contacts;
 import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm.RealmStorage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -46,6 +48,8 @@ public class GroupeController {
   private OuganextSugoiMapper ouganextSugoiMapper = new OuganextSugoiMapper();
 
   @Autowired private GroupService groupService;
+
+  @Autowired private ConverterDomainRealm converterDomainRealm;
 
   /**
    * Get all contacts in a group
@@ -89,9 +93,11 @@ public class GroupeController {
       @Parameter(description = "Group where collect contacts", required = true)
           @PathVariable(name = "groupe", required = true)
           String groupe) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
     Group group =
         groupService
-            .findById(domaine, application, groupe)
+            .findById(realmUserStorage.getRealm(), application, groupe)
             .orElseThrow(
                 () ->
                     new GroupNotFoundException(

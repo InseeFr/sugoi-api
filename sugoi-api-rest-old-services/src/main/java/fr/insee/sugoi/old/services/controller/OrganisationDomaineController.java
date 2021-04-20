@@ -22,6 +22,8 @@ import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.OrganizationService;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm.RealmStorage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -62,6 +64,8 @@ public class OrganisationDomaineController {
   private OuganextSugoiMapper ouganextSugoiMapper = new OuganextSugoiMapper();
 
   @Autowired private OrganizationService organizationService;
+
+  @Autowired private ConverterDomainRealm converterDomainRealm;
 
   /**
    * Update or create an organisation.
@@ -117,22 +121,29 @@ public class OrganisationDomaineController {
           boolean creation,
       @Parameter(description = "Organization to create or modify", required = true) @RequestBody
           Organisation organisation) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
     organisation.setIdentifiant(id);
     Organization sugoiOrganization =
         ouganextSugoiMapper.serializeToSugoi(organisation, Organization.class);
 
     if (creation) {
-      Organization orgCreated = organizationService.create(domaine, null, sugoiOrganization);
+      Organization orgCreated =
+          organizationService.create(
+              realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), sugoiOrganization);
       return ResponseEntity.status(HttpStatus.OK)
           .body(ouganextSugoiMapper.serializeToOuganext(orgCreated, Organisation.class));
     }
 
-    organizationService.update(domaine, null, sugoiOrganization);
+    organizationService.update(
+        realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), sugoiOrganization);
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             ouganextSugoiMapper.serializeToOuganext(
-                organizationService.findById(domaine, null, id).get(), Organisation.class));
+                organizationService
+                    .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), id)
+                    .get(),
+                Organisation.class));
   }
 
   /**
@@ -170,11 +181,13 @@ public class OrganisationDomaineController {
       @Parameter(description = "Organization's id to find", required = true)
           @PathVariable(name = "id", required = true)
           String id) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             ouganextSugoiMapper.serializeToOuganext(
                 organizationService
-                    .findById(domaine, null, id)
+                    .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), id)
                     .orElseThrow(
                         () ->
                             new OrganizationNotFoundException(
@@ -220,8 +233,9 @@ public class OrganisationDomaineController {
       @Parameter(description = "Organization's id to delete", required = true)
           @PathVariable(name = "id", required = true)
           String id) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
-    organizationService.delete(domaine, null, id);
+    organizationService.delete(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), id);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -266,14 +280,20 @@ public class OrganisationDomaineController {
               required = false)
           @RequestHeader(value = "Slug", required = false)
           String slug) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
     Organization sugoiOrganization =
         ouganextSugoiMapper.serializeToSugoi(organisation, Organization.class);
-    if (slug != null && organizationService.findById(domaine, null, slug).isEmpty()) {
+    if (slug != null
+        && organizationService
+            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), slug)
+            .isEmpty()) {
       sugoiOrganization.setIdentifiant(slug);
     } else if (sugoiOrganization.getIdentifiant() == null) {
       sugoiOrganization.setIdentifiant(UUID.randomUUID().toString());
     }
-    organizationService.create(domaine, null, sugoiOrganization);
+    organizationService.create(
+        realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), sugoiOrganization);
     String request = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toString();
     String location =
         request.substring(0, request.lastIndexOf("/"))
@@ -374,6 +394,8 @@ public class OrganisationDomaineController {
       @Parameter(description = "Find a organization by it's certificate", required = false)
           @RequestParam(name = "certificat", required = false)
           String certificat) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
     Organisation searchOrganisation = new Organisation();
     searchOrganisation.setIdentifiant(identifiant);
     searchOrganisation.setNomCommun(nomCommun);
@@ -399,7 +421,11 @@ public class OrganisationDomaineController {
 
     PageResult<Organization> foundOrganizations =
         organizationService.findByProperties(
-            domaine, null, searchSugoiOrganization, pageable, SearchType.AND);
+            realmUserStorage.getRealm(),
+            realmUserStorage.getUserStorage(),
+            searchSugoiOrganization,
+            pageable,
+            SearchType.AND);
 
     HttpHeaders headers = new HttpHeaders();
     headers.add("X-Total-Size", String.valueOf(foundOrganizations.getTotalElements()));
