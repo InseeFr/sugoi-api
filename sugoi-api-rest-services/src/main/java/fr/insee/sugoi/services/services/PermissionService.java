@@ -16,6 +16,8 @@ package fr.insee.sugoi.services.services;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
@@ -100,6 +102,72 @@ public class PermissionService {
       }
     }
     return false;
+  }
+
+  public List<String> getUserRealmReader() {
+    return getUserRightList(regexpReaderList);
+  }
+
+  public List<String> getUserRealmWriter() {
+    return getUserRightList(regexpWriterList);
+  }
+
+  public List<String> getUserRealmPasswordManager() {
+    return getUserRightList(passwordManagerRoleList);
+  }
+
+  public List<String> getUserRealmAppManager() {
+    return getUserRightList(applicationManagerRoleList);
+  }
+
+  private List<String> getUserRightList(List<String> regexpListToSearch) {
+    List<String> searchRoleList =
+        getSearchRoleList(
+                "(?<realm>.*)", "(?<userStorage>.*)", "(?<application>.*)", regexpListToSearch)
+            .stream()
+            .map(String::toUpperCase)
+            .collect(Collectors.toList());
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    List<String> roles =
+        authentication.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .map(String::toUpperCase)
+            .map(
+                role -> {
+                  for (String searchRole : searchRoleList) {
+                    Pattern p = Pattern.compile(searchRole);
+                    Matcher m = p.matcher(role);
+                    if (m.matches()) {
+                      String realm = "";
+                      String userStorage = "";
+                      String application = "";
+                      try {
+                        realm = m.group("REALM");
+                      } catch (Exception e) {
+                      }
+                      try {
+                        userStorage = "_" + m.group("USERSTORAGE");
+                      } catch (Exception e) {
+                      }
+                      try {
+                        if (m.group("APPLICATION") != null) {
+                          if (realm.equals("")) {
+                            realm = "*";
+                            userStorage = "_*";
+                          }
+                          application = "\\" + m.group("APPLICATION");
+                        }
+                      } catch (Exception e) {
+                      }
+                      String res = realm + userStorage + application;
+                      return res;
+                    }
+                  }
+                  return null;
+                })
+            .filter(role -> role != null)
+            .collect(Collectors.toList());
+    return roles;
   }
 
   private List<String> getSearchRoleList(
