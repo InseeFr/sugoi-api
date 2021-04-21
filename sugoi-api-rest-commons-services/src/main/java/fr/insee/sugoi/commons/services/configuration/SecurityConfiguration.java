@@ -59,6 +59,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   /** Search in subtree * */
   private boolean ldapAccountManagmentGroupSubtree;
 
+  private String oidcClaimUsername = "sub";
+
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     // api, so csrf is disabled
@@ -107,6 +109,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   JwtAuthenticationConverter jwtAuthenticationConverter() {
     JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+    jwtAuthenticationConverter.setPrincipalClaimName(oidcClaimUsername);
     jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter());
     return jwtAuthenticationConverter;
   }
@@ -205,5 +208,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   public void setLdapAccountManagmentGroupSubtree(boolean ldapAccountManagmentGroupSubtree) {
     this.ldapAccountManagmentGroupSubtree = ldapAccountManagmentGroupSubtree;
+  }
+
+  public String getOidcClaimUsername() {
+    return this.oidcClaimUsername;
+  }
+
+  public void setOidcClaimUsername(String oidcClaimUsername) {
+    this.oidcClaimUsername = oidcClaimUsername;
   }
 }
