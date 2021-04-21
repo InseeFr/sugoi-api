@@ -72,7 +72,7 @@ public class GroupController {
                   schema = @Schema(implementation = PageResult.class))
             })
       })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#application)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#applicationName)")
   public ResponseEntity<PageResult<Group>> getGroups(
       @Parameter(
               description = "Name of the realm where the operation will be made",
