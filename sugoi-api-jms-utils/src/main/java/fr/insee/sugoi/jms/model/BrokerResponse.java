@@ -13,15 +13,12 @@
 */
 package fr.insee.sugoi.jms.model;
 
+import fr.insee.sugoi.core.model.ProviderResponse;
 import java.util.UUID;
-
 import javax.jms.JMSException;
-
 import org.apache.activemq.command.Message;
 import org.apache.activemq.command.Response;
 import org.apache.activemq.state.CommandVisitor;
-
-import fr.insee.sugoi.core.model.ProviderResponse;
 
 /** BrokerResponse */
 public class BrokerResponse extends Message {

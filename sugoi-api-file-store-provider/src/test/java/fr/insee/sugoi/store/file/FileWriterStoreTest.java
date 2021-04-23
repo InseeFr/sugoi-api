@@ -240,7 +240,7 @@ public class FileWriterStoreTest {
     address.put("Ligne1", "Toto");
     address.put("Ligne2", "Chez Toto");
     user.setAddress(address);
-    fileWriterStore.updateUser(user);
+    fileWriterStore.updateUser(user,false,null);
     User modifiedUser = fileReaderStore.getUser("testo");
     assertThat("testo should have a new mail", modifiedUser.getMail(), is("nvtest@insee.fr"));
     assertThat("testo should have an address", modifiedUser.getAddress().get("Ligne1"), is("Toto"));

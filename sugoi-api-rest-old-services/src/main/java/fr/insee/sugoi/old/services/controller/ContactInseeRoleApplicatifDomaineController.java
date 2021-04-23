@@ -147,7 +147,9 @@ public class ContactInseeRoleApplicatifDomaineController {
       userRoles.add(inseeRole);
       user.getAttributes().put("insee_roles_applicatifs", userRoles);
     }
-    userService.update(domaine, null, user);
+    
+    // As a backport service, no support of asynchronous request
+    userService.update(domaine, null, user,false,null);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -203,7 +205,7 @@ public class ContactInseeRoleApplicatifDomaineController {
                       .filter(role -> !role.equalsIgnoreCase(inseeRole))
                       .collect(Collectors.toList()));
     }
-    userService.update(domaine, null, user);
+    userService.update(domaine, null, user,false,null);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }

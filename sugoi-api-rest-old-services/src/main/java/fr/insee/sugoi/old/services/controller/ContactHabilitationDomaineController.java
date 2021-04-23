@@ -149,7 +149,9 @@ public class ContactHabilitationDomaineController {
     Habilitations habilitations = new Habilitations(user.getHabilitations());
     habilitations.addHabilitation(appName, nomRoles);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
-    userService.update(domaine, null, user);
+    
+    // As a backport service, no support of asynchronous request
+    userService.update(domaine, null, user,false,null);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -210,7 +212,9 @@ public class ContactHabilitationDomaineController {
     Habilitations habilitations = new Habilitations(user.getHabilitations());
     habilitations.addHabilitations(appName, role, proprietes);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
-    userService.update(domaine, null, user);
+    
+    // As a backport service, no support of asynchronous request
+    userService.update(domaine, null, user,false,null);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -263,7 +267,9 @@ public class ContactHabilitationDomaineController {
     Habilitations habilitations = new Habilitations(user.getHabilitations());
     habilitations.removeHabilitation(appName, nomRoles);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
-    userService.update(domaine, null, user);
+    
+    // As a backport service, no support of asynchronous request
+    userService.update(domaine, null, user,false,null);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -323,7 +329,7 @@ public class ContactHabilitationDomaineController {
     Habilitations habilitations = new Habilitations(user.getHabilitations());
     habilitations.removeHabilitation(appName, nomRole, proprietes);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
-    userService.update(domaine, null, user);
+    userService.update(domaine, null, user,false,null);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }

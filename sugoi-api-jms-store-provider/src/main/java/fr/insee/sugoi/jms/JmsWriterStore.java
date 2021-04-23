@@ -13,12 +13,6 @@
 */
 package fr.insee.sugoi.jms;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.jms.JmsException;
-
 import fr.insee.sugoi.core.model.PasswordChangeRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -34,6 +28,10 @@ import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.springframework.jms.JmsException;
 
 public class JmsWriterStore implements WriterStore {
 
@@ -80,35 +78,60 @@ public class JmsWriterStore implements WriterStore {
   }
 
   @Override
-  public ProviderResponse updateUser(User updatedUser) {
+  public ProviderResponse updateUser(User updatedUser, boolean asynchronousAllowed, String transactionId) {
+    ProviderResponse response = new ProviderResponse();
+
+    // Perhaps use 2 jms template, one with a "reasonable" timeout for synchronous requeste,
+    // one without any timout, for ckeing status
+    // => the timeout is defined only at jmsTemplate level, not at the receive
+    // method
+
+    // Check status
+    if (transactionId != null && !transactionId.isEmpty()) {
+      try {
+        BrokerResponse br = jmsWriter.checkResponseInQueue(queueResponseName, transactionId);
+        response = br.getProviderResponse();
+        if (response.getStatus() == ProviderResponseStatus.OK) {
+          response.setStatus(ProviderResponseStatus.ACCEPTED);
+        } else if (response.getStatus() == ProviderResponseStatus.KO) {
+          throw response.getException();
+        }
+      } catch (JmsException e) {
+        response.setStatus(ProviderResponseStatus.REQUESTED);
+        response.setRequestId(transactionId);
+      }
+      return response;
+    }
+
     Map<String, Object> params = new HashMap<>();
     params.put(JmsAtttributes.USER, updatedUser);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
     String correlationId = jmsWriter.writeRequestInQueue(queueRequestName, Method.UPDATE_USER, params);
 
-    ProviderResponse response = new ProviderResponse();
-    // IF asynchronous : status must be requested in another request
-    // response.setEntityId(updatedUser.getUsername());
-    // response.setRequestId(correlationId);
-    // response.setStatus(ProviderResponseStatus.REQUESTED);
-
-    // IF synchronous
-    try {
-      BrokerResponse br = jmsWriter.checkResponseInQueue(queueResponseName, correlationId);
-      response = br.getProviderResponse();
-      if (response.getStatus() == ProviderResponseStatus.OK) {
-        response.setStatus(ProviderResponseStatus.ACCEPTED);
-      } else if (response.getStatus() == ProviderResponseStatus.KO) {
-        throw response.getException();
-      }
-    } catch (JmsException e) {
-      response.setStatus(ProviderResponseStatus.REQUESTED);
+    if (asynchronousAllowed) {
+      // IF asynchronous : status must be requested in another request
+      response.setEntityId(updatedUser.getUsername());
       response.setRequestId(correlationId);
+      response.setStatus(ProviderResponseStatus.REQUESTED);
+    } else {
+
+      // IF synchronous
+      try {
+        BrokerResponse br = jmsWriter.checkResponseInQueue(queueResponseName, correlationId);
+        response = br.getProviderResponse();
+        if (response.getStatus() == ProviderResponseStatus.OK) {
+          response.setStatus(ProviderResponseStatus.ACCEPTED);
+        } else if (response.getStatus() == ProviderResponseStatus.KO) {
+          throw response.getException();
+        }
+      } catch (JmsException e) {
+        response.setStatus(ProviderResponseStatus.REQUESTED);
+        response.setRequestId(correlationId);
+      }
     }
 
     return response;
-
   }
 
   @Override

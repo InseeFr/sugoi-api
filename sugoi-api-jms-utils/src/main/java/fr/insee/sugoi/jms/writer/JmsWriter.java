@@ -13,13 +13,12 @@
 */
 package fr.insee.sugoi.jms.writer;
 
+import fr.insee.sugoi.jms.exception.BrokerException;
+import fr.insee.sugoi.jms.model.BrokerRequest;
+import fr.insee.sugoi.jms.model.BrokerResponse;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
-
-import javax.jms.TextMessage;
-
-import org.apache.activemq.Message;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,19 +26,15 @@ import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
-import fr.insee.sugoi.jms.exception.BrokerException;
-import fr.insee.sugoi.jms.model.BrokerRequest;
-import fr.insee.sugoi.jms.model.BrokerResponse;
-
 @Component
 public class JmsWriter {
 
   private static final Logger logger = LogManager.getLogger(JmsWriter.class);
 
-  @Autowired
-  JmsTemplate jmsTemplate;
+  @Autowired JmsTemplate jmsTemplate;
 
-  public String writeRequestInQueue(String queueName, String methodName, Map<String, Object> methodParams) {
+  public String writeRequestInQueue(
+      String queueName, String methodName, Map<String, Object> methodParams) {
     BrokerRequest request = new BrokerRequest();
     String correlationId = UUID.randomUUID().toString();
     request.setMethod(methodName);
@@ -47,11 +42,18 @@ public class JmsWriter {
       request.setmethodParams(key, methodParams.get(key));
     }
     try {
-      jmsTemplate.convertAndSend(queueName, request, m -> {
-        m.setJMSCorrelationID(correlationId);
-        return m;
-      });
-      logger.debug("Send request with uuid: {}, request: {} in queue {}", request.getUuid(), request, queueName);
+      jmsTemplate.convertAndSend(
+          queueName,
+          request,
+          m -> {
+            m.setJMSCorrelationID(correlationId);
+            return m;
+          });
+      logger.debug(
+          "Send request with uuid: {}, request: {} in queue {}",
+          request.getUuid(),
+          request,
+          queueName);
       return correlationId;
     } catch (JmsException e) {
       logger.debug("Error when sending message {} to broker in queue {}", request, queueName);
@@ -60,8 +62,7 @@ public class JmsWriter {
   }
 
   public BrokerResponse checkResponseInQueue(String queueName, String correlationId) {
-    return (BrokerResponse) jmsTemplate.receiveSelected(queueName, "JMSCorrelationID= '" + correlationId + "'");
-
+    return (BrokerResponse)
+        jmsTemplate.receiveSelected(queueName, "JMSCorrelationID= '" + correlationId + "'");
   }
-
 }

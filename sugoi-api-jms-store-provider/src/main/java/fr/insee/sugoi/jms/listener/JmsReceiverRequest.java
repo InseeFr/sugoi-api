@@ -16,7 +16,6 @@ package fr.insee.sugoi.jms.listener;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.jms.model.BrokerRequest;
 import fr.insee.sugoi.jms.model.BrokerResponse;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +26,15 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(name = "fr.insee.sugoi.jms.receiver.request.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(
+    name = "fr.insee.sugoi.jms.receiver.request.enabled",
+    havingValue = "true",
+    matchIfMissing = false)
 public class JmsReceiverRequest {
 
-  @Autowired
-  JmsRequestRouter router;
+  @Autowired JmsRequestRouter router;
 
-  @Autowired
-  JmsTemplate jmsTemplate;
+  @Autowired JmsTemplate jmsTemplate;
 
   private static final Logger logger = LogManager.getLogger(JmsReceiverRequest.class);
 
@@ -50,9 +50,15 @@ public class JmsReceiverRequest {
   @Value("${fr.insee.sugoi.jms.queue.response.name:}")
   private String queueUrgentResponseName;
 
-  @JmsListener(destination = "${fr.insee.sugoi.jms.queue.requests.name:}", containerFactory = "myFactory")
+  @JmsListener(
+      destination = "${fr.insee.sugoi.jms.queue.requests.name:}",
+      containerFactory = "myFactory")
   public void onRequest(BrokerRequest request) throws Exception {
-    logger.debug("New message with uuid {} on queue {} message: {}", request.getUuid(), queueRequestName, request);
+    logger.debug(
+        "New message with uuid {} on queue {} message: {}",
+        request.getUuid(),
+        queueRequestName,
+        request);
     ProviderResponse response = router.exec(request);
     BrokerResponse br = new BrokerResponse();
     br.setProviderResponse(response);

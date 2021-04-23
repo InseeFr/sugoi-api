@@ -16,9 +16,7 @@ package fr.insee.sugoi.jms.model;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
 import javax.jms.JMSException;
-
 import org.apache.activemq.command.Message;
 import org.apache.activemq.command.Response;
 import org.apache.activemq.state.CommandVisitor;
@@ -65,7 +63,13 @@ public class BrokerRequest extends Message {
 
   @Override
   public String toString() {
-    return "{uuid: " + uuid.toString() + " method: " + method + " params: " + methodParams.toString() + "}";
+    return "{uuid: "
+        + uuid.toString()
+        + " method: "
+        + method
+        + " params: "
+        + methodParams.toString()
+        + "}";
   }
 
   @Override

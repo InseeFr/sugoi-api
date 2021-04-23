@@ -22,17 +22,14 @@ import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import java.util.List;
 
-/**
- * Writer stores are responsible for all operations modifying the underlying
- * store.
- */
+/** Writer stores are responsible for all operations modifying the underlying store. */
 public interface WriterStore {
 
   void deleteUser(String id);
 
   User createUser(User user);
 
-  ProviderResponse updateUser(User updatedUser);
+  ProviderResponse updateUser(User updatedUser,boolean asynchronousAllowed, String transactionId);
 
   void deleteGroup(String appName, String groupName);
 
@@ -56,9 +53,11 @@ public interface WriterStore {
 
   void addUserToGroup(String appName, String groupName, String userId);
 
-  void reinitPassword(User user, String generatedPassword, PasswordChangeRequest pcr, List<SendMode> sendModes);
+  void reinitPassword(
+      User user, String generatedPassword, PasswordChangeRequest pcr, List<SendMode> sendModes);
 
-  void initPassword(User user, String initPassword, PasswordChangeRequest pcr, List<SendMode> sendModes);
+  void initPassword(
+      User user, String initPassword, PasswordChangeRequest pcr, List<SendMode> sendModes);
 
   void changePassword(User user, String oldPassword, String newPassword, PasswordChangeRequest pcr);
 

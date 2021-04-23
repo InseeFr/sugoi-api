@@ -21,8 +21,6 @@ import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.model.User;
-
-import java.security.Provider;
 import java.util.Optional;
 
 public interface UserService {
@@ -34,9 +32,8 @@ public interface UserService {
    * @param storage
    * @param user
    * @return the created user
-   * @throws UserAlreadyExistException if an user with the same username already
-   *                                   exist in the realm
-   * @throws UserNotCreatedException   if user is not found after create
+   * @throws UserAlreadyExistException if an user with the same username already exist in the realm
+   * @throws UserNotCreatedException if user is not found after create
    */
   User create(String realm, String storage, User user);
 
@@ -48,7 +45,7 @@ public interface UserService {
    * @param user
    * @throws UserNotFoundException if user is not found in the realm
    */
-  ProviderResponse update(String realm, String storage, User user);
+  ProviderResponse update(String realm, String storage, User user, boolean asynchronousAllowed, String transactionId);
 
   /**
    * Delete an existing user (if the user already exists in the realm)
@@ -80,6 +77,10 @@ public interface UserService {
    * @param typeRecherche
    * @return a list of users
    */
-  PageResult<User> findByProperties(String realm, String storageName, User userProperties, PageableResult pageable,
+  PageResult<User> findByProperties(
+      String realm,
+      String storageName,
+      User userProperties,
+      PageableResult pageable,
       SearchType typeRecherche);
 }

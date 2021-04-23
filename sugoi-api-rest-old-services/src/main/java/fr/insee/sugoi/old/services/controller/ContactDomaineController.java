@@ -115,7 +115,8 @@ public class ContactDomaineController {
           .body(ouganextSugoiMapper.serializeToOuganext(userCreated, Contact.class));
     }
 
-    userService.update(domaine, null, sugoiUser);
+    // As a backport service, no support of asynchronous request
+    userService.update(domaine, null, sugoiUser,false,null);
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             ouganextSugoiMapper.serializeToOuganext(
