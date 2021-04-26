@@ -15,13 +15,13 @@ package fr.insee.sugoi.store.file;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insee.sugoi.core.model.PasswordChangeRequest;
-import fr.insee.sugoi.core.model.SendMode;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.paging.PasswordChangeRequest;
+import fr.insee.sugoi.model.paging.SendMode;
 import fr.insee.sugoi.store.file.configuration.FileKeysConfig;
 import java.io.File;
 import java.io.FileWriter;

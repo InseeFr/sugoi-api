@@ -24,9 +24,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
 import fr.insee.sugoi.core.exceptions.GroupAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
-import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.paging.PageResult;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -80,6 +80,7 @@ public class GroupControllerTest {
     groups.add(group2);
     pageResult = new PageResult<Group>();
     pageResult.setResults(groups);
+    pageResult.setSearchToken("mySearchToken");
   }
 
   // Test read requests on good query
@@ -246,7 +247,7 @@ public class GroupControllerTest {
           "Location header gives next page",
           mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
           is(
-              "http://localhost/realms/domaine1/applications/monApplication/groups?size=2&offset=2"));
+              "http://localhost/realms/domaine1/applications/monApplication/groups?size=2&searchToken=mySearchToken"));
 
     } catch (Exception e) {
       e.printStackTrace();

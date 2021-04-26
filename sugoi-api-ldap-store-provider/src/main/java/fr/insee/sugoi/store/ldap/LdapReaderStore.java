@@ -20,8 +20,6 @@ import com.unboundid.ldap.sdk.SearchRequest;
 import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
-import fr.insee.sugoi.core.model.PageResult;
-import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.LdapFilter;
@@ -37,6 +35,8 @@ import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.paging.PageResult;
+import fr.insee.sugoi.model.paging.PageableResult;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,6 +49,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     logger.debug("Configuring LdapReaderStore with config : {}", config);
     try {
       this.ldapPoolConnection = LdapFactory.getConnectionPool(config);
+      this.ldapMonoConnection = LdapFactory.getSingleConnection(config);
       this.config = config;
       userLdapMapper = new UserLdapMapper(config);
       organizationLdapMapper = new OrganizationLdapMapper(config);
@@ -318,14 +319,15 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       LdapMapper<ResultType> mapper)
       throws LDAPSearchException {
     SearchRequest searchRequest = new SearchRequest(baseDn, scope, filter, "*", "+");
-    LdapUtils.setRequestControls(searchRequest, pageableResult);
-    SearchResult searchResult = ldapPoolConnection.search(searchRequest);
+    LdapUtils.setRequestControls(searchRequest, pageableResult, config);
+    SearchResult searchResult = ldapMonoConnection.search(searchRequest);
     PageResult<ResultType> pageResult = new PageResult<>();
-    List<ResultType> results =
+    pageResult.setResults(
         searchResult.getSearchEntries().stream()
             .map(e -> mapper.mapFromAttributes(e.getAttributes()))
-            .collect(Collectors.toList());
-    pageResult.setResults(results);
+            .collect(Collectors.toList()));
+    LdapUtils.setResponseControls(pageResult, searchResult);
+    pageResult.setNextStart(pageableResult.getFirst() + pageResult.getPageSize());
     return pageResult;
   }
 

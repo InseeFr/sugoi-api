@@ -11,7 +11,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.core.model;
+package fr.insee.sugoi.model.paging;
 
 public enum SendMode {
   MAIL("mail"),

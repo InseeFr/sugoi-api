@@ -16,14 +16,14 @@ package fr.insee.sugoi.store.file;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import fr.insee.sugoi.core.model.PageResult;
-import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
+import fr.insee.sugoi.model.paging.PageResult;
+import fr.insee.sugoi.model.paging.PageableResult;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -14,9 +14,9 @@
 package fr.insee.sugoi.core.service;
 
 import fr.insee.sugoi.core.exceptions.ApplicationNotCreatedException;
-import fr.insee.sugoi.core.model.PageResult;
-import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.model.Application;
+import fr.insee.sugoi.model.paging.PageResult;
+import fr.insee.sugoi.model.paging.PageableResult;
 import java.util.Optional;
 
 public interface ApplicationService {

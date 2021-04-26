@@ -13,8 +13,6 @@
 */
 package fr.insee.sugoi.jms;
 
-import fr.insee.sugoi.core.model.PasswordChangeRequest;
-import fr.insee.sugoi.core.model.SendMode;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.jms.utils.JmsAtttributes;
 import fr.insee.sugoi.jms.utils.Method;
@@ -25,6 +23,8 @@ import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
+import fr.insee.sugoi.model.paging.PasswordChangeRequest;
+import fr.insee.sugoi.model.paging.SendMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -24,9 +24,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
 import fr.insee.sugoi.core.exceptions.ApplicationAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
-import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.service.ApplicationService;
 import fr.insee.sugoi.model.Application;
+import fr.insee.sugoi.model.paging.PageResult;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -80,6 +80,7 @@ public class ApplicationControllerTest {
     applications.add(application2);
     pageResult = new PageResult<Application>();
     pageResult.setResults(applications);
+    pageResult.setSearchToken("mySearchToken");
   }
 
   // Test read requests on good query
@@ -258,7 +259,7 @@ public class ApplicationControllerTest {
       assertThat(
           "Location header gives next page",
           mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
-          is("http://localhost/realms/domaine1/applications?size=2&offset=2"));
+          is("http://localhost/realms/domaine1/applications?size=2&searchToken=mySearchToken"));
 
     } catch (Exception e) {
       e.printStackTrace();

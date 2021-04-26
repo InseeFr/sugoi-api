@@ -45,6 +45,9 @@ public class LdapStoreBeans {
   @Value("${fr.insee.sugoi.ldap.default.group_source_pattern:}")
   private String defaultGroupSourcePattern;
 
+  @Value("${fr.insee.sugoi.ldap.default.vlv.enabled:false}")
+  private String vlvEnabled;
+
   @Bean("LdapReaderStore")
   @Lazy
   @Scope("prototype")
@@ -84,6 +87,12 @@ public class LdapStoreBeans {
             ? userStorage.getProperties().get("group_filter_pattern")
             : defaultGroupFilterPattern);
     config.put(LdapConfigKeys.REALM_NAME, realm.getName());
+    config.put(
+        LdapConfigKeys.VLV_ENABLED,
+        realm.getProperties().get(LdapConfigKeys.VLV_ENABLED) != null
+            ? realm.getProperties().get(LdapConfigKeys.VLV_ENABLED)
+            : vlvEnabled);
+
     return config;
   }
 }

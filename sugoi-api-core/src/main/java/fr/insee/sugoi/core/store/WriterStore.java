@@ -13,12 +13,12 @@
 */
 package fr.insee.sugoi.core.store;
 
-import fr.insee.sugoi.core.model.PasswordChangeRequest;
-import fr.insee.sugoi.core.model.SendMode;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.paging.PasswordChangeRequest;
+import fr.insee.sugoi.model.paging.SendMode;
 import java.util.List;
 
 /** Writer stores are responsible for all operations modifying the underlying store. */

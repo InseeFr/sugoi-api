@@ -20,9 +20,6 @@ import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.OrganizationAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.OrganizationNotCreatedException;
 import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
-import fr.insee.sugoi.core.model.PageResult;
-import fr.insee.sugoi.core.model.PageableResult;
-import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.OrganizationService;
 import fr.insee.sugoi.core.store.ReaderStore;
@@ -30,6 +27,9 @@ import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
+import fr.insee.sugoi.model.paging.PageResult;
+import fr.insee.sugoi.model.paging.PageableResult;
+import fr.insee.sugoi.model.paging.SearchType;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
@@ -199,8 +199,13 @@ public class OrganizationServiceImpl implements OrganizationService {
                     org.addMetadatas(GlobalKeysConfig.USERSTORAGE, us.getName());
                   });
           result.getResults().addAll(temResult.getResults());
-          result.setTotalElements(result.getResults().size());
-          if (result.getTotalElements() >= result.getPageSize()) {
+          result.setTotalElements(
+              temResult.getTotalElements() == -1
+                  ? temResult.getTotalElements()
+                  : result.getTotalElements() + temResult.getTotalElements());
+          result.setSearchToken(temResult.getSearchToken());
+          result.setHasMoreResult(temResult.isHasMoreResult());
+          if (result.getResults().size() >= result.getPageSize()) {
             sugoiEventPublisher.publishCustomEvent(
                 realm,
                 storageName,

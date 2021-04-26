@@ -13,12 +13,12 @@
 */
 package fr.insee.sugoi.core.store;
 
-import fr.insee.sugoi.core.model.PageResult;
-import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.paging.PageResult;
+import fr.insee.sugoi.model.paging.PageableResult;
 
 /**
  * Reader store are responsible of all operations reading a store (to fetch informations) All method

@@ -11,19 +11,20 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.app.cucumber.utils;
+package fr.insee.sugoi.model.paging;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PageResult<T> {
   private static final int TAILLE_RECHERCHE_DEFAUT = 20;
 
-  private List<T> results;
+  private List<T> results = new ArrayList<>();
   private int totalElements;
   private int nextStart;
   private boolean hasMoreResult = false;
   private int pageSize = TAILLE_RECHERCHE_DEFAUT;
-  private byte[] searchCookie;
+  private String searchToken;
 
   public PageResult() {}
 
@@ -67,11 +68,11 @@ public class PageResult<T> {
     this.pageSize = pageSize;
   }
 
-  public byte[] getSearchCookie() {
-    return this.searchCookie;
+  public String getSearchToken() {
+    return this.searchToken;
   }
 
-  public void setSearchCookie(byte[] searchCookie) {
-    this.searchCookie = searchCookie;
+  public void setSearchToken(String searchToken) {
+    this.searchToken = searchToken;
   }
 }

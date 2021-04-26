@@ -18,6 +18,7 @@ import com.unboundid.ldap.sdk.Modification;
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
+import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Realm;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,8 @@ public class RealmLdapMapper {
           realm.setAppSource(property[1]);
         } else if (property[0].equalsIgnoreCase("seealso_attributes")) {
           realm.addProperty(GlobalKeysConfig.SEEALSO_ATTRIBUTES, property[1]);
+        } else if (property[0].equalsIgnoreCase("vlv_enabled")) {
+          realm.addProperty(LdapConfigKeys.VLV_ENABLED, property[1]);
         }
       }
     }

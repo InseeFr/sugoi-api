@@ -15,13 +15,13 @@ package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
-import fr.insee.sugoi.core.model.PageResult;
-import fr.insee.sugoi.core.model.PageableResult;
-import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.paging.PageResult;
+import fr.insee.sugoi.model.paging.PageableResult;
+import fr.insee.sugoi.model.paging.SearchType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -62,12 +62,12 @@ public class UserController {
   @GetMapping(
       path = {"/realms/{realm}/storages/{storage}/users"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Operation(summary = "Search users according to parameters")
+  @Operation(summary = "Search users according to parameters, paginate working")
   @ApiResponses(
       value = {
         @ApiResponse(
             responseCode = "200",
-            description = "Organizations found according to parameter",
+            description = "Users found according to parameter",
             content = {
               @Content(
                   mediaType = "application/json",
@@ -107,8 +107,8 @@ public class UserController {
       @Parameter(description = "Offset to apply when searching", required = false)
           @RequestParam(name = "offset", required = false, defaultValue = "0")
           int offset,
-      @Parameter(description = "cookie to continue a previous search", required = false)
-          @RequestParam(name = "searchCookie", required = false)
+      @Parameter(description = "Token to continue a previous search", required = false)
+          @RequestParam(name = "searchToken", required = false)
           String searchCookie,
       @Parameter(description = "Search type can be OR or AND ", required = false)
           @RequestParam(name = "typeRecherche", defaultValue = "AND", required = true)
@@ -136,19 +136,14 @@ public class UserController {
     }
 
     // set the page to maintain the search request pagination
-    PageableResult pageable = new PageableResult();
-    if (searchCookie != null) {
-      pageable.setCookie(searchCookie.getBytes());
-    }
-    pageable.setOffset(offset);
-    pageable.setSize(size);
+    PageableResult pageable = new PageableResult(size, offset, searchCookie);
 
     PageResult<User> foundUsers =
         userService.findByProperties(realm, storage, searchUser, pageable, typeRecherche);
     if (foundUsers.isHasMoreResult()) {
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()
-              .replaceQueryParam("offset", offset + size)
+              .replaceQueryParam("searchToken", foundUsers.getSearchToken())
               .build()
               .toUri();
       return ResponseEntity.status(HttpStatus.OK)
@@ -162,7 +157,7 @@ public class UserController {
   @GetMapping(
       path = {"/realms/{realm}/users"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Operation(summary = "Search users according to parameters")
+  @Operation(summary = "Search users according to parameters, paginate could not work")
   @ApiResponses(
       value = {
         @ApiResponse(
@@ -202,8 +197,8 @@ public class UserController {
       @Parameter(description = "Offset to apply when searching", required = false)
           @RequestParam(name = "offset", required = false, defaultValue = "0")
           int offset,
-      @Parameter(description = "cookie to continue a previous search", required = false)
-          @RequestParam(name = "searchCookie", required = false)
+      @Parameter(description = "Token to continue a previous search", required = false)
+          @RequestParam(name = "searchToken", required = false)
           String searchCookie,
       @Parameter(description = "Search type can be OR or AND ", required = false)
           @RequestParam(name = "typeRecherche", defaultValue = "AND", required = true)

@@ -17,9 +17,9 @@ import fr.insee.sugoi.core.exceptions.GroupAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.GroupNotCreatedException;
 import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
-import fr.insee.sugoi.core.model.PageResult;
-import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.paging.PageResult;
+import fr.insee.sugoi.model.paging.PageableResult;
 import java.util.Optional;
 
 public interface GroupService {

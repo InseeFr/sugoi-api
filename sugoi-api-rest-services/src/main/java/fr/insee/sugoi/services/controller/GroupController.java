@@ -14,10 +14,10 @@
 package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
-import fr.insee.sugoi.core.model.PageResult;
-import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.paging.PageResult;
+import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.services.view.GroupView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -91,13 +91,16 @@ public class GroupController {
       @Parameter(description = "Expected size of result", required = false)
           @RequestParam(value = "size", defaultValue = "20")
           int size,
+      @Parameter(description = "Token to continue a previous search", required = false)
+          @RequestParam(name = "searchToken", required = false)
+          String searchCookie,
       @Parameter(description = "Offset to apply when searching", required = false)
           @RequestParam(value = "offset", defaultValue = "0")
           int offset) {
     Group filterGroup = new Group();
     filterGroup.setName(name);
     filterGroup.setDescription(description);
-    PageableResult pageableResult = new PageableResult(size, offset);
+    PageableResult pageableResult = new PageableResult(size, offset, searchCookie);
 
     PageResult<Group> foundGroups =
         groupService.findByProperties(realm, applicationName, filterGroup, pageableResult);
@@ -105,7 +108,7 @@ public class GroupController {
     if (foundGroups.isHasMoreResult()) {
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()
-              .replaceQueryParam("offset", offset + size)
+              .replaceQueryParam("searchToken", foundGroups.getSearchToken())
               .build()
               .toUri();
       return ResponseEntity.status(HttpStatus.OK)
