@@ -14,8 +14,11 @@
 package fr.insee.sugoi.old.services.controller;
 
 import fr.insee.sugoi.converter.ouganext.Habilitations;
+import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm.RealmStorage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -47,6 +50,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ContactHabilitationDomaineController {
 
   @Autowired private UserService userService;
+
+  @Autowired private ConverterDomainRealm converterDomainRealm;
 
   /**
    * Retrieve all the habilitations of a contact
@@ -83,9 +88,19 @@ public class ContactHabilitationDomaineController {
               required = true)
           @PathVariable(name = "domaine", required = true)
           String domaine) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
     return ResponseEntity.status(HttpStatus.OK)
         .body(
-            new Habilitations(userService.findById(domaine, null, identifiant).getHabilitations()));
+            new Habilitations(
+                userService
+                    .findById(
+                        realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
+                    .orElseThrow(
+                        () ->
+                            new UserNotFoundException(
+                                "Cannot find user " + identifiant + " in domaine " + domaine))
+                    .getHabilitations()));
   }
 
   /**
@@ -131,11 +146,19 @@ public class ContactHabilitationDomaineController {
       @Parameter(description = "Name of role to add on the app to the user", required = true)
           @RequestParam(name = "role", required = true)
           List<String> nomRoles) {
-    User user = userService.findById(domaine, null, identifiant);
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
+    User user =
+        userService
+            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
+            .orElseThrow(
+                () ->
+                    new UserNotFoundException(
+                        "Cannot find user " + identifiant + " in domaine " + domaine));
     Habilitations habilitations = new Habilitations(user.getHabilitations());
     habilitations.addHabilitation(appName, nomRoles);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
-    userService.update(domaine, null, user);
+    userService.update(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), user);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -186,11 +209,19 @@ public class ContactHabilitationDomaineController {
       @Parameter(description = "List of properties to add on the app to the user", required = true)
           @RequestParam(name = "propriete", required = true)
           List<String> proprietes) {
-    User user = userService.findById(domaine, null, identifiant);
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
+    User user =
+        userService
+            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
+            .orElseThrow(
+                () ->
+                    new UserNotFoundException(
+                        "Cannot find user " + identifiant + " in domaine " + domaine));
     Habilitations habilitations = new Habilitations(user.getHabilitations());
     habilitations.addHabilitations(appName, role, proprietes);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
-    userService.update(domaine, null, user);
+    userService.update(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), user);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -233,11 +264,19 @@ public class ContactHabilitationDomaineController {
       @Parameter(description = "List of roles to delete on the app for the user", required = true)
           @RequestParam(name = "role", required = true)
           List<String> nomRoles) {
-    User user = userService.findById(domaine, null, identifiant);
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
+    User user =
+        userService
+            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
+            .orElseThrow(
+                () ->
+                    new UserNotFoundException(
+                        "Cannot find user " + identifiant + " in domaine " + domaine));
     Habilitations habilitations = new Habilitations(user.getHabilitations());
     habilitations.removeHabilitation(appName, nomRoles);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
-    userService.update(domaine, null, user);
+    userService.update(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), user);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -287,7 +326,15 @@ public class ContactHabilitationDomaineController {
               required = true)
           @RequestParam(name = "propriete", required = true)
           List<String> proprietes) {
-    User user = userService.findById(domaine, null, identifiant);
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
+    User user =
+        userService
+            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
+            .orElseThrow(
+                () ->
+                    new UserNotFoundException(
+                        "Cannot find user " + identifiant + " in domaine " + domaine));
     Habilitations habilitations = new Habilitations(user.getHabilitations());
     habilitations.removeHabilitation(appName, nomRole, proprietes);
     user.setHabilitations(habilitations.convertSugoiHabilitation());

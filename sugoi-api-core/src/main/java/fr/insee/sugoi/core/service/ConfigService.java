@@ -13,9 +13,12 @@
 */
 package fr.insee.sugoi.core.service;
 
+import fr.insee.sugoi.core.exceptions.RealmAlreadyExistException;
+import fr.insee.sugoi.core.exceptions.RealmNotCreatedException;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.Realm;
 import java.util.List;
+import java.util.Optional;
 
 /** Managing realm configuration */
 public interface ConfigService {
@@ -23,22 +26,38 @@ public interface ConfigService {
   /**
    * Finds a realm by its name by using the RealmProvider Bean The result is cached.
    *
-   * @throws RealmNotFoundException in case no realm is found
    * @param name
-   * @return the Realm
+   * @return an optional of the Realm
    */
-  Realm getRealm(String name);
+  Optional<Realm> getRealm(String name);
 
   /**
-   * Finds all realms using the RelmProvider bean. The resulting list is cached.
+   * Finds all realms using the RealmProvider bean. The resulting list is cached.
    *
    * @return a list of all realms
    */
   List<Realm> getRealms();
 
+  /**
+   * [NotYetImplemented] Check if the realm exists (by name) and delete realm using the name
+   *
+   * @throws RealmNotFoundException if realmName doesn't match with the name of an existing realm
+   */
   void deleteRealm(String realmName);
 
+  /**
+   * [NotYetImplemented] Check if the realm exists and update realm
+   *
+   * @throws RealmNotFoundException if realm doesn't match (by name) with an existing realm
+   */
   void updateRealm(Realm realm);
 
+  /**
+   * [NotYetImplemented] Check if a realm with the same name already exists, and creates it if it
+   * doesn't exist
+   *
+   * @throws RealmAlreadyExistException if realm already exists
+   * @throws RealmNotCreatedException if fail to create realm
+   */
   void createRealm(Realm realm);
 }

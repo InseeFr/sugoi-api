@@ -16,8 +16,11 @@ package fr.insee.sugoi.old.services.controller;
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
 import fr.insee.sugoi.converter.ouganext.Contact;
 import fr.insee.sugoi.converter.ouganext.InfoFormattage;
+import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm;
+import fr.insee.sugoi.old.services.configuration.ConverterDomainRealmConfiguration.ConverterDomainRealm.RealmStorage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -51,6 +54,8 @@ public class ContactDomaineController {
   @Autowired private UserService userService;
 
   @Autowired private OuganextSugoiMapper ouganextSugoiMapper;
+
+  @Autowired private ConverterDomainRealm converterDomainRealm;
 
   /**
    * Update or create a contact.
@@ -105,20 +110,27 @@ public class ContactDomaineController {
               required = false)
           @RequestParam(name = "creation")
           boolean creation) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
     contact.setIdentifiant(identifiant);
     User sugoiUser = ouganextSugoiMapper.serializeToSugoi(contact, User.class);
-    if (userService.findById(domaine, null, identifiant) != null) {
-      userService.update(domaine, null, sugoiUser);
-    } else if (creation) {
-      userService.create(domaine, null, sugoiUser);
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+    if (creation) {
+      User userCreated =
+          userService.create(
+              realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), sugoiUser);
+      return ResponseEntity.status(HttpStatus.OK)
+          .body(ouganextSugoiMapper.serializeToOuganext(userCreated, Contact.class));
     }
 
+    userService.update(domaine, null, sugoiUser);
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             ouganextSugoiMapper.serializeToOuganext(
-                userService.findById(domaine, null, identifiant), Contact.class));
+                userService
+                    .findById(
+                        realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
+                    .get(),
+                Contact.class));
   }
 
   /**
@@ -156,10 +168,19 @@ public class ContactDomaineController {
               required = true)
           @PathVariable(name = "domaine", required = true)
           String domaine) {
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             ouganextSugoiMapper.serializeToOuganext(
-                userService.findById(domaine, null, identifiant), Contact.class));
+                userService
+                    .findById(
+                        realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
+                    .orElseThrow(
+                        () ->
+                            new UserNotFoundException(
+                                "User " + identifiant + " not found in realm " + domaine)),
+                Contact.class));
   }
 
   /**
@@ -199,12 +220,10 @@ public class ContactDomaineController {
               required = true)
           @PathVariable("domaine")
           String domaine) {
-    if (userService.findById(domaine, null, identifiant) != null) {
-      userService.delete(domaine, null, identifiant);
-      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
+
+    userService.delete(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   /**

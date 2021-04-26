@@ -51,7 +51,7 @@ public class OrganizationGlue {
       stepData.setOrganizations(organizations.getResults());
       isOrga = true;
     } catch (JsonProcessingException e) {
-      isOrga = false;
+      e.printStackTrace();
     }
     assertThat("Data receive is a list of organizations", isOrga, is(true));
   }
@@ -66,8 +66,9 @@ public class OrganizationGlue {
       stepData.setOrganization(organization);
       isOrga = true;
     } catch (JsonProcessingException e) {
+      e.printStackTrace();
     }
-    assertThat("Data receive is an organization", isOrga, is(false));
+    assertThat("Data receive is an organization", isOrga, is(true));
   }
 
   @Then("the client expect the identifiant of organization to be {}")

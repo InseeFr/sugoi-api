@@ -13,24 +13,92 @@
 */
 package fr.insee.sugoi.core.service;
 
+import fr.insee.sugoi.core.exceptions.GroupAlreadyExistException;
+import fr.insee.sugoi.core.exceptions.GroupNotCreatedException;
+import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
+import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.model.Group;
+import java.util.Optional;
 
 public interface GroupService {
 
+  /**
+   * Check if the group exists in the app (by name) and create it if it doesn't exist
+   *
+   * @param realm
+   * @param appName
+   * @param group
+   * @return the created group
+   * @throws GroupAlreadyExistException if the group already exist
+   * @throws GroupNotCreatedException if fail to create group
+   */
   Group create(String realm, String appName, Group group);
 
+  /**
+   * Check if the group exists in the app (by name) and update it
+   *
+   * @param realm
+   * @param appName
+   * @param group
+   * @throws GroupNotFoundException if group doesn't exist in app
+   */
   void update(String realm, String appName, Group group);
 
+  /**
+   * Check if the group exists in the app (by name) and delete it
+   *
+   * @param realm
+   * @param appName
+   * @param id
+   * @throws GroupNotFoundException if group doesn't exist in app
+   */
   void delete(String realm, String appName, String id);
 
-  Group findById(String realm, String appName, String id);
+  /**
+   * Find a group by its id in an application
+   *
+   * @param realm
+   * @param appName
+   * @param id
+   * @return an optional with the group found
+   */
+  Optional<Group> findById(String realm, String appName, String id);
 
+  /**
+   * Find a groups matching criterias
+   *
+   * @param realm
+   * @param appName
+   * @param groupFilter
+   * @param pageableResult
+   * @return a list of all groups matching criterias
+   */
   PageResult<Group> findByProperties(
       String realm, String appName, Group groupFilter, PageableResult pageableResult);
 
+  /**
+   * Check if user and group exist and add the user to the group
+   *
+   * @param realm
+   * @param userId
+   * @param appName
+   * @param groupName
+   * @throws GroupNotFoundException if group doesn't exist in app
+   * @throws UserNotFoundException if user doesn't exist realm
+   */
   void addUserToGroup(String realm, String userId, String appName, String groupName);
 
+  /**
+   * Check if user and group exist and remove the user from the group
+   *
+   * @param realm
+   * @param userId
+   * @param appName
+   * @param groupName
+   * @throws GroupNotFoundException if group doesn't exist in app
+   * @throws UserNotFoundException if user doesn't exist realm
+   */
   void deleteUserFromGroup(String realm, String userId, String appName, String groupName);
 }

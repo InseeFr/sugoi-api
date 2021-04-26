@@ -303,7 +303,7 @@ public class OuganextSugoiMapper {
     userStorage.setAddressSource(profil.getBrancheAdresse());
     userStorage.setUserSource(profil.getBrancheContact());
     realm.setUserStorages(List.of(userStorage));
-    realm.setName(profil.getNomProfil().split("_")[1]);
+    realm.setName(profil.getNomProfil());
     return realm;
   }
 }

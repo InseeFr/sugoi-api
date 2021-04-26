@@ -90,6 +90,7 @@ public class WebHookServiceImpl implements WebHookService {
       template =
           configService
               .getRealm((String) values.get(GlobalKeysConfig.REALM))
+              .get()
               .getUserStorages()
               .stream()
               .filter(
@@ -126,6 +127,7 @@ public class WebHookServiceImpl implements WebHookService {
       template =
           configService
               .getRealm((String) values.get(GlobalKeysConfig.REALM))
+              .get()
               .getUserStorages()
               .stream()
               .filter(

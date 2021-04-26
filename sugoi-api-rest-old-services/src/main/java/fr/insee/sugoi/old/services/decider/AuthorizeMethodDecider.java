@@ -79,9 +79,9 @@ public class AuthorizeMethodDecider {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     List<String> roles =
         authentication.getAuthorities().stream()
-            .map(authority -> authority.getAuthority())
+            .map(authority -> authority.getAuthority().toUpperCase())
             .collect(Collectors.toList());
-    if (roles.contains(roleSearch)) {
+    if (roles.contains(roleSearch.toUpperCase())) {
       return true;
     }
     return false;

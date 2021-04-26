@@ -149,7 +149,7 @@ public class GenericGlue {
     assertThat(stepData.getLatestResponse().getBody(), is(bodyResponse));
   }
 
-  @And("body received")
+  @And("show body received")
   public void body_received() throws Throwable {
     scenario.log(stepData.getLatestResponse().getBody());
   }

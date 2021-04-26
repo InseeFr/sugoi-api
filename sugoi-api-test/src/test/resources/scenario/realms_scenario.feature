@@ -7,5 +7,6 @@ Feature: Realms scenario
 
     Scenario: Get realms
         When the client perform GET request on url /realms
+        And show body received
         Then the client receives status code 200
         Then the client expect to have realms access

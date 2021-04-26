@@ -22,12 +22,14 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
-import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
+import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
+import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.User;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -133,7 +135,7 @@ public class UserControllerTest {
   public void shouldGetUserByID() {
     try {
 
-      Mockito.when(userService.findById("domaine1", null, "Toto")).thenReturn(user1);
+      Mockito.when(userService.findById("domaine1", null, "Toto")).thenReturn(Optional.of(user1));
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.get("/realms/domaine1/users/Toto")
@@ -161,7 +163,7 @@ public class UserControllerTest {
     try {
 
       Mockito.when(userService.findById(Mockito.anyString(), Mockito.isNull(), Mockito.anyString()))
-          .thenReturn(user1);
+          .thenReturn(Optional.of(user1));
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.delete("/realms/domaine1/users/supprimemoi")
@@ -183,8 +185,8 @@ public class UserControllerTest {
     try {
 
       Mockito.when(userService.findById("domaine1", null, "Toto"))
-          .thenReturn(user1)
-          .thenReturn(user1Updated);
+          .thenReturn(Optional.of(user1))
+          .thenReturn(Optional.of(user1Updated));
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.put("/realms/domaine1/users/Toto")
@@ -217,8 +219,8 @@ public class UserControllerTest {
   public void postShouldCallPostServiceAndReturnNewApp() {
 
     try {
-      Mockito.when(userService.findById(Mockito.any(), Mockito.any(), Mockito.any()))
-          .thenThrow(EntityNotFoundException.class)
+      Mockito.when(userService.create(Mockito.any(), Mockito.any(), Mockito.any()))
+          .thenReturn(user1)
           .thenReturn(user1);
 
       RequestBuilder requestBuilder =
@@ -274,9 +276,6 @@ public class UserControllerTest {
   public void getObjectLocationInUserCreationResponse() {
     try {
 
-      Mockito.when(userService.findById(Mockito.anyString(), Mockito.any(), Mockito.anyString()))
-          .thenThrow(EntityNotFoundException.class)
-          .thenReturn(user1);
       Mockito.when(userService.create(Mockito.anyString(), Mockito.any(), Mockito.any()))
           .thenReturn(user1);
 
@@ -371,9 +370,9 @@ public class UserControllerTest {
   public void get409WhenCreatingAlreadyExistingUser() {
     try {
 
-      Mockito.when(
-              userService.findById(Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
-          .thenReturn(user1);
+      Mockito.doThrow(new UserAlreadyExistException(""))
+          .when(userService)
+          .create(Mockito.anyString(), Mockito.any(), Mockito.any());
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.post(
@@ -400,7 +399,7 @@ public class UserControllerTest {
     try {
 
       Mockito.when(userService.findById(Mockito.anyString(), Mockito.isNull(), Mockito.anyString()))
-          .thenReturn(null);
+          .thenReturn(Optional.empty());
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.get("/realms/domaine1/users/dontexist")
@@ -444,8 +443,9 @@ public class UserControllerTest {
   public void get404WhenNoUserIsFoundWhenUpdate() {
     try {
 
-      Mockito.when(userService.findById(Mockito.anyString(), Mockito.any(), Mockito.anyString()))
-          .thenThrow(EntityNotFoundException.class);
+      Mockito.doThrow(new UserNotFoundException(""))
+          .when(userService)
+          .update(Mockito.anyString(), Mockito.any(), Mockito.any());
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.put("/realms/domaine1/users/Toto")
               .contentType(MediaType.APPLICATION_JSON)
@@ -469,8 +469,9 @@ public class UserControllerTest {
   public void get404WhenNoUserIsFoundWhenDelete() {
     try {
 
-      Mockito.when(userService.findById(Mockito.anyString(), Mockito.any(), Mockito.anyString()))
-          .thenThrow(EntityNotFoundException.class);
+      Mockito.doThrow(new UserNotFoundException(""))
+          .when(userService)
+          .update(Mockito.anyString(), Mockito.any(), Mockito.any());
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.delete("/realms/domaine1/users/dontexist")

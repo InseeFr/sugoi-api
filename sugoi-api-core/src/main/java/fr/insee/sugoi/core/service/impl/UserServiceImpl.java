@@ -17,7 +17,9 @@ import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
-import fr.insee.sugoi.core.exceptions.EntityNotFoundException;
+import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
+import fr.insee.sugoi.core.exceptions.UserNotCreatedException;
+import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.model.SearchType;
@@ -29,6 +31,7 @@ import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.Map;
+import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,75 +50,136 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public User create(String realm, String storage, User user) {
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        storage,
-        SugoiEventTypeEnum.CREATE_USER,
-        Map.ofEntries(Map.entry(EventKeysConfig.USER, user)));
-    return storeProvider.getWriterStore(realm, storage).createUser(user);
+    try {
+
+      if (findById(realm, storage, user.getUsername()).isEmpty()) {
+        String userName =
+            storeProvider.getWriterStore(realm, storage).createUser(user).getUsername();
+        sugoiEventPublisher.publishCustomEvent(
+            realm,
+            storage,
+            SugoiEventTypeEnum.CREATE_USER,
+            Map.ofEntries(Map.entry(EventKeysConfig.USER, user)));
+        return findById(realm, storage, userName)
+            .orElseThrow(
+                () ->
+                    new UserNotCreatedException(
+                        "Cannot create user " + userName + " in realm " + realm));
+      }
+      throw new UserAlreadyExistException(
+          "User " + user.getUsername() + " already exist in realm " + realm);
+    } catch (Exception e) {
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          storage,
+          SugoiEventTypeEnum.CREATE_USER_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.USER, user),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
+
+      if (e instanceof UserAlreadyExistException) {
+        throw (UserAlreadyExistException) e;
+      } else if (e instanceof UserNotCreatedException) {
+        throw (UserNotCreatedException) e;
+      } else {
+        throw e;
+      }
+    }
   }
 
   @Override
   public void update(String realm, String storage, User user) {
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        storage,
-        SugoiEventTypeEnum.UPDATE_USER,
-        Map.ofEntries(Map.entry(EventKeysConfig.USER, user)));
-    storeProvider.getWriterStore(realm, storage).updateUser(user);
+
+    try {
+      findById(realm, storage, user.getUsername())
+          .orElseThrow(
+              () ->
+                  new UserNotFoundException(
+                      "Cannot find user " + user.getUsername() + " in realm " + realm));
+      storeProvider.getWriterStore(realm, storage).updateUser(user);
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          storage,
+          SugoiEventTypeEnum.UPDATE_USER,
+          Map.ofEntries(Map.entry(EventKeysConfig.USER, user)));
+    } catch (Exception e) {
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          storage,
+          SugoiEventTypeEnum.UPDATE_USER_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.USER, user),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
+      if (e instanceof UserNotFoundException) {
+        throw (UserNotFoundException) e;
+      } else {
+        throw e;
+      }
+    }
   }
 
   @Override
   public void delete(String realmName, String storage, String id) {
-    sugoiEventPublisher.publishCustomEvent(
-        realmName,
-        storage,
-        SugoiEventTypeEnum.DELETE_USER,
-        Map.ofEntries(Map.entry(EventKeysConfig.USER_ID, id)));
-    storeProvider.getWriterStore(realmName, storage).deleteUser(id);
-  }
-
-  @Override
-  public User findById(String realmName, String storage, String id) {
-    if (id != null) {
+    try {
+      findById(realmName, storage, id)
+          .orElseThrow(
+              () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realmName));
+      storeProvider.getWriterStore(realmName, storage).deleteUser(id);
       sugoiEventPublisher.publishCustomEvent(
           realmName,
           storage,
-          SugoiEventTypeEnum.FIND_USER_BY_ID,
+          SugoiEventTypeEnum.DELETE_USER,
           Map.ofEntries(Map.entry(EventKeysConfig.USER_ID, id)));
-
-      if (storage != null) {
-        try {
-          User user = storeProvider.getReaderStore(realmName, storage).getUser(id);
-          if (user != null) {
-            user.addMetadatas(GlobalKeysConfig.REALM, realmName.toLowerCase());
-            user.addMetadatas(GlobalKeysConfig.USERSTORAGE, storage.toLowerCase());
-            return user;
-          }
-        } catch (Exception e) {
-          throw new EntityNotFoundException(
-              "Error while finding user in " + realmName + " and userStorage " + storage);
-        }
-        throw new EntityNotFoundException(
-            "User not found in realm " + realmName + " and userStorage " + storage);
+    } catch (Exception e) {
+      sugoiEventPublisher.publishCustomEvent(
+          realmName,
+          storage,
+          SugoiEventTypeEnum.DELETE_USER_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.USER_ID, id),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
+      if (e instanceof UserNotFoundException) {
+        throw (UserNotFoundException) e;
       } else {
-        Realm r = realmProvider.load(realmName);
-        for (UserStorage us : r.getUserStorages()) {
-          try {
-            User user = storeProvider.getReaderStore(realmName, us.getName()).getUser(id);
-            if (user != null) {
-              user.addMetadatas(GlobalKeysConfig.REALM, realmName);
-              user.addMetadatas(GlobalKeysConfig.USERSTORAGE, us.getName());
-              return user;
-            }
-          } catch (Exception e) {
-            logger.debug(
-                "User " + id + "not in realm " + realmName + " and userstorage " + us.getName());
-          }
-        }
+        throw e;
       }
     }
-    throw new EntityNotFoundException("User not found in realm " + realmName);
+  }
+
+  @Override
+  public Optional<User> findById(String realmName, String storage, String id) {
+    User user = null;
+    try {
+      if (id != null) {
+        if (storage != null) {
+          user = storeProvider.getReaderStore(realmName, storage).getUser(id);
+          user.addMetadatas(GlobalKeysConfig.REALM, realmName.toLowerCase());
+          user.addMetadatas(GlobalKeysConfig.USERSTORAGE, storage.toLowerCase());
+        } else {
+          Realm r = realmProvider.load(realmName);
+          for (UserStorage us : r.getUserStorages()) {
+            user = storeProvider.getReaderStore(realmName, us.getName()).getUser(id);
+            user.addMetadatas(GlobalKeysConfig.REALM, realmName);
+            user.addMetadatas(GlobalKeysConfig.USERSTORAGE, us.getName());
+          }
+        }
+        sugoiEventPublisher.publishCustomEvent(
+            realmName,
+            storage,
+            SugoiEventTypeEnum.FIND_USER_BY_ID,
+            Map.ofEntries(Map.entry(EventKeysConfig.USER_ID, id)));
+      }
+      return Optional.ofNullable(user);
+    } catch (Exception e) {
+      sugoiEventPublisher.publishCustomEvent(
+          realmName,
+          storage,
+          SugoiEventTypeEnum.FIND_USER_BY_ID_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.USER_ID, id),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
+      return Optional.ofNullable(user);
+    }
   }
 
   @Override
@@ -126,14 +190,6 @@ public class UserServiceImpl implements UserService {
       PageableResult pageable,
       SearchType typeRecherche) {
 
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        storage,
-        SugoiEventTypeEnum.FIND_USERS,
-        Map.ofEntries(
-            Map.entry(EventKeysConfig.USER_PROPERTIES, userProperties),
-            Map.entry(EventKeysConfig.PAGEABLE, pageable),
-            Map.entry(EventKeysConfig.TYPE_RECHERCHE, typeRecherche)));
     PageResult<User> result = new PageResult<>();
     result.setPageSize(pageable.getSize());
     try {
@@ -166,6 +222,14 @@ public class UserServiceImpl implements UserService {
           result.getResults().addAll(temResult.getResults());
           result.setTotalElements(result.getResults().size());
           if (result.getTotalElements() >= result.getPageSize()) {
+            sugoiEventPublisher.publishCustomEvent(
+                realm,
+                storage,
+                SugoiEventTypeEnum.FIND_USERS,
+                Map.ofEntries(
+                    Map.entry(EventKeysConfig.USER_PROPERTIES, userProperties),
+                    Map.entry(EventKeysConfig.PAGEABLE, pageable),
+                    Map.entry(EventKeysConfig.TYPE_RECHERCHE, typeRecherche)));
             return result;
           }
           pageable.setSize(pageable.getSize() - result.getTotalElements());
@@ -173,8 +237,25 @@ public class UserServiceImpl implements UserService {
       }
 
     } catch (Exception e) {
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          storage,
+          SugoiEventTypeEnum.FIND_USERS_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.USER_PROPERTIES, userProperties),
+              Map.entry(EventKeysConfig.PAGEABLE, pageable),
+              Map.entry(EventKeysConfig.TYPE_RECHERCHE, typeRecherche),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
       throw new RuntimeException("Erreur lors de la récupération des utilisateurs", e);
     }
+    sugoiEventPublisher.publishCustomEvent(
+        realm,
+        storage,
+        SugoiEventTypeEnum.FIND_USERS,
+        Map.ofEntries(
+            Map.entry(EventKeysConfig.USER_PROPERTIES, userProperties),
+            Map.entry(EventKeysConfig.PAGEABLE, pageable),
+            Map.entry(EventKeysConfig.TYPE_RECHERCHE, typeRecherche)));
     return result;
   }
 }

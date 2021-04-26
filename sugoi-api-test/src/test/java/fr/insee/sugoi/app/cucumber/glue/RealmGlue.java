@@ -54,7 +54,7 @@ public class RealmGlue {
         haveRealmAccess = true;
       }
     } catch (JsonProcessingException e) {
-      haveRealmAccess = false;
+      e.printStackTrace();
     }
     assertThat(haveRealmAccess, is(true));
   }
