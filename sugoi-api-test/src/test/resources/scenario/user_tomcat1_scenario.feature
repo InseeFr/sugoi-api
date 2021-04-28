@@ -11,6 +11,12 @@ Feature: User scenario
         Then the client receives status code 200
         Then the client expect to receive a list of users
 
+    Scenario: Get users with email filter
+        When the client perform GET request on url /realms/domaine1/users?mail=test&size=20&offset=0&typeRecherche=AND
+        And show body received
+        Then the client receives status code 200
+        Then The client expect to receive a list of 1 user(s)
+
     Scenario: Get user
         When the client perform GET request on url /realms/domaine1/users/testc
         And show body received

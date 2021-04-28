@@ -25,6 +25,8 @@ import fr.insee.sugoi.model.User;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Then;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserGlue {
 
@@ -55,6 +57,21 @@ public class UserGlue {
       e.printStackTrace();
     }
     assertThat("Data receive is a list of user", isUsers, is(true));
+  }
+
+  @Then("The client expect to receive a list of {int} user\\(s)")
+  @SuppressWarnings("unchecked")
+  public void expect_to_receive_a_list_of_users(Integer size) {
+    List<User> usersList = new ArrayList<>();
+    ObjectMapper mapper = new ObjectMapper();
+    try {
+      PageResult<User> users =
+          mapper.readValue(stepData.getLatestResponse().getBody(), PageResult.class);
+      usersList = users.getResults();
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    assertThat("Data receive is a list of user", usersList.size(), is(size));
   }
 
   @Then("the client expect to receive an user")

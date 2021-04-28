@@ -89,6 +89,9 @@ public class UserController {
       @Parameter(description = "User's identifiant of user to search ", required = false)
           @RequestParam(name = "identifiant", required = false)
           String identifiant,
+      @Parameter(description = "User's mail of user to search ", required = false)
+          @RequestParam(name = "mail", required = false)
+          String mail,
       @Parameter(description = "User's commun name of user to search ", required = false)
           @RequestParam(name = "nomCommun", required = false)
           String nomCommun,
@@ -121,6 +124,7 @@ public class UserController {
     User searchUser = new User();
     searchUser.setUsername(identifiant);
     searchUser.setLastName(nomCommun);
+    searchUser.setMail(mail);
     if (organisationId != null) {
       Organization organizationSearch = new Organization();
       organizationSearch.setIdentifiant(organisationId);
@@ -180,6 +184,9 @@ public class UserController {
       @Parameter(description = "User's identifiant of user to search ", required = false)
           @RequestParam(name = "identifiant", required = false)
           String identifiant,
+      @Parameter(description = "User's mail of user to search ", required = false)
+          @RequestParam(name = "mail", required = false)
+          String mail,
       @Parameter(description = "User's commun name of user to search ", required = false)
           @RequestParam(name = "nomCommun", required = false)
           String nomCommun,
@@ -211,6 +218,7 @@ public class UserController {
         realm,
         null,
         identifiant,
+        mail,
         nomCommun,
         description,
         organisationId,
