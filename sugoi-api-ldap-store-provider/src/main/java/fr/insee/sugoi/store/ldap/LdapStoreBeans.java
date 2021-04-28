@@ -39,6 +39,12 @@ public class LdapStoreBeans {
   @Value("${fr.insee.sugoi.ldap.default.port:}")
   private String defaultPort;
 
+  @Value("${fr.insee.sugoi.ldap.default.group_filter_pattern:}")
+  private String defaultGroupFilterPattern;
+
+  @Value("${fr.insee.sugoi.ldap.default.group_source_pattern:}")
+  private String defaultGroupSourcePattern;
+
   @Bean("LdapReaderStore")
   @Lazy
   @Scope("prototype")
@@ -69,10 +75,14 @@ public class LdapStoreBeans {
     config.put(LdapConfigKeys.ADDRESS_SOURCE, userStorage.getAddressSource());
     config.put(
         LdapConfigKeys.GROUP_SOURCE_PATTERN,
-        userStorage.getProperties().get("group_source_pattern"));
+        userStorage.getProperties().get("group_source_pattern") != null
+            ? userStorage.getProperties().get("group_source_pattern")
+            : defaultGroupSourcePattern);
     config.put(
         LdapConfigKeys.GROUP_FILTER_PATTERN,
-        userStorage.getProperties().get("group_filter_pattern"));
+        userStorage.getProperties().get("group_filter_pattern") != null
+            ? userStorage.getProperties().get("group_filter_pattern")
+            : defaultGroupFilterPattern);
     config.put(LdapConfigKeys.REALM_NAME, realm.getName());
     return config;
   }
