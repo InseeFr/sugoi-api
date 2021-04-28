@@ -26,6 +26,7 @@ import com.unboundid.ldap.sdk.ResultCode;
 import com.unboundid.ldap.sdk.extensions.PasswordModifyExtendedRequest;
 import com.unboundid.util.SubtreeDeleter;
 import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
+import fr.insee.sugoi.core.exceptions.StoragePolicyNotMetException;
 import fr.insee.sugoi.core.model.PasswordChangeRequest;
 import fr.insee.sugoi.core.model.SendMode;
 import fr.insee.sugoi.core.store.WriterStore;
@@ -149,10 +150,14 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public Group createGroup(String appName, Group group) {
     try {
-      AddRequest ar =
-          new AddRequest(
-              getGroupDN(appName, group.getName()), groupLdapMapper.mapToAttributes(group));
-      ldapPoolConnection.add(ar);
+      if (matchGroupWildcardPattern(appName, group.getName())) {
+        AddRequest ar =
+            new AddRequest(
+                getGroupDN(appName, group.getName()), groupLdapMapper.mapToAttributes(group));
+        ldapPoolConnection.add(ar);
+      } else {
+        throw new StoragePolicyNotMetException("Group pattern won't match");
+      }
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to create group " + group.getName(), e);
     }

@@ -17,7 +17,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import fr.insee.sugoi.core.exceptions.StoragePolicyNotMetException;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
@@ -338,5 +340,20 @@ public class LdapWriterStoreTest {
         "SuperGroup description should be new description",
         ldapReaderStore.getGroup("Applitest", "Amodifier_Applitest").getDescription(),
         is("new description"));
+  }
+
+  @Test
+  public void testGroupShouldMatchGroupPattern() {
+    try {
+      Group groupWontCreate = new Group();
+      groupWontCreate.setName("bad_group_badsuffix");
+      ldapWriterStore.createGroup("WebServicesLdap", groupWontCreate);
+      fail();
+    } catch (StoragePolicyNotMetException e) {
+      assertThat("Should get correct message", e.getMessage(), is("Group pattern won't match"));
+      Group groupToCreate = new Group();
+      groupToCreate.setName("good_group_webServicesLdap");
+      ldapWriterStore.createGroup("WebServicesLdap", groupToCreate);
+    }
   }
 }

@@ -53,6 +53,16 @@ public class LdapStore {
         .replace("{group}", "*");
   }
 
+  protected boolean matchGroupWildcardPattern(String appName, String groupName) {
+    String dnPattern =
+        config
+            .get(LdapConfigKeys.GROUP_FILTER_PATTERN)
+            .replace("{appliname}", appName)
+            .replace("{group}", ".*");
+    String simplePattern = dnPattern.substring(dnPattern.indexOf("=") + 1, dnPattern.length() - 1);
+    return groupName.toLowerCase().matches(simplePattern.toLowerCase());
+  }
+
   protected String getApplicationDN(String applicationName) {
     return String.format(
         "%s=%s,%s",

@@ -27,6 +27,7 @@ import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.core.exceptions.RealmAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.RealmNotCreatedException;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
+import fr.insee.sugoi.core.exceptions.StoragePolicyNotMetException;
 import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.UserNotCreatedException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
@@ -207,6 +208,16 @@ public class SugoiAdviceController {
     errorView.setMessage(e.getMessage());
     final ResponseEntity<ErrorView> response =
         new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
+    return response;
+  }
+
+  @ExceptionHandler(StoragePolicyNotMetException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(StoragePolicyNotMetException e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    final ResponseEntity<ErrorView> response =
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.BAD_REQUEST);
     return response;
   }
 }
