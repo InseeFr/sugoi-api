@@ -350,8 +350,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       AddRequest groupsAR =
           new AddRequest(
               getGroupSource(application.getName()),
-              new Attribute("objectClass", "top"),
-              new Attribute("objectClass", "organizationalUnit"));
+              new Attribute("objectClass", "top", "organizationalUnit"));
       ldapPoolConnection.add(groupsAR);
       application.getGroups().stream().forEach(group -> createGroup(application.getName(), group));
     } catch (LDAPException e) {
