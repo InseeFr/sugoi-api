@@ -34,6 +34,7 @@ public class AuthorizeMethodDecider {
     if (enable) {
       logger.info("Check if user is reader on realm {} and userStorage {}", realm, userStorage);
       return permissionService.isReader(realm, userStorage)
+          || permissionService.isWriter(realm, userStorage)
           || permissionService.isApplicationManager(realm)
           || permissionService.isPasswordManager(realm, userStorage);
     }
