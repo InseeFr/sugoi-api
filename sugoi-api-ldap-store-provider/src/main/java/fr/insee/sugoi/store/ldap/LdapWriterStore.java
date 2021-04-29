@@ -151,6 +151,14 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   public Group createGroup(String appName, Group group) {
     try {
       if (matchGroupWildcardPattern(appName, group.getName())) {
+        // check if parent entry exist
+        if (ldapPoolConnection.getEntry(getGroupSource(appName)) == null) {
+          AddRequest groupsAR =
+              new AddRequest(
+                  getGroupSource(appName),
+                  new Attribute("objectClass", "top", "organizationalUnit"));
+          ldapPoolConnection.add(groupsAR);
+        }
         AddRequest ar =
             new AddRequest(
                 getGroupDN(appName, group.getName()), groupLdapMapper.mapToAttributes(group));

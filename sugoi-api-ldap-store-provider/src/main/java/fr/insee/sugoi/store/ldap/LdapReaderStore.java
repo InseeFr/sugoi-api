@@ -202,8 +202,14 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     Application application =
         (entry != null) ? applicationLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
     if (application != null) {
-      application.setGroups(
-          searchGroups(applicationName, new Group(), new PageableResult(), "AND").getResults());
+      List<Group> groups = new ArrayList<>();
+      try {
+        groups =
+            searchGroups(applicationName, new Group(), new PageableResult(), "AND").getResults();
+      } catch (Exception e) {
+        logger.error(e.getMessage());
+      }
+      application.setGroups(groups);
     }
     return application;
   }
