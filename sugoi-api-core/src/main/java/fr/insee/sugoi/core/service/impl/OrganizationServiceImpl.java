@@ -131,9 +131,21 @@ public class OrganizationServiceImpl implements OrganizationService {
         } else {
           Realm r = realmProvider.load(realm);
           for (UserStorage us : r.getUserStorages()) {
-            org = storeProvider.getReaderStore(realm, us.getName()).getOrganization(id);
-            org.addMetadatas(GlobalKeysConfig.REALM, realm);
-            org.addMetadatas(EventKeysConfig.USERSTORAGE, us.getName());
+            try {
+              org = storeProvider.getReaderStore(realm, us.getName()).getOrganization(id);
+              org.addMetadatas(GlobalKeysConfig.REALM, realm);
+              org.addMetadatas(EventKeysConfig.USERSTORAGE, us.getName());
+            } catch (Exception e) {
+              logger.debug(
+                  "Error when trying to find organization "
+                      + id
+                      + " on realm "
+                      + realm
+                      + " and userstorage "
+                      + us
+                      + " error "
+                      + e.getMessage());
+            }
           }
         }
         sugoiEventPublisher.publishCustomEvent(
