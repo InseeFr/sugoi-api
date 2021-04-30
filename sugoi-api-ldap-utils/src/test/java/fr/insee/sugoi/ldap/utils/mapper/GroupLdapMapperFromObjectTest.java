@@ -92,4 +92,15 @@ public class GroupLdapMapperFromObjectTest {
                     attribute.getName().equals("uniquemember")
                         && attribute.getValue().equals("uid=user2,ou=contacts,o=insee,c=fr"))));
   }
+
+  @Test
+  public void emptyStringShouldBeRemoved() {
+    group.setName("group");
+    group.setDescription("");
+    List<Attribute> mappedAttributes = groupLdapMapper.mapToAttributes(group);
+    assertThat(
+        "Should not have a description attribute",
+        mappedAttributes.stream()
+            .allMatch(attribute -> !(attribute.getName().equals("description"))));
+  }
 }
