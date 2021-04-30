@@ -317,13 +317,14 @@ public class GenericLdapMapper {
             }
             return addressAttributeList;
           default:
-            List<Attribute> attributeList = new ArrayList<>();
-            Attribute attribute =
-                new Attribute(
-                    ldapField.getAnnotation(AttributeLdapName.class).value(),
-                    (String) attributeValue);
-            attributeList.add(attribute);
-            return attributeList;
+            if ((String) attributeValue != "") {
+              return List.of(
+                  new Attribute(
+                      ldapField.getAnnotation(AttributeLdapName.class).value(),
+                      (String) attributeValue));
+            } else {
+              return List.of();
+            }
         }
       }
       return null;
