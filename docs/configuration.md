@@ -147,3 +147,9 @@ You can add all other spring properties for example :
 | logging.level.root                         |                                   |               |         |
 | logging.level.fr.insee.sugoi               |                                   |               |         |
 | logging.level.org.springframework.security |                                   |               |         |
+
+### Old endpoints configuration
+
+| Properties                                                  |                                                             Description                                                             | Default value |                                              example |
+| ----------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------: | ------------: | ---------------------------------------------------: |
+| fr.insee.sugoi.api.old.domain.realm_userStorage.association | MAPPING BETWEEN OLD DOMAINS -> NEW REALM AND USERSTORAGE, Must be of the form domain1:realm1_userstorage,domain2:realm2_userstorage |               | TCC:TCC_Profil_TCC_Sugoi,SSM:SSP_ssm,INSEE:SSP_insee |

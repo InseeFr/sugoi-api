@@ -13,9 +13,8 @@
 */
 package fr.insee.sugoi.old.services.configuration;
 
+import fr.insee.sugoi.old.services.model.ConverterDomainRealm;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,48 +22,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ConverterDomainRealmConfiguration {
 
-  @Value("${fr.insee.sugoi.old.domain.realm_userStorage.association:}")
+  @Value("${fr.insee.sugoi.api.old.domain.realm_userStorage.association:}")
   private List<String> listMapDomainRealm;
 
   @Bean
   public ConverterDomainRealm converterDomainRealm() {
     return new ConverterDomainRealm(listMapDomainRealm);
-  }
-
-  public class ConverterDomainRealm {
-
-    private Map<String, RealmStorage> domainMapRealm = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-
-    public ConverterDomainRealm(List<String> listMapDomainRealm) {
-      listMapDomainRealm.stream()
-          .forEach(
-              el -> {
-                String[] res = el.split(":");
-                domainMapRealm.put(res[0], new RealmStorage(res[1]));
-              });
-    }
-
-    public RealmStorage getRealmForDomain(String domain) {
-      return domainMapRealm.get(domain);
-    }
-
-    public class RealmStorage {
-      private String realm;
-      private String userStorage;
-
-      public RealmStorage(String realmStorage) {
-        String[] res = realmStorage.split("_");
-        realm = res[0];
-        userStorage = res[1];
-      }
-
-      public String getRealm() {
-        return realm;
-      }
-
-      public String getUserStorage() {
-        return userStorage;
-      }
-    }
   }
 }
