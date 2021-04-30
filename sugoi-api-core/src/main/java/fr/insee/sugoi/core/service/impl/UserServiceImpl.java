@@ -158,9 +158,21 @@ public class UserServiceImpl implements UserService {
         } else {
           Realm r = realmProvider.load(realmName);
           for (UserStorage us : r.getUserStorages()) {
-            user = storeProvider.getReaderStore(realmName, us.getName()).getUser(id);
-            user.addMetadatas(GlobalKeysConfig.REALM, realmName);
-            user.addMetadatas(GlobalKeysConfig.USERSTORAGE, us.getName());
+            try {
+              user = storeProvider.getReaderStore(realmName, us.getName()).getUser(id);
+              user.addMetadatas(GlobalKeysConfig.REALM, realmName);
+              user.addMetadatas(GlobalKeysConfig.USERSTORAGE, us.getName());
+            } catch (Exception e) {
+              logger.debug(
+                  "Error when trying to find user "
+                      + id
+                      + " on realm "
+                      + realmName
+                      + " and userstorage "
+                      + us
+                      + " error "
+                      + e.getMessage());
+            }
           }
         }
         sugoiEventPublisher.publishCustomEvent(
