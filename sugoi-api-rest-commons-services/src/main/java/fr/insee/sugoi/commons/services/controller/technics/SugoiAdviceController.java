@@ -20,10 +20,12 @@ import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.core.exceptions.GroupAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.GroupNotCreatedException;
 import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
+import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
 import fr.insee.sugoi.core.exceptions.InvalidUserStorageException;
 import fr.insee.sugoi.core.exceptions.OrganizationAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.OrganizationNotCreatedException;
 import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
+import fr.insee.sugoi.core.exceptions.PasswordPolicyNotMetException;
 import fr.insee.sugoi.core.exceptions.RealmAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.RealmNotCreatedException;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
@@ -218,6 +220,36 @@ public class SugoiAdviceController {
     errorView.setMessage(e.getMessage());
     final ResponseEntity<ErrorView> response =
         new ResponseEntity<ErrorView>(errorView, HttpStatus.BAD_REQUEST);
+    return response;
+  }
+
+  @ExceptionHandler(InvalidPasswordException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(InvalidPasswordException e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    final ResponseEntity<ErrorView> response =
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.FORBIDDEN);
+    return response;
+  }
+
+  @ExceptionHandler(PasswordPolicyNotMetException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(PasswordPolicyNotMetException e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    final ResponseEntity<ErrorView> response =
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.CONFLICT);
+    return response;
+  }
+
+  @ExceptionHandler(Exception.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(Exception e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    final ResponseEntity<ErrorView> response =
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.INTERNAL_SERVER_ERROR);
     return response;
   }
 }
