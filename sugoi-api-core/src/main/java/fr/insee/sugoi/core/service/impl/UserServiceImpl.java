@@ -162,6 +162,7 @@ public class UserServiceImpl implements UserService {
               user = storeProvider.getReaderStore(realmName, us.getName()).getUser(id);
               user.addMetadatas(GlobalKeysConfig.REALM, realmName);
               user.addMetadatas(GlobalKeysConfig.USERSTORAGE, us.getName());
+              break;
             } catch (Exception e) {
               logger.debug(
                   "Error when trying to find user "

@@ -135,6 +135,7 @@ public class OrganizationServiceImpl implements OrganizationService {
               org = storeProvider.getReaderStore(realm, us.getName()).getOrganization(id);
               org.addMetadatas(GlobalKeysConfig.REALM, realm);
               org.addMetadatas(EventKeysConfig.USERSTORAGE, us.getName());
+              break;
             } catch (Exception e) {
               logger.debug(
                   "Error when trying to find organization "
