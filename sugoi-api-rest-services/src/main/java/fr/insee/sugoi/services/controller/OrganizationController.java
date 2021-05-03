@@ -90,6 +90,9 @@ public class OrganizationController {
               required = false)
           @RequestParam(value = "identifiant", required = false)
           String identifiant,
+      @Parameter(description = "Organization's mail of the wanted organization", required = false)
+          @RequestParam(value = "mail", required = false)
+          String email,
       @Parameter(description = "Expected size of result", required = false)
           @RequestParam(value = "size", defaultValue = "20")
           int size,
@@ -101,8 +104,8 @@ public class OrganizationController {
           SearchType typeRecherche) {
     Organization filterOrganization = new Organization();
     filterOrganization.setIdentifiant(identifiant);
+    filterOrganization.addAttributes("mail", email);
     PageableResult pageableResult = new PageableResult(size, offset);
-
     PageResult<Organization> foundOrganizations =
         organizationService.findByProperties(
             realm, storage, filterOrganization, pageableResult, typeRecherche);
@@ -148,6 +151,9 @@ public class OrganizationController {
               required = false)
           @RequestParam(value = "identifiant", required = false)
           String identifiant,
+      @Parameter(description = "Organization's mail of the wanted organization", required = false)
+          @RequestParam(value = "mail", required = false)
+          String email,
       @Parameter(description = "Expected size of result", required = false)
           @RequestParam(value = "size", defaultValue = "20")
           int size,
@@ -157,7 +163,7 @@ public class OrganizationController {
       @Parameter(description = "Default search can be AND or OR", required = true)
           @RequestParam(name = "typeRecherche", defaultValue = "AND", required = true)
           SearchType typeRecherche) {
-    return getOrganizations(realm, null, identifiant, size, offset, typeRecherche);
+    return getOrganizations(realm, null, identifiant, email, size, offset, typeRecherche);
   }
 
   @PostMapping(
