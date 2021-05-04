@@ -111,10 +111,6 @@ public class FileWriterStore implements WriterStore {
     }
   }
 
-  /**
-   * To avoid unconsistency between users and groups, group is recreated without users and then
-   * users are added
-   */
   @Override
   public Group updateGroup(String appName, Group updatedGroup) {
     fileReaderStore.setResourceLoader(resourceLoader);
@@ -125,14 +121,6 @@ public class FileWriterStore implements WriterStore {
               .anyMatch(
                   filterGroup -> filterGroup.getName().equalsIgnoreCase(updatedGroup.getName()))) {
 
-        // simplify group and keep users
-        List<User> usersToAdd =
-            updatedGroup.getUsers() != null
-                ? new ArrayList<>(updatedGroup.getUsers())
-                : new ArrayList<>();
-        updatedGroup.setUsers(new ArrayList<>());
-
-        // update group in application
         application
             .getGroups()
             .removeIf(
@@ -140,10 +128,6 @@ public class FileWriterStore implements WriterStore {
         application.getGroups().add(updatedGroup);
         updateApplication(application);
 
-        // add each users in updated group
-        usersToAdd.forEach(
-            user -> addUserToGroup(appName, updatedGroup.getName(), user.getUsername()));
-        updatedGroup.setUsers(usersToAdd);
         return updatedGroup;
       } else {
         throw new RuntimeException(
@@ -208,10 +192,17 @@ public class FileWriterStore implements WriterStore {
                         && groupFilter.getName().equalsIgnoreCase(groupName));
         updateUser(user);
         if (group.getUsers() != null) {
-          group
-              .getUsers()
-              .removeIf(userFilter -> userFilter.getUsername().equalsIgnoreCase(userId));
-          updateApplication(application);
+          try {
+            group
+                .getUsers()
+                .removeIf(userFilter -> userFilter.getUsername().equalsIgnoreCase(userId));
+            updateResourceFile(
+                config.get(FileKeysConfig.APP_SOURCE),
+                application.getName(),
+                mapper.writeValueAsString(application));
+          } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error mapping application " + application.getName(), e);
+          }
         }
       } else {
         throw new RuntimeException("Group " + groupName + " doesn't exist in " + appName);
@@ -240,16 +231,23 @@ public class FileWriterStore implements WriterStore {
       if (group != null) {
         User user = fileReaderStore.getUser(userId);
         if (user != null) {
-          if (user.getGroups() == null) {
-            user.setGroups(new ArrayList<>());
+          try {
+            if (user.getGroups() == null) {
+              user.setGroups(new ArrayList<>());
+            }
+            user.getGroups().add(new Group(appName, groupName));
+            updateUser(user);
+            if (group.getUsers() == null) {
+              group.setUsers(new ArrayList<>());
+            }
+            group.getUsers().add(user);
+            updateResourceFile(
+                config.get(FileKeysConfig.APP_SOURCE),
+                application.getName(),
+                mapper.writeValueAsString(application));
+          } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error mapping application " + application.getName(), e);
           }
-          user.getGroups().add(new Group(appName, groupName));
-          updateUser(user);
-          if (group.getUsers() == null) {
-            group.setUsers(new ArrayList<>());
-          }
-          group.getUsers().add(user);
-          updateApplication(application);
         } else {
           throw new RuntimeException("User " + userId + " not found");
         }
@@ -281,6 +279,7 @@ public class FileWriterStore implements WriterStore {
   @Override
   public Application createApplication(Application application) {
     try {
+      application.getGroups().forEach(group -> group.setUsers(null));
       createResourceFile(
           config.get(FileKeysConfig.APP_SOURCE),
           application.getName(),
@@ -294,6 +293,14 @@ public class FileWriterStore implements WriterStore {
   @Override
   public Application updateApplication(Application updatedApplication) {
     try {
+      fileReaderStore.setResourceLoader(resourceLoader);
+      for (Group updatedGroup : updatedApplication.getGroups()) {
+        Group existingGroup =
+            fileReaderStore.getGroup(updatedApplication.getName(), updatedGroup.getName());
+        if (existingGroup != null) {
+          updatedGroup.setUsers(existingGroup.getUsers());
+        }
+      }
       updateResourceFile(
           config.get(FileKeysConfig.APP_SOURCE),
           updatedApplication.getName(),

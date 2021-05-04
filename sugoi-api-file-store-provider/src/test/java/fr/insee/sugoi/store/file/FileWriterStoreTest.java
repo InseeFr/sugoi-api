@@ -268,6 +268,7 @@ public class FileWriterStoreTest {
     group1.setName("Group1_MyApplication");
     Group group2 = new Group();
     group2.setName("Group2_MyApplication");
+    group2.setUsers(List.of(new User("toto")));
     groups.add(group1);
     groups.add(group2);
     application.setGroups(groups);
@@ -278,22 +279,41 @@ public class FileWriterStoreTest {
         "My application should have groups",
         retrievedApp.getGroups().get(0).getName(),
         is("Group1_MyApplication"));
+    assertThat(
+        "Should not add the users",
+        retrievedApp.getGroups().stream().allMatch(group -> group.getUsers() == null));
   }
 
   @Test
   public void testUpdateApplication() {
     Application application = fileReaderStore.getApplication("Applitest");
-    List<Group> groups = new ArrayList<>();
     Group group1 = new Group();
     group1.setName("Group1_Applitest");
-    groups.add(group1);
-    application.setGroups(groups);
+    application.getGroups().add(group1);
+    application.getGroups().get(0).setDescription("new description");
+    application.getGroups().stream()
+        .filter(group -> group.getName().equals("Utilisateurs_Applitest"))
+        .findFirst()
+        .get()
+        .getUsers()
+        .remove(0);
     fileWriterStore.updateApplication(application);
     Application retrievedApplication = fileReaderStore.getApplication("Applitest");
     assertThat(
         "Applitest should have group1",
         retrievedApplication.getGroups().stream()
             .anyMatch(group -> group.getName().equals("Group1_Applitest")));
+    assertThat(
+        "A group should have description new description",
+        retrievedApplication.getGroups().stream()
+            .anyMatch(group -> group.getDescription().equals("new description")));
+    assertThat(
+        "Users should not have been modified",
+        !retrievedApplication.getGroups().stream()
+            .anyMatch(
+                group ->
+                    group.getName().equals("Utilisateurs_Applitest")
+                        && group.getUsers().size() != 2));
   }
 
   @Test
