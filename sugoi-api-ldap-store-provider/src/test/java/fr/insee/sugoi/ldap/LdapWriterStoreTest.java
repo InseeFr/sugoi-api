@@ -218,19 +218,61 @@ public class LdapWriterStoreTest {
   }
 
   @Test
-  public void testUpdateApplication() {
+  public void testUpdateApplicationWithGroupAdding() {
     Application application = ldapReaderStore.getApplication("Applitest");
-    List<Group> groups = new ArrayList<>();
     Group group1 = new Group();
     group1.setName("Group1_Applitest");
-    groups.add(group1);
-    application.setGroups(groups);
+    application.getGroups().add(group1);
     ldapWriterStore.updateApplication(application);
     Application retrievedApplication = ldapReaderStore.getApplication("Applitest");
     assertThat(
         "Applitest should have group1",
         retrievedApplication.getGroups().stream()
             .anyMatch(group -> group.getName().equals("Group1_Applitest")));
+  }
+
+  @Test
+  public void testUpdateApplicationWithGroupRemoving() {
+    Application application = ldapReaderStore.getApplication("Applitest");
+    Group adminApplitestGroup =
+        application.getGroups().stream()
+            .filter(group -> group.getName().equalsIgnoreCase("ToDelete_Applitest"))
+            .findFirst()
+            .get();
+    application.getGroups().remove(adminApplitestGroup);
+    ldapWriterStore.updateApplication(application);
+    Application retrievedApplication = ldapReaderStore.getApplication("Applitest");
+    assertThat(
+        "Applitest should not have todelete",
+        !retrievedApplication.getGroups().stream()
+            .anyMatch(group -> group.getName().equals("ToDelete_Applitest")));
+  }
+
+  @Test
+  public void testUpdateApplicationWithGroupModifying() {
+    Application application = ldapReaderStore.getApplication("Applitest");
+    Group adminApplitestGroup =
+        application.getGroups().stream()
+            .filter(group -> group.getName().equalsIgnoreCase("ToUpdate_Applitest"))
+            .findFirst()
+            .get();
+    adminApplitestGroup.setDescription("new description");
+    ldapWriterStore.updateApplication(application);
+    Application retrievedApplication = ldapReaderStore.getApplication("Applitest");
+    assertThat(
+        "ToUpdate should have description new description",
+        retrievedApplication.getGroups().stream()
+            .anyMatch(
+                group ->
+                    group.getName().equalsIgnoreCase("ToUpdate_Applitest")
+                        && group.getDescription().equalsIgnoreCase("new description")));
+    assertThat(
+        "ToUpdate should still have users",
+        retrievedApplication.getGroups().stream()
+            .anyMatch(
+                group ->
+                    group.getName().equalsIgnoreCase("ToUpdate_Applitest")
+                        && group.getUsers().size() > 0));
   }
 
   @Test

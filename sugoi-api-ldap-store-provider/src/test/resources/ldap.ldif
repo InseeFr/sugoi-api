@@ -59,6 +59,20 @@ uniquemember: uid=Testd,ou=SSM,o=insee,c=fr
 uniquemember: uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr
 description: tata
 
+dn: cn=ToUpdate_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
+cn: ToUpdate_Applitest
+objectclass: groupOfUniqueNames
+uniquemember: uid=Testd,ou=SSM,o=insee,c=fr
+uniquemember: uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+description: toto
+
+dn: cn=ToDelete_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
+cn: ToDelete_Applitest
+uniquemember: uid=Testd,ou=SSM,o=insee,c=fr
+uniquemember: uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectclass: groupOfUniqueNames
+description: toto
+
 # BRANCHE APPLICATIVE WEB SERVICE
 dn: ou=WebServicesLdap,ou=Applications,o=insee,c=fr
 objectclass: top
