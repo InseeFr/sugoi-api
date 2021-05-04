@@ -44,6 +44,7 @@ import fr.insee.sugoi.model.User;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class LdapWriterStore extends LdapStore implements WriterStore {
@@ -380,8 +381,25 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
               getApplicationDN(updatedApplication.getName()),
               applicationLdapMapper.createMods(updatedApplication));
       ldapPoolConnection.modify(mr);
-      updatedApplication.getGroups().stream()
-          .forEach(group -> createGroup(updatedApplication.getName(), group));
+      List<Group> alreadyExistingGroups =
+          ldapReaderStore.getApplication(updatedApplication.getName()).getGroups();
+      for (Group existingGroup : alreadyExistingGroups) {
+        Optional<Group> optionalGroup =
+            updatedApplication.getGroups().stream()
+                .filter(group -> group.getName().equalsIgnoreCase(existingGroup.getName()))
+                .findFirst();
+        if (optionalGroup.isPresent()) {
+          updateGroup(updatedApplication.getName(), optionalGroup.get());
+        } else {
+          deleteGroup(updatedApplication.getName(), existingGroup.getName());
+        }
+      }
+      for (Group updatedGroup : updatedApplication.getGroups()) {
+        if (alreadyExistingGroups.stream()
+            .allMatch(group -> !group.getName().equalsIgnoreCase(updatedGroup.getName())))
+          createGroup(updatedApplication.getName(), updatedGroup);
+      }
+
     } catch (LDAPException e) {
       throw new RuntimeException(
           "Failed to update application " + updatedApplication.getName() + "while writing to LDAP",
