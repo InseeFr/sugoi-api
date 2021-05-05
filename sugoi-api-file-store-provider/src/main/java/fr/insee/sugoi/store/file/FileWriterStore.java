@@ -143,33 +143,49 @@ public class FileWriterStore implements WriterStore {
 
   @Override
   public void deleteOrganization(String name) {
-    deleteResourceFile(config.get(FileKeysConfig.ORGANIZATION_SOURCE), name);
+    if (config.get(FileKeysConfig.ORGANIZATION_SOURCE) != null) {
+      deleteResourceFile(config.get(FileKeysConfig.ORGANIZATION_SOURCE), name);
+    } else {
+      throw new UnsupportedOperationException(
+          "organizations feature not configured for this storage");
+    }
   }
 
   @Override
   public Organization createOrganization(Organization organization) {
-    try {
-      createResourceFile(
-          config.get(FileKeysConfig.ORGANIZATION_SOURCE),
-          organization.getIdentifiant(),
-          mapper.writeValueAsString(organization));
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException("Error mapping organization " + organization.getIdentifiant(), e);
+    if (config.get(FileKeysConfig.ORGANIZATION_SOURCE) != null) {
+      try {
+        createResourceFile(
+            config.get(FileKeysConfig.ORGANIZATION_SOURCE),
+            organization.getIdentifiant(),
+            mapper.writeValueAsString(organization));
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException(
+            "Error mapping organization " + organization.getIdentifiant(), e);
+      }
+      return organization;
+    } else {
+      throw new UnsupportedOperationException(
+          "organizations feature not configured for this storage");
     }
-    return organization;
   }
 
   @Override
   public Organization updateOrganization(Organization updatedOrganization) {
-    try {
-      updateResourceFile(
-          config.get(FileKeysConfig.ORGANIZATION_SOURCE),
-          updatedOrganization.getIdentifiant(),
-          mapper.writeValueAsString(updatedOrganization));
-      return updatedOrganization;
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(
-          "Error mapping organization" + updatedOrganization.getIdentifiant(), e);
+    if (config.get(FileKeysConfig.ORGANIZATION_SOURCE) != null) {
+      try {
+        updateResourceFile(
+            config.get(FileKeysConfig.ORGANIZATION_SOURCE),
+            updatedOrganization.getIdentifiant(),
+            mapper.writeValueAsString(updatedOrganization));
+        return updatedOrganization;
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException(
+            "Error mapping organization" + updatedOrganization.getIdentifiant(), e);
+      }
+    } else {
+      throw new UnsupportedOperationException(
+          "organizations feature not configured for this storage");
     }
   }
 
@@ -265,58 +281,70 @@ public class FileWriterStore implements WriterStore {
   @Override
   public void reinitPassword(
       User user, String generatedPassword, PasswordChangeRequest pcr, List<SendMode> sendMode) {
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException("Password actions are not supported on file storage");
   }
 
   @Override
   public void initPassword(
       User user, String password, PasswordChangeRequest pcr, List<SendMode> sendMode) {
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException("Password actions are not supported on file storage");
   }
 
   @Override
   public void changePasswordResetStatus(User user, boolean isReset) {
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException("Password actions are not supported on file storage");
   }
 
   @Override
   public Application createApplication(Application application) {
-    try {
-      application.getGroups().forEach(group -> group.setUsers(null));
-      createResourceFile(
-          config.get(FileKeysConfig.APP_SOURCE),
-          application.getName(),
-          mapper.writeValueAsString(application));
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException("Error mapping application " + application.getName(), e);
+    if (config.get(FileKeysConfig.APP_SOURCE) != null) {
+      try {
+        application.getGroups().forEach(group -> group.setUsers(null));
+        createResourceFile(
+            config.get(FileKeysConfig.APP_SOURCE),
+            application.getName(),
+            mapper.writeValueAsString(application));
+        return application;
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException("Error mapping application " + application.getName(), e);
+      }
+    } else {
+      throw new UnsupportedOperationException("Applications feature not configured for this realm");
     }
-    return application;
   }
 
   @Override
   public Application updateApplication(Application updatedApplication) {
-    try {
-      fileReaderStore.setResourceLoader(resourceLoader);
-      for (Group updatedGroup : updatedApplication.getGroups()) {
-        Group existingGroup =
-            fileReaderStore.getGroup(updatedApplication.getName(), updatedGroup.getName());
-        if (existingGroup != null) {
-          updatedGroup.setUsers(existingGroup.getUsers());
+    if (config.get(FileKeysConfig.APP_SOURCE) != null) {
+      try {
+        fileReaderStore.setResourceLoader(resourceLoader);
+        for (Group updatedGroup : updatedApplication.getGroups()) {
+          Group existingGroup =
+              fileReaderStore.getGroup(updatedApplication.getName(), updatedGroup.getName());
+          if (existingGroup != null) {
+            updatedGroup.setUsers(existingGroup.getUsers());
+          }
         }
+        updateResourceFile(
+            config.get(FileKeysConfig.APP_SOURCE),
+            updatedApplication.getName(),
+            mapper.writeValueAsString(updatedApplication));
+        return updatedApplication;
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException("Error mapping application" + updatedApplication.getName(), e);
       }
-      updateResourceFile(
-          config.get(FileKeysConfig.APP_SOURCE),
-          updatedApplication.getName(),
-          mapper.writeValueAsString(updatedApplication));
-      return updatedApplication;
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException("Error mapping application" + updatedApplication.getName(), e);
+    } else {
+      throw new UnsupportedOperationException("Applications feature not configured for this realm");
     }
   }
 
   @Override
   public void deleteApplication(String applicationName) {
-    deleteResourceFile(config.get(FileKeysConfig.APP_SOURCE), applicationName);
+    if (config.get(FileKeysConfig.APP_SOURCE) != null) {
+      deleteResourceFile(config.get(FileKeysConfig.APP_SOURCE), applicationName);
+    } else {
+      throw new UnsupportedOperationException("Applications feature not configured for this realm");
+    }
   }
 
   @Override

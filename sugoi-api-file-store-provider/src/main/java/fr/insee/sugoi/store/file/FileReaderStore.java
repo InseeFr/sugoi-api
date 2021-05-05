@@ -83,23 +83,28 @@ public class FileReaderStore implements ReaderStore {
 
   @Override
   public Organization getOrganization(String id) {
-    Resource realmsResource =
-        resourceLoader.getResource(config.get(FileKeysConfig.ORGANIZATION_SOURCE) + id);
-    if (realmsResource.exists()) {
-      Organization organization = loadResourceContent(realmsResource, Organization.class);
-      // suborganization is loaded as an independant resource
-      if (organization.getOrganization() != null
-          && organization.getOrganization().getIdentifiant() != null) {
-        try {
-          organization.setOrganization(
-              getOrganization(organization.getOrganization().getIdentifiant()));
-        } catch (RuntimeException e) {
-          logger.error("Unable to retrieve organization's suborganization", e);
+    if (config.get(FileKeysConfig.ORGANIZATION_SOURCE) != null) {
+      Resource realmsResource =
+          resourceLoader.getResource(config.get(FileKeysConfig.ORGANIZATION_SOURCE) + id);
+      if (realmsResource.exists()) {
+        Organization organization = loadResourceContent(realmsResource, Organization.class);
+        // suborganization is loaded as an independant resource
+        if (organization.getOrganization() != null
+            && organization.getOrganization().getIdentifiant() != null) {
+          try {
+            organization.setOrganization(
+                getOrganization(organization.getOrganization().getIdentifiant()));
+          } catch (RuntimeException e) {
+            logger.error("Unable to retrieve organization's suborganization", e);
+          }
         }
+        return organization;
       }
-      return organization;
+      return null;
+    } else {
+      throw new UnsupportedOperationException(
+          "Organizations feature not configured for this storage");
     }
-    return null;
   }
 
   @Override
@@ -121,13 +126,18 @@ public class FileReaderStore implements ReaderStore {
   @Override
   public PageResult<Organization> searchOrganizations(
       Organization organizationFilter, PageableResult pageable, String searchOperator) {
-    PageResult<Organization> pageResult = new PageResult<>();
-    pageResult.setResults(
-        Arrays.stream(getFilenamesFromSource(config.get(FileKeysConfig.ORGANIZATION_SOURCE)))
-            .map(resource -> loadResourceContent(resource, Organization.class))
-            .filter(org -> checkIfMatches(org, organizationFilter))
-            .collect(Collectors.toList()));
-    return pageResult;
+    if (config.get(FileKeysConfig.ORGANIZATION_SOURCE) != null) {
+      PageResult<Organization> pageResult = new PageResult<>();
+      pageResult.setResults(
+          Arrays.stream(getFilenamesFromSource(config.get(FileKeysConfig.ORGANIZATION_SOURCE)))
+              .map(resource -> loadResourceContent(resource, Organization.class))
+              .filter(org -> checkIfMatches(org, organizationFilter))
+              .collect(Collectors.toList()));
+      return pageResult;
+    } else {
+      throw new UnsupportedOperationException(
+          "Organizations feature not configured for this storage");
+    }
   }
 
   @Override
@@ -148,15 +158,19 @@ public class FileReaderStore implements ReaderStore {
   @Override
   public PageResult<Group> searchGroups(
       String appName, Group groupFilter, PageableResult pageable, String searchOperator) {
-    PageResult<Group> pageResult = new PageResult<>();
-    pageResult.setResults(
-        Arrays.stream(getFilenamesFromSource(config.get(FileKeysConfig.APP_SOURCE)))
-            .map(resource -> loadResourceContent(resource, Application.class).getGroups())
-            .filter(groups -> groups != null)
-            .flatMap(groups -> groups.stream())
-            .filter(group -> checkIfMatches(group, groupFilter))
-            .collect(Collectors.toList()));
-    return pageResult;
+    if (config.get(FileKeysConfig.APP_SOURCE) != null) {
+      PageResult<Group> pageResult = new PageResult<>();
+      pageResult.setResults(
+          Arrays.stream(getFilenamesFromSource(config.get(FileKeysConfig.APP_SOURCE)))
+              .map(resource -> loadResourceContent(resource, Application.class).getGroups())
+              .filter(groups -> groups != null)
+              .flatMap(groups -> groups.stream())
+              .filter(group -> checkIfMatches(group, groupFilter))
+              .collect(Collectors.toList()));
+      return pageResult;
+    } else {
+      throw new UnsupportedOperationException("Applications feature not configured for this realm");
+    }
   }
 
   @Override
@@ -166,24 +180,32 @@ public class FileReaderStore implements ReaderStore {
 
   @Override
   public Application getApplication(String applicationName) {
-    Resource realmsResource =
-        resourceLoader.getResource(config.get(FileKeysConfig.APP_SOURCE) + applicationName);
-    if (realmsResource.exists()) {
-      return loadResourceContent(realmsResource, Application.class);
+    if (config.get(FileKeysConfig.APP_SOURCE) != null) {
+      Resource realmsResource =
+          resourceLoader.getResource(config.get(FileKeysConfig.APP_SOURCE) + applicationName);
+      if (realmsResource.exists()) {
+        return loadResourceContent(realmsResource, Application.class);
+      }
+      return null;
+    } else {
+      throw new UnsupportedOperationException("Applications feature not configured for this realm");
     }
-    return null;
   }
 
   @Override
   public PageResult<Application> searchApplications(
       Application applicationFilter, PageableResult pageable, String searchOperator) {
-    PageResult<Application> pageResult = new PageResult<>();
-    pageResult.setResults(
-        Arrays.stream(getFilenamesFromSource(config.get(FileKeysConfig.APP_SOURCE)))
-            .map(resource -> loadResourceContent(resource, Application.class))
-            .filter(app -> checkIfMatches(app, applicationFilter))
-            .collect(Collectors.toList()));
-    return pageResult;
+    if (config.get(FileKeysConfig.APP_SOURCE) != null) {
+      PageResult<Application> pageResult = new PageResult<>();
+      pageResult.setResults(
+          Arrays.stream(getFilenamesFromSource(config.get(FileKeysConfig.APP_SOURCE)))
+              .map(resource -> loadResourceContent(resource, Application.class))
+              .filter(app -> checkIfMatches(app, applicationFilter))
+              .collect(Collectors.toList()));
+      return pageResult;
+    } else {
+      throw new UnsupportedOperationException("Applications feature not configured for this realm");
+    }
   }
 
   public void setResourceLoader(ResourceLoader resourceLoader) {

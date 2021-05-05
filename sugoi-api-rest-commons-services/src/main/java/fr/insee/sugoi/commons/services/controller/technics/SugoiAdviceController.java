@@ -252,4 +252,14 @@ public class SugoiAdviceController {
         new ResponseEntity<ErrorView>(errorView, HttpStatus.INTERNAL_SERVER_ERROR);
     return response;
   }
+
+  @ExceptionHandler(UnsupportedOperationException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(UnsupportedOperationException e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    final ResponseEntity<ErrorView> response =
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_IMPLEMENTED);
+    return response;
+  }
 }
