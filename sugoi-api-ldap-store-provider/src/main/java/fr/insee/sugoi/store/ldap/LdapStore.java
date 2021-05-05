@@ -43,32 +43,49 @@ public class LdapStore {
   protected Map<String, String> config;
 
   protected String getGroupSource(String appName) {
-    return config.get(LdapConfigKeys.GROUP_SOURCE_PATTERN).replace("{appliname}", appName);
+    if (config.get(LdapConfigKeys.GROUP_SOURCE_PATTERN) != null) {
+      return config.get(LdapConfigKeys.GROUP_SOURCE_PATTERN).replace("{appliname}", appName);
+    } else {
+      throw new UnsupportedOperationException("Group feature is not set for this userstorage");
+    }
   }
 
   protected String getGroupWildcardFilter(String appName) {
-    return config
-        .get(LdapConfigKeys.GROUP_FILTER_PATTERN)
-        .replace("{appliname}", appName)
-        .replace("{group}", "*");
+    if (config.get(LdapConfigKeys.GROUP_FILTER_PATTERN) != null) {
+      return config
+          .get(LdapConfigKeys.GROUP_FILTER_PATTERN)
+          .replace("{appliname}", appName)
+          .replace("{group}", "*");
+    } else {
+      throw new UnsupportedOperationException("Group feature is not set for this userstorage");
+    }
   }
 
   protected boolean matchGroupWildcardPattern(String appName, String groupName) {
-    String dnPattern =
-        config
-            .get(LdapConfigKeys.GROUP_FILTER_PATTERN)
-            .replace("{appliname}", appName)
-            .replace("{group}", ".*");
-    String simplePattern = dnPattern.substring(dnPattern.indexOf("=") + 1, dnPattern.length() - 1);
-    return groupName.toLowerCase().matches(simplePattern.toLowerCase());
+    if (config.get(LdapConfigKeys.GROUP_FILTER_PATTERN) != null) {
+      String dnPattern =
+          config
+              .get(LdapConfigKeys.GROUP_FILTER_PATTERN)
+              .replace("{appliname}", appName)
+              .replace("{group}", ".*");
+      String simplePattern =
+          dnPattern.substring(dnPattern.indexOf("=") + 1, dnPattern.length() - 1);
+      return groupName.toLowerCase().matches(simplePattern.toLowerCase());
+    } else {
+      throw new UnsupportedOperationException("Group feature is not set for this userstorage");
+    }
   }
 
   protected String getApplicationDN(String applicationName) {
-    return String.format(
-        "%s=%s,%s",
-        ApplicationLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-        applicationName,
-        config.get(LdapConfigKeys.APP_SOURCE));
+    if (config.get(LdapConfigKeys.APP_SOURCE) != null) {
+      return String.format(
+          "%s=%s,%s",
+          ApplicationLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
+          applicationName,
+          config.get(LdapConfigKeys.APP_SOURCE));
+    } else {
+      throw new UnsupportedOperationException("Applications feature not configured for this realm");
+    }
   }
 
   protected String getGroupDN(String applicationName, String groupName) {
@@ -80,11 +97,16 @@ public class LdapStore {
   }
 
   protected String getOrganizationDN(String organizationId) {
-    return String.format(
-        "%s=%s,%s",
-        OrganizationLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
-        organizationId,
-        config.get(LdapConfigKeys.ORGANIZATION_SOURCE));
+    if (config.get(LdapConfigKeys.ORGANIZATION_SOURCE) != null) {
+      return String.format(
+          "%s=%s,%s",
+          OrganizationLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
+          organizationId,
+          config.get(LdapConfigKeys.ORGANIZATION_SOURCE));
+    } else {
+      throw new UnsupportedOperationException(
+          "Organizations feature not configured for this storage");
+    }
   }
 
   protected String getUserDN(String username) {
