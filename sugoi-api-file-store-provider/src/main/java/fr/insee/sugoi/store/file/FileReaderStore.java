@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.NotImplementedException;
@@ -103,7 +104,12 @@ public class FileReaderStore implements ReaderStore {
   @Override
   public PageResult<User> getUsersInGroup(String appName, String groupName) {
     PageResult<User> pageResult = new PageResult<>();
-    pageResult.setResults(getGroup(appName, groupName).getUsers());
+    Group group = getGroup(appName, groupName);
+    if (group != null) {
+      pageResult.setResults(getGroup(appName, groupName).getUsers());
+    } else {
+      pageResult.setResults(List.of());
+    }
     return pageResult;
   }
 
