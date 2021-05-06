@@ -119,12 +119,11 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     }
   }
 
-  /** Retrieve all the users with their data in the specified group */
   @Override
   public PageResult<User> getUsersInGroup(String appName, String groupName) {
     PageResult<User> page = new PageResult<>();
     SearchResultEntry entry = getEntryByDn(getGroupDN(appName, groupName));
-    if (entry.hasAttribute("uniqueMember")) {
+    if (entry != null && entry.hasAttribute("uniqueMember")) {
       page.setResults(
           Arrays.stream(entry.getAttribute("uniqueMember").getValues())
               .map(uniqueMember -> getUser(LdapUtils.getNodeValueFromDN(uniqueMember)))
