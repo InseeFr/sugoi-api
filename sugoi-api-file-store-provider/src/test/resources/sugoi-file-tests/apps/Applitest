@@ -1,1 +1,64 @@
-{"name":"Applitest","owner":null,"groups":[{"name":"Utilisateurs_Applitest","description":"tata","users":[{"username":"Testd","habilitations":[],"address":{},"metadatas":{},"attributes":{}},{"username":"testc","habilitations":[],"address":{},"metadatas":{},"attributes":{}}],"appName":"Applitest"},{"name":"Administrateurs_Applitest","description":"toto","users":null,"appName":"Applitest"}]}
+{
+   "name":"Applitest",
+   "owner":null,
+   "groups":[
+      {
+         "name":"Utilisateurs_Applitest",
+         "description":"tata",
+         "users":[
+            {
+               "username":"Testd",
+               "habilitations":[
+                  
+               ],
+               "address":{
+                  
+               },
+               "metadatas":{
+                  
+               },
+               "attributes":{
+                  
+               }
+            },
+            {
+               "username":"testc",
+               "habilitations":[
+                  
+               ],
+               "address":{
+                  
+               },
+               "metadatas":{
+                  
+               },
+               "attributes":{
+                  
+               }
+            },
+            {
+               "username":"testo",
+               "habilitations":[
+                  
+               ],
+               "address":{
+                  
+               },
+               "metadatas":{
+                  
+               },
+               "attributes":{
+                  
+               }
+            }
+         ],
+         "appName":"Applitest"
+      },
+      {
+         "name":"Administrateurs_Applitest",
+         "description":"toto",
+         "users":null,
+         "appName":"Applitest"
+      }
+   ]
+}

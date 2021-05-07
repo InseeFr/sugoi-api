@@ -252,6 +252,13 @@ public class FileReaderStoreTest {
     List<User> users =
         fileReaderStore.getUsersInGroup("Applitest", "Utilisateurs_Applitest").getResults();
     assertThat("Should find 2 elements", users.size(), is(2));
+    User testc =
+        users.stream().filter(user -> user.getUsername().equalsIgnoreCase("testc")).findAny().get();
+    assertThat("Information such as mail should be retrieved", testc.getMail(), is("test@test.fr"));
+    assertThat(
+        "Information such as organization's organization should be retrieved",
+        testc.getOrganization().getOrganization().getIdentifiant(),
+        is("testi"));
   }
 
   @Disabled
