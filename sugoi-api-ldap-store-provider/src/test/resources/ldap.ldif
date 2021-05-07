@@ -45,11 +45,19 @@ cn: Administrateurs_Applitest
 objectclass: groupOfUniqueNames
 description: toto
 
+dn: cn=Reader_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
+cn: Reader_Applitest
+objectclass: groupOfUniqueNames
+uniquemember: uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+uniquemember: uid=testo,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+description: toto
+
 dn: cn=Utilisateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
 cn: Utilisateurs_Applitest
 objectclass: groupOfUniqueNames
 uniquemember: uid=Testd,ou=SSM,o=insee,c=fr
 uniquemember: uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+uniquemember: uid=byebye,ou=contacts,ou=clients_domaine1,o=insee,c=fr
 description: tata
 
 dn: cn=Amodifier_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
@@ -241,6 +249,7 @@ objectClass: inseeAttributsHabilitation
 objectClass: inseeAttributsCommunication
 uid: byebye
 cn: byebye
+memberOf: cn=Utilisateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
 inseeAdressePostaleDN: l=supprime, ou=adresses,ou=clients_domaine1,o=insee,c=fr
 
 dn: uid=asupprimer,ou=contacts,ou=clients_domaine1,o=insee,c=fr

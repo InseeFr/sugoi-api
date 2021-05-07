@@ -1,1 +1,85 @@
-{"mail":"test@test.fr","username":"testc","organization":{"identifiant":"testo","gpgkey":null,"organization":{"identifiant":"testi","gpgkey":null,"organization":null,"address":{"Ligne1":"Insee","Ligne4":"88 AVE VERDIER"},"metadatas":{},"attributes":{}},"address":{"Ligne1":"Insee","Ligne4":"88 AVE VERDIER"},"metadatas":{},"attributes":{"description":"Insee"}},"groups":[{"name":"Utilisateurs_Applitest","description":"tata","users":[{"username":"Testd","habilitations":[],"address":{},"metadatas":{},"attributes":{}},{"username":"testc","habilitations":[],"address":{},"metadatas":{},"attributes":{}}],"appName":"Applitest"}],"habilitations":[],"address":{"Ligne1":"Insee","Ligne4":"88 AVE VERDIER"},"metadatas":{},"attributes":{}}
+{
+   "mail":"test@test.fr",
+   "username":"testc",
+   "organization":{
+      "identifiant":"testo",
+      "gpgkey":null,
+      "organization":{
+         "identifiant":"testi",
+         "gpgkey":null,
+         "organization":null,
+         "address":{
+            "Ligne1":"Insee",
+            "Ligne4":"88 AVE VERDIER"
+         },
+         "metadatas":{
+            
+         },
+         "attributes":{
+            
+         }
+      },
+      "address":{
+         "Ligne1":"Insee",
+         "Ligne4":"88 AVE VERDIER"
+      },
+      "metadatas":{
+         
+      },
+      "attributes":{
+         "description":"Insee"
+      }
+   },
+   "groups":[
+      {
+         "name":"Utilisateurs_Applitest",
+         "description":"tata",
+         "users":[
+            {
+               "username":"Testd",
+               "habilitations":[
+                  
+               ],
+               "address":{
+                  
+               },
+               "metadatas":{
+                  
+               },
+               "attributes":{
+                  
+               }
+            },
+            {
+               "username":"testc",
+               "habilitations":[
+                  
+               ],
+               "address":{
+                  
+               },
+               "metadatas":{
+                  
+               },
+               "attributes":{
+                  
+               }
+            }
+         ],
+         "appName":"Applitest"
+      }
+   ],
+   "habilitations":[
+      
+   ],
+   "address":{
+      "Ligne1":"Insee",
+      "Ligne4":"88 AVE VERDIER"
+   },
+   "metadatas":{
+      
+   },
+   "attributes":{
+      
+   }
+}

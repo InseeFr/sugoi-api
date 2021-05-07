@@ -77,6 +77,9 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   public void deleteUser(String id) {
     try {
       User currentUser = ldapReaderStore.getUser(id);
+      currentUser
+          .getGroups()
+          .forEach(group -> deleteUserFromGroup(group.getAppName(), group.getName(), id));
       if (currentUser.getAddress().get("id") != null) {
         deleteAddress(currentUser.getAddress().get("id"));
       }

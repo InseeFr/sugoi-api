@@ -191,9 +191,28 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testDeleteUser() {
+    assertThat(
+        "byebye is in Utilisateurs_Applitest",
+        ldapReaderStore.getGroup("Applitest", "Utilisateurs_Applitest").getUsers().stream()
+            .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
+    assertThat(
+        "byebye is in Utilisateurs_Applitest",
+        ldapReaderStore.getUsersInGroup("Applitest", "Utilisateurs_Applitest").getResults().stream()
+            .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
     ldapWriterStore.deleteUser("byebye");
     assertThat(
-        "testc should have been deleted", ldapReaderStore.getUser("byebye"), is(nullValue()));
+        "byebye should have been deleted", ldapReaderStore.getUser("byebye"), is(nullValue()));
+    assertThat(
+        "byebye should no more be in Utilisateurs_Applitest",
+        !ldapReaderStore.getGroup("Applitest", "Utilisateurs_Applitest").getUsers().stream()
+            .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
+    assertThat(
+        "byebye is in Utilisateurs_Applitest",
+        !ldapReaderStore
+            .getUsersInGroup("Applitest", "Utilisateurs_Applitest")
+            .getResults()
+            .stream()
+            .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
   }
 
   @Test

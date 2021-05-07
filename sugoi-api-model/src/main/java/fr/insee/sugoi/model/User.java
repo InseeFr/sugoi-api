@@ -34,7 +34,7 @@ public class User {
   private byte[] certificate;
   private Organization organization;
 
-  private List<Group> groups;
+  private List<Group> groups = new ArrayList<>();
 
   private List<Habilitation> habilitations = new ArrayList<>();
   private Map<String, String> address = new HashMap<>();
