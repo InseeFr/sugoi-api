@@ -17,8 +17,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
 import fr.insee.sugoi.core.exceptions.StoragePolicyNotMetException;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
@@ -405,16 +406,87 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testGroupShouldMatchGroupPattern() {
-    try {
-      Group groupWontCreate = new Group();
-      groupWontCreate.setName("bad_group_badsuffix");
-      ldapWriterStore.createGroup("WebServicesLdap", groupWontCreate);
-      fail();
-    } catch (StoragePolicyNotMetException e) {
-      assertThat("Should get correct message", e.getMessage(), is("Group pattern won't match"));
-      Group groupToCreate = new Group();
-      groupToCreate.setName("good_group_webServicesLdap");
-      ldapWriterStore.createGroup("WebServicesLdap", groupToCreate);
-    }
+    Group groupWontCreate = new Group();
+    groupWontCreate.setName("bad_group_badsuffix");
+    StoragePolicyNotMetException e =
+        assertThrows(
+            StoragePolicyNotMetException.class,
+            () -> ldapWriterStore.createGroup("WebServicesLdap", groupWontCreate));
+    assertThat("Should get correct message", e.getMessage(), is("Group pattern won't match"));
+    Group groupToCreate = new Group();
+    groupToCreate.setName("good_group_webServicesLdap");
+    ldapWriterStore.createGroup("WebServicesLdap", groupToCreate);
+  }
+
+  @Test
+  public void testInitPasswordNullFails() {
+    User user = ldapReaderStore.getUser("testc");
+    assertThrows(Exception.class, () -> ldapWriterStore.initPassword(user, null, null, null));
+  }
+
+  @Test
+  public void testInitPassword() {
+    User user = ldapReaderStore.getUser("testo");
+    ldapWriterStore.initPassword(user, "toto", null, null);
+    assertThat(
+        "Password toto should be validated", ldapReaderStore.validateCredentials(user, "toto"));
+    assertThat(
+        "Password testc should not be validated",
+        !ldapReaderStore.validateCredentials(user, "testc"));
+  }
+
+  @Test
+  public void testReinitPassword() {
+    User user = ldapReaderStore.getUser("testo");
+    assertThat(
+        "Password should not be reinit", !ldapReaderStore.validateCredentials(user, "reinit"));
+    ldapWriterStore.reinitPassword(user, "reinit", null, null);
+    assertThat("Password should be reinit", ldapReaderStore.validateCredentials(user, "reinit"));
+    assertThat("Password should not be testo", !ldapReaderStore.validateCredentials(user, "testo"));
+    ldapWriterStore.reinitPassword(user, "reinit2", null, null);
+    assertThat("Password should be reinit2", ldapReaderStore.validateCredentials(user, "reinit2"));
+    assertThat(
+        "Password should not be reinit", !ldapReaderStore.validateCredentials(user, "reinit"));
+  }
+
+  @Test
+  public void testChangePasswordWithFalseOld() {
+    User user = ldapReaderStore.getUser("rawpassword");
+    assertThrows(
+        InvalidPasswordException.class,
+        () -> ldapWriterStore.changePassword(user, "falsepassword", "newpassword", null));
+    assertThat(
+        "Password should not be newpassword",
+        !ldapReaderStore.validateCredentials(user, "newpassword"));
+  }
+
+  @Test
+  public void testChangePasswordWithTrueOld() {
+    User user = ldapReaderStore.getUser("rawpassword");
+    ldapWriterStore.changePassword(user, "truepassword", "newpassword", null);
+    assertThat(
+        "Should have a new password", ldapReaderStore.validateCredentials(user, "newpassword"));
+    assertThat(
+        "Password should no more be truepassword",
+        !ldapReaderStore.validateCredentials(user, "truepassword"));
+  }
+
+  @Test
+  public void testChangePasswordWithoutOld() {
+    User user = ldapReaderStore.getUser("nopassword");
+    assertThrows(
+        InvalidPasswordException.class,
+        () -> ldapWriterStore.changePassword(user, "", "newpassword", null));
+    ldapWriterStore.changePassword(user, null, "newpassword", null);
+    assertThat(
+        "Should have a new password", ldapReaderStore.validateCredentials(user, "newpassword"));
+  }
+
+  @Test
+  public void testChangeShaPassword() {
+    User user = ldapReaderStore.getUser("shapassword");
+    ldapWriterStore.changePassword(user, "{SHA}c3q3RSeNwMY7E09Ve9oBHw+MVXg=", "newpassword", null);
+    assertThat(
+        "Should have a new password", ldapReaderStore.validateCredentials(user, "newpassword"));
   }
 }
