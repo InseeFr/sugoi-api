@@ -48,6 +48,9 @@ public class FileWriterStore implements WriterStore {
 
   @Override
   public void deleteUser(String id) {
+    fileReaderStore.setResourceLoader(resourceLoader);
+    User user = fileReaderStore.getUser(id);
+    user.getGroups().forEach(group -> deleteUserFromGroup(group.getAppName(), group.getName(), id));
     deleteResourceFile(config.get(FileKeysConfig.USER_SOURCE), id);
   }
 

@@ -249,15 +249,33 @@ public class FileWriterStoreTest {
 
   @Test
   public void testDeleteUser() {
-    User user = new User();
-    user.setUsername("byebye");
-    user.setMail("byebye@toto.fr");
-    fileWriterStore.createUser(user);
+    User userToDelete = new User();
+    userToDelete.setUsername("byebye");
+    userToDelete.setMail("byebye@toto.fr");
+    fileWriterStore.createUser(userToDelete);
+    fileWriterStore.addUserToGroup("Applitest", "Utilisateurs_Applitest", "byebye");
     assertThat(
-        "byebye should have been added", fileReaderStore.getUser("byebye"), not(nullValue()));
+        "byebye is in Utilisateurs_Applitest",
+        fileReaderStore.getGroup("Applitest", "Utilisateurs_Applitest").getUsers().stream()
+            .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
+    assertThat(
+        "byebye is in Utilisateurs_Applitest",
+        fileReaderStore.getUsersInGroup("Applitest", "Utilisateurs_Applitest").getResults().stream()
+            .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
     fileWriterStore.deleteUser("byebye");
     assertThat(
         "byebye should have been deleted", fileReaderStore.getUser("byebye"), is(nullValue()));
+    assertThat(
+        "byebye should no more be in Utilisateurs_Applitest",
+        !fileReaderStore.getGroup("Applitest", "Utilisateurs_Applitest").getUsers().stream()
+            .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
+    assertThat(
+        "byebye is in Utilisateurs_Applitest",
+        !fileReaderStore
+            .getUsersInGroup("Applitest", "Utilisateurs_Applitest")
+            .getResults()
+            .stream()
+            .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
   }
 
   @Test

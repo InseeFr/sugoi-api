@@ -127,6 +127,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       page.setResults(
           Arrays.stream(entry.getAttribute("uniqueMember").getValues())
               .map(uniqueMember -> getUser(LdapUtils.getNodeValueFromDN(uniqueMember)))
+              .filter(user -> user != null)
               .collect(Collectors.toList()));
     } else {
       page.setResults(new ArrayList<>());
