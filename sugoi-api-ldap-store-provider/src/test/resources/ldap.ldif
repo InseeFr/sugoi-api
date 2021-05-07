@@ -297,6 +297,49 @@ inseegroupedefaut: prop1_TestIgnoreCase_applitest
 inseegroupedefaut: Prop2_TestIgnoreCase_applitest
 inseeAdressePostaleDN: l=testu,ou=adresses,ou=clients_domaine1,o=insee,c=fr
 
+dn: uid=rawpassword,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+userPassword: truepassword
+uid: rawpassword
+cn: rawpassword
+
+dn: uid=nopassword,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+uid: nopassword
+cn: nopassword
+
+dn: uid=shapassword,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+userPassword: {SHA}c3q3RSeNwMY7E09Ve9oBHw+MVXg=
+uid: shapassword
+cn: shapassword
+
+dn: uid=shapassword2,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+userPassword: {SHA}c3q3RSeNwMY7E09Ve9oBHw+MVXg=
+uid: shapassword2
+cn: shapassword2
+
 dn: uid=testo,ou=organisations,ou=clients_domaine1,o=insee,c=fr
 objectClass: top
 objectClass: inseeOrganisation

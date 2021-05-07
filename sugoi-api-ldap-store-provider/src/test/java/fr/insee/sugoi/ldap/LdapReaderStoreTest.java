@@ -298,6 +298,22 @@ public class LdapReaderStoreTest {
   }
 
   @Test
+  public void validateShaCredentialTest() {
+    User user = ldapReaderStore.getUser("shapassword2");
+    assertThat(
+        "Hash password should be validated",
+        ldapReaderStore.validateCredentials(user, "{SHA}c3q3RSeNwMY7E09Ve9oBHw+MVXg="));
+  }
+
+  @Test
+  public void validateNoPasswordTest() {
+    User user = ldapReaderStore.getUser("nopassword");
+    assertThat(
+        "Not having a password should not lead to password validation",
+        !ldapReaderStore.validateCredentials(user, null));
+  }
+
+  @Test
   public void searchUsersInNonExistantGroupTest() {
     PageResult<User> usersPageResult =
         ldapReaderStore.getUsersInGroup("Applitest", "FalseGroup_Applitest");
