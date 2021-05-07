@@ -87,7 +87,16 @@ public class FileWriterStoreTest {
       simpleTestcUser.setUsername("testc");
       User simpleTestDUser = new User();
       simpleTestDUser.setUsername("Testd");
-      utilisateursApplitest.setUsers(List.of(simpleTestDUser, simpleTestcUser));
+
+      User testoUser = new User();
+      testoUser.setUsername("testo");
+      FileWriter testoUserWriter =
+          new FileWriter(
+              resourceLoader.getResource("classpath:/sugoi-file-tests/users/testo").getFile());
+      testoUserWriter.write(mapper.writeValueAsString(testoUser));
+      testoUserWriter.close();
+
+      utilisateursApplitest.setUsers(List.of(simpleTestDUser, simpleTestcUser, testoUser));
       utilisateursApplitest.setDescription("tata");
       Application applitestApp = new Application();
       applitestApp.setName("Applitest");
@@ -106,14 +115,6 @@ public class FileWriterStoreTest {
                   .getFile());
       webserviceWriter.write(mapper.writeValueAsString(webserviceldapApp));
       webserviceWriter.close();
-
-      User testoUser = new User();
-      testoUser.setUsername("testo");
-      FileWriter testoUserWriter =
-          new FileWriter(
-              resourceLoader.getResource("classpath:/sugoi-file-tests/users/testo").getFile());
-      testoUserWriter.write(mapper.writeValueAsString(testoUser));
-      testoUserWriter.close();
 
       Organization testoOrg = new Organization();
       testoOrg.setIdentifiant("testo");
@@ -313,7 +314,7 @@ public class FileWriterStoreTest {
             .anyMatch(
                 group ->
                     group.getName().equals("Utilisateurs_Applitest")
-                        && group.getUsers().size() != 2));
+                        && group.getUsers().size() != 3));
   }
 
   @Test
@@ -382,8 +383,11 @@ public class FileWriterStoreTest {
   public void testDeleteUserInGroup() {
     assertThat(
         "Group should be empty",
-        fileReaderStore.getUsersInGroup("Applitest", "Administrateurs_Applitest").getResults(),
-        is(nullValue()));
+        fileReaderStore
+            .getUsersInGroup("Applitest", "Administrateurs_Applitest")
+            .getResults()
+            .size(),
+        is(0));
     fileWriterStore.addUserToGroup("Applitest", "Administrateurs_Applitest", "testc");
     fileWriterStore.addUserToGroup("Applitest", "Administrateurs_Applitest", "testo");
     fileWriterStore.deleteUserFromGroup("Applitest", "Administrateurs_Applitest", "testo");

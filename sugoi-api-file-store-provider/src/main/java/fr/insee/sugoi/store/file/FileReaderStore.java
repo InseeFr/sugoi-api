@@ -105,8 +105,12 @@ public class FileReaderStore implements ReaderStore {
   public PageResult<User> getUsersInGroup(String appName, String groupName) {
     PageResult<User> pageResult = new PageResult<>();
     Group group = getGroup(appName, groupName);
-    if (group != null) {
-      pageResult.setResults(getGroup(appName, groupName).getUsers());
+    if (group != null && group.getUsers() != null) {
+      pageResult.setResults(
+          group.getUsers().stream()
+              .map(user -> getUser(user.getUsername()))
+              .filter(user -> user != null)
+              .collect(Collectors.toList()));
     } else {
       pageResult.setResults(List.of());
     }
