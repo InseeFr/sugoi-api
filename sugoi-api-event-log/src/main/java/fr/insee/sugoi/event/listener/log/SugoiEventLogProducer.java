@@ -462,6 +462,28 @@ public class SugoiEventLogProducer {
         toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
         toLog.put(EventKeysConfig.USER_ID, properties.get(EventKeysConfig.USER_ID));
         break;
+      case ADD_APP_MANAGED_ATTRIBUTES:
+        toLog.put(EventKeysConfig.REALM, realm);
+        toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
+        toLog.put(EventKeysConfig.USER_ID, properties.get(EventKeysConfig.USER_ID));
+        toLog.put(EventKeysConfig.ATTRIBUTE, properties.get(EventKeysConfig.ATTRIBUTE));
+      case ADD_APP_MANAGED_ATTRIBUTES_ERROR:
+        toLog.put(EventKeysConfig.REALM, realm);
+        toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
+        toLog.put(EventKeysConfig.USER_ID, properties.get(EventKeysConfig.USER_ID));
+        toLog.put(EventKeysConfig.ATTRIBUTE, properties.get(EventKeysConfig.ATTRIBUTE));
+        toLog.put(EventKeysConfig.ERROR, properties.get(EventKeysConfig.ERROR));
+      case DELETE_APP_MANAGED_ATTRIBUTES:
+        toLog.put(EventKeysConfig.REALM, realm);
+        toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
+        toLog.put(EventKeysConfig.USER_ID, properties.get(EventKeysConfig.USER_ID));
+        toLog.put(EventKeysConfig.ATTRIBUTE, properties.get(EventKeysConfig.ATTRIBUTE));
+      case DELETE_APP_MANAGED_ATTRIBUTES_ERROR:
+        toLog.put(EventKeysConfig.REALM, realm);
+        toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
+        toLog.put(EventKeysConfig.USER_ID, properties.get(EventKeysConfig.USER_ID));
+        toLog.put(EventKeysConfig.ATTRIBUTE, properties.get(EventKeysConfig.ATTRIBUTE));
+        toLog.put(EventKeysConfig.ERROR, properties.get(EventKeysConfig.ERROR));
       default:
         break;
     }

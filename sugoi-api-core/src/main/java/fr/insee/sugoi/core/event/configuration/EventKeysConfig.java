@@ -57,5 +57,7 @@ public class EventKeysConfig extends GlobalKeysConfig {
 
   public static final String ERROR = "error";
 
+  public static final String ATTRIBUTE = "attribute";
+
   public static final String TYPE = "type";
 }

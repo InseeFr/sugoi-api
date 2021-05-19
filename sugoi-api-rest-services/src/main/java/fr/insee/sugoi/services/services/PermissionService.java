@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.services.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -183,5 +184,25 @@ public class PermissionService {
     return regexpList.stream()
         .map(regexp -> StrSubstitutor.replace(regexp, valueMap, "$(", ")"))
         .collect(Collectors.toList());
+  }
+
+  public List<String> getAllowedAttributePattern(
+      String realm, String storage, String attributePattern) {
+    List<String> appRightsOfUser =
+        getUserRealmAppManager().stream()
+            .map(app -> app.split("\\\\")[1])
+            .collect(Collectors.toList());
+
+    // Look for regexp of attribute value allowed
+    List<String> regexpAttributesAllowed = new ArrayList<>();
+    for (String appRight : appRightsOfUser) {
+      Map<String, String> valueMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+      valueMap.put("application", appRight);
+      valueMap.put("realm", realm);
+      valueMap.put("storage", storage);
+      regexpAttributesAllowed.add(
+          StrSubstitutor.replace(attributePattern, valueMap, "$(", ")").toUpperCase());
+    }
+    return regexpAttributesAllowed;
   }
 }

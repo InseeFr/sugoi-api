@@ -206,4 +206,20 @@ public interface WriterStore {
    *     been.
    */
   void changePasswordResetStatus(User user, boolean isReset);
+
+  /**
+   * Add the attribute to the app-managed-attribute-key in the store
+   *
+   * @param userId
+   * @param attribute
+   */
+  void addAppManagedAttribute(String userId, String attribute);
+
+  /**
+   * Delete the attribute value from the app-managed-attribute-key in the store
+   *
+   * @param userId
+   * @param attribute
+   */
+  void deleteAppManagedAttribute(String userId, String attribute);
 }
