@@ -14,6 +14,8 @@
 package fr.insee.sugoi.commons.services.controller.technics;
 
 import fr.insee.sugoi.commons.services.view.ErrorView;
+import fr.insee.sugoi.core.exceptions.AppCannotManagedAttributeException;
+import fr.insee.sugoi.core.exceptions.AppManagedAttributeException;
 import fr.insee.sugoi.core.exceptions.ApplicationAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.ApplicationNotCreatedException;
 import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
@@ -276,6 +278,26 @@ public class SugoiAdviceController {
     errorView.setMessage(e.getMessage());
     final ResponseEntity<ErrorView> response =
         new ResponseEntity<ErrorView>(errorView, HttpStatus.INTERNAL_SERVER_ERROR);
+    return response;
+  }
+
+  @ExceptionHandler(AppCannotManagedAttributeException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(AppCannotManagedAttributeException e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    final ResponseEntity<ErrorView> response =
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.FORBIDDEN);
+    return response;
+  }
+
+  @ExceptionHandler(AppManagedAttributeException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(AppManagedAttributeException e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    final ResponseEntity<ErrorView> response =
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
     return response;
   }
 }

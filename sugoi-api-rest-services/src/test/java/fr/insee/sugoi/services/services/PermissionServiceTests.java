@@ -17,6 +17,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -101,6 +102,18 @@ public class PermissionServiceTests {
   public void testAdminWildcard() {
     try {
       assertThat("user is admin sugoi", permissions.isAdmin(), is(true));
+    } catch (Exception e) {
+      fail();
+    }
+  }
+
+  @Test
+  @WithMockUser(roles = {"ASI_realm1_app1", "ASI_app2"})
+  public void testgetAllowedAttributePattern() {
+    try {
+      List<String> allowedAttributesPattern =
+          permissions.getAllowedAttributePattern("toto", "tata", "(.*)_$(application)");
+      assertThat("allowed Attributes Pattern", allowedAttributesPattern.size(), is(2));
     } catch (Exception e) {
       fail();
     }
