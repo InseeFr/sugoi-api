@@ -158,6 +158,18 @@ public class JmsRequestRouter {
                 request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
         credentialsService.changePassword(realm, userStorage, user.getUsername(), pcr);
         break;
+      case Method.ADD_APP_MANAGED_ATTRIBUTE:
+        userService.addAppManagedAttribute(
+            realm,
+            userStorage,
+            (String) request.getmethodParams().get(JmsAtttributes.USER_ID),
+            (String) request.getmethodParams().get(JmsAtttributes.ATTRIBUTE));
+      case Method.DELETE_APP_MANAGED_ATTRIBUTE:
+        userService.deleteAppManagedAttribute(
+            realm,
+            userStorage,
+            (String) request.getmethodParams().get(JmsAtttributes.USER_ID),
+            (String) request.getmethodParams().get(JmsAtttributes.ATTRIBUTE));
       default:
         throw new Exception("Invalid Operation");
     }

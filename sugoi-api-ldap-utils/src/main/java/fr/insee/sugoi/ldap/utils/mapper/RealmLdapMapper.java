@@ -31,7 +31,7 @@ public class RealmLdapMapper {
     realm.setName(searchResultEntry.getAttributeValue("cn").split("_")[1]);
     String[] inseeProperties = searchResultEntry.getAttributeValues("inseepropriete");
     for (String inseeProperty : inseeProperties) {
-      String[] property = inseeProperty.split("\\$");
+      String[] property = inseeProperty.split("\\$", 2);
       // Test if property is valid
       if (property.length == 2) {
         if (property[0].equalsIgnoreCase("ldapUrl")) {
@@ -40,6 +40,10 @@ public class RealmLdapMapper {
           realm.setAppSource(property[1]);
         } else if (property[0].equalsIgnoreCase("seealso_attributes")) {
           realm.addProperty(GlobalKeysConfig.SEEALSO_ATTRIBUTES, property[1]);
+        } else if (property[0].equalsIgnoreCase("app_managed_attribute_key")) {
+          realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEY, property[1]);
+        } else if (property[0].equalsIgnoreCase("app_managed_attribute_pattern")) {
+          realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERN, property[1]);
         }
       }
     }

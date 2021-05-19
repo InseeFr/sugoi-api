@@ -242,4 +242,22 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.PASSWORD_CHANGE_REQUEST, pcr);
     jmsWriter.writeRequestInQueue(queueRequestName, Method.CHANGE_PASSWORD, params);
   }
+
+  @Override
+  public void addAppManagedAttribute(String userId, String attribute) {
+    Map<String, Object> params = new HashMap<>();
+    params.put(JmsAtttributes.USER_ID, userId);
+    params.put(JmsAtttributes.ATTRIBUTE, attribute);
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.ADD_APP_MANAGED_ATTRIBUTE, params);
+  }
+
+  @Override
+  public void deleteAppManagedAttribute(String userId, String attribute) {
+    Map<String, Object> params = new HashMap<>();
+    params.put(JmsAtttributes.USER_ID, userId);
+    params.put(JmsAtttributes.ATTRIBUTE, attribute);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    jmsWriter.writeRequestInQueue(queueRequestName, Method.DELETE_APP_MANAGED_ATTRIBUTE, params);
+  }
 }

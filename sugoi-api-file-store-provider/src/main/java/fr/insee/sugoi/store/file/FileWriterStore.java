@@ -382,4 +382,14 @@ public class FileWriterStore implements WriterStore {
       throw new RuntimeException("Error writing in file", e);
     }
   }
+
+  @Override
+  public void addAppManagedAttribute(String userId, String attribute) {
+    throw new NotImplementedException();
+  }
+
+  @Override
+  public void deleteAppManagedAttribute(String userId, String attribute) {
+    throw new NotImplementedException();
+  }
 }
