@@ -8,5 +8,7 @@ updates:
   - package-ecosystem: "maven" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
-      interval: "monthly"
+      interval: "weekly"
+    commit-message:
+      prefix: "[UP] : ⬆️ "
     open-pull-requests-limit: 10
