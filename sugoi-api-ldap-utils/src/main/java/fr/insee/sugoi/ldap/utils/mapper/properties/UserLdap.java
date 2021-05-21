@@ -104,6 +104,10 @@ public class UserLdap {
       type = ModelType.LIST_STRING)
   private String[] inseeRolesApplicatifs;
 
+  @AttributeLdapName("inseePropriete")
+  @MapToMapElement(name = "attributes", key = "properties", type = ModelType.LIST_STRING)
+  private String inseeProperties;
+
   @AttributeLdapName("inseeAdresseCorrespondantLigne1")
   private String inseeAdresseCorrespondantLigne1;
 
