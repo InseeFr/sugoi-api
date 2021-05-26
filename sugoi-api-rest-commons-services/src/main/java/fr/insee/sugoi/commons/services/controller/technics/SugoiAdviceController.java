@@ -33,8 +33,11 @@ import fr.insee.sugoi.core.exceptions.StoragePolicyNotMetException;
 import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.UserNotCreatedException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -42,6 +45,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @ControllerAdvice
 public class SugoiAdviceController {
+
+  private static final Logger logger = LoggerFactory.getLogger(SugoiAdviceController.class);
 
   @ExceptionHandler(RealmNotFoundException.class)
   @ResponseBody
@@ -243,16 +248,6 @@ public class SugoiAdviceController {
     return response;
   }
 
-  @ExceptionHandler(Exception.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(Exception e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.INTERNAL_SERVER_ERROR);
-    return response;
-  }
-
   @ExceptionHandler(UnsupportedOperationException.class)
   @ResponseBody
   public ResponseEntity<ErrorView> exception(UnsupportedOperationException e) {
@@ -260,6 +255,27 @@ public class SugoiAdviceController {
     errorView.setMessage(e.getMessage());
     final ResponseEntity<ErrorView> response =
         new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_IMPLEMENTED);
+    return response;
+  }
+
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(HttpMessageNotReadableException e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    final ResponseEntity<ErrorView> response =
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.BAD_REQUEST);
+    return response;
+  }
+
+  @ExceptionHandler(Exception.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(Exception e) {
+    logger.error(e.getMessage(), e);
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    final ResponseEntity<ErrorView> response =
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.INTERNAL_SERVER_ERROR);
     return response;
   }
 }
