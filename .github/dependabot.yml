@@ -10,5 +10,4 @@ updates:
     schedule:
       interval: "weekly"
     commit-message:
-      prefix: "[UP] : ⬆️ "
-    open-pull-requests-limit: 10
+      prefix: "[UP] ⬆️ "
