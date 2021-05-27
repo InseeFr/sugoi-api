@@ -87,6 +87,7 @@ public interface UserService {
    * Allow to add only the app-managed attribute of an user, this attribute must follow the
    * app-managed-pattern. All attribute are needed
    *
+   * @param sugoiUser
    * @param realm
    * @param storage
    * @param userId
@@ -98,6 +99,7 @@ public interface UserService {
    * Allow to delete only app-managed attribute of an user, this attribute must follow the
    * app-managed-pattern. All attribute are needed
    *
+   * @param sugoiUser
    * @param realm
    * @param storage
    * @param userId

@@ -16,11 +16,12 @@ package fr.insee.sugoi.services.controller;
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.exceptions.AppCannotManagedAttributeException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
+import fr.insee.sugoi.core.model.SugoiUser;
 import fr.insee.sugoi.core.realm.RealmProvider;
+import fr.insee.sugoi.core.service.PermissionService;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
-import fr.insee.sugoi.services.services.PermissionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,11 +32,15 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -102,45 +107,55 @@ public class AppManagedUserAttributeController {
       @Parameter(description = "value of attribute to add", required = true)
           @PathVariable("app-managed-attribute-value")
           String attributeValue) {
-
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    List<String> roles =
+        authentication.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .map(String::toUpperCase)
+            .collect(Collectors.toList());
+    SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
     Realm _realm = realmProvider.load(realm);
-    if (attributeKey
-        .toUpperCase()
-        .equals(
-            _realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEY).toUpperCase())) {
+    try {
+      if (attributeKey
+          .toUpperCase()
+          .equals(
+              _realm
+                  .getProperties()
+                  .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEY)
+                  .toUpperCase())) {
 
-      if (permissionService.isWriter(realm, storage)) {
-        userService.addAppManagedAttribute(realm, storage, id, attributeValue);
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findById(realm, storage, id));
-      } else {
-
-        userService.addAppManagedAttribute(realm, storage, id, attributeValue);
-        List<String> regexpAttributesAllowed =
-            permissionService.getAllowedAttributePattern(
-                realm,
-                storage,
-                _realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERN));
-        // Check if attribute match with allowed pattern
-        for (String regexpAttributeAllowed : regexpAttributesAllowed) {
-          if (attributeValue.toUpperCase().matches(regexpAttributeAllowed.toUpperCase())) {
+        if (permissionService.isWriter(sugoiUser, realm, storage)) {
+          userService.addAppManagedAttribute(realm, storage, id, attributeValue);
+          return ResponseEntity.status(HttpStatus.OK)
+              .body(userService.findById(realm, storage, id));
+        } else {
+          if (permissionService.isValidAttributeAccordingAttributePattern(
+              sugoiUser, realm, storage, attributeValue)) {
+            userService.addAppManagedAttribute(realm, storage, id, attributeValue);
             return ResponseEntity.status(HttpStatus.OK)
                 .body(userService.findById(realm, storage, id));
           }
+
+          // If no match found then app cannot managed attribute or attribute doesn't math
+          // with allowed pattern
+          throw new AppCannotManagedAttributeException(
+              "Cannot add attribute to user: attribute doesn't match with pattern");
         }
-        // If no match found then app cannot managed attribute or attribute doesn't math
-        // with allowed pattern
-        throw new AppCannotManagedAttributeException(
-            "Cannot add attribute to user: attribute doesn't match with pattern");
       }
+    } catch (Exception e) {
+      throw new AppCannotManagedAttributeException(
+          "Cannot add attribute to user: app cannot managed attributes" + attributeKey);
     }
     throw new AppCannotManagedAttributeException(
-        "Cannot add attribute to user: app cannot managed " + attributeKey);
+        "Cannot add attribute to user: app cannot managed attributes" + attributeKey);
   }
 
   @DeleteMapping(
-      value = {"/realms/{realm}/storages/{storage}/users/{id}/app-managed-attribute"},
+      value = {
+        "/realms/{realm}/storages/{storage}/users/{id}/{app-managed-attribute-name}/{app-managed-attribute-value}"
+      },
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Operation(summary = "add attribute managed by application")
+  @Operation(summary = "delete attribute managed by application")
   @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
   @ApiResponses(
       value = {
@@ -180,37 +195,48 @@ public class AppManagedUserAttributeController {
       @Parameter(description = "value of attribute to add", required = true)
           @PathVariable("app-managed-attribute-value")
           String attributeValue) {
-
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    List<String> roles =
+        authentication.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .map(String::toUpperCase)
+            .collect(Collectors.toList());
+    SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
     Realm _realm = realmProvider.load(realm);
-    if (attributeKey
-        .toUpperCase()
-        .equals(
-            _realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEY).toUpperCase())) {
-      if (permissionService.isWriter(realm, storage)) {
-        userService.deleteAppManagedAttribute(realm, storage, id, attributeValue);
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findById(realm, storage, id));
-      } else {
-        List<String> regexpAttributesAllowed =
-            permissionService.getAllowedAttributePattern(
-                realm,
-                storage,
-                _realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERN));
-        // Check if attribute match with allowed pattern
-        for (String regexpAttributeAllowed : regexpAttributesAllowed) {
-          if (attributeValue.toUpperCase().matches(regexpAttributeAllowed)) {
+    try {
+
+      if (attributeKey
+          .toUpperCase()
+          .equals(
+              _realm
+                  .getProperties()
+                  .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEY)
+                  .toUpperCase())) {
+        if (permissionService.isWriter(sugoiUser, realm, storage)) {
+          userService.deleteAppManagedAttribute(realm, storage, id, attributeValue);
+          return ResponseEntity.status(HttpStatus.OK)
+              .body(userService.findById(realm, storage, id));
+        } else {
+
+          if (permissionService.isValidAttributeAccordingAttributePattern(
+              sugoiUser, realm, storage, attributeValue)) {
             userService.deleteAppManagedAttribute(realm, storage, id, attributeValue);
             return ResponseEntity.status(HttpStatus.OK)
                 .body(userService.findById(realm, storage, id));
           }
+
+          // If no match found then app cannot managed attribute or attribute doesn't math
+          // with allowed pattern
+          throw new AppCannotManagedAttributeException(
+              "Cannot add attribute to user: attribute doesn't match with pattern");
         }
-        // If no match found then app cannot managed attribute or attribute doesn't math
-        // with allowed pattern
-        throw new AppCannotManagedAttributeException(
-            "Cannot add attribute to user: attribute doesn't match with pattern");
       }
+    } catch (Exception e) {
+      throw new AppCannotManagedAttributeException(
+          "Cannot add attribute to user: app cannot managed attributes" + attributeKey);
     }
     throw new AppCannotManagedAttributeException(
-        "Cannot add attribute to user: app cannot managed " + attributeKey);
+        "Cannot add attribute to user: app cannot managed attributes" + attributeKey);
   }
 
   @PatchMapping(
@@ -272,7 +298,7 @@ public class AppManagedUserAttributeController {
         "/realms/{realm}/users/{id}/{app-managed-attribute-name}/{app-managed-attribute-value}"
       },
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Operation(summary = "add attribute managed by application")
+  @Operation(summary = "delete attribute managed by application")
   @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
   @ApiResponses(
       value = {
