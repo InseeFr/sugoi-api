@@ -13,11 +13,17 @@
 */
 package fr.insee.sugoi.services.decider;
 
-import fr.insee.sugoi.services.services.PermissionService;
+import fr.insee.sugoi.core.model.SugoiUser;
+import fr.insee.sugoi.core.service.PermissionService;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component("NewAuthorizeMethodDecider")
@@ -33,10 +39,17 @@ public class AuthorizeMethodDecider {
   public boolean isReader(String realm, String userStorage) {
     if (enable) {
       logger.info("Check if user is reader on realm {} and userStorage {}", realm, userStorage);
-      return permissionService.isReader(realm, userStorage)
-          || permissionService.isWriter(realm, userStorage)
-          || permissionService.isApplicationManager(realm)
-          || permissionService.isPasswordManager(realm, userStorage);
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      List<String> roles =
+          authentication.getAuthorities().stream()
+              .map(GrantedAuthority::getAuthority)
+              .map(String::toUpperCase)
+              .collect(Collectors.toList());
+      SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
+      return permissionService.isReader(sugoiUser, realm, userStorage)
+          || permissionService.isWriter(sugoiUser, realm, userStorage)
+          || permissionService.isApplicationManager(sugoiUser, realm)
+          || permissionService.isPasswordManager(sugoiUser, realm, userStorage);
     }
     logger.warn("PreAuthorize on request is disabled, can cause security problem");
     return true;
@@ -45,8 +58,15 @@ public class AuthorizeMethodDecider {
   public boolean isAppManager(String realm, String application) {
     if (enable) {
       logger.info("Check if user is at least reader on realm {}", realm);
-      return permissionService.isApplicationManager(realm, null, application)
-          || permissionService.isWriter(realm, null);
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      List<String> roles =
+          authentication.getAuthorities().stream()
+              .map(GrantedAuthority::getAuthority)
+              .map(String::toUpperCase)
+              .collect(Collectors.toList());
+      SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
+      return permissionService.isApplicationManager(sugoiUser, realm, null, application)
+          || permissionService.isWriter(sugoiUser, realm, null);
     }
     logger.warn("PreAuthorize on request is disabled, can cause security problem");
     return true;
@@ -56,8 +76,15 @@ public class AuthorizeMethodDecider {
     if (enable) {
       logger.info(
           "Check if user is at least reader on realm {} and userStorage {}", realm, userStorage);
-      return permissionService.isPasswordManager(realm, userStorage)
-          || permissionService.isWriter(realm, userStorage);
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      List<String> roles =
+          authentication.getAuthorities().stream()
+              .map(GrantedAuthority::getAuthority)
+              .map(String::toUpperCase)
+              .collect(Collectors.toList());
+      SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
+      return permissionService.isPasswordManager(sugoiUser, realm, userStorage)
+          || permissionService.isWriter(sugoiUser, realm, userStorage);
     }
     logger.warn("PreAuthorize on request is disabled, can cause security problem");
     return true;
@@ -67,7 +94,14 @@ public class AuthorizeMethodDecider {
     if (enable) {
       logger.info(
           "Check if user is at least writer on realm {} and userStorage {}", realm, userStorage);
-      return permissionService.isWriter(realm, userStorage);
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      List<String> roles =
+          authentication.getAuthorities().stream()
+              .map(GrantedAuthority::getAuthority)
+              .map(String::toUpperCase)
+              .collect(Collectors.toList());
+      SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
+      return permissionService.isWriter(sugoiUser, realm, userStorage);
     }
     logger.warn("PreAuthorize on request is disabled, can cause security problem");
     return true;
@@ -76,7 +110,14 @@ public class AuthorizeMethodDecider {
   public boolean isAdmin() {
     if (enable) {
       logger.info("Check if user is admin");
-      return permissionService.isAdmin();
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      List<String> roles =
+          authentication.getAuthorities().stream()
+              .map(GrantedAuthority::getAuthority)
+              .map(String::toUpperCase)
+              .collect(Collectors.toList());
+      SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
+      return permissionService.isAdmin(sugoiUser);
     }
     logger.warn("PreAuthorize on request is disabled, can cause security problem");
     return true;

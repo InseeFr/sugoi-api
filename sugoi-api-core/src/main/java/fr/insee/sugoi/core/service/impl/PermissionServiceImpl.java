@@ -11,8 +11,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.services.services;
+package fr.insee.sugoi.core.service.impl;
 
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
+import fr.insee.sugoi.core.model.SugoiUser;
+import fr.insee.sugoi.core.realm.RealmProvider;
+import fr.insee.sugoi.core.service.PermissionService;
+import fr.insee.sugoi.model.Realm;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,14 +28,12 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PermissionService {
+public class PermissionServiceImpl implements PermissionService {
 
   @Value("${fr.insee.sugoi.api.regexp.role.reader:}")
   private List<String> regexpReaderList;
@@ -47,49 +50,57 @@ public class PermissionService {
   @Value("${fr.insee.sugoi.api.regexp.role.application.manager:}")
   private List<String> applicationManagerRoleList;
 
+  @Autowired private RealmProvider realmProvider;
+
   public static final Logger logger = LoggerFactory.getLogger(PermissionService.class);
 
-  public boolean isReader(String realm, String userStorage) {
-    List<String> searchRoleList = getSearchRoleList(realm, userStorage, null, regexpReaderList);
-    return checkIfUserGetRoles(searchRoleList)
-        || isWriter(realm, userStorage)
-        || isApplicationManager(realm);
-  }
-
-  public boolean isPasswordManager(String realm, String userStorage) {
+  @Override
+  public boolean isReader(SugoiUser sugoiUser, String realm, String userStorage) {
     List<String> searchRoleList =
-        getSearchRoleList(realm, userStorage, null, passwordManagerRoleList);
-    return checkIfUserGetRoles(searchRoleList);
+        getSearchRoleList(sugoiUser, realm, userStorage, null, regexpReaderList);
+    return checkIfUserGetRoles(sugoiUser, searchRoleList)
+        || isWriter(sugoiUser, realm, userStorage)
+        || isApplicationManager(sugoiUser, realm);
   }
 
-  public boolean isApplicationManager(String realm, String userStorage, String application) {
+  @Override
+  public boolean isPasswordManager(SugoiUser sugoiUser, String realm, String userStorage) {
     List<String> searchRoleList =
-        getSearchRoleList(realm, userStorage, application, applicationManagerRoleList);
-    return checkIfUserGetRoles(searchRoleList);
+        getSearchRoleList(sugoiUser, realm, userStorage, null, passwordManagerRoleList);
+    return checkIfUserGetRoles(sugoiUser, searchRoleList);
   }
 
-  public boolean isApplicationManager(String realm) {
-    List<String> searchRoleList = getSearchRoleList(realm, "*", "*", applicationManagerRoleList);
-    return checkIfUserGetRoles(searchRoleList);
+  @Override
+  public boolean isApplicationManager(
+      SugoiUser sugoiUser, String realm, String userStorage, String application) {
+    List<String> searchRoleList =
+        getSearchRoleList(sugoiUser, realm, userStorage, application, applicationManagerRoleList);
+    return checkIfUserGetRoles(sugoiUser, searchRoleList);
   }
 
-  public boolean isWriter(String realm, String userStorage) {
-    List<String> searchRoleList = getSearchRoleList(realm, userStorage, null, regexpWriterList);
-    return checkIfUserGetRoles(searchRoleList) || isAdmin();
+  @Override
+  public boolean isApplicationManager(SugoiUser sugoiUser, String realm) {
+    List<String> searchRoleList =
+        getSearchRoleList(sugoiUser, realm, "*", "*", applicationManagerRoleList);
+    return checkIfUserGetRoles(sugoiUser, searchRoleList);
   }
 
-  public boolean isAdmin() {
-    return checkIfUserGetRoles(adminRoleList);
+  @Override
+  public boolean isWriter(SugoiUser sugoiUser, String realm, String userStorage) {
+    List<String> searchRoleList =
+        getSearchRoleList(sugoiUser, realm, userStorage, null, regexpWriterList);
+    return checkIfUserGetRoles(sugoiUser, searchRoleList) || isAdmin(sugoiUser);
   }
 
-  private boolean checkIfUserGetRoles(List<String> rolesSearch) {
+  @Override
+  public boolean isAdmin(SugoiUser sugoiUser) {
+    return checkIfUserGetRoles(sugoiUser, adminRoleList);
+  }
+
+  private boolean checkIfUserGetRoles(SugoiUser sugoiUser, List<String> rolesSearch) {
     logger.debug("Checking if user is in : {}", rolesSearch);
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     List<String> roles =
-        authentication.getAuthorities().stream()
-            .map(GrantedAuthority::getAuthority)
-            .map(String::toUpperCase)
-            .collect(Collectors.toList());
+        sugoiUser.getRoles().stream().map(String::toUpperCase).collect(Collectors.toList());
     logger.debug("User roles: {}", roles);
     for (String roleSearch : rolesSearch) {
       logger.trace(roleSearch);
@@ -105,33 +116,39 @@ public class PermissionService {
     return false;
   }
 
-  public List<String> getUserRealmReader() {
-    return getUserRightList(regexpReaderList);
+  @Override
+  public List<String> getUserRealmReader(SugoiUser sugoiUser) {
+    return getUserRightList(sugoiUser, regexpReaderList);
   }
 
-  public List<String> getUserRealmWriter() {
-    return getUserRightList(regexpWriterList);
+  @Override
+  public List<String> getUserRealmWriter(SugoiUser sugoiUser) {
+    return getUserRightList(sugoiUser, regexpWriterList);
   }
 
-  public List<String> getUserRealmPasswordManager() {
-    return getUserRightList(passwordManagerRoleList);
+  @Override
+  public List<String> getUserRealmPasswordManager(SugoiUser sugoiUser) {
+    return getUserRightList(sugoiUser, passwordManagerRoleList);
   }
 
-  public List<String> getUserRealmAppManager() {
-    return getUserRightList(applicationManagerRoleList);
+  @Override
+  public List<String> getUserRealmAppManager(SugoiUser sugoiUser) {
+    return getUserRightList(sugoiUser, applicationManagerRoleList);
   }
 
-  private List<String> getUserRightList(List<String> regexpListToSearch) {
+  private List<String> getUserRightList(SugoiUser sugoiUser, List<String> regexpListToSearch) {
     List<String> searchRoleList =
         getSearchRoleList(
-                "(?<realm>.*)", "(?<userStorage>.*)", "(?<application>.*)", regexpListToSearch)
+                sugoiUser,
+                "(?<realm>.*)",
+                "(?<userStorage>.*)",
+                "(?<application>.*)",
+                regexpListToSearch)
             .stream()
             .map(String::toUpperCase)
             .collect(Collectors.toList());
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     List<String> roles =
-        authentication.getAuthorities().stream()
-            .map(GrantedAuthority::getAuthority)
+        sugoiUser.getRoles().stream()
             .map(String::toUpperCase)
             .map(
                 role -> {
@@ -172,7 +189,11 @@ public class PermissionService {
   }
 
   private List<String> getSearchRoleList(
-      String realm, String userStorage, String application, List<String> regexpList) {
+      SugoiUser sugoiUser,
+      String realm,
+      String userStorage,
+      String application,
+      List<String> regexpList) {
     Map<String, String> valueMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     valueMap.put("realm", realm.toUpperCase());
     if (userStorage != null) {
@@ -186,13 +207,14 @@ public class PermissionService {
         .collect(Collectors.toList());
   }
 
+  @Override
   public List<String> getAllowedAttributePattern(
-      String realm, String storage, String attributePattern) {
+      SugoiUser sugoiUser, String realm, String storage) {
     List<String> appRightsOfUser =
-        getUserRealmAppManager().stream()
+        getUserRealmAppManager(sugoiUser).stream()
             .map(app -> app.split("\\\\")[1])
             .collect(Collectors.toList());
-
+    Realm _realm = realmProvider.load(realm);
     // Look for regexp of attribute value allowed
     List<String> regexpAttributesAllowed = new ArrayList<>();
     for (String appRight : appRightsOfUser) {
@@ -201,8 +223,26 @@ public class PermissionService {
       valueMap.put("realm", realm);
       valueMap.put("storage", storage);
       regexpAttributesAllowed.add(
-          StrSubstitutor.replace(attributePattern, valueMap, "$(", ")").toUpperCase());
+          StrSubstitutor.replace(
+                  _realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERN),
+                  valueMap,
+                  "$(",
+                  ")")
+              .toUpperCase());
     }
     return regexpAttributesAllowed;
+  }
+
+  @Override
+  public boolean isValidAttributeAccordingAttributePattern(
+      SugoiUser sugoiUser, String realm, String storage, String attribute) {
+    List<String> regexpAttributesAllowed = getAllowedAttributePattern(sugoiUser, realm, storage);
+    // Check if attribute match with allowed pattern
+    for (String regexpAttributeAllowed : regexpAttributesAllowed) {
+      if (attribute.toUpperCase().matches(regexpAttributeAllowed)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
