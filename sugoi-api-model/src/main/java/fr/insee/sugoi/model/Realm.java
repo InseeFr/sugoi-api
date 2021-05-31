@@ -23,6 +23,8 @@ public class Realm {
   private String appSource;
   private List<UserStorage> userStorages;
   private Map<String, String> properties = new HashMap<>();
+  private String readerType;
+  private String writerType;
 
   public String getName() {
     return this.name;
@@ -79,5 +81,21 @@ public class Realm {
         + ", userStorages="
         + userStorages
         + "]";
+  }
+
+  public String getReaderType() {
+    return readerType;
+  }
+
+  public void setReaderType(String readerType) {
+    this.readerType = readerType;
+  }
+
+  public String getWriterType() {
+    return writerType;
+  }
+
+  public void setWriterType(String writerType) {
+    this.writerType = writerType;
   }
 }

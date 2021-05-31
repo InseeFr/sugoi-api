@@ -38,21 +38,14 @@ public class StoreStorageImpl implements StoreStorage {
 
   @Autowired private ApplicationContext applicationContext;
 
-  private String defaultWriter;
-
-  private String defaultReader;
-
   @Override
   public Store getStore(Realm realm, UserStorage userStorage) {
-    String writerType = userStorage.getWriterType();
-    String readerType = userStorage.getReaderType();
+    String writerType = realm.getWriterType();
+    String readerType = realm.getReaderType();
+    if (readerType == null || writerType == null) {
+      throw new RuntimeException("Realm must have a defaultReaderType and a defaultWriterType");
+    }
     String name = realm.getName() + "_" + userStorage.getName();
-    if (writerType == null) {
-      writerType = defaultWriter;
-    }
-    if (readerType == null) {
-      readerType = defaultReader;
-    }
     if (!connections.containsKey(name)) {
       logger.info("Chargement de la configuration {}", name);
       WriterStore writerStore =
@@ -68,21 +61,5 @@ public class StoreStorageImpl implements StoreStorage {
     }
 
     return connections.get(name);
-  }
-
-  public String getDefaultWriter() {
-    return defaultWriter;
-  }
-
-  public void setDefaultWriter(String defaultWriter) {
-    this.defaultWriter = defaultWriter;
-  }
-
-  public String getDefaultReader() {
-    return defaultReader;
-  }
-
-  public void setDefaultReader(String defaultReader) {
-    this.defaultReader = defaultReader;
   }
 }

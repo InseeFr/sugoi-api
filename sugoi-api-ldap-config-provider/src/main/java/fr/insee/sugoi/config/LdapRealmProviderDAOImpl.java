@@ -59,6 +59,12 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   @Value("${fr.insee.sugoi.config.ldap.profils.branche:}")
   private String baseDn;
 
+  @Value("${fr.insee.sugoi.store.defaultReader:}")
+  private String defaultReader;
+
+  @Value("${fr.insee.sugoi.store.defaultWriter:}")
+  private String defaultWriter;
+
   @Value("${fr.insee.sugoi.config.ldap.profils.pattern:cn=Profil_{realm}_WebServiceLdap}")
   private String realmEntryPattern;
 
@@ -74,6 +80,12 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
       if (realmEntry != null) {
         logger.debug("Found entry {}", realmEntry.getDN());
         Realm realm = RealmLdapMapper.mapFromSearchEntry(realmEntry);
+        if (realm.getReaderType() == null) {
+          realm.setReaderType(defaultReader);
+        }
+        if (realm.getWriterType() == null) {
+          realm.setWriterType(defaultWriter);
+        }
         logger.debug("Parsing as realm {}", realm);
         realm.setUserStorages(loadUserStorages(realmEntry, ldapConnection));
         return realm;
@@ -98,6 +110,12 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
           .map(
               e -> {
                 Realm realm = RealmLdapMapper.mapFromSearchEntry(e);
+                if (realm.getReaderType() == null) {
+                  realm.setReaderType(defaultReader);
+                }
+                if (realm.getWriterType() == null) {
+                  realm.setWriterType(defaultWriter);
+                }
                 realm.setUserStorages(loadUserStorages(e, ldapConnection));
                 return realm;
               })

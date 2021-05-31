@@ -40,6 +40,10 @@ public class RealmLdapMapper {
           realm.setAppSource(property[1]);
         } else if (property[0].equalsIgnoreCase("seealso_attributes")) {
           realm.addProperty(GlobalKeysConfig.SEEALSO_ATTRIBUTES, property[1]);
+        } else if (property[0].equalsIgnoreCase("default_writer_type")) {
+          realm.setWriterType(property[1]);
+        } else if (property[0].equalsIgnoreCase("default_reader_type")) {
+          realm.setReaderType(property[1]);
         }
       }
     }

@@ -40,6 +40,12 @@ public class LocalFileRealmProviderDAO implements RealmProvider {
   @Value("${fr.insee.sugoi.realm.config.local.path:classpath:/realms.json}")
   private String localFilePath;
 
+  @Value("${fr.insee.sugoi.store.defaultReader:}")
+  private String defaultReader;
+
+  @Value("${fr.insee.sugoi.store.defaultWriter:}")
+  private String defaultWriter;
+
   @Autowired ResourceLoader resourceLoader;
 
   private List<Realm> realms;
@@ -65,6 +71,16 @@ public class LocalFileRealmProviderDAO implements RealmProvider {
       }
       InputStream is = realmsResource.getInputStream();
       realms = mapper.readValue(is, new TypeReference<List<Realm>>() {});
+      realms.stream()
+          .forEach(
+              realm -> {
+                if (realm.getReaderType() == null) {
+                  realm.setReaderType(defaultReader);
+                }
+                if (realm.getWriterType() == null) {
+                  realm.setWriterType(defaultReader);
+                }
+              });
     } catch (Exception e) {
       throw new IllegalArgumentException("No resources found in " + localFilePath, e);
     }
