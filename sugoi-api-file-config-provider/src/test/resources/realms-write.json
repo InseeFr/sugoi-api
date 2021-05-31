@@ -1,25 +1,23 @@
 [
-    {
-        "name": "test",
-        "url": "/test",
-        "appSource": "/applications",
-        "userStorages": [
-            {
-                "name": "default",
-                "userSource": "/users",
-                "organizationSource": "/organizations",
-                "properties": null,
-                "readerType": null,
-                "writerType": null
-            },
-            {
-                "name": "other",
-                "userSource": "/users",
-                "organizationSource": "/organizations2",
-                "properties": null,
-                "readerType": null,
-                "writerType": null
-            }
-        ]
-    }
+  {
+    "name": "test",
+    "url": "/test",
+    "appSource": "/applications",
+    "userStorages": [
+      {
+        "name": "default",
+        "userSource": "/users",
+        "organizationSource": "/organizations",
+        "properties": null
+      },
+      {
+        "name": "other",
+        "userSource": "/users",
+        "organizationSource": "/organizations2",
+        "properties": null
+      }
+    ],
+    "readerType": null,
+    "writerType": null
+  }
 ]
