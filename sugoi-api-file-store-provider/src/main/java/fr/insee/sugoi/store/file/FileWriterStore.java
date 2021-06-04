@@ -384,12 +384,12 @@ public class FileWriterStore implements WriterStore {
   }
 
   @Override
-  public void addAppManagedAttribute(String userId, String attribute) {
+  public void addAppManagedAttribute(String userId, String attributeKey, String attribute) {
     throw new NotImplementedException();
   }
 
   @Override
-  public void deleteAppManagedAttribute(String userId, String attribute) {
+  public void deleteAppManagedAttribute(String userId, String attributeKey, String attribute) {
     throw new NotImplementedException();
   }
 }

@@ -13,7 +13,6 @@
 */
 package fr.insee.sugoi.store.ldap;
 
-import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
@@ -45,12 +44,6 @@ public class LdapStoreBeans {
 
   @Value("${fr.insee.sugoi.ldap.default.group_source_pattern:}")
   private String defaultGroupSourcePattern;
-
-  @Value("${fr.insee.sugoi.ldap.default.app_managed_attribute_key:}")
-  private String defaultAppManagedAttributeKey;
-
-  @Value("${fr.insee.sugoi.ldap.default.app_managed_attribute_pattern:}")
-  private String defaultAppManagedAttributePattern;
 
   @Bean("LdapReaderStore")
   @Lazy
@@ -91,16 +84,6 @@ public class LdapStoreBeans {
             ? userStorage.getProperties().get("group_filter_pattern")
             : defaultGroupFilterPattern);
     config.put(LdapConfigKeys.REALM_NAME, realm.getName());
-    config.put(
-        GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEY,
-        realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEY) != null
-            ? realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEY)
-            : defaultAppManagedAttributeKey);
-    config.put(
-        GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERN,
-        realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERN) != null
-            ? realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERN)
-            : defaultAppManagedAttributePattern);
     return config;
   }
 }

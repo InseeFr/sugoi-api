@@ -45,9 +45,9 @@ public class RealmLdapMapper {
         } else if (property[0].equalsIgnoreCase("default_reader_type")) {
           realm.setReaderType(property[1]);
         } else if (property[0].equalsIgnoreCase("app_managed_attribute_key")) {
-          realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEY, property[1]);
+          realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, property[1]);
         } else if (property[0].equalsIgnoreCase("app_managed_attribute_pattern")) {
-          realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERN, property[1]);
+          realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, property[1]);
         }
       }
     }

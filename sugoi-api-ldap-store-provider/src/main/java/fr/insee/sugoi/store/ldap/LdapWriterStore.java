@@ -25,7 +25,6 @@ import com.unboundid.ldap.sdk.ModifyRequest;
 import com.unboundid.ldap.sdk.ResultCode;
 import com.unboundid.ldap.sdk.extensions.PasswordModifyExtendedRequest;
 import com.unboundid.util.SubtreeDeleter;
-import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.exceptions.AppManagedAttributeException;
 import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
 import fr.insee.sugoi.core.exceptions.StoragePolicyNotMetException;
@@ -453,32 +452,31 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   }
 
   @Override
-  public void addAppManagedAttribute(String userId, String attribute) {
+  public void addAppManagedAttribute(String userId, String attributeKey, String attributeValue) {
     try {
-      String attributeKey = config.get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEY);
       ModifyRequest modifyAttributeRequest =
           new ModifyRequest(
-              getUserDN(userId), new Modification(ModificationType.ADD, attributeKey, attribute));
+              getUserDN(userId),
+              new Modification(ModificationType.ADD, attributeKey, attributeValue));
       ldapPoolConnection.modify(modifyAttributeRequest);
     } catch (LDAPException e) {
       throw new RuntimeException(
           "Failed to update user attribute "
-              + GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEY
+              + attributeKey
               + " with value "
-              + attribute
+              + attributeValue
               + " while writing to LDAP",
           e);
     }
   }
 
   @Override
-  public void deleteAppManagedAttribute(String userId, String attribute) {
+  public void deleteAppManagedAttribute(String userId, String attributeKey, String attributeValue) {
     try {
-      String attributeKey = config.get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEY);
       ModifyRequest modifyAttributeRequest =
           new ModifyRequest(
               getUserDN(userId),
-              new Modification(ModificationType.DELETE, attributeKey, attribute));
+              new Modification(ModificationType.DELETE, attributeKey, attributeValue));
       ldapPoolConnection.modify(modifyAttributeRequest);
     } catch (LDAPException e) {
       if (e.getResultCode().equals(ResultCode.NO_SUCH_ATTRIBUTE)) {
@@ -486,9 +484,9 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       }
       throw new RuntimeException(
           "Failed to update user attribute "
-              + GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEY
+              + attributeKey
               + " with value "
-              + attribute
+              + attributeValue
               + " while writing to LDAP",
           e);
     }

@@ -32,7 +32,7 @@ public interface PermissionService {
   public boolean isAdmin(SugoiUser sugoiUser);
 
   public boolean isValidAttributeAccordingAttributePattern(
-      SugoiUser sugoiUser, String realm, String storage, String attribute);
+      SugoiUser sugoiUser, String realm, String storage, String pattern, String attribute);
 
   public List<String> getUserRealmReader(SugoiUser sugoiUser);
 
@@ -43,5 +43,5 @@ public interface PermissionService {
   public List<String> getUserRealmAppManager(SugoiUser sugoiUser);
 
   public List<String> getAllowedAttributePattern(
-      SugoiUser sugoiUser, String realm, String storageString);
+      SugoiUser sugoiUser, String realm, String storage, String pattern);
 }

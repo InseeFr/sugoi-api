@@ -31,6 +31,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,23 +116,30 @@ public class AppManagedUserAttributeController {
             .collect(Collectors.toList());
     SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
     Realm _realm = realmProvider.load(realm);
+    List<String> attributes_allowed =
+        Arrays.asList(
+            _realm
+                .getProperties()
+                .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST)
+                .toUpperCase()
+                .split(","));
     try {
-      if (attributeKey
-          .toUpperCase()
-          .equals(
-              _realm
-                  .getProperties()
-                  .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEY)
-                  .toUpperCase())) {
+      if (attributes_allowed.contains(attributeKey.toUpperCase())) {
 
         if (permissionService.isWriter(sugoiUser, realm, storage)) {
-          userService.addAppManagedAttribute(realm, storage, id, attributeValue);
+          userService.addAppManagedAttribute(realm, storage, id, attributeKey, attributeValue);
           return ResponseEntity.status(HttpStatus.OK)
               .body(userService.findById(realm, storage, id));
         } else {
+          String pattern_of_attribute =
+              _realm
+                  .getProperties()
+                  .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST)
+                  .toUpperCase()
+                  .split(",")[attributes_allowed.indexOf(attributeKey.toUpperCase())];
           if (permissionService.isValidAttributeAccordingAttributePattern(
-              sugoiUser, realm, storage, attributeValue)) {
-            userService.addAppManagedAttribute(realm, storage, id, attributeValue);
+              sugoiUser, realm, storage, pattern_of_attribute, attributeValue)) {
+            userService.addAppManagedAttribute(realm, storage, id, attributeKey, attributeValue);
             return ResponseEntity.status(HttpStatus.OK)
                 .body(userService.findById(realm, storage, id));
           }
@@ -143,11 +151,14 @@ public class AppManagedUserAttributeController {
         }
       }
     } catch (Exception e) {
+      if (e instanceof AppCannotManagedAttributeException) {
+        throw e;
+      }
       throw new AppCannotManagedAttributeException(
-          "Cannot add attribute to user: app cannot managed attributes" + attributeKey);
+          "Cannot add attribute to user: app cannot managed attributes " + attributeKey);
     }
     throw new AppCannotManagedAttributeException(
-        "Cannot add attribute to user: app cannot managed attributes" + attributeKey);
+        "Cannot add attribute to user: app cannot managed attributes " + attributeKey);
   }
 
   @DeleteMapping(
@@ -203,24 +214,30 @@ public class AppManagedUserAttributeController {
             .collect(Collectors.toList());
     SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
     Realm _realm = realmProvider.load(realm);
+    List<String> attributes_allowed =
+        Arrays.asList(
+            _realm
+                .getProperties()
+                .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST)
+                .toUpperCase()
+                .split(","));
     try {
+      if (attributes_allowed.contains(attributeKey.toUpperCase())) {
 
-      if (attributeKey
-          .toUpperCase()
-          .equals(
-              _realm
-                  .getProperties()
-                  .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEY)
-                  .toUpperCase())) {
         if (permissionService.isWriter(sugoiUser, realm, storage)) {
-          userService.deleteAppManagedAttribute(realm, storage, id, attributeValue);
+          userService.deleteAppManagedAttribute(realm, storage, id, attributeKey, attributeValue);
           return ResponseEntity.status(HttpStatus.OK)
               .body(userService.findById(realm, storage, id));
         } else {
-
+          String pattern_of_attribute =
+              _realm
+                  .getProperties()
+                  .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST)
+                  .toUpperCase()
+                  .split(",")[attributes_allowed.indexOf(attributeKey.toUpperCase())];
           if (permissionService.isValidAttributeAccordingAttributePattern(
-              sugoiUser, realm, storage, attributeValue)) {
-            userService.deleteAppManagedAttribute(realm, storage, id, attributeValue);
+              sugoiUser, realm, storage, pattern_of_attribute, attributeValue)) {
+            userService.addAppManagedAttribute(realm, storage, id, attributeKey, attributeValue);
             return ResponseEntity.status(HttpStatus.OK)
                 .body(userService.findById(realm, storage, id));
           }
@@ -228,15 +245,18 @@ public class AppManagedUserAttributeController {
           // If no match found then app cannot managed attribute or attribute doesn't math
           // with allowed pattern
           throw new AppCannotManagedAttributeException(
-              "Cannot add attribute to user: attribute doesn't match with pattern");
+              "Cannot delete attribute to user: attribute doesn't match with pattern");
         }
       }
     } catch (Exception e) {
+      if (e instanceof AppCannotManagedAttributeException) {
+        throw e;
+      }
       throw new AppCannotManagedAttributeException(
-          "Cannot add attribute to user: app cannot managed attributes" + attributeKey);
+          "Cannot add delete to user: app cannot managed attributes " + attributeKey);
     }
     throw new AppCannotManagedAttributeException(
-        "Cannot add attribute to user: app cannot managed attributes" + attributeKey);
+        "Cannot add delete to user: app cannot managed attributes " + attributeKey);
   }
 
   @PatchMapping(

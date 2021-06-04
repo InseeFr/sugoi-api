@@ -45,8 +45,8 @@ public class PermissionServiceTests {
   public void setup() {
     realm = new Realm();
     realm.setName("test");
-    realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERN, "(.*)_$(application)");
-    realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEY, "my-attribute-key");
+    realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, "(.*)_$(application)");
+    realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, "my-attribute-key");
   }
 
   @Test
@@ -139,7 +139,14 @@ public class PermissionServiceTests {
       SugoiUser sugoiUser =
           new SugoiUser("admin_wildcard", List.of("role_ASI_realm1_app1", "role_ASI_app2"));
       List<String> allowedAttributesPattern =
-          permissions.getAllowedAttributePattern(sugoiUser, "toto", "tata");
+          permissions.getAllowedAttributePattern(
+              sugoiUser,
+              "toto",
+              "tata",
+              realm
+                  .getProperties()
+                  .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST)
+                  .split(",")[0]);
       assertThat("allowed Attributes Pattern", allowedAttributesPattern.size(), is(2));
     } catch (Exception e) {
       fail();

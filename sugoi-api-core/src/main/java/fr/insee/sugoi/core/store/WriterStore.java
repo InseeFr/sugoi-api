@@ -213,7 +213,7 @@ public interface WriterStore {
    * @param userId
    * @param attribute
    */
-  void addAppManagedAttribute(String userId, String attribute);
+  void addAppManagedAttribute(String userId, String attributeKey, String attributeValue);
 
   /**
    * Delete the attribute value from the app-managed-attribute-key in the store
@@ -221,5 +221,5 @@ public interface WriterStore {
    * @param userId
    * @param attribute
    */
-  void deleteAppManagedAttribute(String userId, String attribute);
+  void deleteAppManagedAttribute(String userId, String attributeKey, String attributeValue);
 }

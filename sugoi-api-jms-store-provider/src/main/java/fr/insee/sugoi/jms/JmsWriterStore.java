@@ -244,18 +244,20 @@ public class JmsWriterStore implements WriterStore {
   }
 
   @Override
-  public void addAppManagedAttribute(String userId, String attribute) {
+  public void addAppManagedAttribute(String userId, String attributeKey, String attribute) {
     Map<String, Object> params = new HashMap<>();
     params.put(JmsAtttributes.USER_ID, userId);
-    params.put(JmsAtttributes.ATTRIBUTE, attribute);
+    params.put(JmsAtttributes.ATTRIBUTE_KEY, attributeKey);
+    params.put(JmsAtttributes.ATTRIBUTE_VALUE, attribute);
     jmsWriter.writeRequestInQueue(queueRequestName, Method.ADD_APP_MANAGED_ATTRIBUTE, params);
   }
 
   @Override
-  public void deleteAppManagedAttribute(String userId, String attribute) {
+  public void deleteAppManagedAttribute(String userId, String attributeKey, String attribute) {
     Map<String, Object> params = new HashMap<>();
     params.put(JmsAtttributes.USER_ID, userId);
-    params.put(JmsAtttributes.ATTRIBUTE, attribute);
+    params.put(JmsAtttributes.ATTRIBUTE_KEY, attributeKey);
+    params.put(JmsAtttributes.ATTRIBUTE_VALUE, attribute);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
     jmsWriter.writeRequestInQueue(queueRequestName, Method.DELETE_APP_MANAGED_ATTRIBUTE, params);

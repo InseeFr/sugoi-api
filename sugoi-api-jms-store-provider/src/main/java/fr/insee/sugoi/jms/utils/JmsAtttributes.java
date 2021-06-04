@@ -46,5 +46,6 @@ public class JmsAtttributes {
 
   public static final String SEND_MODE = "sendMode";
 
-  public static final String ATTRIBUTE = "attribute";
+  public static final String ATTRIBUTE_KEY = "attributeKey";
+  public static final String ATTRIBUTE_VALUE = "attributeValue";
 }

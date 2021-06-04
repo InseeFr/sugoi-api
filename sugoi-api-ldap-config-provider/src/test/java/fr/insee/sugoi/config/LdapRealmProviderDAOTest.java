@@ -86,11 +86,11 @@ public class LdapRealmProviderDAOTest {
     Realm realm = ldapRealmProviderDAOImpl.load("domaine1");
     assertThat(
         "app_managed_attribute_key should be inseeGroupeDefaut",
-        realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEY),
+        realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST),
         is("inseeGroupeDefaut"));
     assertThat(
         "app_managed_attribute_pattern should be (.*)_$(application)",
-        realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERN),
+        realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST),
         is("(.*)_$(application)"));
   }
 }
