@@ -163,13 +163,16 @@ public class JmsRequestRouter {
             realm,
             userStorage,
             (String) request.getmethodParams().get(JmsAtttributes.USER_ID),
-            (String) request.getmethodParams().get(JmsAtttributes.ATTRIBUTE));
+            (String) request.getmethodParams().get(JmsAtttributes.ATTRIBUTE_KEY),
+            (String) request.getmethodParams().get(JmsAtttributes.ATTRIBUTE_VALUE));
+
       case Method.DELETE_APP_MANAGED_ATTRIBUTE:
         userService.deleteAppManagedAttribute(
             realm,
             userStorage,
             (String) request.getmethodParams().get(JmsAtttributes.USER_ID),
-            (String) request.getmethodParams().get(JmsAtttributes.ATTRIBUTE));
+            (String) request.getmethodParams().get(JmsAtttributes.ATTRIBUTE_KEY),
+            (String) request.getmethodParams().get(JmsAtttributes.ATTRIBUTE_VALUE));
       default:
         throw new Exception("Invalid Operation");
     }

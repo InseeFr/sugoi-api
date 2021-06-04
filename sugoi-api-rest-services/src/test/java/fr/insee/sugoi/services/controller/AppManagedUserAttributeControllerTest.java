@@ -64,8 +64,8 @@ public class AppManagedUserAttributeControllerTest {
   public void setup() {
     realm = new Realm();
     realm.setName("test");
-    realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERN, "(.*)_$(application)");
-    realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEY, "my-attribute-key");
+    realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, "(.*)_$(application)");
+    realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, "my-attribute-key");
   }
 
   @Test
@@ -130,12 +130,12 @@ public class AppManagedUserAttributeControllerTest {
           .thenReturn(false);
       Mockito.when(
               permissionService.isValidAttributeAccordingAttributePattern(
-                  Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+                  Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
           .thenReturn(true);
       Mockito.when(realmProvider.load(Mockito.anyString())).thenReturn(realm);
       Mockito.when(
               permissionService.getAllowedAttributePattern(
-                  Mockito.any(), Mockito.anyString(), Mockito.anyString()))
+                  Mockito.any(), Mockito.anyString(), Mockito.any(), Mockito.anyString()))
           .thenReturn(List.of("(.*)_appA", "(.*)_appB"));
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.patch(
@@ -164,7 +164,7 @@ public class AppManagedUserAttributeControllerTest {
       Mockito.when(realmProvider.load(Mockito.anyString())).thenReturn(realm);
       Mockito.when(
               permissionService.getAllowedAttributePattern(
-                  Mockito.any(), Mockito.anyString(), Mockito.anyString()))
+                  Mockito.any(), Mockito.anyString(), Mockito.any(), Mockito.anyString()))
           .thenReturn(List.of("(.*)_appA", "(.*)_appB"));
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.patch(
@@ -193,7 +193,7 @@ public class AppManagedUserAttributeControllerTest {
       Mockito.when(realmProvider.load(Mockito.anyString())).thenReturn(realm);
       Mockito.when(
               permissionService.getAllowedAttributePattern(
-                  Mockito.any(), Mockito.anyString(), Mockito.anyString()))
+                  Mockito.any(), Mockito.anyString(), Mockito.any(), Mockito.anyString()))
           .thenReturn(List.of("(.*)_sugoi"));
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.patch(

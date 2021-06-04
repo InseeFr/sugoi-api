@@ -92,8 +92,9 @@ public class LdapWriterStoreTest {
     realm.setName("domaine1");
     realm.setUrl("localhost");
     realm.setAppSource(appSource);
-    realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEY, appManagedAttributeKey);
-    realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERN, appManagedAttributePattern);
+    realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, appManagedAttributeKey);
+    realm.addProperty(
+        GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, appManagedAttributePattern);
     return realm;
   }
 
@@ -509,7 +510,8 @@ public class LdapWriterStoreTest {
     user.setFirstName("Petit");
     user.setMail("petittest@titi.fr");
     ldapWriterStore.createUser(user);
-    ldapWriterStore.addAppManagedAttribute("testAppManagedAdd", "prop_role_appli");
+    ldapWriterStore.addAppManagedAttribute(
+        "testAppManagedAdd", "inseeGroupeDefaut", "prop_role_appli");
     User retrievedUser = ldapReaderStore.getUser("testAppManagedAdd");
     assertThat(
         "Should have a new habilitation",
@@ -526,7 +528,8 @@ public class LdapWriterStoreTest {
     user.setMail("petittest@titi.fr");
     user.addHabilitation(new Habilitation("application", "role", "property"));
     ldapWriterStore.createUser(user);
-    ldapWriterStore.deleteAppManagedAttribute("testAppManagedDelete", "property_role_application");
+    ldapWriterStore.deleteAppManagedAttribute(
+        "testAppManagedDelete", "inseeGroupeDefaut", "property_role_application");
     User retrievedUser = ldapReaderStore.getUser("testAppManagedDelete");
     assertThat(
         "Should have a delete one habilitation", retrievedUser.getHabilitations().size(), is(0));

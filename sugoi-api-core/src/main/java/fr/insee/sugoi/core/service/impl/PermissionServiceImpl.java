@@ -13,11 +13,9 @@
 */
 package fr.insee.sugoi.core.service.impl;
 
-import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.model.SugoiUser;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.PermissionService;
-import fr.insee.sugoi.model.Realm;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -209,12 +207,11 @@ public class PermissionServiceImpl implements PermissionService {
 
   @Override
   public List<String> getAllowedAttributePattern(
-      SugoiUser sugoiUser, String realm, String storage) {
+      SugoiUser sugoiUser, String realm, String storage, String pattern) {
     List<String> appRightsOfUser =
         getUserRealmAppManager(sugoiUser).stream()
             .map(app -> app.split("\\\\")[1])
             .collect(Collectors.toList());
-    Realm _realm = realmProvider.load(realm);
     // Look for regexp of attribute value allowed
     List<String> regexpAttributesAllowed = new ArrayList<>();
     for (String appRight : appRightsOfUser) {
@@ -223,20 +220,16 @@ public class PermissionServiceImpl implements PermissionService {
       valueMap.put("realm", realm);
       valueMap.put("storage", storage);
       regexpAttributesAllowed.add(
-          StrSubstitutor.replace(
-                  _realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERN),
-                  valueMap,
-                  "$(",
-                  ")")
-              .toUpperCase());
+          StrSubstitutor.replace(pattern, valueMap, "$(", ")").toUpperCase());
     }
     return regexpAttributesAllowed;
   }
 
   @Override
   public boolean isValidAttributeAccordingAttributePattern(
-      SugoiUser sugoiUser, String realm, String storage, String attribute) {
-    List<String> regexpAttributesAllowed = getAllowedAttributePattern(sugoiUser, realm, storage);
+      SugoiUser sugoiUser, String realm, String storage, String pattern, String attribute) {
+    List<String> regexpAttributesAllowed =
+        getAllowedAttributePattern(sugoiUser, realm, storage, pattern);
     // Check if attribute match with allowed pattern
     for (String regexpAttributeAllowed : regexpAttributesAllowed) {
       if (attribute.toUpperCase().matches(regexpAttributeAllowed)) {
