@@ -237,7 +237,7 @@ public class AppManagedUserAttributeController {
                   .split(",")[attributes_allowed.indexOf(attributeKey.toUpperCase())];
           if (permissionService.isValidAttributeAccordingAttributePattern(
               sugoiUser, realm, storage, pattern_of_attribute, attributeValue)) {
-            userService.addAppManagedAttribute(realm, storage, id, attributeKey, attributeValue);
+            userService.deleteAppManagedAttribute(realm, storage, id, attributeKey, attributeValue);
             return ResponseEntity.status(HttpStatus.OK)
                 .body(userService.findById(realm, storage, id));
           }
