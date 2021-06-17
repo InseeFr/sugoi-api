@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.ArrayUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -61,6 +62,36 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   private String oidcClaimUsername = "sub";
 
+  /** Enable a monitoring user */
+  private boolean monitorUserEnabled = false;
+
+  private String monitorUserName = "monitor";
+  private String monitorUserPassword;
+
+  public String getMonitorUserName() {
+    return monitorUserName;
+  }
+
+  public void setMonitorUserName(String monitorUserName) {
+    this.monitorUserName = monitorUserName;
+  }
+
+  public String getMonitorUserPassword() {
+    return monitorUserPassword;
+  }
+
+  public void setMonitorUserPassword(String monitorUserPassword) {
+    this.monitorUserPassword = monitorUserPassword;
+  }
+
+  public boolean isMonitorUserEnabled() {
+    return monitorUserEnabled;
+  }
+
+  public void setMonitorUserEnabled(boolean monitorUserEnabled) {
+    this.monitorUserEnabled = monitorUserEnabled;
+  }
+
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     // api, so csrf is disabled
@@ -83,8 +114,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     String adminRegex =
         getApplicationContext()
             .getEnvironment()
-            .getProperty("fr.insee.sugoi.api.regexp.role.admin");
-    String[] adminRoles = adminRegex.split(",");
+            .getProperty("fr.insee.sugoi.api.regexp.role.admin", "ROLE_ADMIN");
+    String[] monitorRoles = (String[]) ArrayUtils.add(adminRegex.split(","), "ROLE_MONITOR");
 
     http.authorizeRequests(
         authz ->
@@ -92,7 +123,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/actuator/health/**")
                 .permitAll()
                 .antMatchers("/actuator/**")
-                .hasAnyAuthority(adminRoles)
+                .hasAnyAuthority(monitorRoles)
                 .antMatchers("/swagger-ui/**", "/v3/api-docs/**")
                 .permitAll()
                 .antMatchers(HttpMethod.OPTIONS)
@@ -139,10 +170,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     };
   }
 
-  // User de test en basic pour voir un accès concurrent basic/bearer
-
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    if (monitorUserEnabled && monitorUserPassword != null) {
+      auth.inMemoryAuthentication()
+          .withUser(monitorUserName)
+          .password("{noop}" + monitorUserPassword)
+          .roles("MONITOR");
+    }
     if (ldapAccountManagmentEnabled) {
       auth.ldapAuthentication()
           .userSearchBase(ldapAccountManagmentUserBase)
