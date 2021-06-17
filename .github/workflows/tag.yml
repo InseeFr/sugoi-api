@@ -8,7 +8,6 @@ on:
         required: true
 
 jobs:
-
   pre-release:
     name: pre-release
     runs-on: ubuntu-latest
@@ -23,9 +22,12 @@ jobs:
           git config --global user.name "Insee - Domaine Outils Transverses"
           git config --global user.email "dg75-dsi-domaine-outils-transverses@insee.fr"  
           git clone https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{github.repository}}.git
+          git fetch --tags
           cd sugoi-api/
           git checkout -b release-${{ github.event.inputs.version }}
           mvn -B versions:set -DnewVersion=${{ github.event.inputs.version }} 
+          CHANGELOG=$(git log `git describe --tags --abbrev=0`..HEAD --no-decorate --pretty=format:"%s")
+          echo "# ${{ github.event.inputs.version }} \n ${CHANGELOG}"; cat CHANGELOG.md > CHANGELOG.md
           git add .
           git commit -m "[REL] :rocket: prepare new version ${{ github.event.inputs.version }}"
           git push origin release-${{ github.event.inputs.version }} -f
