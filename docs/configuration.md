@@ -10,6 +10,7 @@
     - [WebHooks configuration](#webhooks-configuration)
     - [Spring actuator configuration](#spring-actuator-configuration)
     - [Other info configuration](#other-info-configuration)
+    - [Old endpoints configuration](#old-endpoints-configuration)
 
 ## Changing the configuration
 
@@ -138,7 +139,15 @@ A metrics event module is provided to add metrics when events occured. This is d
 ```
 fr.insee.sugoi.api.event.metrics.enabled=true
 ```
+All actuator endpoints are available to admin users. You can also enable a specific monitoring user with the properties : 
 
+```
+fr.insee.sugoi.security.monitor-user-enabled=true
+fr.insee.sugoi.security.monitor-user-name=monitor
+fr.insee.sugoi.security.monitor-user-password=monitor
+```
+
+This user only has rights on `/actuator` endpoints.
 ### Other info configuration
 
 You can add all other spring properties for example :
