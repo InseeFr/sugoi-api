@@ -22,8 +22,8 @@ jobs:
           git config --global user.name "Insee - Domaine Outils Transverses"
           git config --global user.email "dg75-dsi-domaine-outils-transverses@insee.fr"  
           git clone https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{github.repository}}.git
-          git fetch --tags
           cd sugoi-api/
+          git fetch --tags
           git checkout -b release-${{ github.event.inputs.version }}
           mvn -B versions:set -DnewVersion=${{ github.event.inputs.version }} 
           CHANGELOG=$(git log `git describe --tags --abbrev=0`..HEAD --no-decorate --pretty=format:"%s")
