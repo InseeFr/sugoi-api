@@ -1,3 +1,5 @@
+# 0.5.0 \n\n
+[REL] :rocket: Release 0.4.0\n\n
 # 0.4.0
 
 [BUG] �🐛Fix release action
