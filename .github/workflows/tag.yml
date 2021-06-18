@@ -25,9 +25,12 @@ jobs:
           cd sugoi-api/
           git fetch --tags
           git checkout -b release-${{ github.event.inputs.version }}
-          mvn -B versions:set -DnewVersion=${{ github.event.inputs.version }} 
-          CHANGELOG=$(git log `git describe --tags --abbrev=0`..HEAD --no-decorate --pretty=format:"%s")
-          echo "# ${{ github.event.inputs.version }} \n ${CHANGELOG}"; cat CHANGELOG.md > CHANGELOG.md
+          mvn -B versions:set -DnewVersion=${{ github.event.inputs.version }}  -DgenerateBackupPoms=false
+          echo "# ${{ github.event.inputs.version }} \n\n" >> changelog.tmp
+          git log $(git describe --tags --abbrev=0)..HEAD --no-decorate --pretty=format:"%s" >> changelog.tmp
+          echo "\n\n" >> changelog.tmp
+          cat CHANGELOG.md >> changelog.tmp
+          mv changelog.tmp CHANGELOG.md
           git add .
           git commit -m "[REL] :rocket: prepare new version ${{ github.event.inputs.version }}"
           git push origin release-${{ github.event.inputs.version }} -f
@@ -63,7 +66,7 @@ jobs:
           --header "Accept: application/vnd.github.v3+json" \
           --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
           --url https://api.github.com/repos/${{ github.repository }}/releases \
-          -d '{"tag_name":"${{ github.event.inputs.version }}"}' | jq '.upload_url' | cut -d { -f 1)
+          -d '{"tag_name":"${{ github.event.inputs.version }}", "target_commitish":"release-${{ github.event.inputs.version }}", "name": "V${{ github.event.inputs.version }}", "body":"[CHANGELOG](https://github.com/InseeFrLab/sugoi-api/blob/main/CHANGELOG.md)"}' | jq '.upload_url' | cut -d { -f 1)
 
       - name: Upload Jar Release
         run: |
@@ -93,8 +96,9 @@ jobs:
           cd sugoi-api/
           git checkout release-${{ github.event.inputs.version }}
           git pull
+          old_version=${{ github.event.inputs.version }}
           new_version=$(echo $old_version | cut -d. -f1).$(($(echo $old_version | cut -d. -f2) + 1)).0
           mvn -B versions:set -DnewVersion=$new_version-SNAPSHOT -DgenerateBackupPoms=false
           git add .
-          git commit -sm "[ENH] :sparkles: prepare next version"
+          git commit -sm "[REL] :rocket: prepare next version"
           git push origin release-${{ github.event.inputs.version }}
