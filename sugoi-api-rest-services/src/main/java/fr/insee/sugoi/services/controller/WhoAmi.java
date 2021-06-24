@@ -13,15 +13,20 @@
 */
 package fr.insee.sugoi.services.controller;
 
-import fr.insee.sugoi.services.services.PermissionService;
+import fr.insee.sugoi.core.model.SugoiUser;
+import fr.insee.sugoi.core.service.PermissionService;
 import fr.insee.sugoi.services.view.WhoamiView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,14 +53,21 @@ public class WhoAmi {
                   schema = @Schema(implementation = WhoamiView.class))
             })
       })
-  public WhoamiView whoami(Authentication authentication) {
+  public WhoamiView whoami() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    List<String> roles =
+        authentication.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .map(String::toUpperCase)
+            .collect(Collectors.toList());
+    SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
     WhoamiView res = new WhoamiView();
     res.setId(authentication.getName());
-    res.setPasswordRealm(permissionService.getUserRealmPasswordManager());
-    res.setReaderRealm(permissionService.getUserRealmReader());
-    res.setWriterRealm(permissionService.getUserRealmWriter());
-    res.setAppManager(permissionService.getUserRealmAppManager());
-    res.setIsAdmin(permissionService.isAdmin());
+    res.setPasswordRealm(permissionService.getUserRealmPasswordManager(sugoiUser));
+    res.setReaderRealm(permissionService.getUserRealmReader(sugoiUser));
+    res.setWriterRealm(permissionService.getUserRealmWriter(sugoiUser));
+    res.setAppManager(permissionService.getUserRealmAppManager(sugoiUser));
+    res.setIsAdmin(permissionService.isAdmin(sugoiUser));
     return res;
   }
 }

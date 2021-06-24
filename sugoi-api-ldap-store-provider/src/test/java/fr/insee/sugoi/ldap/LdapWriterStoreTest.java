@@ -19,10 +19,12 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
 import fr.insee.sugoi.core.exceptions.StoragePolicyNotMetException;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
@@ -66,6 +68,12 @@ public class LdapWriterStoreTest {
   @Value("${fr.insee.sugoi.ldap.default.addresssource:}")
   private String addressSource;
 
+  @Value("${fr.insee.sugoi.ldap.default.app_managed_attribute_pattern:}")
+  private String appManagedAttributePattern;
+
+  @Value("${fr.insee.sugoi.ldap.default.app_managed_attribute_key:}")
+  private String appManagedAttributeKey;
+
   @Bean
   public UserStorage userStorage() {
     UserStorage us = new UserStorage();
@@ -84,6 +92,9 @@ public class LdapWriterStoreTest {
     realm.setName("domaine1");
     realm.setUrl("localhost");
     realm.setAppSource(appSource);
+    realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, appManagedAttributeKey);
+    realm.addProperty(
+        GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, appManagedAttributePattern);
     return realm;
   }
 
@@ -153,6 +164,7 @@ public class LdapWriterStoreTest {
     address.put("Ligne2", "Chez Toto");
     user.setAddress(address);
     user.addAttributes("additionalMail", "other@insee.fr");
+    user.addHabilitation(new Habilitation("application", "role", "property"));
     ldapWriterStore.createUser(user);
     User retrievedUser = ldapReaderStore.getUser("Titi");
     assertThat("Titi should have been added", retrievedUser, not(nullValue()));
@@ -488,5 +500,38 @@ public class LdapWriterStoreTest {
     ldapWriterStore.changePassword(user, "{SHA}c3q3RSeNwMY7E09Ve9oBHw+MVXg=", "newpassword", null);
     assertThat(
         "Should have a new password", ldapReaderStore.validateCredentials(user, "newpassword"));
+  }
+
+  @Test
+  public void testAddAppManagedAttribute() {
+    User user = new User();
+    user.setUsername("testAppManagedAdd");
+    user.setLastName("Test");
+    user.setFirstName("Petit");
+    user.setMail("petittest@titi.fr");
+    ldapWriterStore.createUser(user);
+    ldapWriterStore.addAppManagedAttribute(
+        "testAppManagedAdd", "inseeGroupeDefaut", "prop_role_appli");
+    User retrievedUser = ldapReaderStore.getUser("testAppManagedAdd");
+    assertThat(
+        "Should have a new habilitation",
+        retrievedUser.getHabilitations().get(0).getId(),
+        is("prop_role_appli"));
+  }
+
+  @Test
+  public void testDeleteAppManagedAttribute() {
+    User user = new User();
+    user.setUsername("testAppManagedDelete");
+    user.setLastName("Test");
+    user.setFirstName("Petit");
+    user.setMail("petittest@titi.fr");
+    user.addHabilitation(new Habilitation("application", "role", "property"));
+    ldapWriterStore.createUser(user);
+    ldapWriterStore.deleteAppManagedAttribute(
+        "testAppManagedDelete", "inseeGroupeDefaut", "property_role_application");
+    User retrievedUser = ldapReaderStore.getUser("testAppManagedDelete");
+    assertThat(
+        "Should have a delete one habilitation", retrievedUser.getHabilitations().size(), is(0));
   }
 }

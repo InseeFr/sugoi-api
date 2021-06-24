@@ -25,4 +25,7 @@ public class GlobalKeysConfig {
   public static final String ADDRESS_SOURCE = "address_source";
 
   public static final String SEEALSO_ATTRIBUTES = "seealso_attributes";
+  public static final String APP_MANAGED_ATTRIBUTE_KEYS_LIST = "app-managed-attribute-keys-list";
+  public static final String APP_MANAGED_ATTRIBUTE_PATTERNS_LIST =
+      "app-managed-attribute-patterns-list";
 }

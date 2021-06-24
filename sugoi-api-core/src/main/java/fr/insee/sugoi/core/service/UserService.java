@@ -82,4 +82,30 @@ public interface UserService {
       User userProperties,
       PageableResult pageable,
       SearchType typeRecherche);
+
+  /**
+   * Allow to add only the app-managed attribute of an user, this attribute must follow the
+   * app-managed-pattern. All attribute are needed
+   *
+   * @param sugoiUser
+   * @param realm
+   * @param storage
+   * @param userId
+   * @param attribute
+   */
+  void addAppManagedAttribute(
+      String realm, String storage, String userId, String attributeKey, String attribute);
+
+  /**
+   * Allow to delete only app-managed attribute of an user, this attribute must follow the
+   * app-managed-pattern. All attribute are needed
+   *
+   * @param sugoiUser
+   * @param realm
+   * @param storage
+   * @param userId
+   * @param attribute
+   */
+  void deleteAppManagedAttribute(
+      String realm, String storage, String userId, String attributeKey, String attribute);
 }

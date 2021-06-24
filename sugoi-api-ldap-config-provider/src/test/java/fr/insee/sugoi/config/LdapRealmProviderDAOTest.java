@@ -16,6 +16,7 @@ package fr.insee.sugoi.config;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.model.Realm;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -78,5 +79,18 @@ public class LdapRealmProviderDAOTest {
         "userstorage should be on 'ou=contacts,ou=clients_domaine1,o=insee,c=fr'",
         uc.getUserStorages().get(0).getUserSource(),
         is("ou=contacts,ou=clients_domaine1,o=insee,c=fr"));
+  }
+
+  @Test
+  public void loadRealmWithConfig() {
+    Realm realm = ldapRealmProviderDAOImpl.load("domaine1");
+    assertThat(
+        "app_managed_attribute_key should be inseeGroupeDefaut",
+        realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST),
+        is("inseeGroupeDefaut"));
+    assertThat(
+        "app_managed_attribute_pattern should be (.*)_$(application)",
+        realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST),
+        is("(.*)_$(application)"));
   }
 }

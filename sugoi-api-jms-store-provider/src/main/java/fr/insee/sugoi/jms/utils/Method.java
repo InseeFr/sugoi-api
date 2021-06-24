@@ -48,4 +48,8 @@ public class Method {
   public static final String DELETE_APPLICATION = "deleteApplication";
 
   public static final String CHANGE_PASSWORD = "changePassword";
+
+  public static final String ADD_APP_MANAGED_ATTRIBUTE = "addAppManagedAttribute";
+
+  public static final String DELETE_APP_MANAGED_ATTRIBUTE = "deleteAppManagedAttribute";
 }

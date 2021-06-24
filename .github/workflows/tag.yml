@@ -1,72 +1,63 @@
-name: Sugoi API Tag
+name: Sugoi API Release
 
 on:
-  push:
-    tags:
-      - "[0-9]+.[0-9]+.[0-9]+"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "The version of the release"
+        required: true
 
 jobs:
-  build:
-    name: Build
+  pre-release:
+    name: pre-release
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.get_version.outputs.VERSION }}
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Cache Maven Packages
-        uses: actions/cache@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
         with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-m2-
+          java-version: 11
+
+      - name: Prepare
+        run: |
+          git config --global user.name "Insee - Domaine Outils Transverses"
+          git config --global user.email "dg75-dsi-domaine-outils-transverses@insee.fr"  
+          git clone https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{github.repository}}.git
+          cd sugoi-api/
+          git fetch --tags
+          git checkout -b release-${{ github.event.inputs.version }}
+          mvn -B versions:set -DnewVersion=${{ github.event.inputs.version }}  -DgenerateBackupPoms=false
+          echo -e "# ${{ github.event.inputs.version }} \n\n" >> changelog.tmp
+          git log $(git describe --tags --abbrev=0)..HEAD --no-decorate --pretty=format:"- %s" >> changelog.tmp
+          echo -e "\n\n" >> changelog.tmp
+          cat CHANGELOG.md >> changelog.tmp
+          mv changelog.tmp CHANGELOG.md
+          git add .
+          git commit -m "[REL] :rocket: prepare new version ${{ github.event.inputs.version }}"
+          git push origin release-${{ github.event.inputs.version }} -f
+          echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
+          gh pr create --title "[REL] :rocket: prepare new version ${{ github.event.inputs.version }}" --body "[REL] :rocket: prepare new version ${{ github.event.inputs.version }}"
+
+  release:
+    name: release
+    runs-on: ubuntu-latest
+    needs: pre-release
+    steps:
+      - name: Clone Deployments repo
+        uses: actions/checkout@v2
+        with:
+          repository: ${{github.repository}}
+          ref: release-${{ github.event.inputs.version }}
 
       - name: Set up JDK 11
         uses: actions/setup-java@v1
         with:
           java-version: 11
 
-      - id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-
-      - name: Set current version
-        run: mvn -B versions:set -DnewVersion=${{ steps.get_version.outputs.VERSION }}
-
       - name: Build with Maven
         run: |
           mvn -B clean install 
           cd sugoi-api-distribution/sugoi-api-distribution-jar/
           mvn -B assembly:single
-
-      - name: Upload jar
-        uses: actions/upload-artifact@v2
-        with:
-          name: jar
-          path: sugoi-api-distribution/sugoi-api-distribution-jar/target/sugoi-api.zip
-
-      - name: Upload war
-        uses: actions/upload-artifact@v2
-        with:
-          name: war
-          path: sugoi-api-distribution/sugoi-api-distribution-war/target/*.war
-
-  release:
-    needs: build
-    name: Create Release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout jar artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: jar
-          path: sugoi-api-distribution/sugoi-api-distribution-jar/target
-
-      - name: Checkout war artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: war
-          path: sugoi-api-distribution/sugoi-api-distribution-war/target
 
       - name: Create a release
         id: create_release
@@ -75,32 +66,39 @@ jobs:
           --header "Accept: application/vnd.github.v3+json" \
           --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
           --url https://api.github.com/repos/${{ github.repository }}/releases \
-          -d '{"tag_name":"${{ needs.build.outputs.version }}"}' | jq '.upload_url' | cut -d { -f 1)
+          -d '{"tag_name":"${{ github.event.inputs.version }}", "target_commitish":"release-${{ github.event.inputs.version }}", "name": "V${{ github.event.inputs.version }}", "body":"[CHANGELOG](https://github.com/InseeFrLab/sugoi-api/blob/${{ github.event.inputs.version }}/CHANGELOG.md)"}' | jq '.upload_url' | cut -d { -f 1)
 
-      - name: Upload Jar Release 
+      - name: Upload Jar Release
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
-          gh release upload --repo ${{ github.repository }} "${{ needs.build.outputs.version }}" \
+          gh release upload --repo ${{ github.repository }} "${{ github.event.inputs.version }}" \
           ./sugoi-api-distribution/sugoi-api-distribution-jar/target/sugoi-api.zip
 
-      - name: Upload War Release 
+      - name: Upload War Release
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
-          gh release upload --repo ${{ github.repository }} "${{ needs.build.outputs.version }}" \
-          ./sugoi-api-distribution/sugoi-api-distribution-war/target/sugoi-api.war 
+          gh release upload --repo ${{ github.repository }} "${{ github.event.inputs.version }}" \
+          ./sugoi-api-distribution/sugoi-api-distribution-war/target/sugoi-api.war
 
-      - name: Update version in github repository
-        run: |
-          git clone https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{github.repository}}.git
-          cd sugoi-api
+  after-release:
+    name: after-release
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Use Node.js 14
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+      - run: |
           git config --global user.name "Insee - Domaine Outils Transverses"
-          git config --global user.email "dg75-dsi-domaine-outils-transverses@insee.fr"
-          git checkout main
-          old_version=${{ needs.build.outputs.version }}
+          git config --global user.email "dg75-dsi-domaine-outils-transverses@insee.fr"  
+          git clone https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{github.repository}}.git
+          cd sugoi-api/
+          git checkout release-${{ github.event.inputs.version }}
+          git pull
+          old_version=${{ github.event.inputs.version }}
           new_version=$(echo $old_version | cut -d. -f1).$(($(echo $old_version | cut -d. -f2) + 1)).0
-          git checkout -b prepare-version-$new_version
           mvn -B versions:set -DnewVersion=$new_version-SNAPSHOT -DgenerateBackupPoms=false
           git add .
-          git commit -sm"Prepare new version"
-          git push origin prepare-version-$new_version
-          gh pr create --title "Prepare new version" --body "Prepare new version"
+          git commit -sm "[REL] :rocket: prepare next version"
+          git push origin release-${{ github.event.inputs.version }}

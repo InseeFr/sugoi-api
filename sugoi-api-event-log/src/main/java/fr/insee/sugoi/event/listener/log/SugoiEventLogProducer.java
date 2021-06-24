@@ -462,6 +462,32 @@ public class SugoiEventLogProducer {
         toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
         toLog.put(EventKeysConfig.USER_ID, properties.get(EventKeysConfig.USER_ID));
         break;
+      case ADD_APP_MANAGED_ATTRIBUTES:
+        toLog.put(EventKeysConfig.REALM, realm);
+        toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
+        toLog.put(EventKeysConfig.USER_ID, properties.get(EventKeysConfig.USER_ID));
+        toLog.put(EventKeysConfig.ATTRIBUTE_KEY, properties.get(EventKeysConfig.ATTRIBUTE_KEY));
+        toLog.put(EventKeysConfig.ATTRIBUTE_VALUE, properties.get(EventKeysConfig.ATTRIBUTE_VALUE));
+      case ADD_APP_MANAGED_ATTRIBUTES_ERROR:
+        toLog.put(EventKeysConfig.REALM, realm);
+        toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
+        toLog.put(EventKeysConfig.USER_ID, properties.get(EventKeysConfig.USER_ID));
+        toLog.put(EventKeysConfig.ATTRIBUTE_KEY, properties.get(EventKeysConfig.ATTRIBUTE_KEY));
+        toLog.put(EventKeysConfig.ATTRIBUTE_VALUE, properties.get(EventKeysConfig.ATTRIBUTE_VALUE));
+        toLog.put(EventKeysConfig.ERROR, properties.get(EventKeysConfig.ERROR));
+      case DELETE_APP_MANAGED_ATTRIBUTES:
+        toLog.put(EventKeysConfig.REALM, realm);
+        toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
+        toLog.put(EventKeysConfig.USER_ID, properties.get(EventKeysConfig.USER_ID));
+        toLog.put(EventKeysConfig.ATTRIBUTE_KEY, properties.get(EventKeysConfig.ATTRIBUTE_KEY));
+        toLog.put(EventKeysConfig.ATTRIBUTE_VALUE, properties.get(EventKeysConfig.ATTRIBUTE_VALUE));
+
+      case DELETE_APP_MANAGED_ATTRIBUTES_ERROR:
+        toLog.put(EventKeysConfig.REALM, realm);
+        toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
+        toLog.put(EventKeysConfig.USER_ID, properties.get(EventKeysConfig.USER_ID));
+        toLog.put(EventKeysConfig.ATTRIBUTE_KEY, properties.get(EventKeysConfig.ATTRIBUTE_KEY));
+        toLog.put(EventKeysConfig.ATTRIBUTE_VALUE, properties.get(EventKeysConfig.ATTRIBUTE_VALUE));
       default:
         break;
     }

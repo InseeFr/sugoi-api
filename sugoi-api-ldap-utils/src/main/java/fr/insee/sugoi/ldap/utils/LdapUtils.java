@@ -85,7 +85,8 @@ public class LdapUtils {
     if (config.get(LdapConfigKeys.VLV_ENABLED).equalsIgnoreCase("true")) {
       // TODO test if this code works on vlv
       searchRequest.addControl(
-          new ServerSideSortRequestControl(new SortKey("uid", "caseExactOrderingMatch", false)));
+          new ServerSideSortRequestControl(
+              new SortKey(config.get(LdapConfigKeys.SORT_KEY), "caseExactOrderingMatch", false)));
       if (pageable.getFirst() == 0) {
         pageable.setOffset(1);
       }

@@ -304,4 +304,68 @@ public class UserServiceImpl implements UserService {
             Map.entry(EventKeysConfig.TYPE_RECHERCHE, typeRecherche)));
     return result;
   }
+
+  @Override
+  public void addAppManagedAttribute(
+      String realm, String storage, String userId, String attributeKey, String attribute) {
+    try {
+      findById(realm, storage, userId)
+          .orElseThrow(
+              () -> new UserNotFoundException("Cannot find user " + userId + " in realm " + realm));
+      storeProvider
+          .getWriterStore(realm, storage)
+          .addAppManagedAttribute(userId, attributeKey, attribute);
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          storage,
+          SugoiEventTypeEnum.ADD_APP_MANAGED_ATTRIBUTES,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.ATTRIBUTE_KEY, attributeKey),
+              Map.entry(EventKeysConfig.ATTRIBUTE_VALUE, attribute),
+              Map.entry(EventKeysConfig.USER_ID, userId)));
+    } catch (Exception e) {
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          storage,
+          SugoiEventTypeEnum.ADD_APP_MANAGED_ATTRIBUTES_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.ATTRIBUTE_KEY, attributeKey),
+              Map.entry(EventKeysConfig.ATTRIBUTE_VALUE, attribute),
+              Map.entry(EventKeysConfig.USER_ID, userId),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
+      throw e;
+    }
+  }
+
+  @Override
+  public void deleteAppManagedAttribute(
+      String realm, String storage, String userId, String attributeKey, String attribute) {
+    try {
+      findById(realm, storage, userId)
+          .orElseThrow(
+              () -> new UserNotFoundException("Cannot find user " + userId + " in realm " + realm));
+      storeProvider
+          .getWriterStore(realm, storage)
+          .deleteAppManagedAttribute(userId, attributeKey, attribute);
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          storage,
+          SugoiEventTypeEnum.DELETE_APP_MANAGED_ATTRIBUTES,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.ATTRIBUTE_KEY, attributeKey),
+              Map.entry(EventKeysConfig.ATTRIBUTE_VALUE, attribute),
+              Map.entry(EventKeysConfig.USER_ID, userId)));
+    } catch (Exception e) {
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          storage,
+          SugoiEventTypeEnum.DELETE_APP_MANAGED_ATTRIBUTES_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.ATTRIBUTE_KEY, attributeKey),
+              Map.entry(EventKeysConfig.ATTRIBUTE_VALUE, attribute),
+              Map.entry(EventKeysConfig.USER_ID, userId),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
+      throw e;
+    }
+  }
 }

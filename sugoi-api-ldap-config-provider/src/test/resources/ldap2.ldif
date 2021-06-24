@@ -148,6 +148,8 @@ inseepropriete: brancheOrganisation$ou=organisations,ou=clients_domaine1,o=in
  see,c=fr
 inseepropriete: groupSourcePattern$ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr
 inseepropriete: groupFilterPattern$(cn={group}_{appliname})
+inseepropriete: app_managed_attribute_key$inseeGroupeDefaut
+inseepropriete: app_managed_attribute_pattern$(.*)_$(application)
 inseepropriete: habilitationsPossibles$propriete_role_appli
 inseepropriete: branchesApplicativesPossibles$applitest
 description: domaine1

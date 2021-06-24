@@ -45,4 +45,7 @@ public class JmsAtttributes {
   public static final String PASSWORD_CHANGE_REQUEST = "passwordChangeRequest";
 
   public static final String SEND_MODE = "sendMode";
+
+  public static final String ATTRIBUTE_KEY = "attributeKey";
+  public static final String ATTRIBUTE_VALUE = "attributeValue";
 }

@@ -25,6 +25,7 @@ import com.unboundid.ldap.sdk.ModifyRequest;
 import com.unboundid.ldap.sdk.ResultCode;
 import com.unboundid.ldap.sdk.extensions.PasswordModifyExtendedRequest;
 import com.unboundid.util.SubtreeDeleter;
+import fr.insee.sugoi.core.exceptions.AppManagedAttributeException;
 import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
 import fr.insee.sugoi.core.exceptions.StoragePolicyNotMetException;
 import fr.insee.sugoi.core.store.WriterStore;
@@ -448,5 +449,46 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   private void deleteAddress(String id) throws LDAPException {
     DeleteRequest deleteRequest = new DeleteRequest(getAddressDN(id));
     ldapPoolConnection.delete(deleteRequest);
+  }
+
+  @Override
+  public void addAppManagedAttribute(String userId, String attributeKey, String attributeValue) {
+    try {
+      ModifyRequest modifyAttributeRequest =
+          new ModifyRequest(
+              getUserDN(userId),
+              new Modification(ModificationType.ADD, attributeKey, attributeValue));
+      ldapPoolConnection.modify(modifyAttributeRequest);
+    } catch (LDAPException e) {
+      throw new RuntimeException(
+          "Failed to update user attribute "
+              + attributeKey
+              + " with value "
+              + attributeValue
+              + " while writing to LDAP",
+          e);
+    }
+  }
+
+  @Override
+  public void deleteAppManagedAttribute(String userId, String attributeKey, String attributeValue) {
+    try {
+      ModifyRequest modifyAttributeRequest =
+          new ModifyRequest(
+              getUserDN(userId),
+              new Modification(ModificationType.DELETE, attributeKey, attributeValue));
+      ldapPoolConnection.modify(modifyAttributeRequest);
+    } catch (LDAPException e) {
+      if (e.getResultCode().equals(ResultCode.NO_SUCH_ATTRIBUTE)) {
+        throw new AppManagedAttributeException("Cannot delete, attribute not found", e);
+      }
+      throw new RuntimeException(
+          "Failed to update user attribute "
+              + attributeKey
+              + " with value "
+              + attributeValue
+              + " while writing to LDAP",
+          e);
+    }
   }
 }

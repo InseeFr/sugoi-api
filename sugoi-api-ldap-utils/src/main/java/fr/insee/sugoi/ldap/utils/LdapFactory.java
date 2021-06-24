@@ -28,6 +28,8 @@ public class LdapFactory {
   // private static final Logger logger = LogManager.getLogger(LdapUtils.class);
 
   private static final Map<String, LDAPConnectionPool> openLdapPoolConnection = new HashMap<>();
+  private static final Map<String, String> openLdapPoolConnectionConfig = new HashMap<>();
+  private static final Map<String, String> openLdapMonoConnectionConfig = new HashMap<>();
   private static final Map<String, LDAPConnection> openLdapMonoConnection = new HashMap<>();
 
   /**
@@ -42,29 +44,53 @@ public class LdapFactory {
     // Check if a ldap connection pool already exist for this userStorage and create
     // it if it doesn't exist
     String key =
+        config.get(LdapConfigKeys.REALM_NAME)
+            + "_"
+            + config.get(LdapConfigKeys.NAME)
+            + "_"
+            + config.hashCode()
+            + "_R";
+    String name =
         config.get(LdapConfigKeys.REALM_NAME) + "_" + config.get(LdapConfigKeys.NAME) + "_R";
-    if (!openLdapPoolConnection.containsKey(key)) {
+
+    if (!openLdapPoolConnectionConfig.containsKey(key)) {
+      if (openLdapPoolConnection.containsKey(name)) {
+        openLdapPoolConnection.get(name).close();
+      }
+      openLdapPoolConnectionConfig.put(key, name);
       openLdapPoolConnection.put(
-          key,
+          name,
           new LDAPConnectionPool(
               new LDAPConnection(
                   config.get(LdapConfigKeys.URL), Integer.valueOf(config.get(LdapConfigKeys.PORT))),
               Integer.valueOf(config.get(LdapConfigKeys.POOL_SIZE))));
     }
-    return openLdapPoolConnection.get(key);
+    return openLdapPoolConnection.get(name);
   }
 
   public static LDAPConnection getSingleConnection(Map<String, String> config)
       throws LDAPException {
     String key =
+        config.get(LdapConfigKeys.REALM_NAME)
+            + "_"
+            + config.get(LdapConfigKeys.NAME)
+            + "_"
+            + config.hashCode()
+            + "_R";
+    String name =
         config.get(LdapConfigKeys.REALM_NAME) + "_" + config.get(LdapConfigKeys.NAME) + "_R";
-    if (!openLdapMonoConnection.containsKey(key)) {
+
+    if (!openLdapMonoConnectionConfig.containsKey(key)) {
+      if (openLdapMonoConnection.containsKey(name)) {
+        openLdapMonoConnection.get(name).close();
+      }
+      openLdapMonoConnectionConfig.put(key, name);
       openLdapMonoConnection.put(
-          key,
+          name,
           new LDAPConnection(
               config.get(LdapConfigKeys.URL), Integer.valueOf(config.get(LdapConfigKeys.PORT))));
     }
-    return openLdapMonoConnection.get(key);
+    return openLdapMonoConnection.get(name);
   }
 
   /**
@@ -78,11 +104,23 @@ public class LdapFactory {
       throws LDAPException {
     // Check if a ldap connection pool already exist for this userStorage and create
     // it if it doesn't exist
-    String key =
+    String name =
         config.get(LdapConfigKeys.REALM_NAME) + "_" + config.get(LdapConfigKeys.NAME) + "_RW";
-    if (!openLdapPoolConnection.containsKey(key)) {
+    String key =
+        config.get(LdapConfigKeys.REALM_NAME)
+            + "_"
+            + config.get(LdapConfigKeys.NAME)
+            + "_"
+            + config.hashCode()
+            + "_RW";
+
+    if (!openLdapPoolConnectionConfig.containsKey(key)) {
+      if (openLdapPoolConnection.containsKey(name)) {
+        openLdapPoolConnection.get(name).close();
+      }
+      openLdapPoolConnectionConfig.put(key, name);
       openLdapPoolConnection.put(
-          key,
+          name,
           new LDAPConnectionPool(
               new LDAPConnection(
                   config.get(LdapConfigKeys.URL),
@@ -91,23 +129,34 @@ public class LdapFactory {
                   config.get(LdapConfigKeys.PASSWORD)),
               Integer.valueOf(config.get(LdapConfigKeys.POOL_SIZE))));
     }
-    return openLdapPoolConnection.get(key);
+    return openLdapPoolConnection.get(name);
   }
 
   public static LDAPConnection getSingleConnectionAuthenticated(Map<String, String> config)
       throws LDAPException {
-    String key =
+    String name =
         config.get(LdapConfigKeys.REALM_NAME) + "_" + config.get(LdapConfigKeys.NAME) + "_RW";
-    if (!openLdapMonoConnection.containsKey(key)) {
+    String key =
+        config.get(LdapConfigKeys.REALM_NAME)
+            + "_"
+            + config.get(LdapConfigKeys.NAME)
+            + "_"
+            + config.hashCode()
+            + "_RW";
+    if (!openLdapMonoConnectionConfig.containsKey(key)) {
+      if (openLdapMonoConnection.containsKey(name)) {
+        openLdapMonoConnection.get(name).close();
+      }
+      openLdapMonoConnectionConfig.put(key, name);
       openLdapMonoConnection.put(
-          key,
+          name,
           new LDAPConnection(
               config.get(LdapConfigKeys.URL),
               Integer.valueOf(config.get(LdapConfigKeys.PORT)),
               config.get(LdapConfigKeys.USERNAME),
               config.get(LdapConfigKeys.PASSWORD)));
     }
-    return openLdapMonoConnection.get(key);
+    return openLdapMonoConnection.get(name);
   }
 
   public static boolean validateUserPassword(

@@ -24,10 +24,12 @@ import com.unboundid.ldap.sdk.SearchRequest;
 import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.ldap.utils.LdapFilter;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
+import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.ldap.utils.mapper.RealmLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserStorageLdapMapper;
 import fr.insee.sugoi.model.Realm;
@@ -59,8 +61,23 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   @Value("${fr.insee.sugoi.config.ldap.profils.branche:}")
   private String baseDn;
 
+  @Value("${fr.insee.sugoi.store.defaultReader:}")
+  private String defaultReader;
+
+  @Value("${fr.insee.sugoi.store.defaultWriter:}")
+  private String defaultWriter;
+
   @Value("${fr.insee.sugoi.config.ldap.profils.pattern:cn=Profil_{realm}_WebServiceLdap}")
   private String realmEntryPattern;
+
+  @Value("${fr.insee.sugoi.default.app_managed_attribute_keys:}")
+  private String defaultAppManagedAttributeKeyList;
+
+  @Value("${fr.insee.sugoi.default.app_managed_attribute_patterns:}")
+  private String defaultAppManagedAttributePatternList;
+
+  @Value("${fr.insee.sugoi.config.ldap.default.sortKey:}")
+  private String defaultSortKey;
 
   private static final Logger logger = LogManager.getLogger(LdapRealmProviderDAOImpl.class);
 
@@ -74,8 +91,25 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
       if (realmEntry != null) {
         logger.debug("Found entry {}", realmEntry.getDN());
         Realm realm = RealmLdapMapper.mapFromSearchEntry(realmEntry);
+        if (realm.getReaderType() == null) {
+          realm.setReaderType(defaultReader);
+        }
+        if (realm.getWriterType() == null) {
+          realm.setWriterType(defaultWriter);
+        }
         logger.debug("Parsing as realm {}", realm);
         realm.setUserStorages(loadUserStorages(realmEntry, ldapConnection));
+        if (realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST) == null) {
+          realm.addProperty(
+              GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, defaultAppManagedAttributeKeyList);
+        }
+        if (realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST)
+            == null) {
+          realm.addProperty(
+              GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST,
+              defaultAppManagedAttributePatternList);
+        }
+        realm.getProperties().putIfAbsent(LdapConfigKeys.SORT_KEY, defaultSortKey);
         return realm;
       }
       throw new RealmNotFoundException("Erreur lors du chargement du realm " + realmName);
@@ -98,6 +132,24 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
           .map(
               e -> {
                 Realm realm = RealmLdapMapper.mapFromSearchEntry(e);
+                if (realm.getReaderType() == null) {
+                  realm.setReaderType(defaultReader);
+                }
+                if (realm.getWriterType() == null) {
+                  realm.setWriterType(defaultWriter);
+                }
+                if (realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST)
+                    == null) {
+                  realm.addProperty(
+                      GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST,
+                      defaultAppManagedAttributeKeyList);
+                }
+                if (realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST)
+                    == null) {
+                  realm.addProperty(
+                      GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST,
+                      defaultAppManagedAttributePatternList);
+                }
                 realm.setUserStorages(loadUserStorages(e, ldapConnection));
                 return realm;
               })
