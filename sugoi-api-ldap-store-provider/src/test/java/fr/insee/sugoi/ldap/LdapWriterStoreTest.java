@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
 import fr.insee.sugoi.core.exceptions.StoragePolicyNotMetException;
+import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Habilitation;
@@ -83,6 +84,10 @@ public class LdapWriterStoreTest {
     us.setName("default");
     us.addProperty("group_filter_pattern", groupFilterPattern);
     us.addProperty("group_source_pattern", groupSourcePattern);
+    us.addProperty(
+        LdapConfigKeys.USER_OBJECT_CLASSES,
+        "top,inseeContact,inseeAttributsHabilitation,inseeAttributsCommunication");
+    us.addProperty(LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES, "top,inseeOrganisation");
     return us;
   }
 
@@ -182,6 +187,7 @@ public class LdapWriterStoreTest {
     user.setLastName("Test");
     user.setFirstName("Petit");
     user.setMail("petittest@titi.fr");
+    user.getAttributes().put("common_name", "Petit Test");
     ldapWriterStore.createUser(user);
     User retrievedUser = ldapReaderStore.getUser("TitiNoAddress");
     assertThat("TitiNoAddress should have been added", retrievedUser, not(nullValue()));
@@ -509,6 +515,7 @@ public class LdapWriterStoreTest {
     user.setLastName("Test");
     user.setFirstName("Petit");
     user.setMail("petittest@titi.fr");
+    user.getAttributes().put("common_name", "Petit test");
     ldapWriterStore.createUser(user);
     ldapWriterStore.addAppManagedAttribute(
         "testAppManagedAdd", "inseeGroupeDefaut", "prop_role_appli");
@@ -525,6 +532,7 @@ public class LdapWriterStoreTest {
     user.setUsername("testAppManagedDelete");
     user.setLastName("Test");
     user.setFirstName("Petit");
+    user.getAttributes().put("common_name", "Petit test");
     user.setMail("petittest@titi.fr");
     user.addHabilitation(new Habilitation("application", "role", "property"));
     ldapWriterStore.createUser(user);

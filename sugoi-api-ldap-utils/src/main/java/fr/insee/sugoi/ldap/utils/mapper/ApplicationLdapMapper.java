@@ -15,8 +15,10 @@ package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
+import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.ldap.utils.mapper.properties.ApplicationLdap;
 import fr.insee.sugoi.model.Application;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -24,9 +26,14 @@ import java.util.Map;
 public class ApplicationLdapMapper implements LdapMapper<Application> {
 
   Map<String, String> config;
+  List<String> objectClasses;
 
   public ApplicationLdapMapper(Map<String, String> config) {
     this.config = config;
+    if (config.get(LdapConfigKeys.APPLICATION_OBJECT_CLASSES) != null) {
+      objectClasses =
+          Arrays.asList(config.get(LdapConfigKeys.APPLICATION_OBJECT_CLASSES).split(","));
+    }
   }
 
   public Application mapFromAttributes(Collection<Attribute> attributes) {
@@ -36,7 +43,7 @@ public class ApplicationLdapMapper implements LdapMapper<Application> {
 
   public List<Attribute> mapToAttributes(Application application) {
     return GenericLdapMapper.mapObjectToLdapAttributes(
-        application, ApplicationLdap.class, Application.class, config);
+        application, ApplicationLdap.class, Application.class, config, objectClasses);
   }
 
   public List<Modification> createMods(Application updatedApplication) {

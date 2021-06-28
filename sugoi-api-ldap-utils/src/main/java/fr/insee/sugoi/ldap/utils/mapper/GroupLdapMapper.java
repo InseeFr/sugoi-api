@@ -15,8 +15,10 @@ package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
+import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.ldap.utils.mapper.properties.GroupLdap;
 import fr.insee.sugoi.model.Group;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -24,9 +26,13 @@ import java.util.Map;
 public class GroupLdapMapper implements LdapMapper<Group> {
 
   Map<String, String> config;
+  List<String> objectClasses;
 
   public GroupLdapMapper(Map<String, String> config) {
     this.config = config;
+    if (config.get(LdapConfigKeys.GROUP_OBJECT_CLASSES) != null) {
+      objectClasses = Arrays.asList(config.get(LdapConfigKeys.GROUP_OBJECT_CLASSES).split(","));
+    }
   }
 
   @Override
@@ -37,7 +43,8 @@ public class GroupLdapMapper implements LdapMapper<Group> {
 
   @Override
   public List<Attribute> mapToAttributes(Group group) {
-    return GenericLdapMapper.mapObjectToLdapAttributes(group, GroupLdap.class, Group.class, config);
+    return GenericLdapMapper.mapObjectToLdapAttributes(
+        group, GroupLdap.class, Group.class, config, objectClasses);
   }
 
   @Override

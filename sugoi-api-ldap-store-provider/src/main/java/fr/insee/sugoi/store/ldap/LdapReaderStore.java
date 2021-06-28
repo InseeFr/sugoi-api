@@ -55,6 +55,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       organizationLdapMapper = new OrganizationLdapMapper(config);
       groupLdapMapper = new GroupLdapMapper(config);
       applicationLdapMapper = new ApplicationLdapMapper(config);
+      addressLdapMapper = new AddressLdapMapper(config);
     } catch (LDAPException e) {
       throw new RuntimeException(e);
     }
@@ -333,6 +334,6 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
 
   private Map<String, String> getAddress(String addressId) {
     SearchResultEntry addressResult = getEntryByDn(getAddressDN(addressId));
-    return addressResult != null ? AddressLdapMapper.mapFromSearchEntry(addressResult) : null;
+    return addressResult != null ? addressLdapMapper.mapFromSearchEntry(addressResult) : null;
   }
 }

@@ -56,6 +56,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   private OrganizationLdapMapper organizationLdapMapper;
   private GroupLdapMapper groupLdapMapper;
   private ApplicationLdapMapper applicationLdapMapper;
+  private AddressLdapMapper addressLdapMapper;
 
   private LdapReaderStore ldapReaderStore;
 
@@ -67,6 +68,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       organizationLdapMapper = new OrganizationLdapMapper(config);
       groupLdapMapper = new GroupLdapMapper(config);
       applicationLdapMapper = new ApplicationLdapMapper(config);
+      addressLdapMapper = new AddressLdapMapper(config);
       ldapReaderStore = new LdapReaderStore(config);
     } catch (LDAPException e) {
       throw new RuntimeException(e);
@@ -106,7 +108,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
           new AddRequest(getUserDN(user.getUsername()), userLdapMapper.mapToAttributes(user));
       ldapPoolConnection.add(userAddRequest);
     } catch (LDAPException e) {
-      throw new RuntimeException("Failed to create user", e);
+      throw new RuntimeException("Failed to create user. Provider message : " + e.getMessage(), e);
     }
     return user;
   }
@@ -435,14 +437,14 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     UUID addressUUID = UUID.randomUUID();
     AddRequest addressAddRequest =
         new AddRequest(
-            getAddressDN(addressUUID.toString()), AddressLdapMapper.mapToAttributes(address));
+            getAddressDN(addressUUID.toString()), addressLdapMapper.mapToAttributes(address));
     ldapPoolConnection.add(addressAddRequest);
     return addressUUID;
   }
 
   private void updateAddress(String id, Map<String, String> newAddress) throws LDAPException {
     ModifyRequest modifyRequest =
-        new ModifyRequest(getAddressDN(id), AddressLdapMapper.createMods(newAddress));
+        new ModifyRequest(getAddressDN(id), addressLdapMapper.createMods(newAddress));
     ldapPoolConnection.modify(modifyRequest);
   }
 

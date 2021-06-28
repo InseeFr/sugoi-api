@@ -17,10 +17,6 @@ import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
-import fr.insee.sugoi.ldap.utils.mapper.properties.AddressLdap;
-import fr.insee.sugoi.ldap.utils.mapper.properties.GroupLdap;
-import fr.insee.sugoi.ldap.utils.mapper.properties.LdapObjectClass;
-import fr.insee.sugoi.ldap.utils.mapper.properties.OrganizationLdap;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.AttributeLdapName;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToAttribute;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToMapElement;
@@ -80,13 +76,15 @@ public class GenericLdapMapper {
       ObjectType entity,
       Class<LdapType> ldapClazz,
       Class<ObjectType> entityClazz,
-      Map<String, String> config) {
+      Map<String, String> config,
+      List<String> objectClasses) {
     try {
       List<Attribute> attributes = new ArrayList<>();
-      LdapObjectClass ldapObjectClass = ldapClazz.getAnnotation(LdapObjectClass.class);
 
-      if (ldapObjectClass != null) {
-        attributes.add(new Attribute("objectClass", ldapObjectClass.values()));
+      if (objectClasses == null || objectClasses.isEmpty()) {
+        // Exception ? not needed if modification step
+      } else {
+        attributes.add(new Attribute("objectClass", objectClasses));
       }
 
       Arrays.stream(ldapClazz.getDeclaredFields())
@@ -128,7 +126,8 @@ public class GenericLdapMapper {
   public static <O, N> List<Modification> createMods(
       N entity, Class<O> propertiesClazz, Class<N> clazz, Map<String, String> config) {
     return LdapUtils.convertAttributesToModifications(
-        mapObjectToLdapAttributes(entity, propertiesClazz, clazz, config));
+        // Modification => no need to specify object classes
+        mapObjectToLdapAttributes(entity, propertiesClazz, clazz, config, null));
   }
 
   private static <ObjectType> void setFieldFromAttributeAnnotation(
@@ -272,9 +271,9 @@ public class GenericLdapMapper {
                     attributeName,
                     String.format(
                         "%s=%s,%s",
-                        OrganizationLdap.class
-                            .getAnnotation(LdapObjectClass.class)
-                            .rdnAttributeName(),
+                        // TODO should be a param
+                        "uid",
+                        //
                         ((Organization) attributeValue).getIdentifiant(),
                         config.get(LdapConfigKeys.ORGANIZATION_SOURCE)));
             List<Attribute> organizationAttributeList = new ArrayList<>();
@@ -298,9 +297,9 @@ public class GenericLdapMapper {
                             new Attribute(
                                 attributeName,
                                 String.format(
-                                    GroupLdap.class
-                                        .getAnnotation(LdapObjectClass.class)
-                                        .rdnAttributeName(),
+                                    // TODO should be a param
+                                    "cn",
+                                    //
                                     group.getName(),
                                     config.get(LdapConfigKeys.APP_SOURCE))))
                     .collect(Collectors.toList());
@@ -313,7 +312,9 @@ public class GenericLdapMapper {
                       attributeName,
                       String.format(
                           "%s=%s,%s",
-                          AddressLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
+                          // TODO should be a param
+                          "l",
+                          //
                           ((Map<String, String>) attributeValue).get("id"),
                           config.get(LdapConfigKeys.ADDRESS_SOURCE)));
               addressAttributeList.add(addressAttribute);

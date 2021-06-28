@@ -48,6 +48,21 @@ public class LdapStoreBeans {
   @Value("${fr.insee.sugoi.ldap.default.vlv.enabled:false}")
   private String vlvEnabled;
 
+  @Value("${fr.insee.sugoi.ldap.default.user-object-classes:top,person}")
+  private String defaultUserObjectClasses;
+
+  @Value("${fr.insee.sugoi.ldap.default.organization-object-classes:top,organization}")
+  private String defaultOrganizationObjectClasses;
+
+  @Value("${fr.insee.sugoi.ldap.default.group-object-classes:top,groupOfUniqueNames}")
+  private String defaultGroupObjectClasses;
+
+  @Value("${fr.insee.sugoi.ldap.default.application-object-classes:top,organizationalUnit}")
+  private String defaultApplicationObjectClasses;
+
+  @Value("${fr.insee.sugoi.ldap.default.address-object-classes:top,locality}")
+  private String defaultAddressObjectClasses;
+
   @Bean("LdapReaderStore")
   @Lazy
   @Scope("prototype")
@@ -92,6 +107,31 @@ public class LdapStoreBeans {
         realm.getProperties().get(LdapConfigKeys.VLV_ENABLED) != null
             ? realm.getProperties().get(LdapConfigKeys.VLV_ENABLED)
             : vlvEnabled);
+    config.put(
+        LdapConfigKeys.USER_OBJECT_CLASSES,
+        userStorage.getProperties().get(LdapConfigKeys.USER_OBJECT_CLASSES) != null
+            ? userStorage.getProperties().get(LdapConfigKeys.USER_OBJECT_CLASSES)
+            : defaultUserObjectClasses);
+    config.put(
+        LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES,
+        userStorage.getProperties().get(LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES) != null
+            ? userStorage.getProperties().get(LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES)
+            : defaultOrganizationObjectClasses);
+    config.put(
+        LdapConfigKeys.GROUP_OBJECT_CLASSES,
+        userStorage.getProperties().get(LdapConfigKeys.GROUP_OBJECT_CLASSES) != null
+            ? userStorage.getProperties().get(LdapConfigKeys.GROUP_OBJECT_CLASSES)
+            : defaultGroupObjectClasses);
+    config.put(
+        LdapConfigKeys.APPLICATION_OBJECT_CLASSES,
+        userStorage.getProperties().get(LdapConfigKeys.APPLICATION_OBJECT_CLASSES) != null
+            ? userStorage.getProperties().get(LdapConfigKeys.APPLICATION_OBJECT_CLASSES)
+            : defaultApplicationObjectClasses);
+    config.put(
+        LdapConfigKeys.ADDRESS_OBJECT_CLASSES,
+        userStorage.getProperties().get(LdapConfigKeys.ADDRESS_OBJECT_CLASSES) != null
+            ? userStorage.getProperties().get(LdapConfigKeys.ADDRESS_OBJECT_CLASSES)
+            : defaultAddressObjectClasses);
 
     return config;
   }

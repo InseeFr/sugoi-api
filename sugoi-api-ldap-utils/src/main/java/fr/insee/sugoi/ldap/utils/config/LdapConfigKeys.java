@@ -29,4 +29,9 @@ public class LdapConfigKeys extends GlobalKeysConfig {
   public static final String TYPE = "TYPE";
   public static final String VLV_ENABLED = "vlvEnabled";
   public static final String SORT_KEY = "sortKey";
+  public static final String USER_OBJECT_CLASSES = "user_object_classes";
+  public static final String ORGANIZATION_OBJECT_CLASSES = "organization_object_classes";
+  public static final String GROUP_OBJECT_CLASSES = "group_object_classes";
+  public static final String APPLICATION_OBJECT_CLASSES = "application_object_classes";
+  public static final String ADDRESS_OBJECT_CLASSES = "address_object_classes";
 }

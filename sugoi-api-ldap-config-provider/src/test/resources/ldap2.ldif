@@ -122,6 +122,8 @@ inseepropriete: brancheOrganisation$ou=organisations,ou=clients_domaine2,o=in
  see,c=fr
 inseepropriete: groupSourcePattern$ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr
 inseepropriete: groupFilterPattern$(cn={group}_{appliname})
+inseepropriete: user_object_classes$top,inseeCompte,inseeContact,inseeAttributsAuthentification,inseeAttributsHabilitation,inseeAttributsCommunication
+inseepropriete: organization_object_classes$top,inseeOrganisation
 description: domaine2
 
 dn: cn=autreUserStorage,cn=Profil_domaine2_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We
@@ -134,6 +136,8 @@ inseepropriete: brancheOrganisation$ou=organisations,ou=clients_domaine2,o=in
  see,c=fr
 inseepropriete: groupSourcePattern$ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr
 inseepropriete: groupFilterPattern$(cn={group}_{appliname})
+inseepropriete: user_object_classes$top,inseeCompte,inseeContact,inseeAttributsAuthentification,inseeAttributsHabilitation,inseeAttributsCommunication
+inseepropriete: organization_object_classes$top,inseeOrganisation
 description: domaine2
 
 dn: cn=Profil_domaine1_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We
@@ -152,6 +156,8 @@ inseepropriete: app_managed_attribute_key$inseeGroupeDefaut
 inseepropriete: app_managed_attribute_pattern$(.*)_$(application)
 inseepropriete: habilitationsPossibles$propriete_role_appli
 inseepropriete: branchesApplicativesPossibles$applitest
+inseepropriete: user_object_classes$top,inseeCompte,inseeContact,inseeAttributsAuthentification,inseeAttributsHabilitation,inseeAttributsCommunication
+inseepropriete: organization_object_classes$top,inseeOrganisation
 description: domaine1
 
 dn: cn=Profil_domainesugoi_Sugoi,cn=profil-contact-sugoi,ou=We
@@ -460,6 +466,7 @@ inseepropriete: objectclasscontact$top,person,organizationalPerson,inetOrgPerson
 inseepropriete: branchesApplicativesPossibles$applitest
 inseepropriete: groupSourcePattern$ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr
 inseepropriete: groupFilterPattern$(cn={group}_{appliname})
+inseepropriete: user_object_classes$top,inseeCompte,inseeContact,inseeAttributsAuthentification,inseeAttributsHabilitation,inseeAttributsCommunication
 description: SSM
 
 dn: ou=SSM,o=insee,c=fr
