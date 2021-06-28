@@ -16,16 +16,11 @@ package fr.insee.sugoi.store.ldap;
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
+import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.GroupLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
-import fr.insee.sugoi.ldap.utils.mapper.properties.AddressLdap;
-import fr.insee.sugoi.ldap.utils.mapper.properties.ApplicationLdap;
-import fr.insee.sugoi.ldap.utils.mapper.properties.GroupLdap;
-import fr.insee.sugoi.ldap.utils.mapper.properties.LdapObjectClass;
-import fr.insee.sugoi.ldap.utils.mapper.properties.OrganizationLdap;
-import fr.insee.sugoi.ldap.utils.mapper.properties.UserLdap;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,6 +36,7 @@ public class LdapStore {
   protected OrganizationLdapMapper organizationLdapMapper;
   protected GroupLdapMapper groupLdapMapper;
   protected ApplicationLdapMapper applicationLdapMapper;
+  protected AddressLdapMapper addressLdapMapper;
 
   protected Map<String, String> config;
 
@@ -82,7 +78,9 @@ public class LdapStore {
     if (config.get(LdapConfigKeys.APP_SOURCE) != null) {
       return String.format(
           "%s=%s,%s",
-          ApplicationLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
+          // TODO should be a param
+          "ou",
+          //
           applicationName,
           config.get(LdapConfigKeys.APP_SOURCE));
     } else {
@@ -93,7 +91,9 @@ public class LdapStore {
   protected String getGroupDN(String applicationName, String groupName) {
     return String.format(
         "%s=%s,%s",
-        GroupLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
+        // TODO should be a param
+        "cn",
+        //
         groupName,
         getGroupSource(applicationName));
   }
@@ -101,8 +101,9 @@ public class LdapStore {
   protected String getOrganizationDN(String organizationId) {
     if (config.get(LdapConfigKeys.ORGANIZATION_SOURCE) != null) {
       return String.format(
-          "%s=%s,%s",
-          OrganizationLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
+          "%s=%s,%s", // TODO should be a param
+          "uid",
+          //
           organizationId,
           config.get(LdapConfigKeys.ORGANIZATION_SOURCE));
     } else {
@@ -114,7 +115,9 @@ public class LdapStore {
   protected String getUserDN(String username) {
     return String.format(
         "%s=%s,%s",
-        UserLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
+        // TODO should be a param
+        "uid",
+        //
         username,
         config.get(LdapConfigKeys.USER_SOURCE));
   }
@@ -122,7 +125,9 @@ public class LdapStore {
   protected String getAddressDN(String addressId) {
     return String.format(
         "%s=%s,%s",
-        AddressLdap.class.getAnnotation(LdapObjectClass.class).rdnAttributeName(),
+        // TODO should be a param
+        "l",
+        //
         addressId,
         config.get(LdapConfigKeys.ADDRESS_SOURCE));
   }

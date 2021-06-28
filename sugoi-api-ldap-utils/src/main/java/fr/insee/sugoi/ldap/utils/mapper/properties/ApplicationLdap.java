@@ -16,12 +16,6 @@ package fr.insee.sugoi.ldap.utils.mapper.properties;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.AttributeLdapName;
 import fr.insee.sugoi.ldap.utils.mapper.properties.utils.MapToAttribute;
 
-@LdapObjectClass(
-    values = {
-      "top",
-      "organizationalUnit",
-    },
-    rdnAttributeName = "ou")
 public class ApplicationLdap {
 
   @MapToAttribute("name")

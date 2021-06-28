@@ -16,6 +16,7 @@ package fr.insee.sugoi.ldap.utils.mapper;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
+import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,6 +48,22 @@ public class UserStorageLdapMapper {
                   }
                   if (property[0].equalsIgnoreCase("groupFilterPattern")) {
                     userStorage.addProperty("group_filter_pattern", property[1]);
+                  }
+                  if (property[0].equalsIgnoreCase(LdapConfigKeys.USER_OBJECT_CLASSES)) {
+                    userStorage.addProperty(LdapConfigKeys.USER_OBJECT_CLASSES, property[1]);
+                  }
+                  if (property[0].equalsIgnoreCase(LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES)) {
+                    userStorage.addProperty(
+                        LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES, property[1]);
+                  }
+                  if (property[0].equalsIgnoreCase(LdapConfigKeys.GROUP_OBJECT_CLASSES)) {
+                    userStorage.addProperty(LdapConfigKeys.GROUP_OBJECT_CLASSES, property[1]);
+                  }
+                  if (property[0].equalsIgnoreCase(LdapConfigKeys.APPLICATION_OBJECT_CLASSES)) {
+                    userStorage.addProperty(LdapConfigKeys.APPLICATION_OBJECT_CLASSES, property[1]);
+                  }
+                  if (property[0].equalsIgnoreCase(LdapConfigKeys.ADDRESS_OBJECT_CLASSES)) {
+                    userStorage.addProperty(LdapConfigKeys.ADDRESS_OBJECT_CLASSES, property[1]);
                   }
                 }
               }

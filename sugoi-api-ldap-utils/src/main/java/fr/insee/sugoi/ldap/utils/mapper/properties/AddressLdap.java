@@ -13,7 +13,4 @@
 */
 package fr.insee.sugoi.ldap.utils.mapper.properties;
 
-@LdapObjectClass(
-    values = {"InseeAdressePostale", "locality", "top"},
-    rdnAttributeName = "l")
 public class AddressLdap {}

@@ -17,8 +17,6 @@ import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import com.unboundid.ldap.sdk.ModificationType;
 import com.unboundid.ldap.sdk.SearchResultEntry;
-import fr.insee.sugoi.ldap.utils.mapper.properties.AddressLdap;
-import fr.insee.sugoi.ldap.utils.mapper.properties.LdapObjectClass;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +25,17 @@ import java.util.stream.Collectors;
 
 public class AddressLdapMapper {
 
-  public static Map<String, String> mapFromSearchEntry(SearchResultEntry searchResultEntry) {
+  public Map<String, String> config;
+  public String[] objectClasses = {"InseeAdressePostale", "locality", "top"};
+
+  public AddressLdapMapper(Map<String, String> config) {
+    // TODO Only if this mapper become more generic
+    // if (config.get(LdapConfigKeys.ADDRESS_OBJECT_CLASSES) != null) {
+    // objectClasses = config.get(LdapConfigKeys.ADDRESS_OBJECT_CLASSES).split(",");
+    // }
+  }
+
+  public Map<String, String> mapFromSearchEntry(SearchResultEntry searchResultEntry) {
     Map<String, String> address = new HashMap<>();
     for (int i = 1; i < 8; i++) {
       address.put(
@@ -38,7 +46,7 @@ public class AddressLdapMapper {
     return address;
   }
 
-  public static List<Attribute> mapToAttributes(Map<String, String> address) {
+  public List<Attribute> mapToAttributes(Map<String, String> address) {
     List<Attribute> attributes = new ArrayList<>();
     for (int i = 1; i < 8; i++) {
       if (address.containsKey("Ligne" + String.valueOf(i))
@@ -49,13 +57,11 @@ public class AddressLdapMapper {
                 address.get("Ligne" + String.valueOf(i))));
       }
     }
-    attributes.add(
-        new Attribute(
-            "objectClass", AddressLdap.class.getAnnotation(LdapObjectClass.class).values()));
+    attributes.add(new Attribute("objectClass", objectClasses));
     return attributes;
   }
 
-  public static List<Modification> createMods(Map<String, String> address) {
+  public List<Modification> createMods(Map<String, String> address) {
     return mapToAttributes(address).stream()
         .map(
             attribute ->

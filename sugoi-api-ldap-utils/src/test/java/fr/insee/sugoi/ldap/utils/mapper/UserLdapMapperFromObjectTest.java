@@ -16,10 +16,12 @@ package fr.insee.sugoi.ldap.utils.mapper;
 import static org.hamcrest.MatcherAssert.*;
 
 import com.unboundid.ldap.sdk.Attribute;
+import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,7 @@ public class UserLdapMapperFromObjectTest {
   UserLdapMapper userLdapMapper;
   List<Attribute> mappedAttributes;
   User user;
+  String[] objectClassesToCompare = {"top", "person"};
 
   @BeforeEach
   public void setup() {
@@ -40,6 +43,7 @@ public class UserLdapMapperFromObjectTest {
     Map<String, String> config = new HashMap<>();
     config.put("organization_source", "ou=organisations,o=insee,c=fr");
     config.put("address_source", "ou=address,o=insee,c=fr");
+    config.put(LdapConfigKeys.USER_OBJECT_CLASSES, "top,person");
     userLdapMapper = new UserLdapMapper(config);
 
     user = new User();
@@ -53,7 +57,13 @@ public class UserLdapMapperFromObjectTest {
     user.setLastName("Tata");
     user.setMail("toto@insee.fr");
     List<Attribute> mappedAttributes = userLdapMapper.mapToAttributes(user);
-
+    assertThat(
+        "Should have right objectClasses",
+        mappedAttributes.stream()
+            .anyMatch(
+                attribute ->
+                    attribute.getName().equals("objectClass")
+                        && Arrays.equals(attribute.getValues(), objectClassesToCompare)));
     assertThat(
         "Should have username",
         mappedAttributes.stream()
