@@ -27,4 +27,6 @@ public class LdapConfigKeys extends GlobalKeysConfig {
   public static final String GROUP_FILTER_PATTERN = "group_filter_pattern";
   public static final String REALM_NAME = "realm_name";
   public static final String TYPE = "TYPE";
+  public static final String VLV_ENABLED = "vlvEnabled";
+  public static final String SORT_KEY = "sortKey";
 }

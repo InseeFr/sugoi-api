@@ -16,8 +16,8 @@ package fr.insee.sugoi.core.service;
 import fr.insee.sugoi.core.exceptions.PasswordPolicyNotMetException;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
-import fr.insee.sugoi.core.model.PasswordChangeRequest;
-import fr.insee.sugoi.core.model.SendMode;
+import fr.insee.sugoi.model.paging.PasswordChangeRequest;
+import fr.insee.sugoi.model.paging.SendMode;
 import java.util.List;
 
 public interface CredentialsService {

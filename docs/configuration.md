@@ -32,6 +32,8 @@ Realm can be load from different sources.
 | fr.insee.sugoi.config.ldap.profils.port    |                              Use only if config type is ldap. Ldap host and port where the realm configurations are stored                              |               |         389 |
 | fr.insee.sugoi.config.ldap.profils.branche |                                      Use only if config type is ldap. Ldap subtree where configurations are stored                                      |               |             |
 | fr.insee.sugoi.config.ldap.profils.pattern | Use only if config type is ldap. String pattern to find realms ('{realm}' is replaced with realm's name). cn={realm} wil search realm config for realm1 |               |             |
+| fr.insee.sugoi.ldap.default.vlv.enabled    |                                                               enable vlv searched on ldap                                                               |         false |             |
+| fr.insee.sugoi.config.ldap.default.sortKey |                                                    attribute on which paging request will be ordered                                                    |               |         uid |
 
 ### Reader writer configuration
 

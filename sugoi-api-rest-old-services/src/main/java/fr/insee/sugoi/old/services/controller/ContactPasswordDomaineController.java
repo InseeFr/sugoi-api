@@ -110,7 +110,7 @@ public class ContactPasswordDomaineController {
         realmUserStorage.getUserStorage(),
         identifiant,
         ouganextSugoiMapper.serializeToSugoi(
-            pcr, fr.insee.sugoi.core.model.PasswordChangeRequest.class),
+            pcr, fr.insee.sugoi.model.paging.PasswordChangeRequest.class),
         new ArrayList<>());
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
@@ -166,7 +166,7 @@ public class ContactPasswordDomaineController {
         realmUserStorage.getUserStorage(),
         identifiant,
         ouganextSugoiMapper.serializeToSugoi(
-            pcr, fr.insee.sugoi.core.model.PasswordChangeRequest.class),
+            pcr, fr.insee.sugoi.model.paging.PasswordChangeRequest.class),
         new ArrayList<>());
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
@@ -230,7 +230,7 @@ public class ContactPasswordDomaineController {
         realmUserStorage.getUserStorage(),
         identifiant,
         ouganextSugoiMapper.serializeToSugoi(
-            pcr, fr.insee.sugoi.core.model.PasswordChangeRequest.class));
+            pcr, fr.insee.sugoi.model.paging.PasswordChangeRequest.class));
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }

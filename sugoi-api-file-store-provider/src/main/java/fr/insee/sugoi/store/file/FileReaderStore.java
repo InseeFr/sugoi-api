@@ -14,13 +14,13 @@
 package fr.insee.sugoi.store.file;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insee.sugoi.core.model.PageResult;
-import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.paging.PageResult;
+import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.store.file.configuration.FileKeysConfig;
 import java.io.IOException;
 import java.lang.reflect.Field;

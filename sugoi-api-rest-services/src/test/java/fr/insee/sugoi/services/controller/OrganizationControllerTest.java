@@ -24,9 +24,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
 import fr.insee.sugoi.core.exceptions.OrganizationAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
-import fr.insee.sugoi.core.model.PageResult;
 import fr.insee.sugoi.core.service.OrganizationService;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.paging.PageResult;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -78,6 +78,7 @@ public class OrganizationControllerTest {
     organizations.add(organization2);
     pageResult = new PageResult<Organization>();
     pageResult.setResults(organizations);
+    pageResult.setSearchToken("mySearchToken");
   }
 
   // Test read requests on good query
@@ -260,7 +261,7 @@ public class OrganizationControllerTest {
       assertThat(
           "Location header gives next page",
           mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
-          is("http://localhost/realms/domaine1/organizations?size=2&offset=2"));
+          is("http://localhost/realms/domaine1/organizations?size=2&searchToken=mySearchToken"));
 
     } catch (Exception e) {
       e.printStackTrace();

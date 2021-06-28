@@ -29,6 +29,7 @@ import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.ldap.utils.LdapFilter;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
+import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.ldap.utils.mapper.RealmLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserStorageLdapMapper;
 import fr.insee.sugoi.model.Realm;
@@ -75,6 +76,9 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   @Value("${fr.insee.sugoi.default.app_managed_attribute_patterns:}")
   private String defaultAppManagedAttributePatternList;
 
+  @Value("${fr.insee.sugoi.config.ldap.default.sortKey:}")
+  private String defaultSortKey;
+
   private static final Logger logger = LogManager.getLogger(LdapRealmProviderDAOImpl.class);
 
   @Override
@@ -105,6 +109,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
               GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST,
               defaultAppManagedAttributePatternList);
         }
+        realm.getProperties().putIfAbsent(LdapConfigKeys.SORT_KEY, defaultSortKey);
         return realm;
       }
       throw new RealmNotFoundException("Erreur lors du chargement du realm " + realmName);

@@ -20,9 +20,6 @@ import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.UserNotCreatedException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
-import fr.insee.sugoi.core.model.PageResult;
-import fr.insee.sugoi.core.model.PageableResult;
-import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.seealso.SeeAlsoService;
 import fr.insee.sugoi.core.service.UserService;
@@ -31,6 +28,9 @@ import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
+import fr.insee.sugoi.model.paging.PageResult;
+import fr.insee.sugoi.model.paging.PageableResult;
+import fr.insee.sugoi.model.paging.SearchType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -261,8 +261,13 @@ public class UserServiceImpl implements UserService {
                     user.addMetadatas(EventKeysConfig.USERSTORAGE, us.getName());
                   });
           result.getResults().addAll(temResult.getResults());
-          result.setTotalElements(result.getResults().size());
-          if (result.getTotalElements() >= result.getPageSize()) {
+          result.setTotalElements(
+              temResult.getTotalElements() == -1
+                  ? temResult.getTotalElements()
+                  : result.getTotalElements() + temResult.getTotalElements());
+          result.setSearchToken(temResult.getSearchToken());
+          result.setHasMoreResult(temResult.isHasMoreResult());
+          if (result.getResults().size() >= result.getPageSize()) {
             sugoiEventPublisher.publishCustomEvent(
                 realm,
                 storage,

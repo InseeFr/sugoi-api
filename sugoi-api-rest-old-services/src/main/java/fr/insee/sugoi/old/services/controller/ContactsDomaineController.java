@@ -17,12 +17,12 @@ import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
 import fr.insee.sugoi.converter.ouganext.Contact;
 import fr.insee.sugoi.converter.ouganext.Contacts;
 import fr.insee.sugoi.converter.ouganext.Organisation;
-import fr.insee.sugoi.core.model.PageResult;
-import fr.insee.sugoi.core.model.PageableResult;
-import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.paging.PageResult;
+import fr.insee.sugoi.model.paging.PageableResult;
+import fr.insee.sugoi.model.paging.SearchType;
 import fr.insee.sugoi.old.services.model.ConverterDomainRealm;
 import fr.insee.sugoi.old.services.model.RealmStorage;
 import io.swagger.v3.oas.annotations.Operation;
@@ -265,7 +265,7 @@ public class ContactsDomaineController {
 
     PageableResult pageable = new PageableResult();
     if (searchCookie != null) {
-      pageable.setCookie(searchCookie.getBytes());
+      pageable.setSearchToken(searchCookie);
     }
     pageable.setOffset(offset);
     pageable.setSize(size);
@@ -283,7 +283,7 @@ public class ContactsDomaineController {
     headers.add(
         "nextLocation",
         ServletUriComponentsBuilder.fromCurrentRequest()
-            .replaceQueryParam("offset", foundUsers.getNextStart())
+            .replaceQueryParam("searchCookie", foundUsers.getSearchToken())
             .build()
             .toString());
 

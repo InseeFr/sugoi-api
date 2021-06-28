@@ -18,9 +18,9 @@ import static org.hamcrest.Matchers.is;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insee.sugoi.app.cucumber.utils.PageResult;
 import fr.insee.sugoi.app.cucumber.utils.StepData;
 import fr.insee.sugoi.model.Application;
+import fr.insee.sugoi.model.paging.PageResult;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Then;

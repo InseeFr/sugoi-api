@@ -15,11 +15,11 @@ package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
-import fr.insee.sugoi.core.model.PageResult;
-import fr.insee.sugoi.core.model.PageableResult;
-import fr.insee.sugoi.core.model.SearchType;
 import fr.insee.sugoi.core.service.OrganizationService;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.paging.PageResult;
+import fr.insee.sugoi.model.paging.PageableResult;
+import fr.insee.sugoi.model.paging.SearchType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -62,7 +62,7 @@ public class OrganizationController {
       path = {"/realms/{realm}/storages/{storage}/organizations"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
-  @Operation(summary = "Search organizations by parameters")
+  @Operation(summary = "Search organizations by parameters, paginate working")
   @ApiResponses(
       value = {
         @ApiResponse(
@@ -93,6 +93,9 @@ public class OrganizationController {
       @Parameter(description = "Organization's mail of the wanted organization", required = false)
           @RequestParam(value = "mail", required = false)
           String email,
+      @Parameter(description = "Token to continue a previous search", required = false)
+          @RequestParam(name = "searchToken", required = false)
+          String searchCookie,
       @Parameter(description = "Expected size of result", required = false)
           @RequestParam(value = "size", defaultValue = "20")
           int size,
@@ -105,7 +108,8 @@ public class OrganizationController {
     Organization filterOrganization = new Organization();
     filterOrganization.setIdentifiant(identifiant);
     filterOrganization.addAttributes("mail", email);
-    PageableResult pageableResult = new PageableResult(size, offset);
+    PageableResult pageableResult = new PageableResult(size, offset, searchCookie);
+
     PageResult<Organization> foundOrganizations =
         organizationService.findByProperties(
             realm, storage, filterOrganization, pageableResult, typeRecherche);
@@ -113,7 +117,7 @@ public class OrganizationController {
     if (foundOrganizations.isHasMoreResult()) {
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()
-              .replaceQueryParam("offset", offset + size)
+              .replaceQueryParam("searchToken", foundOrganizations.getSearchToken())
               .build()
               .toUri();
       return ResponseEntity.status(HttpStatus.OK)
@@ -128,7 +132,7 @@ public class OrganizationController {
       path = {"/realms/{realm}/organizations"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
-  @Operation(summary = "Search organizations by parameters")
+  @Operation(summary = "Search organizations by parameters, paginate could not work")
   @ApiResponses(
       value = {
         @ApiResponse(
@@ -154,6 +158,9 @@ public class OrganizationController {
       @Parameter(description = "Organization's mail of the wanted organization", required = false)
           @RequestParam(value = "mail", required = false)
           String email,
+      @Parameter(description = "Token to continue a previous search", required = false)
+          @RequestParam(name = "searchToken", required = false)
+          String searchCookie,
       @Parameter(description = "Expected size of result", required = false)
           @RequestParam(value = "size", defaultValue = "20")
           int size,
@@ -163,7 +170,8 @@ public class OrganizationController {
       @Parameter(description = "Default search can be AND or OR", required = true)
           @RequestParam(name = "typeRecherche", defaultValue = "AND", required = true)
           SearchType typeRecherche) {
-    return getOrganizations(realm, null, identifiant, email, size, offset, typeRecherche);
+    return getOrganizations(
+        realm, null, identifiant, email, searchCookie, size, offset, typeRecherche);
   }
 
   @PostMapping(

@@ -14,10 +14,10 @@
 package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
-import fr.insee.sugoi.core.model.PageResult;
-import fr.insee.sugoi.core.model.PageableResult;
 import fr.insee.sugoi.core.service.ApplicationService;
 import fr.insee.sugoi.model.Application;
+import fr.insee.sugoi.model.paging.PageResult;
+import fr.insee.sugoi.model.paging.PageableResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -81,6 +81,9 @@ public class ApplicationController {
       @Parameter(description = "Expected size of result", required = false)
           @RequestParam(name = "size", defaultValue = "20")
           int size,
+      @Parameter(description = "Token to continue a previous search", required = false)
+          @RequestParam(name = "searchToken", required = false)
+          String searchCookie,
       @Parameter(description = "Offset to apply when searching", required = false)
           @RequestParam(name = "offset", required = false, defaultValue = "0")
           int offset,
@@ -95,7 +98,7 @@ public class ApplicationController {
     applicationFilter.setName(name);
     applicationFilter.setOwner(owner);
 
-    PageableResult pageableResult = new PageableResult(size, offset);
+    PageableResult pageableResult = new PageableResult(size, offset, searchCookie);
 
     PageResult<Application> foundApplications =
         applicationService.findByProperties(realm, applicationFilter, pageableResult);
@@ -103,7 +106,7 @@ public class ApplicationController {
     if (foundApplications.isHasMoreResult()) {
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()
-              .replaceQueryParam("offset", offset + size)
+              .replaceQueryParam("searchToken", foundApplications.getSearchToken())
               .build()
               .toUri();
       return ResponseEntity.status(HttpStatus.OK)

@@ -40,7 +40,6 @@ These configurations are used for all type of Store Provider.
 | properties   |                    See next section                    |                                                yes |                                                                                                               {}  | A list of other options which can be specific to the type of Store Provider.                                         |
 | readerType   |          "LdapReaderStore", "FileReaderStore"          |                                                 no |   the default can be set via the instance property : fr.insee.sugoi.store.readerType, if not set app cannot work  | Indicates wich type of store is used for reading. This attribute is read-only for now and should be set via default. |
 | writeType    | "JMSWriterStore", "LdapWriterStore", "FileWriterStore" |                                                 no |  the default can be set via the instance property : fr.insee.sugoi.store.writerType?, if not set app cannot work  | Indicates wich type of store is used for writing. This attribute is read-only for now and should be set via default. |
-
 ### Realm configuration properties
 
 | Field name                          |                      Example                      |                                                                                Optional | Default | Description                                                                                                                                                                                                                |
@@ -48,6 +47,10 @@ These configurations are used for all type of Store Provider.
 | seealso_attributes                  |              "seeAlso, otherSeeAlso"              |                                                no, set to enable seealso functionnality |         | All values in the corresponding attributes will be parsed as [SeeAlso](concepts.md#SeeAlso) string to add a new attributes to a user. It can be a single attribute name or a list of attribute names separated by a comma. |
 | app-managed-attribute-keys-list     |    "inseeGroupeDefaut, inseeGroupeApplicatif"     | yes, it just allow person with app right to give (or remove) properties on an attribute |         | The name of the attribute to modify                                                                                                                                                                                        |
 | app-managed-attribute-patterns-list | "(.\*)\_$(application),$(application)\\$\\$(.\*)" |                                                                                     yes |         | The pattern that the attribute value must follow                                                                                                                                                                           |
+| vlv_enabled        |      true or false      |                 yes, disabled by default |         | Allowed to make vlv search on ldap                                                                                                                                                                                         |
+| sort_key           |           uid           |                                       no |         | Attribute on which ordered will be done when making a paging request    
+
+
 
 ## UserStorage configuration
 

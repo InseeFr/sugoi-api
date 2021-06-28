@@ -13,8 +13,6 @@
 */
 package fr.insee.sugoi.jms.listener;
 
-import fr.insee.sugoi.core.model.PasswordChangeRequest;
-import fr.insee.sugoi.core.model.SendMode;
 import fr.insee.sugoi.core.service.CredentialsService;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.core.service.OrganizationService;
@@ -28,6 +26,8 @@ import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.paging.PasswordChangeRequest;
+import fr.insee.sugoi.model.paging.SendMode;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
