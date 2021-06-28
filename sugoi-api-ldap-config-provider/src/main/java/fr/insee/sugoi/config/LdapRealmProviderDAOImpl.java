@@ -81,6 +81,8 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
 
   private static final Logger logger = LogManager.getLogger(LdapRealmProviderDAOImpl.class);
 
+  private static LDAPConnectionPool ldapConnectionPool;
+
   @Override
   public Realm load(String realmName) {
     logger.info("Loading configuration from ldap://{}:{}/{}", url, port, baseDn);
@@ -260,9 +262,16 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
     }
   }
 
-  private LDAPConnectionPool initLdapPoolConnection() {
+  private synchronized LDAPConnectionPool initLdapPoolConnection() {
     try {
-      return new LDAPConnectionPool(new LDAPConnection(url, port), 1);
+      if (ldapConnectionPool == null
+          || !ldapConnectionPool.getConnectionPoolName().equals(url + "-" + port)) {
+        ldapConnectionPool = new LDAPConnectionPool(new LDAPConnection(url, port), 10);
+        ldapConnectionPool.setConnectionPoolName(url + "-" + port);
+        ldapConnectionPool.setCreateIfNecessary(true);
+      }
+
+      return ldapConnectionPool;
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to init ldap connection", e);
     }
