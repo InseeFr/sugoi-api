@@ -68,4 +68,9 @@ public class Habilitation {
         ? this.property + "_" + this.role + "_" + this.application
         : this.role + "_" + this.application;
   }
+
+  @Override
+  public String toString() {
+    return getId();
+  }
 }
