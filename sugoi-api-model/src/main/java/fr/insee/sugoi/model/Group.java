@@ -63,4 +63,9 @@ public class Group {
   public void setAppName(String appName) {
     this.appName = appName;
   }
+
+  @Override
+  public String toString() {
+    return name + " (" + appName + ")";
+  }
 }
