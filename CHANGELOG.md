@@ -1,6 +1,5 @@
 # 0.7.0
 
-
 - [BUG] 🐛 fix some sonar/compilation warnings
 - [BUG] :bug: renew connection with ldap if server is down (#391)
 - [UP] :arrow_up: Bump commons-io from 2.10.0 to 2.11.0
@@ -23,11 +22,9 @@
 - [REL] :rocket: prepare next version
 - [REL] :rocket: prepare new version 0.5.0
 - [REL] :rocket: Release 0.4.0
-- Resolve [250] Add paging properties on userstorage of type ldap + Resolve [247] Having a generic interface for paged requests  + Resolve [248] Refactor findByProperties services for multi-userstorage paging + Resolve [251] Implement paging on Ldap store
-
+- Resolve [250] Add paging properties on userstorage of type ldap + Resolve [247] Having a generic interface for paged requests + Resolve [248] Refactor findByProperties services for multi-userstorage paging + Resolve [251] Implement paging on Ldap store
 
 # 0.6.0
-
 
 - [BUG] :bug: Signoff commit when preparing release
 - [META] :card_index: change commit message when releasing
@@ -42,8 +39,7 @@
 - [REL] :rocket: prepare next version
 - [REL] :rocket: prepare new version 0.5.0
 - [REL] :rocket: Release 0.4.0
-- Resolve [250] Add paging properties on userstorage of type ldap + Resolve [247] Having a generic interface for paged requests  + Resolve [248] Refactor findByProperties services for multi-userstorage paging + Resolve [251] Implement paging on Ldap store
-
+- Resolve [250] Add paging properties on userstorage of type ldap + Resolve [247] Having a generic interface for paged requests + Resolve [248] Refactor findByProperties services for multi-userstorage paging + Resolve [251] Implement paging on Ldap store
 
 # 0.5.0
 

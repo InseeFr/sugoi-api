@@ -13,10 +13,11 @@
 */
 package fr.insee.sugoi.model;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserStorage {
+public class UserStorage implements Serializable {
   private String name;
   private String userSource;
   private String organizationSource;
@@ -70,15 +71,8 @@ public class UserStorage {
 
   @Override
   public String toString() {
-    return "UserStorage [name="
-        + name
-        + ", organizationSource="
-        + organizationSource
-        + ", properties="
-        + properties
-        + ", userSource="
-        + userSource
-        + "]";
+    return "UserStorage [name=" + name + ", organizationSource=" + organizationSource + ", properties=" + properties
+        + ", userSource=" + userSource + "]";
   }
 
   public void setMappings(Map<String, Map<String, String>> mappings) {
