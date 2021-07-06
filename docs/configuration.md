@@ -58,6 +58,10 @@ For each realm we have the possibility to configure a default reader and a defau
 | fr.insee.sugoi.ldap.default.group_filter_pattern      |     Use only if defaultWriter is ldap. Default pattern to follow for naming groups      |               |                                                 |
 | fr.insee.sugoi.default.app_managed_attribute_keys     |                a list of all attributes that a user can update directly                 |               |
 | fr.insee.sugoi.default.app_managed_attribute_patterns | Default pattern that each fr.insee.sugoi.default.app_managed_attribute_keys must follow |               |
+| fr.insee.sugoi.ldap.default.user-mapping | List of mappings between sugoi user attributes and ldap attributes divided by semicolon , see [Realm configuration](realm-configuration.md) | username:uid,String,rw;groups:memberOf,list_group,ro;habilitations:inseeGroupeDefaut,list_habilitation,rw |
+| fr.insee.sugoi.ldap.default.organization-mapping | List of mappings between sugoi organization attributes and ldap attributes divided by semicolon, see [Realm configuration](realm-configuration.md) | identifiant:uid,String,rw;address:inseeAdressePostaleDN,address,rw;organization:inseeOrganisationDN,organization,rw |
+| fr.insee.sugoi.ldap.default.group-mapping | List of mappings between sugoi group attributes and ldap attributes divided by semicolon, see [Realm configuration](realm-configuration.md) | name:cn,String,rw;description:description,String,rw;users:uniquemember,list_user,rw |
+| fr.insee.sugoi.ldap.default.application-mapping | List of mappings between sugoi application attributes and ldap attributes divided by semicolon, see [Realm configuration](realm-configuration.md) | name:ou,String,rw |
 
 ### SpringDoc configuration
 

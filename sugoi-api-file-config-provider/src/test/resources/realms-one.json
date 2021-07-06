@@ -8,7 +8,40 @@
         "name": "default",
         "userSource": "/users",
         "organizationSource": "/organizations",
-        "properties": null
+        "properties": null,
+        "mappings": {
+          "organizationMapping": {
+            "address": "inseeAdressePostaleDN,address,rw",
+            "attributes.description": "description,String,rw",
+            "identifiant": "uid,String,rw",
+            "organization": "inseeOrganisationDN,organization,rw",
+            "attributes.mail": "mail,String,rw"
+          },
+          "userMapping": {
+            "attributes.identifiant_metier": "inseeIdentifiantMetier,String,rw",
+            "lastName": "sn,String,rw",
+            "address": "inseeAdressePostaleDN,address,rw",
+            "mail": "mail,String,rw",
+            "attributes.description": "description,String,rw",
+            "attributes.common_name": "cn,String,rw",
+            "attributes.phone_number": "telephoneNumber,String,rw",
+            "attributes.telephone_portable": "inseenumerotelephoneportable,String,rw",
+            "habilitations": "inseeGroupeDefaut,list_habilitation,rw",
+            "groups": "memberOf,list_group,ro",
+            "attributes.properties": "inseePropriete,list_string,rw",
+            "metadatas.modifyTimestamp": "modifyTimestamp,string,ro",
+            "attributes.additionalMail": "inseeMailCorrespondant,String,rw",
+            "attributes.seeAlsos": "seeAlso,list_string,ro",
+            "attributes.personal_title": "personalTitle,String,rw",
+            "attributes.insee_timbre": "inseeTimbre,String,rw",
+            "attributes.repertoire_distribution": "inseerepertoirededistribution,String,rw",
+            "firstName": "givenname,String,rw",
+            "attributes.insee_organisme": "inseeOrganisme,String,rw",
+            "organization": "inseeOrganisationDN,organization,rw",
+            "attributes.insee_roles_applicatifs": "inseeRoleApplicatif,list_string,rw",
+            "username": "uid,String,rw"
+          }
+        }
       },
       {
         "name": "other",
@@ -18,6 +51,16 @@
       }
     ],
     "readerType": null,
-    "writerType": null
+    "writerType": null,
+    "mappings": {
+      "applicationMapping": {
+        "name": "ou,String,rw"
+      },
+      "groupMapping": {
+        "name": "cn,String,rw",
+        "description": "description,String,rw",
+        "users": "uniquemember,list_user,rw"
+      }
+    }
   }
 ]

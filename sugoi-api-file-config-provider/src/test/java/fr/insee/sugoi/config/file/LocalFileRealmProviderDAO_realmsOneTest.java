@@ -61,4 +61,53 @@ public class LocalFileRealmProviderDAO_realmsOneTest {
         realm.getUserStorages().stream()
             .anyMatch(userstorage -> userstorage.getName().equals("other")));
   }
+
+  @Test
+  public void shouldHaveRealmMapping() {
+    Realm realm = localFileConfig.load("test");
+    assertThat(
+        "Should have groupMapping",
+        realm.getMappings().get("groupMapping").get("name"),
+        is("cn,String,rw"));
+    assertThat(
+        "Should have groupMapping",
+        realm.getMappings().get("groupMapping").get("users"),
+        is("uniquemember,list_user,rw"));
+    assertThat(
+        "Should have applicationMapping",
+        realm.getMappings().get("applicationMapping").get("name"),
+        is("ou,String,rw"));
+  }
+
+  @Test
+  public void shouldHaveUsOneMapping() {
+    Realm realm = localFileConfig.load("test");
+    assertThat(
+        "Should have the userMapping",
+        realm.getUserStorages().get(0).getMappings().get("userMapping").get("firstName"),
+        is("givenname,String,rw"));
+    assertThat(
+        "Should have userMapping",
+        realm
+            .getUserStorages()
+            .get(0)
+            .getMappings()
+            .get("userMapping")
+            .get("attributes.insee_roles_applicatifs"),
+        is("inseeRoleApplicatif,list_string,rw"));
+
+    assertThat(
+        "Should have the organizationMapping",
+        realm
+            .getUserStorages()
+            .get(0)
+            .getMappings()
+            .get("organizationMapping")
+            .get("attributes.mail"),
+        is("mail,String,rw"));
+    assertThat(
+        "Should have organizationMapping",
+        realm.getUserStorages().get(0).getMappings().get("organizationMapping").get("address"),
+        is("inseeAdressePostaleDN,address,rw"));
+  }
 }

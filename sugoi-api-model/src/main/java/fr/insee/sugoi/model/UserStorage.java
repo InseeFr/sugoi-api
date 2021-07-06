@@ -22,6 +22,7 @@ public class UserStorage {
   private String organizationSource;
   private String addressSource;
   private Map<String, String> properties = new HashMap<>();
+  private Map<String, Map<String, String>> mappings = new HashMap<>();
 
   public String getName() {
     return this.name;
@@ -78,5 +79,13 @@ public class UserStorage {
         + ", userSource="
         + userSource
         + "]";
+  }
+
+  public void setMappings(Map<String, Map<String, String>> mappings) {
+    this.mappings = mappings;
+  }
+
+  public Map<String, Map<String, String>> getMappings() {
+    return mappings;
   }
 }
