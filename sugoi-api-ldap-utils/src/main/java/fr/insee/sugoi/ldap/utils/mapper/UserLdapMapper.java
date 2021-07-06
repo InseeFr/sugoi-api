@@ -16,7 +16,6 @@ package fr.insee.sugoi.ldap.utils.mapper;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
-import fr.insee.sugoi.ldap.utils.mapper.properties.UserLdap;
 import fr.insee.sugoi.model.User;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,28 +26,29 @@ public class UserLdapMapper implements LdapMapper<User> {
 
   Map<String, String> config;
   List<String> objectClasses;
+  Map<String, String> mapping;
 
-  public UserLdapMapper(Map<String, String> config) {
+  public UserLdapMapper(Map<String, String> config, Map<String, String> mapping) {
     this.config = config;
     if (config.get(LdapConfigKeys.USER_OBJECT_CLASSES) != null) {
       objectClasses = Arrays.asList(config.get(LdapConfigKeys.USER_OBJECT_CLASSES).split(","));
     }
+    this.mapping = mapping;
   }
 
   @Override
   public User mapFromAttributes(Collection<Attribute> attributes) {
-    return GenericLdapMapper.mapLdapAttributesToObject(
-        attributes, UserLdap.class, User.class, config);
+    return GenericLdapMapper.mapLdapAttributesToObject(attributes, User.class, config, mapping);
   }
 
   @Override
   public List<Attribute> mapToAttributes(User u) {
     return GenericLdapMapper.mapObjectToLdapAttributes(
-        u, UserLdap.class, User.class, config, objectClasses);
+        u, User.class, config, mapping, objectClasses);
   }
 
   @Override
   public List<Modification> createMods(User updatedUser) {
-    return GenericLdapMapper.createMods(updatedUser, UserLdap.class, User.class, config);
+    return GenericLdapMapper.createMods(updatedUser, User.class, config, mapping);
   }
 }

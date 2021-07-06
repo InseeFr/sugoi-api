@@ -88,6 +88,43 @@ public class LdapWriterStoreTest {
         LdapConfigKeys.USER_OBJECT_CLASSES,
         "top,inseeContact,inseeAttributsHabilitation,inseeAttributsCommunication");
     us.addProperty(LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES, "top,inseeOrganisation");
+    Map<String, Map<String, String>> mappings = new HashMap<>();
+
+    Map<String, String> userMapping = new HashMap<>();
+    userMapping.put("username", "uid,String,rw");
+    userMapping.put("lastName", "sn,String,rw");
+    userMapping.put("mail", "mail,String,rw");
+    userMapping.put("firstName", "givenname,String,rw");
+    userMapping.put("attributes.common_name", "cn,String,rw");
+    userMapping.put("attributes.personal_title", "personalTitle,String,rw");
+    userMapping.put("attributes.description", "description,String,rw");
+    userMapping.put("attributes.phone_number", "telephoneNumber,String,rw");
+    userMapping.put("habilitations", "inseeGroupeDefaut,list_habilitation,rw");
+    userMapping.put("organization", "inseeOrganisationDN,organization,rw");
+    userMapping.put("address", "inseeAdressePostaleDN,address,rw");
+    userMapping.put("groups", "memberOf,list_group,ro");
+    userMapping.put("attributes.insee_roles_applicatifs", "inseeRoleApplicatif,list_string,rw");
+    userMapping.put("attributes.common_name", "cn,String,rw");
+    userMapping.put("attributes.additionalMail", "inseeMailCorrespondant,String,rw");
+    Map<String, String> organizationMapping = new HashMap<>();
+    organizationMapping.put("identifiant", "uid,String,rw");
+    organizationMapping.put("attributes.description", "description,String,rw");
+    organizationMapping.put("attributes.mail", "mail,String,rw");
+    organizationMapping.put("address", "inseeAdressePostaleDN,address,rw");
+    organizationMapping.put("organization", "inseeOrganisationDN,organization,rw");
+    Map<String, String> applicationMapping = new HashMap<>();
+    applicationMapping.put("name", "ou,String,rw");
+    Map<String, String> groupMapping = new HashMap<>();
+    groupMapping.put("name", "cn,String,rw");
+    groupMapping.put("description", "description,String,rw");
+    groupMapping.put("users", "uniquemember,list_user,rw");
+
+    mappings.put("userMapping", userMapping);
+    mappings.put("organizationMapping", organizationMapping);
+    mappings.put("applicationMapping", applicationMapping);
+    mappings.put("groupMapping", groupMapping);
+
+    us.setMappings(mappings);
     return us;
   }
 
@@ -100,6 +137,18 @@ public class LdapWriterStoreTest {
     realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, appManagedAttributeKey);
     realm.addProperty(
         GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, appManagedAttributePattern);
+
+    Map<String, Map<String, String>> mappings = new HashMap<>();
+    Map<String, String> applicationMapping = new HashMap<>();
+    applicationMapping.put("name", "ou,String,rw");
+    Map<String, String> groupMapping = new HashMap<>();
+    groupMapping.put("name", "cn,String,rw");
+    groupMapping.put("description", "description,String,rw");
+    groupMapping.put("users", "uniquemember,list_user,rw");
+    mappings.put("applicationMapping", applicationMapping);
+    mappings.put("groupMapping", groupMapping);
+    realm.setMappings(mappings);
+
     return realm;
   }
 

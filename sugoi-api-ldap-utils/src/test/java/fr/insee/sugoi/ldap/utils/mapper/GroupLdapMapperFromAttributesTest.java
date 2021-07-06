@@ -37,7 +37,11 @@ public class GroupLdapMapperFromAttributesTest {
     Map<String, String> config = new HashMap<>();
     config.put("address_source", "ou=address,o=insee,c=fr");
     config.put("organization_source", "ou=organisations,ou=clients_domaine1,o=insee,c=fr");
-    groupLdapMapper = new GroupLdapMapper(config);
+    Map<String, String> mapping = new HashMap<>();
+    groupLdapMapper = new GroupLdapMapper(config, mapping);
+    mapping.put("name", "cn,String,rw");
+    mapping.put("description", "description,String,rw");
+    mapping.put("users", "uniquemember,list_user,rw");
   }
 
   @Test

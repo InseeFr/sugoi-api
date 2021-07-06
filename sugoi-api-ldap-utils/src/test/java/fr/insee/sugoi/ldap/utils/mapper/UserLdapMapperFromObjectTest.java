@@ -44,7 +44,23 @@ public class UserLdapMapperFromObjectTest {
     config.put("organization_source", "ou=organisations,o=insee,c=fr");
     config.put("address_source", "ou=address,o=insee,c=fr");
     config.put(LdapConfigKeys.USER_OBJECT_CLASSES, "top,person");
-    userLdapMapper = new UserLdapMapper(config);
+    Map<String, String> mapping = new HashMap<>();
+    mapping.put("username", "uid,String,rw");
+    mapping.put("lastName", "sn,String,rw");
+    mapping.put("mail", "mail,String,rw");
+    mapping.put("firstName", "givenname,String,rw");
+    mapping.put("attributes.common_name", "cn,String,rw");
+    mapping.put("attributes.personal_title", "personalTitle,String,rw");
+    mapping.put("attributes.description", "description,String,rw");
+    mapping.put("attributes.phone_number", "telephoneNumber,String,rw");
+    mapping.put("habilitations", "inseeGroupeDefaut,list_habilitation,rw");
+    mapping.put("organization", "inseeOrganisationDN,organization,rw");
+    mapping.put("address", "inseeAdressePostaleDN,address,rw");
+    mapping.put("groups", "memberOf,list_group,ro");
+    mapping.put("attributes.insee_roles_applicatifs", "inseeRoleApplicatif,list_string,rw");
+    mapping.put("attributes.common_name", "cn,String,rw");
+    mapping.put("metadatas.modifyTimestamp", "modifyTimestamp,String,ro");
+    userLdapMapper = new UserLdapMapper(config, mapping);
 
     user = new User();
   }
@@ -81,7 +97,7 @@ public class UserLdapMapperFromObjectTest {
         mappedAttributes.stream()
             .anyMatch(
                 attribute ->
-                    attribute.getName().equals("givenName")
+                    attribute.getName().equalsIgnoreCase("givenName")
                         && attribute.getValue().equals("Toto")));
     assertThat(
         "Should have mail",

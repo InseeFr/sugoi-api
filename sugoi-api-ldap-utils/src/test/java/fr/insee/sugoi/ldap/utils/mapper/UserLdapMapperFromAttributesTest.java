@@ -40,7 +40,21 @@ public class UserLdapMapperFromAttributesTest {
     config.put(
         "group_source_pattern",
         "ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr");
-    userLdapMapper = new UserLdapMapper(config);
+    Map<String, String> mapping = new HashMap<>();
+    mapping.put("username", "uid,String,rw");
+    mapping.put("lastName", "sn,String,rw");
+    mapping.put("mail", "mail,String,rw");
+    mapping.put("firstName", "givenname,String,rw");
+    mapping.put("attributes.common_name", "cn,String,rw");
+    mapping.put("attributes.personal_title", "personalTitle,String,rw");
+    mapping.put("attributes.description", "description,String,rw");
+    mapping.put("attributes.phone_number", "telephoneNumber,String,rw");
+    mapping.put("habilitations", "inseeGroupeDefaut,list_habilitation,rw");
+    mapping.put("organization", "inseeOrganisationDN,organization,rw");
+    mapping.put("address", "inseeAdressePostaleDN,address,rw");
+    mapping.put("groups", "memberOf,list_group,ro");
+    mapping.put("attributes.insee_roles_applicatifs", "inseeRoleApplicatif,list_string,rw");
+    userLdapMapper = new UserLdapMapper(config, mapping);
   }
 
   @Test

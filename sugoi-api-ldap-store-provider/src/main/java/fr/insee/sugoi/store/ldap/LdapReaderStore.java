@@ -45,16 +45,17 @@ import java.util.stream.Collectors;
 
 public class LdapReaderStore extends LdapStore implements ReaderStore {
 
-  public LdapReaderStore(Map<String, String> config) {
+  public LdapReaderStore(Map<String, String> config, Map<String, Map<String, String>> mappings) {
     logger.debug("Configuring LdapReaderStore with config : {}", config);
     try {
       this.ldapPoolConnection = LdapFactory.getConnectionPool(config);
       this.ldapMonoConnection = LdapFactory.getSingleConnection(config);
       this.config = config;
-      userLdapMapper = new UserLdapMapper(config);
-      organizationLdapMapper = new OrganizationLdapMapper(config);
-      groupLdapMapper = new GroupLdapMapper(config);
-      applicationLdapMapper = new ApplicationLdapMapper(config);
+      userLdapMapper = new UserLdapMapper(config, mappings.get("userMapping"));
+      organizationLdapMapper =
+          new OrganizationLdapMapper(config, mappings.get("organizationMapping"));
+      groupLdapMapper = new GroupLdapMapper(config, mappings.get("groupMapping"));
+      applicationLdapMapper = new ApplicationLdapMapper(config, mappings.get("applicationMapping"));
       addressLdapMapper = new AddressLdapMapper(config);
     } catch (LDAPException e) {
       throw new RuntimeException(e);
