@@ -23,6 +23,7 @@ import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,5 +153,52 @@ public class LdapRealmProviderWriteTest {
         "Url should have changed",
         ldapRealmProviderDAOImpl.load("tomodify").getUrl(),
         is("new_url"));
+  }
+
+  @Test
+  public void addApplicationMappingTest() {
+    Realm realmToModify = ldapRealmProviderDAOImpl.load("tomodify");
+    if (!realmToModify.getMappings().containsKey("applicationMapping")) {
+      realmToModify.getMappings().put("applicationMapping", new HashMap<>());
+    }
+    realmToModify.getMappings().get("applicationMapping").put("name", "ou,String,rw");
+    ldapRealmProviderDAOImpl.updateRealm(realmToModify);
+    assertThat(
+        "Application mapping should have a name",
+        ldapRealmProviderDAOImpl
+            .load("tomodify")
+            .getMappings()
+            .get("applicationMapping")
+            .get("name"),
+        is("ou,String,rw"));
+  }
+
+  @Test
+  public void addOrganizationMappingTest() {
+    Realm realmToModify = ldapRealmProviderDAOImpl.load("tomodify");
+    if (!realmToModify.getUserStorages().get(0).getMappings().containsKey("organizationMapping")) {
+      realmToModify
+          .getUserStorages()
+          .get(0)
+          .getMappings()
+          .put("organizationMapping", new HashMap<>());
+    }
+    realmToModify
+        .getUserStorages()
+        .get(0)
+        .getMappings()
+        .get("organizationMapping")
+        .put("address", "inseeAdressePostaleDN,address,rw");
+    ldapRealmProviderDAOImpl.updateRealm(realmToModify);
+    assertThat(
+        "Organization mapping should have an address",
+        ldapRealmProviderDAOImpl
+            .load("tomodify")
+            .getUserStorages()
+            .get(0)
+            .getMappings()
+            .get("organizationMapping")
+            .get("address"),
+        is("inseeAdressePostaleDN,address,rw"));
   }
 }

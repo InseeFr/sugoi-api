@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -171,5 +172,48 @@ public class LocalFileWriteRealmTest {
     realmToModify.setUrl("new_url");
     localFileConfig.updateRealm(realmToModify);
     assertThat("Url should have changed", localFileConfig.load("tomodify").getUrl(), is("new_url"));
+  }
+
+  @Test
+  public void addApplicationMappingTest() {
+    Realm realmToModify = localFileConfig.load("tomodify");
+    if (!realmToModify.getMappings().containsKey("applicationMapping")) {
+      realmToModify.getMappings().put("applicationMapping", new HashMap<>());
+    }
+    realmToModify.getMappings().get("applicationMapping").put("name", "ou,String,rw");
+    localFileConfig.updateRealm(realmToModify);
+    assertThat(
+        "Application mapping should have a name",
+        localFileConfig.load("tomodify").getMappings().get("applicationMapping").get("name"),
+        is("ou,String,rw"));
+  }
+
+  @Test
+  public void addOrganizationMappingTest() {
+    Realm realmToModify = localFileConfig.load("tomodify");
+    if (!realmToModify.getUserStorages().get(0).getMappings().containsKey("organizationMapping")) {
+      realmToModify
+          .getUserStorages()
+          .get(0)
+          .getMappings()
+          .put("organizationMapping", new HashMap<>());
+    }
+    realmToModify
+        .getUserStorages()
+        .get(0)
+        .getMappings()
+        .get("organizationMapping")
+        .put("address", "inseeAdressePostaleDN,address,rw");
+    localFileConfig.updateRealm(realmToModify);
+    assertThat(
+        "Organization mapping should have an address",
+        localFileConfig
+            .load("tomodify")
+            .getUserStorages()
+            .get(0)
+            .getMappings()
+            .get("organizationMapping")
+            .get("address"),
+        is("inseeAdressePostaleDN,address,rw"));
   }
 }

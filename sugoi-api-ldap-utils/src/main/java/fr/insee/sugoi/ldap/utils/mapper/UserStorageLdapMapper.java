@@ -20,6 +20,7 @@ import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +49,22 @@ public class UserStorageLdapMapper {
                   }
                   if (property[0].equalsIgnoreCase("groupFilterPattern")) {
                     userStorage.addProperty("group_filter_pattern", property[1]);
+                  }
+                  if (property[0].equalsIgnoreCase("userMapping")
+                      || property[0].equalsIgnoreCase("organizationMapping")) {
+                    // ex with userMapping$username:uid,string,rw
+                    if (!userStorage.getMappings().containsKey(property[0])) {
+                      userStorage
+                          .getMappings()
+                          .put(property[0], new HashMap<>()); // add a map userMapping
+                    }
+                    String[] attributeSplits = property[1].split(":");
+                    String attributeName = attributeSplits[0]; // username
+                    String attributeMappingValues = attributeSplits[1]; // uid,string,rw
+                    userStorage
+                        .getMappings()
+                        .get(property[0])
+                        .put(attributeName, attributeMappingValues);
                   }
                   if (property[0].equalsIgnoreCase(LdapConfigKeys.USER_OBJECT_CLASSES)) {
                     userStorage.addProperty(LdapConfigKeys.USER_OBJECT_CLASSES, property[1]);
@@ -113,6 +130,18 @@ public class UserStorageLdapMapper {
               String.format(
                   "groupFilterPattern$%s",
                   userStorage.getProperties().get("group_filter_pattern"))));
+    }
+    for (String entityKey : userStorage.getMappings().keySet()) {
+      for (String attributeName : userStorage.getMappings().get(entityKey).keySet()) {
+        attributes.add(
+            new Attribute(
+                "inseepropriete",
+                String.format(
+                    "%s$%s:%s",
+                    entityKey,
+                    attributeName,
+                    userStorage.getMappings().get(entityKey).get(attributeName))));
+      }
     }
     return attributes;
   }

@@ -21,6 +21,7 @@ import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Realm;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /** ProfilContextMapper */
@@ -53,6 +54,15 @@ public class RealmLdapMapper {
           realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, property[1]);
         } else if (property[0].equalsIgnoreCase("sort_key")) {
           realm.addProperty(LdapConfigKeys.SORT_KEY, property[1]);
+        } else if (property[0].equalsIgnoreCase("groupMapping")
+            || property[0].equalsIgnoreCase("applicationMapping")) {
+          if (!realm.getMappings().containsKey(property[0])) {
+            realm.getMappings().put(property[0], new HashMap<>());
+          }
+          String[] attributeSplits = property[1].split(":");
+          String attributeName = attributeSplits[0];
+          String attributeMappingValues = attributeSplits[1];
+          realm.getMappings().get(property[0]).put(attributeName, attributeMappingValues);
         }
       }
     }
@@ -79,6 +89,19 @@ public class RealmLdapMapper {
                 attributes.add(
                     new Attribute(
                         "inseepropriete", String.format("%s$%s", propertyName, propertyValue))));
+    for (String entityKey : realm.getMappings().keySet()) {
+      for (String attributeName : realm.getMappings().get(entityKey).keySet()) {
+        attributes.add(
+            new Attribute(
+                "inseepropriete",
+                String.format(
+                    "%s$%s:%s",
+                    entityKey,
+                    attributeName,
+                    realm.getMappings().get(entityKey).get(attributeName))));
+      }
+    }
+
     return attributes;
   }
 

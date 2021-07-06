@@ -23,6 +23,7 @@ public class Realm {
   private String appSource;
   private List<UserStorage> userStorages;
   private Map<String, String> properties = new HashMap<>();
+  private Map<String, Map<String, String>> mappings = new HashMap<>();
   private String readerType;
   private String writerType;
 
@@ -97,5 +98,13 @@ public class Realm {
 
   public void setWriterType(String writerType) {
     this.writerType = writerType;
+  }
+
+  public void setMappings(Map<String, Map<String, String>> mappings) {
+    this.mappings = mappings;
+  }
+
+  public Map<String, Map<String, String>> getMappings() {
+    return mappings;
   }
 }

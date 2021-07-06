@@ -40,6 +40,8 @@ These configurations are used for all type of Store Provider.
 | properties   |                    See next section                    |                                                yes |                                                                                                               {}  | A list of other options which can be specific to the type of Store Provider.                                         |
 | readerType   |          "LdapReaderStore", "FileReaderStore"          |                                                 no |   the default can be set via the instance property : fr.insee.sugoi.store.readerType, if not set app cannot work  | Indicates wich type of store is used for reading. This attribute is read-only for now and should be set via default. |
 | writeType    | "JMSWriterStore", "LdapWriterStore", "FileWriterStore" |                                                 no |  the default can be set via the instance property : fr.insee.sugoi.store.writerType?, if not set app cannot work  | Indicates wich type of store is used for writing. This attribute is read-only for now and should be set via default. |
+| mappings | see mappings section | yes | see mappings section |  Description of how to map Sugoi application and group attributes with ldap attributes when using a ldap store provider |
+
 ### Realm configuration properties
 
 | Field name                          |                      Example                      |                                                                                Optional | Default | Description                                                                                                                                                                                                                |
@@ -66,6 +68,7 @@ These configuration should be set for each UserStorage contained in a Realm :
 | properties         |                                                                               |                         might be needed depending on the type of store (see next sections) |                                                                                      | A list of other options which can be specific to the type of Store Provider.                                                                            |
 | readerType         |                     "LdapReaderStore", "FileReaderStore"                      |                                                                                         no |  the default can be set via the instance property : fr.insee.sugoi.store.readerType  | Indicates wich type of store is used for reading. This attribute is read-only for now and should be set via default.                                    |
 | writeType          |            "JMSWriterStore", "LdapWriterStore", "FileWriterStore"             |                                                                                         no |  the default can be set via the instance property : fr.insee.sugoi.store.writerType  | Indicates wich type of store is used for writing. This attribute is read-only for now and should be set via default.                                    |
+| mappings | see mappings section | should be set when using a ldap store provider | see mappings section |  Description of how to map Sugoi user and organization attributes with ldap attributes when using a ldap store provider |
 
 ### Userstorage properties with a LDAP Store Provider
 
@@ -80,3 +83,38 @@ With an LDAP Store Provider the properties can be :
 | group_object_class |"top,groupOfUniqueNames" |      yes | value of property fr.insee.sugoi.ldap.default.group-object-classes or top,groupOfUniqueNames | Object classes to put on a new group in ldap storage
 | application_object_class |"top,organizationalUnit" |      yes | value of property fr.insee.sugoi.ldap.default.application-object-classes or top,organizationalUnit| Object classes to put on a new application in ldap storage
 | address_object_class |"top,locality" |      yes | value of property fr.insee.sugoi.ldap.default.adress-object-classes or top,locality | Object classes to put on a new address in ldap storage **not supported yet**
+
+## Realm and Userstorage mappings with a LDAP Store Provider
+
+When using a ldap store provider, the administrator should set how it expects to map the sugoi value with the ldap attributes. For example, in a userstorage one might want to have the name of the user to be "cn" while in an other userstorage it'd rather be "sn".
+The configuration should be done for users and for organizations, groups and applications if these features are intended to be used.
+
+For each of these objects a list of mapping must be set.
+
+A mapping is described as a key value with value "[name of the sugoi attribute in the object] and key [attribute name in ldap],[type of the object in sugoi (see available list of type)],[ro or rw depending on if the attribute can be modified]
+
+To set an attribute in the metadatas or attributes map of an objet the name of the sugoi attribute should be metadatas.myField or attributes.myField. Thus no other dot is allowed in a sugoi attribute name.
+
+Type of attribute can be :
+
+- string
+- organization
+- address
+- list_habilitation
+- list_user
+- list_group
+- list_string
+
+Mapping is to be set at the userstorage level for users and organizations and at the realm level for groupes and applications.
+
+In the realm mappings map :
+|  Key                 |                               Example                                | Optional |                                                                                             Default | Description                                                                                                                                                                                 |
+| -------------------- | :------------------------------------------------------------------: | -------: | --------------------------------------------------------------------------------------------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| userMapping | {"username": "uid,String,rw", "groups": "memberOf,list_group,ro", "habilitations": "inseeGroupeDefaut,list_habilitation,rw"} | should be set when using an ldap store provider | List of mappings between sugoi user attributes and ldap attributes | parsed from the value of property fr.insee.sugoi.ldap.default.user-mapping |
+| organizationMapping | {"identifiant": "uid,String,rw", "address": "inseeAdressePostaleDN,address,rw","organization": "inseeOrganisationDN,organization,rw"} | yes | List of mappings between sugoi organization attributes and ldap attributes | parsed from the value of property fr.insee.sugoi.ldap.default.organization-mapping |
+
+In the userstorage mappings map :
+|  Key                 |                               Example                                | Optional |                                                                                             Default | Description                                                                                                                                                                                 |
+| -------------------- | :------------------------------------------------------------------: | -------: | --------------------------------------------------------------------------------------------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| groupMapping | {"name": "cn,String,rw","description": "description,String,rw",users": "uniquemember,list_user,rw"} | yes | List of mappings between sugoi group attributes and ldap attributes | parsed from the value of property fr.insee.sugoi.ldap.default.group-mapping |
+| applicationMapping | {"name": "ou,String,rw"} | yes | List of mappings between sugoi application attributes and ldap attributes | parsed from the value of property fr.insee.sugoi.ldap.default.application-mapping |
