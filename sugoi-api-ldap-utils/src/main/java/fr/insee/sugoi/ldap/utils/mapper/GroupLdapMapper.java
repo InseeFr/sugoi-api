@@ -16,7 +16,6 @@ package fr.insee.sugoi.ldap.utils.mapper;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
-import fr.insee.sugoi.ldap.utils.mapper.properties.GroupLdap;
 import fr.insee.sugoi.model.Group;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,28 +26,29 @@ public class GroupLdapMapper implements LdapMapper<Group> {
 
   Map<String, String> config;
   List<String> objectClasses;
+  Map<String, String> mapping;
 
-  public GroupLdapMapper(Map<String, String> config) {
+  public GroupLdapMapper(Map<String, String> config, Map<String, String> mapping) {
     this.config = config;
     if (config.get(LdapConfigKeys.GROUP_OBJECT_CLASSES) != null) {
       objectClasses = Arrays.asList(config.get(LdapConfigKeys.GROUP_OBJECT_CLASSES).split(","));
     }
+    this.mapping = mapping;
   }
 
   @Override
   public Group mapFromAttributes(Collection<Attribute> attributes) {
-    return GenericLdapMapper.mapLdapAttributesToObject(
-        attributes, GroupLdap.class, Group.class, config);
+    return GenericLdapMapper.mapLdapAttributesToObject(attributes, Group.class, config, mapping);
   }
 
   @Override
   public List<Attribute> mapToAttributes(Group group) {
     return GenericLdapMapper.mapObjectToLdapAttributes(
-        group, GroupLdap.class, Group.class, config, objectClasses);
+        group, Group.class, config, mapping, objectClasses);
   }
 
   @Override
   public List<Modification> createMods(Group updatedGroup) {
-    return GenericLdapMapper.createMods(updatedGroup, GroupLdap.class, Group.class, config);
+    return GenericLdapMapper.createMods(updatedGroup, Group.class, config, mapping);
   }
 }

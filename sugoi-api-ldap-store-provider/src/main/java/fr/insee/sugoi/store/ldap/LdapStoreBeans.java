@@ -17,6 +17,7 @@ import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -63,18 +64,32 @@ public class LdapStoreBeans {
   @Value("${fr.insee.sugoi.ldap.default.address-object-classes:top,locality}")
   private String defaultAddressObjectClasses;
 
+  @Value("#{'${fr.insee.sugoi.ldap.default.user-mapping}'.split(';')}")
+  private List<String> defaultUserMapping;
+
+  @Value("#{'${fr.insee.sugoi.ldap.default.organization-mapping}'.split(';')}")
+  private List<String> defaultOrganizationMapping;
+
+  @Value("#{'${fr.insee.sugoi.ldap.default.group-mapping}'.split(';')}")
+  private List<String> defaultGroupMapping;
+
+  @Value("#{'${fr.insee.sugoi.ldap.default.application-mapping}'.split(';')}")
+  private List<String> defaultApplicationMapping;
+
   @Bean("LdapReaderStore")
   @Lazy
   @Scope("prototype")
   public LdapReaderStore ldapReaderStore(Realm realm, UserStorage userStorage) {
-    return new LdapReaderStore(generateConfig(realm, userStorage));
+    return new LdapReaderStore(
+        generateConfig(realm, userStorage), getCompleteMapping(realm, userStorage));
   }
 
   @Bean("LdapWriterStore")
   @Lazy
   @Scope("prototype")
   public LdapWriterStore ldapWriterStore(Realm realm, UserStorage userStorage) {
-    return new LdapWriterStore(generateConfig(realm, userStorage));
+    return new LdapWriterStore(
+        generateConfig(realm, userStorage), getCompleteMapping(realm, userStorage));
   }
 
   public Map<String, String> generateConfig(Realm realm, UserStorage userStorage) {
@@ -134,5 +149,51 @@ public class LdapStoreBeans {
             : defaultAddressObjectClasses);
 
     return config;
+  }
+
+  public Map<String, Map<String, String>> getCompleteMapping(Realm realm, UserStorage userStorage) {
+    Map<String, Map<String, String>> resultMappings = new HashMap<>();
+    if (!userStorage.getMappings().containsKey("userMapping")) {
+      Map<String, String> mapping = new HashMap<>();
+      for (String mappingInstruction : defaultUserMapping) {
+        String[] mappingInstructionSplit = mappingInstruction.split(":");
+        mapping.put(mappingInstructionSplit[0], mappingInstructionSplit[1]);
+      }
+      resultMappings.put("userMapping", mapping);
+    } else {
+      resultMappings.put("userMapping", userStorage.getMappings().get("userMapping"));
+    }
+    if (!userStorage.getMappings().containsKey("organizationMapping")) {
+      Map<String, String> mapping = new HashMap<>();
+      for (String mappingInstruction : defaultOrganizationMapping) {
+        String[] mappingInstructionSplit = mappingInstruction.split(":");
+        mapping.put(mappingInstructionSplit[0], mappingInstructionSplit[1]);
+      }
+      resultMappings.put("organizationMapping", mapping);
+    } else {
+      resultMappings.put(
+          "organizationMapping", userStorage.getMappings().get("organizationMapping"));
+    }
+    if (!realm.getMappings().containsKey("applicationMapping")) {
+      Map<String, String> mapping = new HashMap<>();
+      for (String mappingInstruction : defaultApplicationMapping) {
+        String[] mappingInstructionSplit = mappingInstruction.split(":");
+        mapping.put(mappingInstructionSplit[0], mappingInstructionSplit[1]);
+      }
+      resultMappings.put("applicationMapping", mapping);
+    } else {
+      resultMappings.put("applicationMapping", realm.getMappings().get("applicationMapping"));
+    }
+    if (!realm.getMappings().containsKey("groupMapping")) {
+      Map<String, String> mapping = new HashMap<>();
+      for (String mappingInstruction : defaultGroupMapping) {
+        String[] mappingInstructionSplit = mappingInstruction.split(":");
+        mapping.put(mappingInstructionSplit[0], mappingInstructionSplit[1]);
+      }
+      resultMappings.put("groupMapping", mapping);
+    } else {
+      resultMappings.put("groupMapping", realm.getMappings().get("groupMapping"));
+    }
+    return resultMappings;
   }
 }

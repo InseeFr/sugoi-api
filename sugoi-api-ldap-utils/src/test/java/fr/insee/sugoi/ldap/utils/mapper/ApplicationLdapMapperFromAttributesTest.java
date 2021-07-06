@@ -37,7 +37,9 @@ public class ApplicationLdapMapperFromAttributesTest {
     Map<String, String> config = new HashMap<>();
     config.put("address_source", "ou=address,o=insee,c=fr");
     config.put("app_source", "ou=organisations,ou=clients_domaine1,o=inese,c=fr");
-    applicationLdapMapper = new ApplicationLdapMapper(config);
+    Map<String, String> mapping = new HashMap<>();
+    applicationLdapMapper = new ApplicationLdapMapper(config, mapping);
+    mapping.put("name", "ou,String,rw");
   }
 
   @Test

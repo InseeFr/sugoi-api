@@ -37,7 +37,13 @@ public class OrganizationLdapMapperFromObjectTest {
     Map<String, String> config = new HashMap<>();
     config.put("organization_source", "ou=organisations,o=insee,c=fr");
     config.put("address_source", "ou=address,o=insee,c=fr");
-    organizationLdapMapper = new OrganizationLdapMapper(config);
+    Map<String, String> mapping = new HashMap<>();
+    mapping.put("identifiant", "uid,String,rw");
+    mapping.put("attributes.description", "description,String,rw");
+    mapping.put("attributes.mail", "mail,String,rw");
+    mapping.put("address", "inseeAdressePostaleDN,address,rw");
+    mapping.put("organization", "inseeOrganisationDN,organization,rw");
+    organizationLdapMapper = new OrganizationLdapMapper(config, mapping);
 
     organization = new Organization();
   }

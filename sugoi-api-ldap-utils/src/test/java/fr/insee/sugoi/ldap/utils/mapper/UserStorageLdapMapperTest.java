@@ -20,6 +20,9 @@ import com.unboundid.ldap.sdk.Attribute;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -67,5 +70,77 @@ public class UserStorageLdapMapperTest {
         "Should have group filter pattern",
         userStorage.getProperties().get("group_filter_pattern"),
         is("(cn={group}_{appliname})"));
+  }
+
+  @Test
+  public void getUserStorageMappingFromAttributes() {
+    String[] values = {
+      "userMapping$username:uid,string,rw",
+      "organizationMapping$mail:mail,String,rw",
+      "userMapping$mail:mail,String,rw",
+    };
+    Attribute cnAttribute = new Attribute("cn", "userStorageName");
+    Attribute inseeProprieteAttributes = new Attribute("inseepropriete", values);
+    UserStorage userStorage =
+        UserStorageLdapMapper.mapFromAttributes(List.of(inseeProprieteAttributes, cnAttribute));
+    assertThat(
+        "Only userMapping and organizationMapping are in the map of map",
+        userStorage.getMappings().size(),
+        is(2));
+    assertThat(
+        "userMapping should have a username mapping",
+        userStorage.getMappings().get("userMapping").get("username"),
+        is("uid,string,rw"));
+    assertThat(
+        "userMapping should have a mail mapping",
+        userStorage.getMappings().get("userMapping").get("mail"),
+        is("mail,String,rw"));
+    assertThat(
+        "organizationMapping should have a mail mapping",
+        userStorage.getMappings().get("organizationMapping").get("mail"),
+        is("mail,String,rw"));
+  }
+
+  @Test
+  public void getMappingAttributesFromUserStorage() {
+    UserStorage userStorage = new UserStorage();
+    Map<String, String> usermapping = new HashMap<>();
+    Map<String, String> organizationmapping = new HashMap<>();
+    usermapping.put("username", "uid,String,rw");
+    usermapping.put("lastName", "sn,String,rw");
+    organizationmapping.put("firstName", "givenname,String,rw");
+    Map<String, Map<String, String>> mappings = new HashMap<>();
+    mappings.put("userMapping", usermapping);
+    mappings.put("organizationMapping", organizationmapping);
+    userStorage.setMappings(mappings);
+    List<Attribute> attributes = UserStorageLdapMapper.mapToAttributes(userStorage);
+    assertThat(
+        "Should have inseePropriete with username",
+        attributes.stream()
+            .anyMatch(
+                attribute ->
+                    attribute.getName().equalsIgnoreCase("inseepropriete")
+                        && attribute
+                            .getValue()
+                            .equalsIgnoreCase("userMapping$username:uid,String,rw")));
+    assertThat(
+        "Should have inseePropriete with lastname",
+        attributes.stream()
+            .anyMatch(
+                attribute ->
+                    attribute.getName().equalsIgnoreCase("inseepropriete")
+                        && attribute
+                            .getValue()
+                            .equalsIgnoreCase("userMapping$lastName:sn,String,rw")));
+    assertThat(
+        "Should have inseepropriete with firstname",
+        attributes.stream()
+            .anyMatch(
+                attribute ->
+                    attribute.getName().equalsIgnoreCase("inseepropriete")
+                        && attribute
+                            .getValue()
+                            .equalsIgnoreCase(
+                                "organizationMapping$firstName:givenname,String,rw")));
   }
 }

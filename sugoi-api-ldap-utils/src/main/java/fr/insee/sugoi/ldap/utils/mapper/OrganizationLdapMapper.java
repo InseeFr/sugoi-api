@@ -16,7 +16,6 @@ package fr.insee.sugoi.ldap.utils.mapper;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
-import fr.insee.sugoi.ldap.utils.mapper.properties.OrganizationLdap;
 import fr.insee.sugoi.model.Organization;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,20 +26,22 @@ public class OrganizationLdapMapper implements LdapMapper<Organization> {
 
   Map<String, String> config;
   List<String> objectClasses;
+  Map<String, String> mapping;
 
-  public OrganizationLdapMapper(Map<String, String> config) {
+  public OrganizationLdapMapper(Map<String, String> config, Map<String, String> mapping) {
     this.config = config;
     if (config.get(LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES) != null) {
       objectClasses =
           Arrays.asList(config.get(LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES).split(","));
     }
+    this.mapping = mapping;
   }
 
   @Override
   public Organization mapFromAttributes(Collection<Attribute> attributes) {
     Organization org =
         GenericLdapMapper.mapLdapAttributesToObject(
-            attributes, OrganizationLdap.class, Organization.class, config);
+            attributes, Organization.class, config, mapping);
     // org.setGpgkey(searchResultEntry.getAttribute("inseeClefChiffrement").getValueByteArray());
     return org;
   }
@@ -48,12 +49,11 @@ public class OrganizationLdapMapper implements LdapMapper<Organization> {
   @Override
   public List<Attribute> mapToAttributes(Organization organization) {
     return GenericLdapMapper.mapObjectToLdapAttributes(
-        organization, OrganizationLdap.class, Organization.class, config, objectClasses);
+        organization, Organization.class, config, mapping, objectClasses);
   }
 
   @Override
   public List<Modification> createMods(Organization updatedOrganization) {
-    return GenericLdapMapper.createMods(
-        updatedOrganization, OrganizationLdap.class, Organization.class, config);
+    return GenericLdapMapper.createMods(updatedOrganization, Organization.class, config, mapping);
   }
 }
