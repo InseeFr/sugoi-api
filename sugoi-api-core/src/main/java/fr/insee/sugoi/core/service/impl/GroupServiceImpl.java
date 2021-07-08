@@ -190,7 +190,6 @@ public class GroupServiceImpl implements GroupService {
     }
   }
 
-  // TODO attention il manque le userStorage du userId a ajouter
   @Override
   public ProviderResponse addUserToGroup(
       String realm,
@@ -204,8 +203,8 @@ public class GroupServiceImpl implements GroupService {
         User user =
             userService
                 .findById(realm, null, userId)
-                .orElseThrow(() -> new UserNotFoundException("message"));
-        storage = (String) user.getAttributes().get(GlobalKeysConfig.USERSTORAGE);
+                .orElseThrow(() -> new UserNotFoundException("Cannot find user in realm " + realm));
+        storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE);
       }
       ProviderResponse response =
           storeProvider
@@ -250,7 +249,7 @@ public class GroupServiceImpl implements GroupService {
             userService
                 .findById(realm, null, userId)
                 .orElseThrow(() -> new UserNotFoundException("message"));
-        storage = (String) user.getAttributes().get(GlobalKeysConfig.USERSTORAGE);
+        storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE);
       }
       ProviderResponse response =
           storeProvider

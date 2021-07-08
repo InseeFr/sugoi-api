@@ -70,7 +70,7 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.USER_ID, id);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    return CheckAndSend(Method.DELETE_USER, params, id, providerRequest);
+    return checkAndSend(Method.DELETE_USER, params, id, providerRequest);
   }
 
   @Override
@@ -79,7 +79,7 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.USER, user);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    return CheckAndSend(Method.CREATE_USER, params, user.getUsername(), providerRequest);
+    return checkAndSend(Method.CREATE_USER, params, user.getUsername(), providerRequest);
   }
 
   @Override
@@ -88,7 +88,7 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.USER, updatedUser);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    return CheckAndSend(Method.UPDATE_USER, params, updatedUser.getUsername(), providerRequest);
+    return checkAndSend(Method.UPDATE_USER, params, updatedUser.getUsername(), providerRequest);
   }
 
   @Override
@@ -99,7 +99,7 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.GROUP_NAME, groupName);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    return CheckAndSend(Method.DELETE_GROUP, params, groupName, providerRequest);
+    return checkAndSend(Method.DELETE_GROUP, params, groupName, providerRequest);
   }
 
   @Override
@@ -110,7 +110,7 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.GROUP, group);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    return CheckAndSend(Method.CREATE_GROUP, params, group.getName(), providerRequest);
+    return checkAndSend(Method.CREATE_GROUP, params, group.getName(), providerRequest);
   }
 
   @Override
@@ -121,7 +121,7 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.GROUP, updatedGroup);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    return CheckAndSend(Method.UPDATE_GROUP, params, updatedGroup.getName(), providerRequest);
+    return checkAndSend(Method.UPDATE_GROUP, params, updatedGroup.getName(), providerRequest);
   }
 
   @Override
@@ -130,7 +130,7 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.ORGANIZATION_NAME, name);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    return CheckAndSend(Method.DELETE_ORGANIZATION, params, name, providerRequest);
+    return checkAndSend(Method.DELETE_ORGANIZATION, params, name, providerRequest);
   }
 
   @Override
@@ -140,7 +140,7 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.ORGANIZATION, organization);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    return CheckAndSend(
+    return checkAndSend(
         Method.CREATE_ORGANIZATION, params, organization.getIdentifiant(), providerRequest);
   }
 
@@ -151,7 +151,7 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.ORGANIZATION, updatedOrganization);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    return CheckAndSend(
+    return checkAndSend(
         Method.UPDATE_ORGANIZATION, params, updatedOrganization.getIdentifiant(), providerRequest);
   }
 
@@ -164,7 +164,7 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.USER_ID, userId);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    return CheckAndSend(Method.DELETE_USER_FROM_GROUP, params, groupName, providerRequest);
+    return checkAndSend(Method.DELETE_USER_FROM_GROUP, params, groupName, providerRequest);
   }
 
   @Override
@@ -176,7 +176,7 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.USER_ID, userId);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    return CheckAndSend(Method.ADD_USER_TO_GROUP, params, groupName, providerRequest);
+    return checkAndSend(Method.ADD_USER_TO_GROUP, params, groupName, providerRequest);
   }
 
   @Override
@@ -193,7 +193,7 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.PASSWORD, password);
     params.put(JmsAtttributes.PASSWORD_CHANGE_REQUEST, pcr);
     params.put(JmsAtttributes.SEND_MODE, sendModes);
-    return CheckAndSend(Method.REINIT_PASSWORD, params, userId, providerRequest);
+    return checkAndSend(Method.REINIT_PASSWORD, params, userId, providerRequest);
   }
 
   @Override
@@ -210,7 +210,7 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
     params.put(JmsAtttributes.PASSWORD_CHANGE_REQUEST, pcr);
     params.put(JmsAtttributes.SEND_MODE, sendModes);
-    return CheckAndSend(Method.INIT_PASSWORD, params, userId, providerRequest);
+    return checkAndSend(Method.INIT_PASSWORD, params, userId, providerRequest);
   }
 
   @Override
@@ -220,7 +220,7 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.APPLICATION, application);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    return CheckAndSend(Method.CREATE_APPLICATION, params, application.getName(), providerRequest);
+    return checkAndSend(Method.CREATE_APPLICATION, params, application.getName(), providerRequest);
   }
 
   @Override
@@ -230,7 +230,7 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.APPLICATION, updatedApplication);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    return CheckAndSend(
+    return checkAndSend(
         Method.UPDATE_APPLICATION, params, updatedApplication.getName(), providerRequest);
   }
 
@@ -241,7 +241,7 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.APP_NAME, applicationName);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    return CheckAndSend(Method.DELETE_APPLICATION, params, applicationName, providerRequest);
+    return checkAndSend(Method.DELETE_APPLICATION, params, applicationName, providerRequest);
   }
 
   @Override
@@ -258,7 +258,7 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
     params.put(JmsAtttributes.PASSWORD_CHANGE_REQUEST, pcr);
-    return CheckAndSend(Method.CHANGE_PASSWORD, params, userId, providerRequest);
+    return checkAndSend(Method.CHANGE_PASSWORD, params, userId, providerRequest);
   }
 
   @Override
@@ -268,7 +268,7 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.USER_ID, userId);
     params.put(JmsAtttributes.ATTRIBUTE_KEY, attributeKey);
     params.put(JmsAtttributes.ATTRIBUTE_VALUE, attribute);
-    return CheckAndSend(Method.ADD_APP_MANAGED_ATTRIBUTE, params, userId, providerRequest);
+    return checkAndSend(Method.ADD_APP_MANAGED_ATTRIBUTE, params, userId, providerRequest);
   }
 
   @Override
@@ -280,10 +280,10 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.ATTRIBUTE_VALUE, attribute);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    return CheckAndSend(Method.DELETE_APP_MANAGED_ATTRIBUTE, params, userId, providerRequest);
+    return checkAndSend(Method.DELETE_APP_MANAGED_ATTRIBUTE, params, userId, providerRequest);
   }
 
-  private ProviderResponse CheckAndSend(
+  private ProviderResponse checkAndSend(
       String method, Map<String, Object> params, String entityId, ProviderRequest providerRequest) {
     ProviderResponse response = new ProviderResponse();
 
@@ -300,10 +300,14 @@ public class JmsWriterStore implements WriterStore {
         // We dont't care of the jmstemplate when checking for response we just care
         // about the queue name
         BrokerResponse br =
-            jmsWriter.checkResponseInQueueAsynchronous(
+            jmsWriter.checkResponseInQueueSynchronous(
                 providerRequest.isUrgent() ? queueUrgentResponseName : queueResponseName,
                 providerRequest.getTransactionId());
-
+        if (br == null) {
+          response.setStatus(ProviderResponseStatus.PENDING);
+          response.setRequestId(providerRequest.getTransactionId());
+          return response;
+        }
         response = br.getProviderResponse();
         if (response.getStatus() == ProviderResponseStatus.OK) {
           response.setStatus(ProviderResponseStatus.ACCEPTED);
@@ -343,7 +347,16 @@ public class JmsWriterStore implements WriterStore {
             jmsWriter.checkResponseInQueueSynchronous(
                 providerRequest.isUrgent() ? queueUrgentResponseName : queueResponseName,
                 correlationId);
+        // warn : br is null if no response in time
+
+        if (br == null) {
+          response.setStatus(ProviderResponseStatus.PENDING);
+          response.setRequestId(providerRequest.getTransactionId());
+          return response;
+        }
+
         response = br.getProviderResponse();
+
         if (response.getStatus() == ProviderResponseStatus.OK) {
           response.setStatus(ProviderResponseStatus.ACCEPTED);
         } else if (response.getStatus() == ProviderResponseStatus.KO) {

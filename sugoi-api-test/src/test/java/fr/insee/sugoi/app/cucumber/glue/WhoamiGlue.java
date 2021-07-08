@@ -20,19 +20,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.app.cucumber.utils.StepData;
 import fr.insee.sugoi.app.cucumber.utils.WhoamiView;
-import io.cucumber.java.Before;
-import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Then;
 
 public class WhoamiGlue {
   private StepData stepData;
-
-  private Scenario scenario;
-
-  @Before
-  public void before(Scenario scenario) {
-    this.scenario = scenario;
-  }
 
   public WhoamiGlue(StepData stepData) {
     this.stepData = stepData;

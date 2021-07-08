@@ -21,7 +21,6 @@ import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
-import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.core.service.CredentialsService;
 import fr.insee.sugoi.core.service.PasswordService;
@@ -36,9 +35,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-// TODO bien faire gaffe a cette classe toute les verifs ne sont pas faites au niveau du provider le
-// ldap doit checker que les configurations sont bien faites alors que le jms envoie la requete et
-// ne s'occupe de rien
 @Service
 public class CredentialsServiceImpl implements CredentialsService {
 
@@ -138,10 +134,11 @@ public class CredentialsServiceImpl implements CredentialsService {
       boolean newPasswordIsValid = validatePassword(pcr.getNewPassword(), realmProperties);
 
       if (newPasswordIsValid) {
-        storeProvider
-            .getWriterStore(realm, userStorage)
-            .changePassword(
-                userId, pcr.getOldPassword(), pcr.getNewPassword(), pcr, providerRequest);
+        ProviderResponse providerResponse =
+            storeProvider
+                .getWriterStore(realm, userStorage)
+                .changePassword(
+                    userId, pcr.getOldPassword(), pcr.getNewPassword(), pcr, providerRequest);
         sugoiEventPublisher.publishCustomEvent(
             realm,
             userStorage,
@@ -149,12 +146,10 @@ public class CredentialsServiceImpl implements CredentialsService {
             Map.ofEntries(
                 Map.entry(EventKeysConfig.PASSWORD_CHANGE_REQUEST, pcr),
                 Map.entry(EventKeysConfig.USER, userId)));
+        return providerResponse;
       } else {
         throw new PasswordPolicyNotMetException("New password is not valid");
       }
-      ProviderResponse response = new ProviderResponse();
-      response.setStatus(ProviderResponseStatus.OK);
-      return response;
     } catch (Exception e) {
       sugoiEventPublisher.publishCustomEvent(
           realm,

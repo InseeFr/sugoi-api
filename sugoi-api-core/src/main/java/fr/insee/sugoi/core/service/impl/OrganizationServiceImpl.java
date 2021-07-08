@@ -17,7 +17,7 @@ import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
-import fr.insee.sugoi.core.exceptions.OrganizationNotCreatedException;
+import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -78,13 +78,7 @@ public class OrganizationServiceImpl implements OrganizationService {
           Map.ofEntries(
               Map.entry(EventKeysConfig.ORGANIZATION, organization),
               Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw new OrganizationNotCreatedException(
-          "Cannot create organization "
-              + organization.getIdentifiant()
-              + " in realm "
-              + realm
-              + " because "
-              + e.toString());
+      throw e;
     }
   }
 
@@ -122,7 +116,11 @@ public class OrganizationServiceImpl implements OrganizationService {
           org.addMetadatas(EventKeysConfig.REALM, realm.toLowerCase());
           org.addMetadatas(EventKeysConfig.USERSTORAGE, storage.toLowerCase());
         } else {
-          Realm r = realmProvider.load(realm);
+          Realm r =
+              realmProvider
+                  .load(realm)
+                  .orElseThrow(
+                      () -> new RealmNotFoundException("The realm " + realm + " doesn't exist "));
           for (UserStorage us : r.getUserStorages()) {
             try {
               org = storeProvider.getReaderStore(realm, us.getName()).getOrganization(id);
@@ -177,7 +175,11 @@ public class OrganizationServiceImpl implements OrganizationService {
                 .getReaderStore(realm, storageName)
                 .searchOrganizations(organizationFilter, pageableResult, typeRecherche.name());
       } else {
-        Realm r = realmProvider.load(realm);
+        Realm r =
+            realmProvider
+                .load(realm)
+                .orElseThrow(
+                    () -> new RealmNotFoundException("The realm " + realm + " doesn't exist "));
         for (UserStorage us : r.getUserStorages()) {
           ReaderStore readerStore =
               storeProvider.getStoreForUserStorage(realm, us.getName()).getReader();
