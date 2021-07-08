@@ -16,6 +16,7 @@ package fr.insee.sugoi.config.file;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
+import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.model.Realm;
 import org.junit.jupiter.api.Test;
@@ -45,13 +46,31 @@ public class LocalFileRealmProviderDAO_realmsOneTest {
 
   @Test
   public void shouldFetchTestRealm() {
-    assertThat("We should have a realm test", localFileConfig.load("test").getName(), is("test"));
-    assertThat("We should have a realm TeSt", localFileConfig.load("TeSt").getName(), is("test"));
+    assertThat(
+        "We should have a realm test",
+        localFileConfig
+            .load("test")
+            .orElseThrow(
+                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "))
+            .getName(),
+        is("test"));
+    assertThat(
+        "We should have a realm TeSt",
+        localFileConfig
+            .load("TeSt")
+            .orElseThrow(
+                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "))
+            .getName(),
+        is("test"));
   }
 
   @Test
   public void shouldHaveTwoUserstorages() {
-    Realm realm = localFileConfig.load("test");
+    Realm realm =
+        localFileConfig
+            .load("test")
+            .orElseThrow(
+                () -> new RealmNotFoundException("The realm " + "realm" + " doesn't exist "));
     assertThat(
         "We should have a userstorage default",
         realm.getUserStorages().stream()
@@ -64,7 +83,11 @@ public class LocalFileRealmProviderDAO_realmsOneTest {
 
   @Test
   public void shouldHaveRealmMapping() {
-    Realm realm = localFileConfig.load("test");
+    Realm realm =
+        localFileConfig
+            .load("test")
+            .orElseThrow(
+                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
     assertThat(
         "Should have groupMapping",
         realm.getMappings().get("groupMapping").get("name"),
@@ -81,7 +104,11 @@ public class LocalFileRealmProviderDAO_realmsOneTest {
 
   @Test
   public void shouldHaveUsOneMapping() {
-    Realm realm = localFileConfig.load("test");
+    Realm realm =
+        localFileConfig
+            .load("test")
+            .orElseThrow(
+                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
     assertThat(
         "Should have the userMapping",
         realm.getUserStorages().get(0).getMappings().get("userMapping").get("firstName"),

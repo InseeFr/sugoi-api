@@ -426,7 +426,10 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       if (!e.getResultCode().equals(ResultCode.NO_SUCH_ATTRIBUTE)) {
         throw new RuntimeException("Failed to remove user to group " + groupName, e);
       }
-      throw new RuntimeException(e.getMessage());
+      ProviderResponse response = new ProviderResponse();
+      response.setStatus(ProviderResponseStatus.OK);
+      response.setEntityId(userId);
+      return response;
     }
   }
 
@@ -463,7 +466,10 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       if (!e.getResultCode().equals(ResultCode.ATTRIBUTE_OR_VALUE_EXISTS)) {
         throw new RuntimeException("Failed to add user to group " + groupName, e);
       }
-      throw new RuntimeException(e.getMessage());
+      ProviderResponse response = new ProviderResponse();
+      response.setStatus(ProviderResponseStatus.OK);
+      response.setEntityId(userId);
+      return response;
     }
   }
 

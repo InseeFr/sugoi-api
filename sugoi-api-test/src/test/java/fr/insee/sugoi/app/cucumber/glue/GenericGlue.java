@@ -38,17 +38,18 @@ import org.apache.commons.net.util.Base64;
 
 public class GenericGlue {
 
-  private Scenario scenario;
-
   @Before
   public void before(Scenario scenario) {
     this.scenario = scenario;
   }
 
+  private Scenario scenario;
   private StepData stepData;
 
-  String basicUsername = null;
-  String basicPassword = null;
+  private String basicUsername = null;
+  private String basicPassword = null;
+
+  private Map<String, String> headers = new HashMap<>();
 
   public GenericGlue(StepData stepData) {
     this.stepData = stepData;
@@ -76,11 +77,25 @@ public class GenericGlue {
     basicPassword = password;
   }
 
+  @Given("the client make an asynchronous request")
+  public void async_request() {
+    headers.put("X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", "true");
+  }
+
+  @Given("the client check status for transaction {}")
+  public void check_status(int id) {
+    headers.put("X-SUGOI-TRANSACTION-ID", String.valueOf(id));
+  }
+
+  @Given("the client want to use the urgent queue")
+  public void urgent_queue() {
+    headers.put("X-SUGOI-URGENT-REQUEST", "true");
+  }
+
   @When("the client perform {} request with body on url {} body:")
   public void the_client_perform_request_on_url(String MethodType, String url, String body)
       throws Throwable {
     WebRequest webRequest = new WebRequest();
-    Map<String, String> headers = new HashMap<>();
     if (basicPassword != null && basicUsername != null) {
       String auth = basicUsername + ":" + basicPassword;
       byte[] encodedAuth = Base64.encodeBase64(auth.getBytes());
@@ -107,10 +122,44 @@ public class GenericGlue {
     }
   }
 
+  @When(
+      "the client, in {} max retry, perform {} request with body on url {} and expect a statuscode {} with body:")
+  public void the_client_perform_request_on_url_with_body_with_retry(
+      int maxRetry, String MethodType, String url, int status, String body) throws Throwable {
+    int retry = 0;
+    the_client_perform_request_on_url(MethodType, url, body);
+    while (stepData.getLatestResponse().getClientHttpResponse().getStatusCode().value() != status
+        && retry < maxRetry) {
+      scenario.log(
+          retry
+              + " attempt get status code: "
+              + stepData.getLatestResponse().getClientHttpResponse().getStatusCode().value());
+      Thread.sleep(1000);
+      the_client_perform_request_on_url(MethodType, url, body);
+      retry++;
+    }
+  }
+
+  @When("the client, in {} max retry, perform {} request on url {} and expect a statuscode {}")
+  public void the_client_perform_request_on_url_with_retry(
+      int maxRetry, String MethodType, String url, int status) throws Throwable {
+    int retry = 0;
+    the_client_perform_request_on_url(MethodType, url);
+    while (stepData.getLatestResponse().getClientHttpResponse().getStatusCode().value() != status
+        && retry < maxRetry) {
+      scenario.log(
+          retry
+              + " attempt get status code: "
+              + stepData.getLatestResponse().getClientHttpResponse().getStatusCode().value());
+      Thread.sleep(1000);
+      the_client_perform_request_on_url(MethodType, url);
+      retry++;
+    }
+  }
+
   @When("the client perform {} request on url {}")
   public void the_client_perform_request_on_url(String MethodType, String url) throws Throwable {
     WebRequest webRequest = new WebRequest();
-    Map<String, String> headers = new HashMap<>();
     if (basicPassword != null && basicUsername != null) {
       String auth = basicUsername + ":" + basicPassword;
       byte[] encodedAuth = Base64.encodeBase64(auth.getBytes());
@@ -152,6 +201,11 @@ public class GenericGlue {
   @And("show body received")
   public void body_received() throws Throwable {
     scenario.log(stepData.getLatestResponse().getBody());
+  }
+
+  @And("show header {} ")
+  public void headers_received(String name) throws Throwable {
+    scenario.log(stepData.getLatestResponse().getHeader(name).toString());
   }
 
   // the metric CREATE_USER is 1

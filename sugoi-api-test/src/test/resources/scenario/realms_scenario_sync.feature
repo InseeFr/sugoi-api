@@ -1,4 +1,4 @@
-Feature: Realms scenario
+Feature: Realms scenario asynchrone
     Performing actions on realms
 
     Background: Use tomcat1

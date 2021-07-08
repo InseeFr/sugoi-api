@@ -11,11 +11,11 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.model.paging;
+package fr.insee.sugoi.core.configuration;
 
-import java.io.Serializable;
+public class GenericKeysConfig {
 
-public enum SearchType implements Serializable {
-  AND,
-  OR
+  public static final String REALM = "realm";
+
+  public static final String USERSTORAGE = "userStorage";
 }

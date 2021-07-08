@@ -23,6 +23,7 @@ import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.paging.PasswordChangeRequest;
 import fr.insee.sugoi.model.paging.SendMode;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +65,10 @@ public class Converter {
       organization.setAddress((Map<String, String>) linkedHashMap.get("address"));
       organization.setAttributes((Map<String, Object>) linkedHashMap.get("attributes"));
       organization.setMetadatas((Map<String, Object>) linkedHashMap.get("metadatas"));
-      organization.setOrganization(toOrganization(object));
+      organization.setOrganization(
+          linkedHashMap.get("organization") != null
+              ? toOrganization(linkedHashMap.get("organization"))
+              : null);
       return organization;
     }
     return null;
@@ -76,7 +80,10 @@ public class Converter {
       Application application = new Application();
       application.setName((String) linkedHashMap.get("name"));
       application.setOwner((String) linkedHashMap.get("owner"));
-      List<Object> listGroup = (List<Object>) linkedHashMap.get("groups");
+      List<Object> listGroup =
+          (linkedHashMap.get("groups") != null
+              ? (List<Object>) linkedHashMap.get("groups")
+              : new ArrayList<>());
       application.setGroups(
           (List<Group>)
               listGroup.stream()
@@ -93,7 +100,10 @@ public class Converter {
       Group group = new Group();
       group.setDescription((String) linkedHashMap.get("description"));
       group.setName((String) linkedHashMap.get("name"));
-      List<Object> usersList = ((List<Object>) linkedHashMap.get("users"));
+      List<Object> usersList =
+          (linkedHashMap.get("users") != null
+              ? (List<Object>) linkedHashMap.get("users")
+              : new ArrayList<>());
       group.setUsers(
           usersList.stream().map((userObject) -> toUser(object)).collect(Collectors.toList()));
       return group;
@@ -120,10 +130,21 @@ public class Converter {
     if (linkedHashMap != null) {
       ProviderRequest pr = new ProviderRequest();
       pr.setAsynchronousAllowed((boolean) linkedHashMap.get("asynchronousAllowed"));
-      pr.setSugoiUser((SugoiUser) linkedHashMap.get("sugoiUser"));
+      pr.setSugoiUser(toSugoiUser(linkedHashMap.get("sugoiUser")));
       pr.setIsUrgent((boolean) linkedHashMap.get("urgent"));
       pr.setTransactionId((String) linkedHashMap.get("transactionId"));
       return pr;
+    }
+    return null;
+  }
+
+  public SugoiUser toSugoiUser(Object object) {
+    LinkedHashMap linkedHashMap = (LinkedHashMap) object;
+    if (linkedHashMap != null) {
+      SugoiUser su = new SugoiUser();
+      su.setName((String) linkedHashMap.get("name"));
+      su.setRoles((List<String>) linkedHashMap.get("roles"));
+      return su;
     }
     return null;
   }

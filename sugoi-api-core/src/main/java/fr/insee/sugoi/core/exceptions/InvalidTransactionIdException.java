@@ -11,11 +11,28 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.model.paging;
+package fr.insee.sugoi.core.exceptions;
 
-import java.io.Serializable;
+public class InvalidTransactionIdException extends RuntimeException {
 
-public enum SearchType implements Serializable {
-  AND,
-  OR
+  /** */
+  private static final long serialVersionUID = 1L;
+
+  private String message;
+
+  public InvalidTransactionIdException(Exception e) {
+    super(e);
+  }
+
+  public InvalidTransactionIdException(String message) {
+    this.message = message;
+  }
+
+  public String getMessage() {
+    return this.message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
+  }
 }

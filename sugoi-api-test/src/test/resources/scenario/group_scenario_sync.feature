@@ -1,4 +1,4 @@
-Feature: Groups scenario
+Feature: Groups scenario admin
     Performing actions on groups
 
     Background: Use tomcat1
@@ -77,12 +77,12 @@ Feature: Groups scenario
     Scenario: Add member to application group
         When the client perform PUT request on url /realms/domaine1/applications/applitest/groups/Administrateurs_fake_AppliTest/members/testc
         And show body received
-        Then the client receives status code 200
+        Then the client receives status code 204
 
     Scenario: Add member to application group, user already present
         When the client perform PUT request on url /realms/domaine1/applications/applitest/groups/Administrateurs_fake_AppliTest/members/testc
         And show body received
-        Then the client receives status code 200
+        Then the client receives status code 204
 
     Scenario: Add member to application group, group no exist
         When the client perform PUT request on url /realms/domaine1/applications/applitest/groups/Administrateurs_AppliTest3/members/testc
@@ -97,12 +97,12 @@ Feature: Groups scenario
     Scenario: Delete member from application group
         When the client perform DELETE request on url /realms/domaine1/applications/applitest/groups/Administrateurs_fake_AppliTest/members/testc
         And show body received
-        Then the client receives status code 200
+        Then the client receives status code 204
 
     Scenario: Delete member from application group, already remove
         When the client perform DELETE request on url /realms/domaine1/applications/applitest/groups/Administrateurs_fake_AppliTest/members/testc
         And show body received
-        Then the client receives status code 200
+        Then the client receives status code 204
 
     Scenario: Delete member from application group, group no exist
         When the client perform DELETE request on url /realms/domaine1/applications/applitest/groups/Administrateurs_AppliTest3/members/testc
