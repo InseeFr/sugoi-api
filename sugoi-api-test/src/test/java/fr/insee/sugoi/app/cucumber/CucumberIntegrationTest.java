@@ -28,7 +28,6 @@ import org.junit.runner.RunWith;
       "pretty",
       "json:target/cucumber/cucumber.json",
       "usage:target/cucumber/usage.jsonx",
-      "junit:target/cucumber/junit.xml",
-      "de.monochromata.cucumber.report.PrettyReports:target/cucumber"
+      "junit:target/cucumber/junit.xml"
     })
 public class CucumberIntegrationTest {}
