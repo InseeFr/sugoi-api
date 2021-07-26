@@ -94,6 +94,13 @@ objectclass: groupOfUniqueNames
 uniquemember: uid=appli_sugoi,ou=Applitest,ou=Applications,o=insee,c=fr
 uniqueMember: uid=test_password,ou=contacts,ou=clients_domaine1,o=insee,c=fr
 
+dn: cn=SUGOI_Domaine1_Reader,ou=WebServicesLdap_Obje
+ ts,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
+description: Utilisateur du webservices contact
+cn: SUGOI_Domaine1_Reader
+objectclass: top
+objectclass: groupOfUniqueNames
+uniqueMember: uid=appli_applitest,ou=Applitest,ou=Applications,o=insee,c=fr
 
 dn: cn=Utilisateurs_contacts_domaine2_WebServicesLdap,ou=WebServicesLdap_Obje
  ts,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
@@ -257,6 +264,7 @@ cn: Utilisateurs_contacts_domaine1_WebServicesLdap
 objectclass: groupOfUniqueNames
 uniqueMember: uid=consultant_domaine_1,ou=Applitest,ou=Applications,o=insee,c=fr
 uniqueMember: uid=test_password,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+uniqueMember: uid=appli_applitest,ou=Applitest,ou=Applications,o=insee,c=fr
 
 dn: cn=Admin_WebServicesLdap,ou=WebServicesLdap_Obje
  ts,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
@@ -271,6 +279,8 @@ description: Utilisateur du webservices contact
 cn: Gestionnaires_contacts_domaine2_WebServicesLdap
 objectclass: groupOfUniqueNames
 uniqueMember: uid=gestionnaire_domaine_2,ou=Applitest,ou=Applications,o=insee,c=fr
+
+
 
 # DOMAINE DE GESTION 1
 dn: ou=clients_domaine1,o=insee,c=fr

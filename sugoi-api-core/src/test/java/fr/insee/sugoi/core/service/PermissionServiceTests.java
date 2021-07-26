@@ -89,7 +89,9 @@ public class PermissionServiceTests {
   public void testAppManager() {
     try {
       SugoiUser sugoiUser =
-          new SugoiUser("appmanager_realm1_appli1", List.of("role_Asi_realm1_appli1"));
+          new SugoiUser(
+              "appmanager_realm1_appli1",
+              List.of("role_Asi_realm1_appli1", "role_reader_realm1_sugoi"));
       assertThat(
           "user is app manager for appli1 in realm1",
           permissions.isApplicationManager(sugoiUser, "realm1", null, "appli1"),
@@ -104,7 +106,9 @@ public class PermissionServiceTests {
   @Test
   public void testAppManagerWithoutRealmInRoleName() {
     try {
-      SugoiUser sugoiUser = new SugoiUser("appmanager_appli1", List.of("role_Asi_appli1"));
+      SugoiUser sugoiUser =
+          new SugoiUser(
+              "appmanager_appli1", List.of("role_Asi_appli1", "role_reader_realm1_sugoi"));
       assertThat(
           "user is app manager for appli1 in realm1",
           permissions.isApplicationManager(sugoiUser, "realm1", null, "appli1"),
@@ -114,9 +118,9 @@ public class PermissionServiceTests {
       assertThat(
           "user is app manager for appli1 in realm2",
           permissions.isApplicationManager(sugoiUser, "realm2", null, "appli1"),
-          is(true));
+          is(false));
       assertThat(
-          "user is reader in realm2", permissions.isReader(sugoiUser, "realm2", null), is(true));
+          "user is reader in realm2", permissions.isReader(sugoiUser, "realm2", null), is(false));
 
     } catch (Exception e) {
       fail();
