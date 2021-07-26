@@ -14,11 +14,13 @@
 package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
+import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.model.SugoiUser;
+import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
@@ -67,6 +69,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class UserController {
 
   @Autowired private UserService userService;
+
+  @Autowired private RealmProvider realmService;
 
   @GetMapping(
       path = {"/realms/{realm}/storages/{storage}/users"},
@@ -631,5 +635,80 @@ public class UserController {
       @Parameter(description = "Username to search", required = true) @PathVariable("username")
           String id) {
     return getUserByUsername(realm, null, id);
+  }
+
+  @GetMapping(
+      path = {"/realms/{realm}/storages/{storage}/users/mail/{mail}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Get user by mail")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "User found according to parameters",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = User.class))
+            })
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
+  public ResponseEntity<User> getUserByMail(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "User's mail to search", required = true) @PathVariable("mail")
+          String mail) {
+    if (Boolean.parseBoolean(
+        realmService
+            .load(realm)
+            .orElseThrow(() -> new RealmNotFoundException("Realm " + realm + " doesn't exist"))
+            .getProperties()
+            .get(GlobalKeysConfig.VERIFY_MAIL_UNICITY))) {
+
+      User user =
+          userService
+              .findByMail(realm, storage, mail)
+              .orElseThrow(
+                  () ->
+                      new UserNotFoundException(
+                          "Cannot find user with mail " + mail + " in realm " + realm));
+      return ResponseEntity.status(HttpStatus.OK).body(user);
+    }
+    return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+  }
+
+  @GetMapping(
+      path = {"/realms/{realm}/users/mail/{mail}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Get user by mail")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "User found according to parameters",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = User.class))
+            })
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
+  public ResponseEntity<User> getUserByMail(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "User's mail to search", required = true) @PathVariable("mail")
+          String mail) {
+    return getUserByMail(realm, null, mail);
   }
 }

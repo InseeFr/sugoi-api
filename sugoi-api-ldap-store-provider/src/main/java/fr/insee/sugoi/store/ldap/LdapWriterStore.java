@@ -128,6 +128,11 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public ProviderResponse createUser(User user, ProviderRequest providerRequest) {
     if (ldapReaderStore.getUser(user.getUsername()) == null) {
+      if (Boolean.parseBoolean(config.get(LdapConfigKeys.UNIQUE_EMAILS))
+          && user.getMail() != null
+          && ldapReaderStore.getUserByMail(user.getMail()) != null) {
+        throw new UserAlreadyExistException("An user with this email already exist");
+      }
       try {
         if (user.getAddress() != null && user.getAddress().size() > 0) {
           UUID addressUuid = createAddress(user.getAddress());
@@ -158,6 +163,13 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public ProviderResponse updateUser(User updatedUser, ProviderRequest providerRequest) {
     if (ldapReaderStore.getUser(updatedUser.getUsername()) != null) {
+      User temp = ldapReaderStore.getUserByMail(updatedUser.getMail());
+      if (Boolean.parseBoolean(config.get(LdapConfigKeys.UNIQUE_EMAILS))
+          && updatedUser.getMail() != null
+          && temp != null
+          && temp.getUsername() != updatedUser.getUsername()) {
+        throw new UserAlreadyExistException("An user with this email already exist");
+      }
       try {
         if (updatedUser != null) {
           User currentUser = ldapReaderStore.getUser(updatedUser.getUsername());

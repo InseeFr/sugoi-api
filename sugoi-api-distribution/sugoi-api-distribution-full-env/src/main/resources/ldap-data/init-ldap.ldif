@@ -123,6 +123,7 @@ inseepropriete: groupMapping$name:cn,String,rw
 inseepropriete: groupMapping$description:description,String,rw
 inseepropriete: groupMapping$users:uniquemember,list_user,rw
 inseepropriete: description$Le profil domaine2
+inseepropriete: enableMailUnicity$true
 
 
 dn: cn=monUserStorage,cn=Profil_domaine2_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We

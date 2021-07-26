@@ -40,6 +40,8 @@ public class RealmLdapMapper {
       if (property.length == 2) {
         if (property[0].equalsIgnoreCase("ldapUrl")) {
           realm.setUrl(property[1]);
+        } else if (property[0].equalsIgnoreCase("enableMailUnicity")) {
+          realm.addProperty(GlobalKeysConfig.VERIFY_MAIL_UNICITY, property[1]);
         } else if (property[0].equalsIgnoreCase("branchesApplicativesPossibles")) {
           realm.setAppSource(property[1]);
         } else if (property[0].equalsIgnoreCase("seealso_attributes")) {

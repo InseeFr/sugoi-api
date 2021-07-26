@@ -26,6 +26,7 @@ import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
+import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.paging.PageResult;
@@ -59,6 +60,8 @@ public class UserControllerTest {
   @Autowired MockMvc mockMvc;
 
   @MockBean private UserService userService;
+
+  @MockBean private RealmProvider realmService;
 
   ObjectMapper objectMapper = new ObjectMapper();
   User user1, user2, user1Updated;

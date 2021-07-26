@@ -32,12 +32,24 @@ Feature: User scenario
         When the client perform POST request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users body:
             """
             {
-                "username": "abcd"
+                "username": "abcd",
+                "mail": "test@insee.fr"
             }
             """
         And show body received
         Then the client receives status code 201
         Then the client expect to receive an user
+
+    Scenario: Post user with email already exit
+        When the client perform POST request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users body:
+            """
+            {
+                "username": "abcd2",
+                "mail": "test@insee.fr"
+            }
+            """
+        And show body received
+        Then the client receives status code 409
 
     Scenario: Post user already exist
         When the client perform POST request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users body:
@@ -144,3 +156,8 @@ Feature: User scenario
         When the client perform DELETE request on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users/abcd
         And show body received
         Then the client receives status code 404
+
+    Scenario: Get user by mail on realm without mail unicity
+        When the client perform GET request on url /realms/domaine2/users/mail/invalid@mail.fr
+        And show body received
+        Then the client receives status code 501

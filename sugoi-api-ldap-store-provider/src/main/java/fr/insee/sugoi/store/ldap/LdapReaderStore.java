@@ -38,6 +38,7 @@ import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
+import fr.insee.sugoi.model.paging.SearchType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -351,5 +352,32 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
   private Map<String, String> getAddress(String addressId) {
     SearchResultEntry addressResult = getEntryByDn(getAddressDN(addressId));
     return addressResult != null ? addressLdapMapper.mapFromSearchEntry(addressResult) : null;
+  }
+
+  @Override
+  public User getUserByMail(String mail) {
+    logger.debug("Searching user with mail {}", mail);
+    User searchedUser = new User();
+    searchedUser.setMail(mail);
+    PageResult<User> users =
+        searchUsers(searchedUser, new PageableResult(2, 0, null), SearchType.OR.name());
+    User user = null;
+    if (users.getResults().size() == 1) {
+      user = users.getResults().get(0);
+      if (user.getAddress() != null && user.getAddress().containsKey("id")) {
+        Map<String, String> address = getAddress(user.getAddress().get("id"));
+        if (address != null) {
+          address.put("id", user.getAddress().get("id"));
+          user.setAddress(address);
+        }
+      }
+      if (user.getOrganization() != null) {
+        user.setOrganization(getOrganization(user.getOrganization().getIdentifiant()));
+      }
+    } else if (users.getResults().size() > 1) {
+      throw new RuntimeException(
+          "multiple user found with this email where found cannot determine which one to choose");
+    }
+    return user;
   }
 }

@@ -69,6 +69,16 @@ public interface UserService {
   Optional<User> findById(String realm, String storageName, String idep);
 
   /**
+   * Find a user by its username in a realm
+   *
+   * @param realm
+   * @param storageName
+   * @param idep
+   * @return an optional of user
+   */
+  Optional<User> findByMail(String realm, String storageName, String mail);
+
+  /**
    * Find users by criterias in a realm
    *
    * @param realm

@@ -262,4 +262,20 @@ public class FileReaderStore implements ReaderStore {
       throw new RuntimeException("Failed to load resource", e);
     }
   }
+
+  @Override
+  public User getUserByMail(String mail) {
+    logger.debug("Searching user with mail {}", mail);
+    User searchedUser = new User();
+    searchedUser.setMail(mail);
+    PageResult<User> users = searchUsers(searchedUser, null, null);
+    User user = null;
+    if (users.getResults().size() == 1) {
+      user = users.getResults().get(0);
+    } else if (users.getResults().size() > 1) {
+      throw new RuntimeException(
+          "multiple user found with this email where found cannot determine which one to choose");
+    }
+    return user;
+  }
 }
