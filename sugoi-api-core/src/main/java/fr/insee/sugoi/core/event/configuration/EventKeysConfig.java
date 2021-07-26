@@ -39,6 +39,7 @@ public class EventKeysConfig extends GlobalKeysConfig {
   public static final String USER = "user";
   public static final String USER_ID = "userId";
   public static final String USER_NAME = "userName";
+  public static final String USER_MAIL = "userMail";
   public static final String USER_FILTER = "userFilter";
   public static final String USER_PROPERTIES = "userProperties";
 

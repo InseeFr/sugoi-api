@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.store.ldap;
 
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
@@ -104,6 +105,11 @@ public class LdapStoreBeans {
     config.put(LdapConfigKeys.USERNAME, defaultUsername);
     config.put(LdapConfigKeys.PASSWORD, defaultPassword);
     config.put(LdapConfigKeys.POOL_SIZE, defaultPoolSize);
+    config.put(
+        LdapConfigKeys.UNIQUE_EMAILS,
+        realm.getProperties().get(GlobalKeysConfig.VERIFY_MAIL_UNICITY) != null
+            ? realm.getProperties().get(GlobalKeysConfig.VERIFY_MAIL_UNICITY)
+            : "false");
     config.put(LdapConfigKeys.USER_SOURCE, userStorage.getUserSource());
     config.put(LdapConfigKeys.APP_SOURCE, realm.getAppSource());
     config.put(LdapConfigKeys.ORGANIZATION_SOURCE, userStorage.getOrganizationSource());

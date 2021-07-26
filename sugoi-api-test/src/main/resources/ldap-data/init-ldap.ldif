@@ -256,6 +256,7 @@ inseepropriete: userMapping$attributes.properties:inseePropriete,list_string,rw
 inseepropriete: userMapping$metadatas.modifyTimestamp:modifyTimestamp,string,ro
 inseepropriete: userMapping$attributes.seeAlsos:seeAlso,list_string,ro,singl
 description: domaine1
+inseepropriete: enableMailUnicity$true
 
 dn: cn=Utilisateurs_contacts_domaine1_WebServicesLdap,ou=WebServicesLdap_Obje
  ts,ou=WebServicesLdap,ou=Applications,o=insee,c=fr

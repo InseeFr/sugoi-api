@@ -29,4 +29,5 @@ public class GlobalKeysConfig {
   public static final String APP_MANAGED_ATTRIBUTE_KEYS_LIST = "app-managed-attribute-keys-list";
   public static final String APP_MANAGED_ATTRIBUTE_PATTERNS_LIST =
       "app-managed-attribute-patterns-list";
+  public static final String VERIFY_MAIL_UNICITY = "verify_mail_unicity";
 }

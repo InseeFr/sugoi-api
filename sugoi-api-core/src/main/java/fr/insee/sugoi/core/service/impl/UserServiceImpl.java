@@ -376,4 +376,79 @@ public class UserServiceImpl implements UserService {
       throw e;
     }
   }
+
+  @Override
+  public Optional<User> findByMail(String realmName, String storageName, String mail) {
+    User user = null;
+    try {
+      if (mail != null) {
+        Realm realm =
+            realmProvider
+                .load(realmName)
+                .orElseThrow(
+                    () -> new RealmNotFoundException("The realm " + realmName + " doesn't exist "));
+        if (storageName != null) {
+          user = storeProvider.getReaderStore(realmName, storageName).getUserByMail(mail);
+          user.addMetadatas(GlobalKeysConfig.REALM, realmName.toLowerCase());
+          user.addMetadatas(GlobalKeysConfig.USERSTORAGE, storageName.toLowerCase());
+        } else {
+          for (UserStorage us : realm.getUserStorages()) {
+            try {
+              user = storeProvider.getReaderStore(realmName, us.getName()).getUserByMail(mail);
+              user.addMetadatas(GlobalKeysConfig.REALM, realmName);
+              user.addMetadatas(GlobalKeysConfig.USERSTORAGE, us.getName());
+              break;
+            } catch (Exception e) {
+              logger.debug(
+                  "Error when trying to find user with mail"
+                      + mail
+                      + " on realm "
+                      + realmName
+                      + " and userstorage "
+                      + us
+                      + " error "
+                      + e.getMessage());
+            }
+          }
+        }
+        if (seeAlsoService != null
+            && realm.getProperties().containsKey(GlobalKeysConfig.SEEALSO_ATTRIBUTES)) {
+          String[] seeAlsosAttributes =
+              realm
+                  .getProperties()
+                  .get(GlobalKeysConfig.SEEALSO_ATTRIBUTES)
+                  .replace(" ", "")
+                  .split(",");
+          List<String> seeAlsos = new ArrayList<>();
+          for (String seeAlsoAttribute : seeAlsosAttributes) {
+            Object seeAlsoAttributeValue = user.getAttributes().get(seeAlsoAttribute);
+            if (seeAlsoAttributeValue instanceof String) {
+              seeAlsos.add((String) seeAlsoAttributeValue);
+            } else if (seeAlsoAttributeValue instanceof List) {
+              ((List<?>) seeAlsoAttributeValue)
+                  .forEach(seeAlso -> seeAlsos.add(seeAlso.toString()));
+            }
+          }
+          for (String seeAlso : seeAlsos) {
+            seeAlsoService.decorateWithSeeAlso(user, seeAlso);
+          }
+        }
+        sugoiEventPublisher.publishCustomEvent(
+            realmName,
+            storageName,
+            SugoiEventTypeEnum.FIND_USER_BY_MAIL,
+            Map.ofEntries(Map.entry(EventKeysConfig.USER_MAIL, mail)));
+      }
+      return Optional.ofNullable(user);
+    } catch (Exception e) {
+      sugoiEventPublisher.publishCustomEvent(
+          realmName,
+          storageName,
+          SugoiEventTypeEnum.FIND_USER_BY_MAIL_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.USER_MAIL, mail),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
+      return Optional.ofNullable(user);
+    }
+  }
 }
