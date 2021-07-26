@@ -37,6 +37,17 @@ public interface ReaderStore {
    */
   public User getUser(String id);
 
+
+  /**
+   * Only on realms where `unique_emails` is enabled, 
+   * retrieve the user with the given mail in the store. 
+   *
+   * @param mail
+   * @return the user with matching mail, null if no user matches
+   */
+  public User getUserByMail(String id);
+
+
   /**
    * Search users matching userFilter filled attributes.
    *
