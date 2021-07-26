@@ -54,8 +54,7 @@ public class PermissionServiceImpl implements PermissionService {
     List<String> searchRoleList =
         getSearchRoleList(sugoiUser, realm, userStorage, null, regexpReaderList);
     return checkIfUserGetRoles(sugoiUser, searchRoleList)
-        || isWriter(sugoiUser, realm, userStorage)
-        || isApplicationManager(sugoiUser, realm);
+        || isWriter(sugoiUser, realm, userStorage);
   }
 
   @Override
@@ -70,14 +69,7 @@ public class PermissionServiceImpl implements PermissionService {
       SugoiUser sugoiUser, String realm, String userStorage, String application) {
     List<String> searchRoleList =
         getSearchRoleList(sugoiUser, realm, userStorage, application, applicationManagerRoleList);
-    return checkIfUserGetRoles(sugoiUser, searchRoleList);
-  }
-
-  @Override
-  public boolean isApplicationManager(SugoiUser sugoiUser, String realm) {
-    List<String> searchRoleList =
-        getSearchRoleList(sugoiUser, realm, "*", "*", applicationManagerRoleList);
-    return checkIfUserGetRoles(sugoiUser, searchRoleList);
+    return checkIfUserGetRoles(sugoiUser, searchRoleList) && isReader(sugoiUser, realm, null);
   }
 
   @Override

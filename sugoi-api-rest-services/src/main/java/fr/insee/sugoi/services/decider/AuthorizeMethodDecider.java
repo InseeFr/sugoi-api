@@ -48,7 +48,6 @@ public class AuthorizeMethodDecider {
       SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
       return permissionService.isReader(sugoiUser, realm, userStorage)
           || permissionService.isWriter(sugoiUser, realm, userStorage)
-          || permissionService.isApplicationManager(sugoiUser, realm)
           || permissionService.isPasswordManager(sugoiUser, realm, userStorage);
     }
     logger.warn("PreAuthorize on request is disabled, can cause security problem");

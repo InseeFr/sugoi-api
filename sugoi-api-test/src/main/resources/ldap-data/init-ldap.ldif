@@ -94,6 +94,13 @@ objectclass: groupOfUniqueNames
 uniquemember: uid=appli_sugoi,ou=Applitest,ou=Applications,o=insee,c=fr
 uniqueMember: uid=test_password,ou=contacts,ou=clients_domaine1,o=insee,c=fr
 
+dn: cn=SUGOI_Domaine1_Reader,ou=WebServicesLdap_Obje
+ ts,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
+description: Utilisateur du webservices contact
+cn: SUGOI_Domaine1_Reader
+objectclass: top
+objectclass: groupOfUniqueNames
+uniqueMember: uid=appli_applitest,ou=Applitest,ou=Applications,o=insee,c=fr
 
 dn: cn=Utilisateurs_contacts_domaine2_WebServicesLdap,ou=WebServicesLdap_Obje
  ts,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
