@@ -16,6 +16,7 @@ package fr.insee.sugoi.core.configuration;
 public class GlobalKeysConfig {
 
   public static final String REALM = "realm";
+  public static final String REALM_DESCRIPTION = "description";
 
   public static final String USERSTORAGE = "userStorage";
 
