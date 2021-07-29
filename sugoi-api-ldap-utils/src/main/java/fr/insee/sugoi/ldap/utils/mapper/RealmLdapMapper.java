@@ -31,6 +31,8 @@ public class RealmLdapMapper {
     Realm realm = new Realm();
     // this means we can't have _ in a realm name !
     realm.setName(searchResultEntry.getAttributeValue("cn").split("_")[1]);
+    realm.addProperty(
+        GlobalKeysConfig.REALM_DESCRIPTION, searchResultEntry.getAttributeValue("description"));
     String[] inseeProperties = searchResultEntry.getAttributeValues("inseepropriete");
     for (String inseeProperty : inseeProperties) {
       String[] property = inseeProperty.split("\\$", 2);
@@ -54,6 +56,7 @@ public class RealmLdapMapper {
           realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, property[1]);
         } else if (property[0].equalsIgnoreCase("sort_key")) {
           realm.addProperty(LdapConfigKeys.SORT_KEY, property[1]);
+
         } else if (property[0].equalsIgnoreCase("groupMapping")
             || property[0].equalsIgnoreCase("applicationMapping")) {
           if (!realm.getMappings().containsKey(property[0])) {

@@ -122,6 +122,8 @@ inseepropriete: applicationMapping$name:ou,String,rw
 inseepropriete: groupMapping$name:cn,String,rw
 inseepropriete: groupMapping$description:description,String,rw
 inseepropriete: groupMapping$users:uniquemember,list_user,rw
+inseepropriete: description$Le profil domaine2
+
 
 dn: cn=monUserStorage,cn=Profil_domaine2_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We
  bServicesLdap_Objets,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
@@ -210,6 +212,7 @@ description: domaine2
 dn: cn=Profil_domaine1_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We
  bServicesLdap_Objets,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
 cn: Profil_domaine1_WebServiceLdap
+description: Le profil domaine2<br/>Test <b>html</b> in description
 objectclass: inseeOrganizationalRole
 inseepropriete: ldapUrl$localhost
 inseepropriete: ldapPort$10389
