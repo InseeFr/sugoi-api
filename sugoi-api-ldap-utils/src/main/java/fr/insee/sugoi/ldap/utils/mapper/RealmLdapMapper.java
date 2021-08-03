@@ -17,6 +17,7 @@ import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
+import fr.insee.sugoi.core.configuration.UiMappingService;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Realm;
@@ -26,6 +27,8 @@ import java.util.List;
 
 /** ProfilContextMapper */
 public class RealmLdapMapper {
+
+  static UiMappingService uiMappingService = new UiMappingService();
 
   public static Realm mapFromSearchEntry(SearchResultEntry searchResultEntry) {
     Realm realm = new Realm();
@@ -61,6 +64,7 @@ public class RealmLdapMapper {
 
         } else if (property[0].equalsIgnoreCase("groupMapping")
             || property[0].equalsIgnoreCase("applicationMapping")) {
+
           if (!realm.getMappings().containsKey(property[0])) {
             realm.getMappings().put(property[0], new HashMap<>());
           }
@@ -68,11 +72,24 @@ public class RealmLdapMapper {
           String attributeName = attributeSplits[0];
           String attributeMappingValues = attributeSplits[1];
           realm.getMappings().get(property[0]).put(attributeName, attributeMappingValues);
+        } else if (property[0].equalsIgnoreCase("uiUserMapping")
+            || property[0].equalsIgnoreCase("uiOrganizationMapping")) {
+
+          if (!realm.getUiMapping().containsKey(property[0])) {
+            realm.getUiMapping().put(property[0], new ArrayList<>());
+          }
+          realm
+              .getUiMapping()
+              .get(property[0])
+              .add(uiMappingService.convertStringToUIField(property[1]));
         }
       }
     }
     return realm;
   }
+
+  // inseePropriété:
+  // userUiMapping$name;helpTextTitle;helpText;path;type;modifiable;tag;options1:value,options2:value;
 
   public static List<Attribute> mapToAttributes(
       Realm realm, String realmEntryPattern, String baseDn) {

@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import fr.insee.sugoi.core.configuration.UiMappingService;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
@@ -29,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ldap.embedded.EmbeddedLdapAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest(classes = {EmbeddedLdapAutoConfiguration.class, LdapRealmProviderDAOImpl.class})
@@ -36,6 +38,8 @@ import org.springframework.test.context.TestPropertySource;
 public class LdapRealmProviderWriteTest {
 
   @Autowired LdapRealmProviderDAOImpl ldapRealmProviderDAOImpl;
+
+  @MockBean private UiMappingService uiMappingService;
 
   @Test
   public void addNewRealmWithOneUserStorageTest() {
