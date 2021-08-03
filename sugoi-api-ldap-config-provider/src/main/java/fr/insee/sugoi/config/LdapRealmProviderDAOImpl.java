@@ -25,6 +25,7 @@ import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
+import fr.insee.sugoi.core.configuration.UiMappingService;
 import fr.insee.sugoi.core.exceptions.RealmAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
@@ -43,6 +44,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -84,6 +86,8 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   @Value("${fr.insee.sugoi.config.ldap.default.sortKey:}")
   private String defaultSortKey;
 
+  @Autowired UiMappingService uiMappingService;
+
   private static final Logger logger = LogManager.getLogger(LdapRealmProviderDAOImpl.class);
 
   private static LDAPConnectionPool ldapConnectionPool;
@@ -116,6 +120,15 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
               GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST,
               defaultAppManagedAttributePatternList);
         }
+        realm
+            .getUiMapping()
+            .putIfAbsent(
+                "uiUserMapping", (List<Object>) (Object) uiMappingService.getUserUiDefaultField());
+        realm
+            .getUiMapping()
+            .putIfAbsent(
+                "uiOrganizationMapping",
+                (List<Object>) (Object) uiMappingService.getOrganizationUiDefaultField());
         realm.getProperties().putIfAbsent(LdapConfigKeys.SORT_KEY, defaultSortKey);
         return Optional.of(realm);
       }

@@ -25,6 +25,7 @@ public class Realm implements Serializable {
   private List<UserStorage> userStorages;
   private Map<String, String> properties = new HashMap<>();
   private Map<String, Map<String, String>> mappings = new HashMap<>();
+  private Map<String, List<Object>> uiMapping = new HashMap<>();
   private String readerType;
   private String writerType;
 
@@ -107,5 +108,13 @@ public class Realm implements Serializable {
 
   public Map<String, Map<String, String>> getMappings() {
     return mappings;
+  }
+
+  public Map<String, List<Object>> getUiMapping() {
+    return uiMapping;
+  }
+
+  public void setUiMapping(Map<String, List<Object>> uiMapping) {
+    this.uiMapping = uiMapping;
   }
 }

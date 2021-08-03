@@ -116,6 +116,7 @@ dn: cn=Profil_domaine2_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We
  bServicesLdap_Objets,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
 cn: Profil_domaine2_WebServiceLdap
 objectclass: inseeOrganizationalRole
+description: Le profil domaine2
 inseepropriete: ldapUrl$localhost
 inseepropriete: ldapPort$10389
 inseepropriete: applicationMapping$name:ou,String,rw
@@ -124,7 +125,31 @@ inseepropriete: groupMapping$description:description,String,rw
 inseepropriete: groupMapping$users:uniquemember,list_user,rw
 inseepropriete: description$Le profil domaine2
 inseepropriete: enableMailUnicity$true
-
+inseepropriete: uiUserMapping$Identifiant;Identifiant de l'utilisateur;Il servira pour le rechercher a travers l'annuaire. Caracteres autorises alphabetiques chiffres apostrophes espaces tirets;username;string;true;main;
+inseepropriete: uiUserMapping$Nom commun;Nom commun de l'utilisateur;Caracteres autorises alphabetiques chiffres apostrophes espaces tirets;attributes.common_name;string;true;main;
+inseepropriete: uiUserMapping$Nom;Nom de l'utilisateur;Caracteres autorises alphabetiques chiffres apostrophes espaces tirets;lastName;string;true;main;
+inseepropriete: uiUserMapping$Prénom;Prénom de l'utilisateur;Caracteres autorises alphabetiques chiffres apostrophes espaces tirets;firstName;string;true;main;
+inseepropriete: uiUserMapping$Adresse e-mail;Adresse de message de l'utilisateur;Caracteres autorises alphabetiques chiffres apostrophes espaces tirets;mail;string;true;main;
+inseepropriete: uiUserMapping$Numéro de téléphone;Numéro de téléphone de l'utilisateur;;attributes.phone_number;string;true;main;
+inseepropriete: uiUserMapping$Description;Desscription de l'utilisateur;;attributes.phone_number;string;true;main;
+inseepropriete: uiUserMapping$Organisation;Organisation d'appartenance de l'agent;;attributes.organisation;string;true;main;
+inseepropriete: uiUserMapping$Timbre;Timbre de l'utilisateur;;attributes.insee_timbre;string;true;main;
+inseepropriete: uiUserMapping$Dernière modification;;;metadatas.modifyTimestamp;string;false;advanced;
+inseepropriete: uiUserMapping$Realm;;;metadatas.realm;string;false;advanced;
+inseepropriete: uiUserMapping$UserStorage;;;metadatas.userStorage;string;false;advanced;
+inseepropriete: uiUserMapping$Identifiant adresse;Identifiant unique de l'adresse;Il servira pour le rechercher dans l'annuaire;address.id;string;false;advanced;
+inseepropriete: uiUserMapping$Identification du destinataire;;;address.ligne1;string;true;address;
+inseepropriete: uiUserMapping$N° appartement, boite aux lettres, étage, couloir;;;address.ligne2;string;true;address;
+inseepropriete: uiUserMapping$Entrée, tour, bâtiment, immeuble, résidence;;;address.ligne3;string;true;address;
+inseepropriete: uiUserMapping$Numéro et libellé de la voie;;;address.ligne4;string;true;address;
+inseepropriete: uiUserMapping$Lieu dit ou boîte postale;;;address.ligne5;string;true;address;
+inseepropriete: uiUserMapping$Code postal et localité de destination;;;address.ligne6;string;true;address;
+inseepropriete: uiUserMapping$Pays;;;address.ligne7;string;true;address;
+inseepropriete: uiUserMapping$Habilitations;;;habilitations;habilitations;true;rights;attribute_key=inseeGroupeDefaut
+inseepropriete: uiUserMapping$Groupes;;;groups;groups;true;rights;addTitle=Ajouter un groupe;deleteTitle=Supprimer un groupe
+inseepropriete: uiUserMapping$Rôles applicatifs;;;attributes.insee_roles_applicatifs;simpleAppManagedAttributes;true;rights;addTitle=Ajouter un rôle;deleteTitle=Supprimer un rôle;attribute_key=inseeRoleApplicatif
+inseepropriete: uiUserMapping$Propriétés;Propriétés du contact; Ajouter une propriété à saisir en cliquant sur "Ajouter un champ". Supprimer une propriété saisie en vidant le champ ou en cliquant sur la croix rouge à droite du champ. Aucune limite d'ajout.;attributes.properties;list;true;properties;addTitle=Ajouter une propriété;deleteTitle=Supprimer une propriété
+inseepropriete: uiUserMapping$PasswordLastChange;Dernier changement de mdp;;metadatas.passwordLastChange;string;true;authentification;
 
 dn: cn=monUserStorage,cn=Profil_domaine2_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We
  bServicesLdap_Objets,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
@@ -259,6 +284,30 @@ inseepropriete: userMapping$attributes.insee_organisme:inseeOrganisme,String,rw
 inseepropriete: userMapping$attributes.properties:inseePropriete,list_string,rw
 inseepropriete: userMapping$metadatas.modifyTimestamp:modifyTimestamp,string,ro
 inseepropriete: userMapping$attributes.seeAlsos:seeAlso,list_string,ro,singl
+inseepropriete: uiUserMapping$Identifiant;Identifiant de l'utilisateur;Il servira pour le rechercher a travers l'annuaire. Caracteres autorises alphabetiques chiffres apostrophes espaces tirets;username;string;true;main;
+inseepropriete: uiUserMapping$Nom commun;Nom commun de l'utilisateur;Caracteres autorises alphabetiques chiffres apostrophes espaces tirets;attributes.common_name;string;true;main;
+inseepropriete: uiUserMapping$Nom;Nom de l'utilisateur;Caracteres autorises alphabetiques chiffres apostrophes espaces tirets;lastName;string;true;main;
+inseepropriete: uiUserMapping$Prénom;Prénom de l'utilisateur;Caracteres autorises alphabetiques chiffres apostrophes espaces tirets;firstName;string;true;main;
+inseepropriete: uiUserMapping$Adresse e-mail;Adresse de message de l'utilisateur;Caracteres autorises alphabetiques chiffres apostrophes espaces tirets;mail;string;true;main;
+inseepropriete: uiUserMapping$Numéro de téléphone;Numéro de téléphone de l'utilisateur;;attributes.phone_number;string;true;main;
+inseepropriete: uiUserMapping$Description;Desscription de l'utilisateur;;attributes.phone_number;string;true;main;
+inseepropriete: uiUserMapping$Organisation;Organisation d'appartenance de l'agent;;attributes.organisation;string;true;main;
+inseepropriete: uiUserMapping$Timbre;Timbre de l'utilisateur;;attributes.insee_timbre;string;true;main;
+inseepropriete: uiUserMapping$Dernière modification;;;metadatas.modifyTimestamp;string;false;advanced;
+inseepropriete: uiUserMapping$Realm;;;metadatas.realm;string;false;advanced;
+inseepropriete: uiUserMapping$UserStorage;;;metadatas.userStorage;string;false;advanced;
+inseepropriete: uiUserMapping$Identifiant adresse;Identifiant unique de l'adresse;Il servira pour le rechercher dans l'annuaire;address.id;string;false;advanced;
+inseepropriete: uiUserMapping$Identification du destinataire;;;address.ligne1;string;true;address;
+inseepropriete: uiUserMapping$N° appartement, boite aux lettres, étage, couloir;;;address.ligne2;string;true;address;
+inseepropriete: uiUserMapping$Entrée, tour, bâtiment, immeuble, résidence;;;address.ligne3;string;true;address;
+inseepropriete: uiUserMapping$Numéro et libellé de la voie;;;address.ligne4;string;true;address;
+inseepropriete: uiUserMapping$Lieu dit ou boîte postale;;;address.ligne5;string;true;address;
+inseepropriete: uiUserMapping$Code postal et localité de destination;;;address.ligne6;string;true;address;
+inseepropriete: uiUserMapping$Pays;;;address.ligne7;string;true;address;
+inseepropriete: uiUserMapping$Habilitations;;;habilitations;habilitations;true;rights;attribute_key=inseeGroupeDefaut
+inseepropriete: uiUserMapping$Groupes;;;groups;groups;true;rights;addTitle=Ajouter un groupe;deleteTitle=Supprimer un groupe
+inseepropriete: uiUserMapping$Rôles applicatifs;;;attributes.insee_roles_applicatifs;simpleAppManagedAttributes;true;rights;addTitle=Ajouter un rôle;deleteTitle=Supprimer un rôle;attribute_key=inseeRoleApplicatif
+inseepropriete: uiUserMapping$Propriétés;Propriétés du contact; Ajouter une propriété à saisir en cliquant sur "Ajouter un champ". Supprimer une propriété saisie en vidant le champ ou en cliquant sur la croix rouge à droite du champ. Aucune limite d'ajout.;attributes.properties;list;true;properties;addTitle=Ajouter une propriété;deleteTitle=Supprimer une propriété
 description: domaine1
 
 dn: cn=Utilisateurs_contacts_domaine1_WebServicesLdap,ou=WebServicesLdap_Obje

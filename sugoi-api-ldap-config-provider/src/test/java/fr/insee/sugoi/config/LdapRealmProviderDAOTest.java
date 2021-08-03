@@ -13,10 +13,11 @@
 */
 package fr.insee.sugoi.config;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
+import fr.insee.sugoi.core.configuration.UiMappingService;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.Realm;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ldap.embedded.EmbeddedLdapAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest(classes = {EmbeddedLdapAutoConfiguration.class, LdapRealmProviderDAOImpl.class})
@@ -31,6 +33,8 @@ import org.springframework.test.context.TestPropertySource;
 public class LdapRealmProviderDAOTest {
 
   @Autowired LdapRealmProviderDAOImpl ldapRealmProviderDAOImpl;
+
+  @MockBean private UiMappingService uiMappingService;
 
   @Test
   public void loadUniStorage() {
