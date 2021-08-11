@@ -253,7 +253,7 @@ public class GroupServiceImpl implements GroupService {
       }
       ProviderResponse response =
           storeProvider
-              .getWriterStore(realm)
+              .getWriterStore(realm, storage)
               .deleteUserFromGroup(appName, groupName, userId, providerRequest);
       sugoiEventPublisher.publishCustomEvent(
           realm,
