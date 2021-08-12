@@ -57,13 +57,14 @@ public class LdapFactory {
       if (openLdapPoolConnection.containsKey(name)) {
         openLdapPoolConnection.get(name).close();
       }
-      openLdapPoolConnectionConfig.put(key, name);
       openLdapPoolConnection.put(
           name,
           new LDAPConnectionPool(
               new LDAPConnection(
                   config.get(LdapConfigKeys.URL), Integer.valueOf(config.get(LdapConfigKeys.PORT))),
               Integer.valueOf(config.get(LdapConfigKeys.POOL_SIZE))));
+      // Only put key if ldap connection correctly open
+      openLdapPoolConnectionConfig.put(key, name);
     }
     return openLdapPoolConnection.get(name);
   }
@@ -89,11 +90,12 @@ public class LdapFactory {
       if (openLdapMonoConnection.containsKey(name) || forceErase) {
         openLdapMonoConnection.get(name).close();
       }
-      openLdapMonoConnectionConfig.put(key, name);
       openLdapMonoConnection.put(
           name,
           new LDAPConnection(
               config.get(LdapConfigKeys.URL), Integer.valueOf(config.get(LdapConfigKeys.PORT))));
+      // Only put key if ldap connection correctly open
+      openLdapMonoConnectionConfig.put(key, name);
     }
     return openLdapMonoConnection.get(name);
   }
@@ -123,7 +125,6 @@ public class LdapFactory {
       if (openLdapPoolConnection.containsKey(name)) {
         openLdapPoolConnection.get(name).close();
       }
-      openLdapPoolConnectionConfig.put(key, name);
       openLdapPoolConnection.put(
           name,
           new LDAPConnectionPool(
@@ -133,6 +134,8 @@ public class LdapFactory {
                   config.get(LdapConfigKeys.USERNAME),
                   config.get(LdapConfigKeys.PASSWORD)),
               Integer.valueOf(config.get(LdapConfigKeys.POOL_SIZE))));
+      // Only put key if ldap connection correctly open
+      openLdapPoolConnectionConfig.put(key, name);
     }
     return openLdapPoolConnection.get(name);
   }
@@ -152,7 +155,6 @@ public class LdapFactory {
       if (openLdapMonoConnection.containsKey(name)) {
         openLdapMonoConnection.get(name).close();
       }
-      openLdapMonoConnectionConfig.put(key, name);
       openLdapMonoConnection.put(
           name,
           new LDAPConnection(
@@ -160,6 +162,8 @@ public class LdapFactory {
               Integer.valueOf(config.get(LdapConfigKeys.PORT)),
               config.get(LdapConfigKeys.USERNAME),
               config.get(LdapConfigKeys.PASSWORD)));
+      // Only put key if ldap connection correctly open
+      openLdapMonoConnectionConfig.put(key, name);
     }
     return openLdapMonoConnection.get(name);
   }
