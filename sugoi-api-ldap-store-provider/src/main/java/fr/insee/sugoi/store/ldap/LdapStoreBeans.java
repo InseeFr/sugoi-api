@@ -41,6 +41,9 @@ public class LdapStoreBeans {
   @Value("${fr.insee.sugoi.ldap.default.port:}")
   private String defaultPort;
 
+  @Value("${fr.insee.sugoi.ldap.default.use-authenticated-connection-for-reading:}")
+  private String defaultUseAuthenticatedConnectionForReading = String.valueOf(true);
+
   @Value("${fr.insee.sugoi.ldap.default.group_filter_pattern:}")
   private String defaultGroupFilterPattern;
 
@@ -104,6 +107,8 @@ public class LdapStoreBeans {
     config.put(LdapConfigKeys.PORT, defaultPort);
     config.put(LdapConfigKeys.USERNAME, defaultUsername);
     config.put(LdapConfigKeys.PASSWORD, defaultPassword);
+    config.put(
+        LdapConfigKeys.READ_CONNECTION_AUTHENTICATED, defaultUseAuthenticatedConnectionForReading);
     config.put(LdapConfigKeys.POOL_SIZE, defaultPoolSize);
     config.put(
         LdapConfigKeys.UNIQUE_EMAILS,

@@ -50,8 +50,13 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
   public LdapReaderStore(Map<String, String> config, Map<String, Map<String, String>> mappings) {
     logger.debug("Configuring LdapReaderStore with config : {}", config);
     try {
-      this.ldapPoolConnection = LdapFactory.getConnectionPool(config);
-      this.ldapMonoConnection = LdapFactory.getSingleConnection(config);
+      if (Boolean.valueOf(config.get(LdapConfigKeys.READ_CONNECTION_AUTHENTICATED))) {
+        this.ldapPoolConnection = LdapFactory.getConnectionPoolAuthenticated(config);
+        this.ldapMonoConnection = LdapFactory.getSingleConnectionAuthenticated(config);
+      } else {
+        this.ldapPoolConnection = LdapFactory.getConnectionPool(config);
+        this.ldapMonoConnection = LdapFactory.getSingleConnection(config);
+      }
       this.config = config;
       userLdapMapper = new UserLdapMapper(config, mappings.get("userMapping"));
       organizationLdapMapper =
