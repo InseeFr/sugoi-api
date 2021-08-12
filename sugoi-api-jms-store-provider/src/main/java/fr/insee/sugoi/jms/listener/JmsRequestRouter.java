@@ -196,6 +196,7 @@ public class JmsRequestRouter {
     } catch (RuntimeException e) {
       response.setStatus(ProviderResponseStatus.KO);
       response.setException(e);
+      response.setExceptionType(e.getClass().getCanonicalName());
     }
     return response;
   }

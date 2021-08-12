@@ -23,6 +23,10 @@ public class InvalidPasswordException extends RuntimeException {
     this.message = message;
   }
 
+  public InvalidPasswordException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
   public String getMessage() {
     return this.message;
   }

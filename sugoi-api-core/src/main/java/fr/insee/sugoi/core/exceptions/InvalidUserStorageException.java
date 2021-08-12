@@ -23,6 +23,10 @@ public class InvalidUserStorageException extends RuntimeException {
     this.message = message;
   }
 
+  public InvalidUserStorageException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
   public String getMessage() {
     return this.message;
   }

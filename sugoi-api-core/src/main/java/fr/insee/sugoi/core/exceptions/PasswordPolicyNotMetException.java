@@ -23,6 +23,10 @@ public class PasswordPolicyNotMetException extends RuntimeException {
     this.message = message;
   }
 
+  public PasswordPolicyNotMetException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
   public String getMessage() {
     return this.message;
   }
