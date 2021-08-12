@@ -456,4 +456,27 @@ public class FileWriterStore implements WriterStore {
       throw new RuntimeException("Error writing in file", e);
     }
   }
+
+  @Override
+  public ProviderResponse updateUserCertificate(
+      User user, byte[] certificate, ProviderRequest providerRequest) {
+    throw new NotImplementedException();
+  }
+
+  @Override
+  public ProviderResponse deleteUserCertificate(User user, ProviderRequest providerRequest) {
+    throw new NotImplementedException();
+  }
+
+  @Override
+  public ProviderResponse updateOrganizationGpgKey(
+      Organization organization, byte[] bytes, ProviderRequest providerRequest) {
+    throw new NotImplementedException();
+  }
+
+  @Override
+  public ProviderResponse deleteOrganizationGpgKey(
+      Organization organization, ProviderRequest providerRequest) {
+    throw new NotImplementedException();
+  }
 }

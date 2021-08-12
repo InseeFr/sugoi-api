@@ -15,12 +15,14 @@ package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
+import fr.insee.sugoi.core.exceptions.UnableToUpdateCertificateException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.model.SugoiUser;
 import fr.insee.sugoi.core.realm.RealmProvider;
+import fr.insee.sugoi.core.service.CertificateService;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
@@ -38,10 +40,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
 import java.net.URI;
+import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -59,6 +65,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
@@ -71,6 +78,8 @@ public class UserController {
   @Autowired private UserService userService;
 
   @Autowired private RealmProvider realmService;
+
+  @Autowired private CertificateService certificateService;
 
   @GetMapping(
       path = {"/realms/{realm}/storages/{storage}/users"},
@@ -710,5 +719,280 @@ public class UserController {
       @Parameter(description = "User's mail to search", required = true) @PathVariable("mail")
           String mail) {
     return getUserByMail(realm, null, mail);
+  }
+
+  @GetMapping(value = "/realms/{realm}/storages/{storage}/users/{id}/certificates")
+  @Operation(summary = "Get user certificate")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Certficate of user")})
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
+  public ResponseEntity<Resource> getUserCertificate(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "Username to search", required = true) @PathVariable("id")
+          String id) {
+    Resource resource = new ByteArrayResource(userService.getCertificate(realm, storage, id));
+    return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+        .header(
+            HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"cert-user-" + id + ".der\"")
+        .body(resource);
+  }
+
+  @GetMapping(value = "/realms/{realm}/users/{id}/certificates")
+  @Operation(summary = "Get user certificate")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Certficate of user",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = User.class))
+            })
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
+  public ResponseEntity<Resource> getUserCertificate(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "Username to search", required = true) @PathVariable("id")
+          String id) {
+    User user =
+        userService
+            .findById(realm, null, id)
+            .orElseThrow(
+                () ->
+                    new UserNotFoundException(
+                        "Cannot find user with id " + id + " in realm " + realm));
+    return getUserCertificate(
+        realm, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id);
+  }
+
+  @PutMapping(
+      value = "/realms/{realm}/storages/{storage}/users/{id}/certificates",
+      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  @Operation(summary = "Update user certificate")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Certficate of user",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = User.class))
+            })
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  public ResponseEntity<?> updateUserCertificate(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "Username to search", required = true) @PathVariable("id") String id,
+      @Parameter(description = "Certificate") @RequestBody MultipartFile file,
+      @Parameter(description = "Allowed asynchronous request", required = false)
+          @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
+          boolean isAsynchronous,
+      @Parameter(description = "Make request prioritary", required = false)
+          @RequestHeader(name = "X-SUGOI-URGENT-REQUEST", defaultValue = "false")
+          boolean isUrgent,
+      @Parameter(description = "Transaction Id", required = false)
+          @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
+          String transactionId,
+      Authentication authentication)
+      throws IOException {
+    try {
+      X509Certificate certificat = certificateService.getCertificateClientFromMultipartFile(file);
+      ProviderResponse response =
+          userService.updateCertificate(
+              realm,
+              storage,
+              id,
+              certificat.getEncoded(),
+              new ProviderRequest(
+                  new SugoiUser(
+                      authentication.getName(),
+                      authentication.getAuthorities().stream()
+                          .map(GrantedAuthority::getAuthority)
+                          .map(String::toUpperCase)
+                          .collect(Collectors.toList())),
+                  isAsynchronous,
+                  transactionId,
+                  isUrgent));
+      return ResponseEntity.status(Utils.convertStatusTHttpStatus(response, false, true))
+          .header("X-SUGOI-TRANSACTION-ID", response.getRequestId())
+          .header("X-SUGOI-REQUEST-STATUS", response.getStatus().toString())
+          .build();
+    } catch (Exception e) {
+      throw new UnableToUpdateCertificateException(e.toString(), e);
+    }
+  }
+
+  @PutMapping(
+      value = "/realms/{realm}/users/{id}/certificates",
+      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  @Operation(summary = "Update user certificate")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Certficate of user")})
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  public ResponseEntity<?> updateUserCertificate(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "Username to search", required = true) @PathVariable("id") String id,
+      @Parameter(description = "Certificate") @RequestBody(required = true) MultipartFile file,
+      @Parameter(description = "Allowed asynchronous request", required = false)
+          @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
+          boolean isAsynchronous,
+      @Parameter(description = "Make request prioritary", required = false)
+          @RequestHeader(name = "X-SUGOI-URGENT-REQUEST", defaultValue = "false")
+          boolean isUrgent,
+      @Parameter(description = "Transaction Id", required = false)
+          @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
+          String transactionId,
+      Authentication authentication)
+      throws IOException {
+
+    User user =
+        userService
+            .findById(realm, null, id)
+            .orElseThrow(
+                () ->
+                    new UserNotFoundException(
+                        "Cannot find user with id " + id + " in realm " + realm));
+    return updateUserCertificate(
+        realm,
+        (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
+        id,
+        file,
+        isAsynchronous,
+        isUrgent,
+        transactionId,
+        authentication);
+  }
+
+  @DeleteMapping(value = "/realms/{realm}/storages/{storage}/users/{id}/certificates")
+  @Operation(summary = "Delete user certificate")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Certficate of user",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = User.class))
+            })
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  public ResponseEntity<?> deleteUserCertificate(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "Username to search", required = true) @PathVariable("id") String id,
+      @Parameter(description = "Allowed asynchronous request", required = false)
+          @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
+          boolean isAsynchronous,
+      @Parameter(description = "Make request prioritary", required = false)
+          @RequestHeader(name = "X-SUGOI-URGENT-REQUEST", defaultValue = "false")
+          boolean isUrgent,
+      @Parameter(description = "Transaction Id", required = false)
+          @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
+          String transactionId,
+      Authentication authentication) {
+    ProviderResponse response =
+        userService.deleteCertificate(
+            realm,
+            storage,
+            id,
+            new ProviderRequest(
+                new SugoiUser(
+                    authentication.getName(),
+                    authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .map(String::toUpperCase)
+                        .collect(Collectors.toList())),
+                isAsynchronous,
+                transactionId,
+                isUrgent));
+    return ResponseEntity.status(Utils.convertStatusTHttpStatus(response, false, true))
+        .header("X-SUGOI-TRANSACTION-ID", response.getRequestId())
+        .header("X-SUGOI-REQUEST-STATUS", response.getStatus().toString())
+        .build();
+  }
+
+  @DeleteMapping(value = "/realms/{realm}/users/{id}/certificates")
+  @Operation(summary = "Delete user certificate")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Certficate of user",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = User.class))
+            })
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  public ResponseEntity<?> deleteUserCertificate(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "Username to search", required = true) @PathVariable("id") String id,
+      @Parameter(description = "Allowed asynchronous request", required = false)
+          @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
+          boolean isAsynchronous,
+      @Parameter(description = "Make request prioritary", required = false)
+          @RequestHeader(name = "X-SUGOI-URGENT-REQUEST", defaultValue = "false")
+          boolean isUrgent,
+      @Parameter(description = "Transaction Id", required = false)
+          @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
+          String transactionId,
+      Authentication authentication) {
+
+    User user =
+        userService
+            .findById(realm, null, id)
+            .orElseThrow(
+                () ->
+                    new UserNotFoundException(
+                        "Cannot find user with id " + id + " in realm " + realm));
+    return deleteUserCertificate(
+        realm,
+        (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
+        id,
+        isAsynchronous,
+        isUrgent,
+        transactionId,
+        authentication);
   }
 }

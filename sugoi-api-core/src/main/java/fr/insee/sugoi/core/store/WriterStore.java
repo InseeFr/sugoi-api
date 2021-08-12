@@ -228,4 +228,15 @@ public interface WriterStore {
    */
   ProviderResponse deleteAppManagedAttribute(
       String userId, String attributeKey, String attributeValue, ProviderRequest providerRequest);
+
+  ProviderResponse updateUserCertificate(
+      User user, byte[] certificate, ProviderRequest providerRequest);
+
+  ProviderResponse deleteUserCertificate(User user, ProviderRequest providerRequest);
+
+  ProviderResponse updateOrganizationGpgKey(
+      Organization organization, byte[] bytes, ProviderRequest providerRequest);
+
+  ProviderResponse deleteOrganizationGpgKey(
+      Organization organization, ProviderRequest providerRequest);
 }

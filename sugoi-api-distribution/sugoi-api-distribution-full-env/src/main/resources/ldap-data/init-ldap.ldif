@@ -255,6 +255,9 @@ inseepropriete: organization_object_classes$top,inseeOrganisation
 inseepropriete: userMapping$username:uid,String,rw
 inseepropriete: userMapping$lastName:sn,String,rw
 inseepropriete: userMapping$mail:mail,String,rw
+inseepropriete: userMapping$certificate:userCertificate;binary,byte_array,ro
+inseepropriete: organizationMapping$gpgkey:inseeClefChiffrement,byte_array,ro
+inseepropriete: userMapping$mail:mail,String,rw
 inseepropriete: userMapping$firstName:givenname,String,rw
 inseepropriete: userMapping$attributes.common_name:cn,String,rw
 inseepropriete: userMapping$attributes.personal_title:personalTitle,String,rw
@@ -308,6 +311,11 @@ inseepropriete: uiUserMapping$Habilitations;;;habilitations;habilitations;true;r
 inseepropriete: uiUserMapping$Groupes;;;groups;groups;true;rights;addTitle=Ajouter un groupe;deleteTitle=Supprimer un groupe
 inseepropriete: uiUserMapping$Rôles applicatifs;;;attributes.insee_roles_applicatifs;simpleAppManagedAttributes;true;rights;addTitle=Ajouter un rôle;deleteTitle=Supprimer un rôle;attribute_key=inseeRoleApplicatif
 inseepropriete: uiUserMapping$Propriétés;Propriétés du contact; Ajouter une propriété à saisir en cliquant sur "Ajouter un champ". Supprimer une propriété saisie en vidant le champ ou en cliquant sur la croix rouge à droite du champ. Aucune limite d'ajout.;attributes.properties;list;true;properties;addTitle=Ajouter une propriété;deleteTitle=Supprimer une propriété
+inseepropriete: uiUserMapping$Certificat ID;;;metadatas.cert.id;string;false;authentification;
+inseepropriete: uiUserMapping$Certificat valide;;;metadatas.cert.isValid;string;false;authentification;
+inseepropriete: uiUserMapping$Certificat issuer;;;metadatas.cert.issuer;string;false;authentification;
+inseepropriete: uiUserMapping$Certificat subject;;;metadatas.cert.subject;string;false;authentification;
+inseepropriete: uiUserMapping$Certificat expiration;;;metadatas.cert.expiration;string;false;authentification;
 description: domaine1
 
 dn: cn=Utilisateurs_contacts_domaine1_WebServicesLdap,ou=WebServicesLdap_Obje

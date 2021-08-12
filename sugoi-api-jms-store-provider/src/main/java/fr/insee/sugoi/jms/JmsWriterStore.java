@@ -273,6 +273,49 @@ public class JmsWriterStore implements WriterStore {
     return checkAndSend(Method.DELETE_APP_MANAGED_ATTRIBUTE, params, userId, providerRequest);
   }
 
+  @Override
+  public ProviderResponse updateUserCertificate(
+      User user, byte[] certificate, ProviderRequest providerRequest) {
+    Map<String, Object> params = new HashMap<>();
+    params.put(JmsAtttributes.USER_ID, user.getUsername());
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    params.put(JmsAtttributes.CERTIFICATE, certificate);
+    return checkAndSend(Method.UPDATE_CERTIFICATE, params, user.getUsername(), providerRequest);
+  }
+
+  @Override
+  public ProviderResponse deleteUserCertificate(User user, ProviderRequest providerRequest) {
+    Map<String, Object> params = new HashMap<>();
+    params.put(JmsAtttributes.USER_ID, user.getUsername());
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    return checkAndSend(Method.DELETE_CERTIFICATE, params, user.getUsername(), providerRequest);
+  }
+
+  @Override
+  public ProviderResponse updateOrganizationGpgKey(
+      Organization organization, byte[] bytes, ProviderRequest providerRequest) {
+    Map<String, Object> params = new HashMap<>();
+    params.put(JmsAtttributes.ORGANIZATION_NAME, organization.getIdentifiant());
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    params.put(JmsAtttributes.GPG_KEY, bytes);
+    return checkAndSend(
+        Method.UPDATE_GPG_KEY, params, organization.getIdentifiant(), providerRequest);
+  }
+
+  @Override
+  public ProviderResponse deleteOrganizationGpgKey(
+      Organization organization, ProviderRequest providerRequest) {
+    Map<String, Object> params = new HashMap<>();
+    params.put(JmsAtttributes.ORGANIZATION_NAME, organization.getIdentifiant());
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    return checkAndSend(
+        Method.DELETE_GPG_KEY, params, organization.getIdentifiant(), providerRequest);
+  }
+
   private ProviderResponse checkAndSend(
       String method, Map<String, Object> params, String entityId, ProviderRequest providerRequest) {
     ProviderResponse response = new ProviderResponse();

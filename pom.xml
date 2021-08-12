@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.insee.sugoi</groupId>
 	<artifactId>sugoi-api-parent</artifactId>
@@ -41,6 +42,7 @@
 		<wiremock-standalone.version>2.27.2</wiremock-standalone.version>
 		<freemarker.version>2.3.31</freemarker.version>
 		<git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
+		<commons-io.version>2.11.0</commons-io.version>
 	</properties>
 
 	<dependencies></dependencies>
@@ -309,6 +311,11 @@
 				<groupId>fr.insee.sugoi</groupId>
 				<artifactId>sugoi-api-seealso</artifactId>
 				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>{commons-io.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

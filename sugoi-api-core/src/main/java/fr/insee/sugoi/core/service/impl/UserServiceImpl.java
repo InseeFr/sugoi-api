@@ -18,6 +18,7 @@ import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
+import fr.insee.sugoi.core.exceptions.UnableToUpdateCertificateException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
@@ -450,5 +451,57 @@ public class UserServiceImpl implements UserService {
               Map.entry(EventKeysConfig.ERROR, e.toString())));
       return Optional.ofNullable(user);
     }
+  }
+
+  @Override
+  public byte[] getCertificate(String realm, String userStorage, String userId) {
+    User user =
+        findById(realm, userStorage, userId)
+            .orElseThrow(
+                () ->
+                    new UserNotFoundException(
+                        "Cannot find user with id " + userId + " in realm " + realm));
+    return user.getCertificate();
+  }
+
+  @Override
+  public ProviderResponse updateCertificate(
+      String realm,
+      String userStorage,
+      String userId,
+      byte[] certificat,
+      ProviderRequest providerRequest) {
+    try {
+      User user =
+          findById(realm, userStorage, userId)
+              .orElseThrow(
+                  () ->
+                      new UserNotFoundException(
+                          "Cannot find user with id " + userId + " in realm " + realm));
+      ProviderResponse response =
+          storeProvider
+              .getWriterStore(realm, userStorage)
+              .updateUserCertificate(user, certificat, providerRequest);
+      return response;
+    } catch (Exception e) {
+      throw new UnableToUpdateCertificateException(
+          "Cannot update certificate because: " + e.toString(), e);
+    }
+  }
+
+  @Override
+  public ProviderResponse deleteCertificate(
+      String realm, String userStorage, String id, ProviderRequest providerRequest) {
+    User user =
+        findById(realm, userStorage, id)
+            .orElseThrow(
+                () ->
+                    new UserNotFoundException(
+                        "Cannot find user with id " + id + " in realm " + realm));
+    ProviderResponse response =
+        storeProvider
+            .getWriterStore(realm, userStorage)
+            .deleteUserCertificate(user, providerRequest);
+    return response;
   }
 }

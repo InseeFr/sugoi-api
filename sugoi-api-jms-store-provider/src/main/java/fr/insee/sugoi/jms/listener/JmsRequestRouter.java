@@ -30,6 +30,10 @@ import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.User;
+import java.io.ByteArrayInputStream;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,7 +169,7 @@ public class JmsRequestRouter {
               (String) request.getmethodParams().get(JmsAtttributes.ATTRIBUTE_KEY),
               (String) request.getmethodParams().get(JmsAtttributes.ATTRIBUTE_VALUE),
               providerRequest);
-
+          break;
         case Method.DELETE_APP_MANAGED_ATTRIBUTE:
           userService.deleteAppManagedAttribute(
               realm,
@@ -174,6 +178,43 @@ public class JmsRequestRouter {
               (String) request.getmethodParams().get(JmsAtttributes.ATTRIBUTE_KEY),
               (String) request.getmethodParams().get(JmsAtttributes.ATTRIBUTE_VALUE),
               providerRequest);
+          break;
+        case Method.DELETE_CERTIFICATE:
+          userService.deleteCertificate(
+              realm,
+              userStorage,
+              (String) request.getmethodParams().get(JmsAtttributes.USER_ID),
+              providerRequest);
+          break;
+        case Method.UPDATE_CERTIFICATE:
+          String cert = (String) request.getmethodParams().get(JmsAtttributes.CERTIFICATE);
+          byte encodedCert[] = Base64.getDecoder().decode(cert);
+          ByteArrayInputStream inputStream = new ByteArrayInputStream(encodedCert);
+          CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+          X509Certificate certificate =
+              (X509Certificate) certFactory.generateCertificate(inputStream);
+          userService.updateCertificate(
+              realm,
+              userStorage,
+              (String) request.getmethodParams().get(JmsAtttributes.USER_ID),
+              certificate.getEncoded(),
+              providerRequest);
+          break;
+        case Method.UPDATE_GPG_KEY:
+          orgService.updateGpgKey(
+              realm,
+              userStorage,
+              (String) request.getmethodParams().get(JmsAtttributes.ORGANIZATION_NAME),
+              ((String) request.getmethodParams().get(JmsAtttributes.GPG_KEY)).getBytes(),
+              providerRequest);
+          break;
+        case Method.DELETE_GPG_KEY:
+          orgService.deleteGpgKey(
+              realm,
+              userStorage,
+              (String) request.getmethodParams().get(JmsAtttributes.ORGANIZATION_NAME),
+              providerRequest);
+          break;
         default:
           throw new Exception("Invalid Operation");
       }

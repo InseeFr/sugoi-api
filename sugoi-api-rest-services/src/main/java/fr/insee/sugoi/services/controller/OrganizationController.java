@@ -15,6 +15,7 @@ package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
+import fr.insee.sugoi.core.exceptions.UnabletoUpdateGPGKeyException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -37,6 +38,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -54,6 +57,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
@@ -583,5 +587,260 @@ public class OrganizationController {
           @PathVariable("orgId")
           String id) {
     return getOrganizationById(realm, null, id);
+  }
+
+  @GetMapping(value = "/realms/{realm}/storages/{storage}/organization/{id}/gpg-key")
+  @Operation(summary = "Get organization GPG key")
+  @ApiResponses(
+      value = {@ApiResponse(responseCode = "200", description = "GPG key of organization")})
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
+  public ResponseEntity<?> getOrganizationGPGKey(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "Organization ID to search", required = true) @PathVariable("id")
+          String id) {
+    Resource resource = new ByteArrayResource(organizationService.getGpgkey(realm, storage, id));
+    return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"gpg-keys-" + id + ".gpg\"")
+        .body(resource);
+  }
+
+  @GetMapping(value = "/realms/{realm}/organization/{id}/gpg-key")
+  @Operation(summary = "Get organization GPG key")
+  @ApiResponses(
+      value = {@ApiResponse(responseCode = "200", description = "GPG key of organization")})
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
+  public ResponseEntity<?> getOrganizationGPGKey(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "Organization ID to search", required = true) @PathVariable("id")
+          String id) {
+    Organization organization =
+        organizationService
+            .findById(realm, null, id)
+            .orElseThrow(
+                () ->
+                    new OrganizationNotFoundException(
+                        "Cannot find organization with id " + id + " in realm " + realm));
+    return getOrganizationGPGKey(
+        realm, (String) organization.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id);
+  }
+
+  @PutMapping(
+      value = "/realms/{realm}/storages/{storage}/organization/{id}/gpg-key",
+      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  @Operation(summary = "Update organization gpg key")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Certficate of user",
+            content = {})
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  public ResponseEntity<?> updateOrganizationGpgKey(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "Organization ID to search", required = true) @PathVariable("id")
+          String id,
+      @Parameter(description = "GPG key") @RequestBody MultipartFile file,
+      @Parameter(description = "Allowed asynchronous request", required = false)
+          @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
+          boolean isAsynchronous,
+      @Parameter(description = "Make request prioritary", required = false)
+          @RequestHeader(name = "X-SUGOI-URGENT-REQUEST", defaultValue = "false")
+          boolean isUrgent,
+      @Parameter(description = "Transaction Id", required = false)
+          @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
+          String transactionId,
+      Authentication authentication) {
+    try {
+      ProviderResponse response =
+          organizationService.updateGpgKey(
+              realm,
+              storage,
+              id,
+              file.getBytes(),
+              new ProviderRequest(
+                  new SugoiUser(
+                      authentication.getName(),
+                      authentication.getAuthorities().stream()
+                          .map(GrantedAuthority::getAuthority)
+                          .map(String::toUpperCase)
+                          .collect(Collectors.toList())),
+                  isAsynchronous,
+                  transactionId,
+                  isUrgent));
+      return ResponseEntity.status(Utils.convertStatusTHttpStatus(response, false, true))
+          .header("X-SUGOI-TRANSACTION-ID", response.getRequestId())
+          .header("X-SUGOI-REQUEST-STATUS", response.getStatus().toString())
+          .build();
+    } catch (Exception e) {
+      throw new UnabletoUpdateGPGKeyException(e.toString(), e);
+    }
+  }
+
+  @PutMapping(
+      value = "/realms/{realm}/organization/{id}/gpg-key",
+      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  @Operation(summary = "update GPG key")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Certficate of user")})
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  public ResponseEntity<?> updateOrganizationGpgKey(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "Organization ID to search", required = true) @PathVariable("id")
+          String id,
+      @Parameter(description = "Gpg key") @RequestBody(required = true) MultipartFile file,
+      @Parameter(description = "Allowed asynchronous request", required = false)
+          @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
+          boolean isAsynchronous,
+      @Parameter(description = "Make request prioritary", required = false)
+          @RequestHeader(name = "X-SUGOI-URGENT-REQUEST", defaultValue = "false")
+          boolean isUrgent,
+      @Parameter(description = "Transaction Id", required = false)
+          @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
+          String transactionId,
+      Authentication authentication) {
+
+    Organization organization =
+        organizationService
+            .findById(realm, null, id)
+            .orElseThrow(
+                () ->
+                    new OrganizationNotFoundException(
+                        "Cannot find organization with id " + id + " in realm " + realm));
+    return updateOrganizationGpgKey(
+        realm,
+        (String) organization.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
+        id,
+        file,
+        isAsynchronous,
+        isUrgent,
+        transactionId,
+        authentication);
+  }
+
+  @DeleteMapping(value = "/realms/{realm}/storages/{storage}/organization/{id}/gpg-key")
+  @Operation(summary = "Delete organization gpg Key")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Certficate of user",
+            content = {})
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  public ResponseEntity<?> deleteOrganizationGpgKey(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "Organization ID to search", required = true) @PathVariable("id")
+          String id,
+      @Parameter(description = "Allowed asynchronous request", required = false)
+          @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
+          boolean isAsynchronous,
+      @Parameter(description = "Make request prioritary", required = false)
+          @RequestHeader(name = "X-SUGOI-URGENT-REQUEST", defaultValue = "false")
+          boolean isUrgent,
+      @Parameter(description = "Transaction Id", required = false)
+          @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
+          String transactionId,
+      Authentication authentication) {
+    ProviderResponse response =
+        organizationService.deleteGpgKey(
+            realm,
+            storage,
+            id,
+            new ProviderRequest(
+                new SugoiUser(
+                    authentication.getName(),
+                    authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .map(String::toUpperCase)
+                        .collect(Collectors.toList())),
+                isAsynchronous,
+                transactionId,
+                isUrgent));
+    return ResponseEntity.status(Utils.convertStatusTHttpStatus(response, false, true))
+        .header("X-SUGOI-TRANSACTION-ID", response.getRequestId())
+        .header("X-SUGOI-REQUEST-STATUS", response.getStatus().toString())
+        .build();
+  }
+
+  @DeleteMapping(value = "/realms/{realm}/organization/{id}/gpg-key")
+  @Operation(summary = "Delete organization gpg Key")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Certficate of user",
+            content = {})
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  public ResponseEntity<?> deleteOrganizationCertificate(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "Organization ID to search", required = true) @PathVariable("id")
+          String id,
+      @Parameter(description = "Allowed asynchronous request", required = false)
+          @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
+          boolean isAsynchronous,
+      @Parameter(description = "Make request prioritary", required = false)
+          @RequestHeader(name = "X-SUGOI-URGENT-REQUEST", defaultValue = "false")
+          boolean isUrgent,
+      @Parameter(description = "Transaction Id", required = false)
+          @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
+          String transactionId,
+      Authentication authentication) {
+
+    Organization organization =
+        organizationService
+            .findById(realm, null, id)
+            .orElseThrow(
+                () ->
+                    new OrganizationNotFoundException(
+                        "Cannot find organization with id " + id + " in realm " + realm));
+    return deleteOrganizationGpgKey(
+        realm,
+        (String) organization.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
+        id,
+        isAsynchronous,
+        isUrgent,
+        transactionId,
+        authentication);
   }
 }
