@@ -15,6 +15,10 @@ package fr.insee.sugoi.core.exceptions;
 
 public class StoragePolicyNotMetException extends RuntimeException {
 
+  public StoragePolicyNotMetException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
   public StoragePolicyNotMetException(String message) {
     super(message);
   }

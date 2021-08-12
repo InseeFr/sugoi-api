@@ -21,6 +21,7 @@ public class ProviderResponse implements Serializable {
   String requestId;
   String entityId;
   RuntimeException exception;
+  String exceptionType;
   Object entity;
 
   public ProviderResponse(
@@ -33,6 +34,9 @@ public class ProviderResponse implements Serializable {
     this.requestId = requestId;
     this.status = status;
     this.exception = e;
+    if (e != null) {
+      this.exceptionType = e.getClass().getCanonicalName();
+    }
     this.entity = entity;
   }
 
@@ -92,5 +96,13 @@ public class ProviderResponse implements Serializable {
 
   public void setEntity(Object entity) {
     this.entity = entity;
+  }
+
+  public String getExceptionType() {
+    return this.exceptionType;
+  }
+
+  public void setExceptionType(String exceptionType) {
+    this.exceptionType = exceptionType;
   }
 }

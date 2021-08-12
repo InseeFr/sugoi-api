@@ -350,7 +350,7 @@ public class JmsWriterStore implements WriterStore {
         if (response.getStatus() == ProviderResponseStatus.OK) {
           response.setStatus(ProviderResponseStatus.ACCEPTED);
         } else if (response.getStatus() == ProviderResponseStatus.KO) {
-          throw response.getException();
+          throw createExceptionFromResponse(response);
         }
       } catch (JmsException e) {
         response.setStatus(ProviderResponseStatus.REQUESTED);
@@ -359,5 +359,18 @@ public class JmsWriterStore implements WriterStore {
     }
 
     return response;
+  }
+
+  private RuntimeException createExceptionFromResponse(ProviderResponse providerResponse) {
+    try {
+      Class<?> c = Class.forName(providerResponse.getExceptionType());
+      return (RuntimeException)
+          c.getDeclaredConstructor(String.class, Throwable.class)
+              .newInstance(
+                  providerResponse.getException().getMessage(), providerResponse.getException());
+    } catch (Exception e) {
+      return new RuntimeException(
+          providerResponse.getException().getMessage(), providerResponse.getException());
+    }
   }
 }

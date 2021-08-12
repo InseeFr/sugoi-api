@@ -28,6 +28,10 @@ public class InvalidTransactionIdException extends RuntimeException {
     this.message = message;
   }
 
+  public InvalidTransactionIdException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
   public String getMessage() {
     return this.message;
   }
