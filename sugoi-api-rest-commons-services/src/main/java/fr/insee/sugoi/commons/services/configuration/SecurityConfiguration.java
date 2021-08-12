@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.commons.services.configuration;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -61,36 +62,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   private boolean ldapAccountManagmentGroupSubtree;
 
   private String oidcClaimUsername = "sub";
+  /** Path to the role field in token. For instance realm_access.role */
+  private String oidcClaimRole = "realm_access.roles";
 
   /** Enable a monitoring user */
   private boolean monitorUserEnabled = false;
 
   private String monitorUserName = "monitor";
   private String monitorUserPassword;
-
-  public String getMonitorUserName() {
-    return monitorUserName;
-  }
-
-  public void setMonitorUserName(String monitorUserName) {
-    this.monitorUserName = monitorUserName;
-  }
-
-  public String getMonitorUserPassword() {
-    return monitorUserPassword;
-  }
-
-  public void setMonitorUserPassword(String monitorUserPassword) {
-    this.monitorUserPassword = monitorUserPassword;
-  }
-
-  public boolean isMonitorUserEnabled() {
-    return monitorUserEnabled;
-  }
-
-  public void setMonitorUserEnabled(boolean monitorUserEnabled) {
-    this.monitorUserEnabled = monitorUserEnabled;
-  }
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
@@ -148,24 +127,40 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter() {
     return new Converter<Jwt, Collection<GrantedAuthority>>() {
       @Override
-      @SuppressWarnings({"unchecked", "serial"})
+      @SuppressWarnings({"unchecked"})
       public Collection<GrantedAuthority> convert(Jwt source) {
-        return ((Map<String, List<String>>) source.getClaim("realm_access"))
-            .get("roles").stream()
-                .map(
-                    s ->
-                        new GrantedAuthority() {
-                          @Override
-                          public String getAuthority() {
-                            return "ROLE_" + s;
-                          }
 
-                          @Override
-                          public String toString() {
-                            return getAuthority();
-                          }
-                        })
-                .collect(Collectors.toList());
+        String[] claimPath = oidcClaimRole.split("\\.");
+        Map<String, Object> claims = source.getClaims();
+        try {
+
+          for (int i = 0; i < claimPath.length - 1; i++) {
+            claims = (Map<String, Object>) claims.get(claimPath[i]);
+          }
+
+          List<String> roles =
+              (List<String>)
+                  claims.getOrDefault(claimPath[claimPath.length - 1], new ArrayList<>());
+
+          return roles.stream()
+              .map(
+                  s ->
+                      new GrantedAuthority() {
+                        @Override
+                        public String getAuthority() {
+                          return "ROLE_" + s;
+                        }
+
+                        @Override
+                        public String toString() {
+                          return getAuthority();
+                        }
+                      })
+              .collect(Collectors.toList());
+        } catch (ClassCastException e) {
+          // role path not correctly found, assume that no role for this user
+          return new ArrayList<>();
+        }
       }
     };
   }
@@ -251,5 +246,37 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   public void setOidcClaimUsername(String oidcClaimUsername) {
     this.oidcClaimUsername = oidcClaimUsername;
+  }
+
+  public String getOidcClaimRole() {
+    return oidcClaimRole;
+  }
+
+  public void setOidcClaimRole(String oidcClaimRole) {
+    this.oidcClaimRole = oidcClaimRole;
+  }
+
+  public String getMonitorUserName() {
+    return monitorUserName;
+  }
+
+  public void setMonitorUserName(String monitorUserName) {
+    this.monitorUserName = monitorUserName;
+  }
+
+  public String getMonitorUserPassword() {
+    return monitorUserPassword;
+  }
+
+  public void setMonitorUserPassword(String monitorUserPassword) {
+    this.monitorUserPassword = monitorUserPassword;
+  }
+
+  public boolean isMonitorUserEnabled() {
+    return monitorUserEnabled;
+  }
+
+  public void setMonitorUserEnabled(boolean monitorUserEnabled) {
+    this.monitorUserEnabled = monitorUserEnabled;
   }
 }
