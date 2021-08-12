@@ -17,8 +17,15 @@ import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.User;
+import java.io.ByteArrayInputStream;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +45,36 @@ public class UserLdapMapper implements LdapMapper<User> {
 
   @Override
   public User mapFromAttributes(Collection<Attribute> attributes) {
-    return GenericLdapMapper.mapLdapAttributesToObject(attributes, User.class, config, mapping);
+    User user =
+        GenericLdapMapper.mapLdapAttributesToObject(attributes, User.class, config, mapping);
+    if (user.getCertificate() != null) {
+      CertificateFactory cf;
+      try {
+        cf = CertificateFactory.getInstance("X509");
+        X509Certificate myCert =
+            (X509Certificate)
+                cf.generateCertificate(new ByteArrayInputStream(user.getCertificate()));
+        user.setCertificate(myCert.getEncoded());
+        Map<String, Object> certDetails = new HashMap<>();
+        certDetails.put("expiration", myCert.getNotAfter());
+        String certificateIdEntry =
+            ((List<String>) user.getAttributes().get("properties"))
+                .stream().filter(entry -> entry.contains("certificateId$")).findFirst().get();
+        certDetails.put("id", certificateIdEntry.split("\\$")[1]);
+        try {
+          myCert.checkValidity();
+          certDetails.put("isValid", true);
+        } catch (CertificateExpiredException | CertificateNotYetValidException e) {
+          certDetails.put("isValid", false);
+        }
+        certDetails.put("issuer", myCert.getIssuerX500Principal().getName());
+        certDetails.put("subject", myCert.getSubjectX500Principal().getName());
+        user.addMetadatas("cert", certDetails);
+      } catch (CertificateException e) {
+        e.printStackTrace();
+      }
+    }
+    return user;
   }
 
   @Override

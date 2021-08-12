@@ -50,4 +50,8 @@ public class JmsAtttributes {
   public static final String ATTRIBUTE_VALUE = "attributeValue";
 
   public static final String PROVIDER_REQUEST = "providerRequest";
+
+  public static final String CERTIFICATE = "certificate";
+
+  public static final String GPG_KEY = "gpgKey";
 }

@@ -24,6 +24,7 @@ import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -51,12 +52,10 @@ public class GenericLdapMapper {
           String attributeLdapName = splitedMappingDefinition[0];
           String mappingType = splitedMappingDefinition[1];
           String fieldToSetName = mappingDefinition.getKey();
-          List<String> correspondingAttributes = new ArrayList<>();
-          attributes.stream()
-              .filter(attribute -> attributeLdapName.equalsIgnoreCase(attribute.getName()))
-              .forEach(
-                  attribute ->
-                      correspondingAttributes.addAll(Arrays.asList(attribute.getValues())));
+          List<Attribute> correspondingAttributes =
+              attributes.stream()
+                  .filter(attribute -> attributeLdapName.equalsIgnoreCase(attribute.getName()))
+                  .collect(Collectors.toList());
           if (correspondingAttributes.size() > 0) {
             if (fieldToSetName.contains(".")) {
               String[] splitedFieldName = fieldToSetName.split("\\.");
@@ -159,31 +158,39 @@ public class GenericLdapMapper {
   }
 
   private static Object transformAttributeToSugoi(
-      String type, List<String> attr, Map<String, String> config) {
+      String type, List<Attribute> attrs, Map<String, String> config) throws CertificateException {
     switch (type.toUpperCase()) {
       case "STRING":
-        return attr.get(0);
+        return attrs.get(0).getValue();
+      case "BYTE_ARRAY":
+        return attrs.get(0).getValueByteArray();
       case "ORGANIZATION":
         Organization orga = new Organization();
-        orga.setIdentifiant(LdapUtils.getNodeValueFromDN(attr.get(0)));
+        orga.setIdentifiant(LdapUtils.getNodeValueFromDN(attrs.get(0).getValue()));
         return orga;
       case "ADDRESS":
         Map<String, String> address = new HashMap<>();
-        address.put("id", LdapUtils.getNodeValueFromDN(attr.get(0)));
+        address.put("id", LdapUtils.getNodeValueFromDN(attrs.get(0).getValue()));
         return address;
       case "LIST_HABILITATION":
-        return attr.stream()
+        List<String> values = new ArrayList<>();
+        attrs.stream().forEach(attribute -> values.addAll(Arrays.asList(attribute.getValues())));
+        return values.stream()
             .filter(
                 attributeValue ->
                     attributeValue.split("_").length == 2 || attributeValue.split("_").length == 3)
             .map(attributeValue -> new Habilitation(attributeValue))
             .collect(Collectors.toList());
       case "LIST_USER":
-        return attr.stream()
+        values = new ArrayList<>();
+        attrs.stream().forEach(attribute -> values.addAll(Arrays.asList(attribute.getValues())));
+        return values.stream()
             .map(attributeValue -> new User(LdapUtils.getNodeValueFromDN(attributeValue)))
             .collect(Collectors.toList());
       case "LIST_GROUP":
-        return attr.stream()
+        values = new ArrayList<>();
+        attrs.stream().forEach(attribute -> values.addAll(Arrays.asList(attribute.getValues())));
+        return values.stream()
             .map(
                 attributeValue -> {
                   Pattern pattern =
@@ -202,7 +209,9 @@ public class GenericLdapMapper {
                 })
             .collect(Collectors.toList());
       case "LIST_STRING":
-        return attr.stream().collect(Collectors.toList());
+        values = new ArrayList<>();
+        attrs.stream().forEach(attribute -> values.addAll(Arrays.asList(attribute.getValues())));
+        return values.stream().collect(Collectors.toList());
       default:
         return null;
     }

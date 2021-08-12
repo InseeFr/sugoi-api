@@ -130,4 +130,16 @@ public interface UserService {
       String attributeKey,
       String attribute,
       ProviderRequest providerRequest);
+
+  byte[] getCertificate(String realm, String userStorage, String userId);
+
+  ProviderResponse updateCertificate(
+      String realm,
+      String userStorage,
+      String userId,
+      byte[] certificate,
+      ProviderRequest providerRequest);
+
+  ProviderResponse deleteCertificate(
+      String realm, String userStorage, String userid, ProviderRequest providerRequest);
 }

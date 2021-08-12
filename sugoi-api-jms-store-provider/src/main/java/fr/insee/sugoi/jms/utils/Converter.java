@@ -22,6 +22,9 @@ import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.User;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -154,5 +157,13 @@ public class Converter {
       return pr;
     }
     return null;
+  }
+
+  public byte[] convertToBytes(Object object) throws IOException {
+    try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream out = new ObjectOutputStream(bos)) {
+      out.writeObject(object);
+      return bos.toByteArray();
+    }
   }
 }

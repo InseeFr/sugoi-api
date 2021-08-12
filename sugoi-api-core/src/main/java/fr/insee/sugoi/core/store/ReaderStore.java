@@ -156,4 +156,6 @@ public interface ReaderStore {
    * @return true if credential matches the credential of the user in the store, false otherwise
    */
   public boolean validateCredentials(User user, String credential);
+
+  public byte[] getUserCertificate(String id);
 }

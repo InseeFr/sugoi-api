@@ -278,4 +278,10 @@ public class FileReaderStore implements ReaderStore {
     }
     return user;
   }
+
+  @Override
+  public byte[] getUserCertificate(String id) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

@@ -52,4 +52,12 @@ public class Method {
   public static final String ADD_APP_MANAGED_ATTRIBUTE = "addAppManagedAttribute";
 
   public static final String DELETE_APP_MANAGED_ATTRIBUTE = "deleteAppManagedAttribute";
+
+  public static final String UPDATE_CERTIFICATE = "updateCertificate";
+
+  public static final String DELETE_CERTIFICATE = "deleteCertificate";
+
+  public static final String UPDATE_GPG_KEY = "updateGpgKey";
+
+  public static final String DELETE_GPG_KEY = "deleteGpgKey";
 }

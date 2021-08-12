@@ -27,6 +27,7 @@ import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.realm.RealmProvider;
+import fr.insee.sugoi.core.service.CertificateService;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.paging.PageResult;
@@ -60,6 +61,8 @@ public class UserControllerTest {
   @Autowired MockMvc mockMvc;
 
   @MockBean private UserService userService;
+
+  @MockBean private CertificateService certificateService;
 
   @MockBean private RealmProvider realmService;
 

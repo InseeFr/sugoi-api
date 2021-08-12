@@ -86,4 +86,12 @@ public interface OrganizationService {
    */
   ProviderResponse update(
       String realm, String storage, Organization organization, ProviderRequest providerRequest);
+
+  ProviderResponse updateGpgKey(
+      String realm, String storage, String id, byte[] bytes, ProviderRequest providerRequest);
+
+  ProviderResponse deleteGpgKey(
+      String realm, String storage, String id, ProviderRequest providerRequest);
+
+  byte[] getGpgkey(String realm, String storage, String id);
 }

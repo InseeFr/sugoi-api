@@ -35,11 +35,15 @@ import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
 import fr.insee.sugoi.core.exceptions.OrganizationAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.core.exceptions.StoragePolicyNotMetException;
+import fr.insee.sugoi.core.exceptions.UnableToUpdateCertificateException;
+import fr.insee.sugoi.core.exceptions.UnabletoUpdateGPGKeyException;
 import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
+import fr.insee.sugoi.core.service.CertificateService;
+import fr.insee.sugoi.core.service.impl.CertificateServiceImpl;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
@@ -53,6 +57,8 @@ import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.User;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -801,5 +807,125 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   private void deleteAddress(String id) throws LDAPException {
     DeleteRequest deleteRequest = new DeleteRequest(getAddressDN(id));
     ldapPoolConnection.delete(deleteRequest);
+  }
+
+  @Override
+  public ProviderResponse updateUserCertificate(
+      User user, byte[] bytes, ProviderRequest providerRequest) {
+    try {
+      CertificateService cfs = new CertificateServiceImpl();
+      if (user.getCertificate() != null) {
+
+        X509Certificate certificate = cfs.getCertificateFromByte(user.getCertificate());
+        String certificateId =
+            (String) ((Map<String, Object>) user.getMetadatas().get("cert")).get("id");
+        ldapPoolConnection.modify(
+            new ModifyRequest(
+                getUserDN(user.getUsername()),
+                List.of(
+                    new Modification(
+                        ModificationType.DELETE,
+                        "usercertificate;binary",
+                        certificate.getEncoded()),
+                    new Modification(
+                        ModificationType.DELETE,
+                        "inseePropriéte",
+                        "certificateId$" + certificateId))));
+      }
+
+      X509Certificate certificate = cfs.getCertificateFromByte(bytes);
+      String certificateId = cfs.encodeCertificate(certificate);
+      ldapPoolConnection.modify(
+          new ModifyRequest(
+              getUserDN(user.getUsername()),
+              List.of(
+                  new Modification(
+                      ModificationType.ADD, "usercertificate;binary", certificate.getEncoded()),
+                  new Modification(
+                      ModificationType.ADD, "inseePropriete", "certificateId$" + certificateId))));
+      ProviderResponse response = new ProviderResponse();
+      response.setStatus(ProviderResponseStatus.OK);
+      response.setEntityId(user.getUsername());
+      return response;
+    } catch (CertificateException e) {
+      throw new UnableToUpdateCertificateException(e.toString(), e);
+    } catch (LDAPException e) {
+      throw new UnableToUpdateCertificateException(e.toString(), e);
+    }
+  }
+
+  @Override
+  public ProviderResponse deleteUserCertificate(User user, ProviderRequest providerRequest) {
+
+    if (user.getCertificate() != null) {
+      CertificateService cfs = new CertificateServiceImpl();
+      try {
+        X509Certificate certificate = cfs.getCertificateFromByte(user.getCertificate());
+        String certificateId = cfs.encodeCertificate(certificate);
+        ldapPoolConnection.modify(
+            new ModifyRequest(
+                getUserDN(user.getUsername()),
+                List.of(
+                    new Modification(
+                        ModificationType.DELETE,
+                        "usercertificate;binary",
+                        certificate.getEncoded()),
+                    new Modification(
+                        ModificationType.DELETE,
+                        "inseePropriete",
+                        "certificateId$" + certificateId))));
+        ProviderResponse response = new ProviderResponse();
+        response.setStatus(ProviderResponseStatus.OK);
+        response.setEntityId(user.getUsername());
+        return response;
+      } catch (Exception e) {
+        throw new UnableToUpdateCertificateException(e.toString(), e);
+      }
+    }
+    ProviderResponse response = new ProviderResponse();
+    response.setStatus(ProviderResponseStatus.OK);
+    response.setEntityId(user.getUsername());
+    return response;
+  }
+
+  @Override
+  public ProviderResponse updateOrganizationGpgKey(
+      Organization organization, byte[] bytes, ProviderRequest providerRequest) {
+    try {
+      ldapPoolConnection.modify(
+          new ModifyRequest(
+              getOrganizationDN(organization.getIdentifiant()),
+              new Modification(ModificationType.REPLACE, "inseeClefChiffrement", bytes)));
+      ProviderResponse response = new ProviderResponse();
+      response.setStatus(ProviderResponseStatus.OK);
+      response.setEntityId(organization.getIdentifiant());
+      return response;
+    } catch (Exception e) {
+      throw new UnabletoUpdateGPGKeyException(e.toString(), e);
+    }
+  }
+
+  @Override
+  public ProviderResponse deleteOrganizationGpgKey(
+      Organization organization, ProviderRequest providerRequest) {
+    if (organization.getGpgkey() != null) {
+      try {
+        ldapPoolConnection.modify(
+            new ModifyRequest(
+                getOrganizationDN(organization.getIdentifiant()),
+                new Modification(
+                    ModificationType.DELETE, "inseeClefChiffrement", organization.getGpgkey())));
+        ProviderResponse response = new ProviderResponse();
+        response.setStatus(ProviderResponseStatus.OK);
+        response.setEntityId(organization.getIdentifiant());
+        return response;
+      } catch (Exception e) {
+        throw new UnabletoUpdateGPGKeyException(e.toString(), e);
+      }
+    }
+    ProviderResponse response = new ProviderResponse();
+    response.setStatus(ProviderResponseStatus.OK);
+    response.setEntityId(organization.getIdentifiant());
+    return response;
   }
 }

@@ -17,6 +17,7 @@ import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
+import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
@@ -269,5 +270,45 @@ public class OrganizationServiceImpl implements OrganizationService {
               Map.entry(EventKeysConfig.ERROR, e.toString())));
       throw e;
     }
+  }
+
+  @Override
+  public ProviderResponse updateGpgKey(
+      String realm, String storage, String id, byte[] bytes, ProviderRequest providerRequest) {
+    Organization organization =
+        findById(realm, storage, id)
+            .orElseThrow(
+                () ->
+                    new OrganizationNotFoundException(
+                        "Cannot find organization with id " + id + " in realm " + realm));
+
+    return storeProvider
+        .getWriterStore(realm, storage)
+        .updateOrganizationGpgKey(organization, bytes, providerRequest);
+  }
+
+  @Override
+  public ProviderResponse deleteGpgKey(
+      String realm, String storage, String id, ProviderRequest providerRequest) {
+    Organization organization =
+        findById(realm, storage, id)
+            .orElseThrow(
+                () ->
+                    new OrganizationNotFoundException(
+                        "Cannot find organization with id " + id + " in realm " + realm));
+    return storeProvider
+        .getWriterStore(realm, storage)
+        .deleteOrganizationGpgKey(organization, providerRequest);
+  }
+
+  @Override
+  public byte[] getGpgkey(String realm, String storage, String id) {
+    Organization organization =
+        findById(realm, storage, id)
+            .orElseThrow(
+                () ->
+                    new OrganizationNotFoundException(
+                        "Cannot find organization with id " + id + " in realm " + realm));
+    return organization.getGpgkey();
   }
 }
