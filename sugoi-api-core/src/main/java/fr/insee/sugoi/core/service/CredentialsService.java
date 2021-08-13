@@ -18,9 +18,7 @@ import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
-import fr.insee.sugoi.model.paging.PasswordChangeRequest;
-import fr.insee.sugoi.model.paging.SendMode;
-import java.util.List;
+import fr.insee.sugoi.model.PasswordChangeRequest;
 
 public interface CredentialsService {
 
@@ -31,7 +29,6 @@ public interface CredentialsService {
    * @param userStorage
    * @param userId
    * @param pcr
-   * @param sendMode
    * @throws RealmNotFoundException if realm doesn't exist
    * @throws UserNotFoundException if user doesn't exist in realm
    */
@@ -40,7 +37,6 @@ public interface CredentialsService {
       String userStorage,
       String userId,
       PasswordChangeRequest pcr,
-      List<SendMode> sendMode,
       ProviderRequest providerRequest);
 
   /**
@@ -71,7 +67,6 @@ public interface CredentialsService {
    * @param userStorage
    * @param userId
    * @param pcr
-   * @param sendMode
    * @throws RealmNotFoundException if realm doesn't exist
    * @throws UserNotFoundException if user doesn't exist in realm
    * @throws PasswordPolicyNotMetException if password doesn't meet the password policy set for the
@@ -82,7 +77,6 @@ public interface CredentialsService {
       String userStorage,
       String userId,
       PasswordChangeRequest pcr,
-      List<SendMode> sendMode,
       ProviderRequest providerRequest);
 
   /**

@@ -22,15 +22,13 @@ import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.User;
-import fr.insee.sugoi.model.paging.PasswordChangeRequest;
-import fr.insee.sugoi.model.paging.SendMode;
 import fr.insee.sugoi.store.file.configuration.FileKeysConfig;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -332,18 +330,13 @@ public class FileWriterStore implements WriterStore {
       String userId,
       String generatedPassword,
       PasswordChangeRequest pcr,
-      List<SendMode> sendMode,
       ProviderRequest providerRequest) {
     throw new UnsupportedOperationException("Password actions are not supported on file storage");
   }
 
   @Override
   public ProviderResponse initPassword(
-      String userId,
-      String password,
-      PasswordChangeRequest pcr,
-      List<SendMode> sendMode,
-      ProviderRequest providerRequest) {
+      String userId, String password, PasswordChangeRequest pcr, ProviderRequest providerRequest) {
     throw new UnsupportedOperationException("Password actions are not supported on file storage");
   }
 

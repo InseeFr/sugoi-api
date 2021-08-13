@@ -20,9 +20,8 @@ import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.SugoiUser;
 import fr.insee.sugoi.core.service.CredentialsService;
 import fr.insee.sugoi.core.service.UserService;
+import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.User;
-import fr.insee.sugoi.model.paging.PasswordChangeRequest;
-import fr.insee.sugoi.model.paging.SendMode;
 import fr.insee.sugoi.services.Utils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,8 +31,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -92,9 +89,6 @@ public class CredentialsController {
           String userStorage,
       @Parameter(description = "User's id to change password", required = true) @PathVariable("id")
           String id,
-      @Parameter(description = "Way to send password", required = false)
-          @RequestParam(value = "sendModes", required = false)
-          List<SendMode> sendMode,
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
@@ -112,7 +106,6 @@ public class CredentialsController {
             userStorage,
             id,
             pcr,
-            sendMode != null ? sendMode : new ArrayList<>(),
             new ProviderRequest(
                 new SugoiUser(
                     authentication.getName(),
@@ -153,9 +146,6 @@ public class CredentialsController {
           String realm,
       @Parameter(description = "User's id to change password", required = true) @PathVariable("id")
           String id,
-      @Parameter(description = "Way to send password", required = false)
-          @RequestParam(value = "sendModes", required = false)
-          List<SendMode> sendMode,
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
@@ -177,7 +167,6 @@ public class CredentialsController {
         realm,
         (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
         id,
-        sendMode,
         isAsynchronous,
         isUrgent,
         transactionId,
@@ -299,7 +288,7 @@ public class CredentialsController {
 
   @PostMapping(path = {"/realms/{realm}/storages/{storage}/users/{id}/initPassword"})
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
-  @Operation(summary = "Initialize user's password with a random generated password")
+  @Operation(summary = "Initialize user's password with the given password")
   @ApiResponses(
       value = {
         @ApiResponse(
@@ -327,9 +316,6 @@ public class CredentialsController {
           String id,
       @Parameter(description = "Password change request&", required = true) @RequestBody
           PasswordChangeRequest pcr,
-      @Parameter(description = "Way to send password", required = false)
-          @RequestParam(value = "sendModes", required = false)
-          List<SendMode> sendMode,
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
@@ -347,7 +333,6 @@ public class CredentialsController {
             userStorage,
             id,
             pcr,
-            sendMode != null ? sendMode : new ArrayList<>(),
             new ProviderRequest(
                 new SugoiUser(
                     authentication.getName(),
@@ -366,7 +351,7 @@ public class CredentialsController {
 
   @PostMapping(path = {"/realms/{realm}/users/{id}/initPassword"})
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
-  @Operation(summary = "Initialize user's password with a random generated password")
+  @Operation(summary = "Initialize user's password with the given password")
   @ApiResponses(
       value = {
         @ApiResponse(
@@ -389,9 +374,6 @@ public class CredentialsController {
           String id,
       @Parameter(description = "Password change request&", required = true) @RequestBody
           PasswordChangeRequest pcr,
-      @Parameter(description = "Way to send password", required = false)
-          @RequestParam(value = "sendModes", required = false)
-          List<SendMode> sendMode,
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
@@ -413,7 +395,6 @@ public class CredentialsController {
         (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
         id,
         pcr,
-        sendMode,
         isAsynchronous,
         isUrgent,
         transactionId,

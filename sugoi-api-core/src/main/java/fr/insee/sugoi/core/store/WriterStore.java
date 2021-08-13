@@ -19,10 +19,8 @@ import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.User;
-import fr.insee.sugoi.model.paging.PasswordChangeRequest;
-import fr.insee.sugoi.model.paging.SendMode;
-import java.util.List;
 
 /** Writer stores are responsible for all operations modifying the underlying store. */
 public interface WriterStore {
@@ -180,11 +178,7 @@ public interface WriterStore {
    * @param sendModes not used
    */
   ProviderResponse initPassword(
-      String user,
-      String initPassword,
-      PasswordChangeRequest pcr,
-      List<SendMode> sendModes,
-      ProviderRequest providerRequest);
+      String user, String initPassword, PasswordChangeRequest pcr, ProviderRequest providerRequest);
 
   /**
    * Set the password of user to generatedPassword. Same behaviour than initPassword.
@@ -198,7 +192,6 @@ public interface WriterStore {
       String userId,
       String generatedPassword,
       PasswordChangeRequest pcr,
-      List<SendMode> sendModes,
       ProviderRequest providerRequest);
 
   /**

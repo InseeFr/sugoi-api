@@ -51,9 +51,8 @@ import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.User;
-import fr.insee.sugoi.model.paging.PasswordChangeRequest;
-import fr.insee.sugoi.model.paging.SendMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -490,7 +489,6 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       String userId,
       String generatedPassword,
       PasswordChangeRequest pcr,
-      List<SendMode> sendMode,
       ProviderRequest providerRequest) {
 
     Modification mod =
@@ -523,11 +521,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
 
   @Override
   public ProviderResponse initPassword(
-      String userId,
-      String password,
-      PasswordChangeRequest pcr,
-      List<SendMode> sendMode,
-      ProviderRequest providerRequest) {
+      String userId, String password, PasswordChangeRequest pcr, ProviderRequest providerRequest) {
     Modification mod = new Modification(ModificationType.REPLACE, "userPassword", password);
     User user = ldapReaderStore.getUser(userId);
     if (user == null) {

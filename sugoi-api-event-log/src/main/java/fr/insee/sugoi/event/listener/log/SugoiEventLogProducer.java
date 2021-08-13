@@ -243,22 +243,17 @@ public class SugoiEventLogProducer {
       case CHANGE_PASSWORD:
         toLog.put(EventKeysConfig.REALM, realm);
         toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
-        toLog.put(
-            EventKeysConfig.USER_ID, ((User) properties.get(EventKeysConfig.USER)).getUsername());
+        toLog.put(EventKeysConfig.USER_ID, properties.get(EventKeysConfig.USER_ID));
         break;
       case INIT_PASSWORD:
         toLog.put(EventKeysConfig.REALM, realm);
         toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
-        toLog.put(
-            EventKeysConfig.USER_ID,
-            (String) ((User) properties.get(EventKeysConfig.USER)).getUsername());
+        toLog.put(EventKeysConfig.USER_ID, (String) properties.get(EventKeysConfig.USER_ID));
         break;
       case RESET_PASSWORD:
         toLog.put(EventKeysConfig.REALM, realm);
         toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
-        toLog.put(
-            EventKeysConfig.USER_ID,
-            (String) ((User) properties.get(EventKeysConfig.USER)).getUsername());
+        toLog.put(EventKeysConfig.USER_ID, (String) properties.get(EventKeysConfig.USER_ID));
         break;
 
       case CREATE_USER_ERROR:
@@ -450,17 +445,17 @@ public class SugoiEventLogProducer {
       case CHANGE_PASSWORD_ERROR:
         toLog.put(EventKeysConfig.REALM, realm);
         toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
-        toLog.put(EventKeysConfig.USER_ID, properties.get(EventKeysConfig.USER_ID));
+        toLog.put(EventKeysConfig.USER_ID, ((String) properties.get(EventKeysConfig.USER_ID)));
         break;
       case INIT_PASSWORD_ERROR:
         toLog.put(EventKeysConfig.REALM, realm);
         toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
-        toLog.put(EventKeysConfig.USER_ID, properties.get(EventKeysConfig.USER_ID));
+        toLog.put(EventKeysConfig.USER_ID, ((String) properties.get(EventKeysConfig.USER_ID)));
         break;
       case RESET_PASSWORD_ERROR:
         toLog.put(EventKeysConfig.REALM, realm);
         toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
-        toLog.put(EventKeysConfig.USER_ID, properties.get(EventKeysConfig.USER_ID));
+        toLog.put(EventKeysConfig.USER_ID, ((String) properties.get(EventKeysConfig.USER_ID)));
         break;
       case ADD_APP_MANAGED_ATTRIBUTES:
         toLog.put(EventKeysConfig.REALM, realm);
