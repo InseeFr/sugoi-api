@@ -195,4 +195,40 @@ public class WebHookServiceImpl implements WebHookService {
       throw new RuntimeException("Unable to inject data in template", e);
     }
   }
+
+  @Override
+  public void sendLogin(String webHookName, Map<String, Object> values) {
+    String template = null;
+    try {
+      template =
+          configService
+              .getRealm((String) values.get(GlobalKeysConfig.REALM))
+              .get()
+              .getUserStorages()
+              .stream()
+              .filter(
+                  us ->
+                      us.getName()
+                          .equalsIgnoreCase((String) values.get(GlobalKeysConfig.USERSTORAGE)))
+              .findFirst()
+              .get()
+              .getProperties()
+              .get(webHookName + "_send_login_template");
+    } catch (Exception e) {
+      // we don't need to manage this exception here
+    }
+    if (template == null) {
+      template =
+          loadResource(
+              env.getProperty(
+                  "sugoi.api.event.webhook." + webHookName + ".default.send-login.template"));
+    }
+    String content = injectValueInTemplate(template, values);
+    String target = env.getProperty("sugoi.api.event.webhook." + webHookName + ".target");
+    String authType = env.getProperty("sugoi.api.event.webhook." + webHookName + ".auth.type");
+    Map<String, String> headers = new HashMap<>();
+    headers.put("content-type", "application/json");
+    addAuthHeader(webHookName, authType, headers);
+    send(webHookName, target, content, headers);
+  }
 }

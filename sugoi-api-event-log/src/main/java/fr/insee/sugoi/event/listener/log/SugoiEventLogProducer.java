@@ -253,9 +253,10 @@ public class SugoiEventLogProducer {
       case RESET_PASSWORD:
         toLog.put(EventKeysConfig.REALM, realm);
         toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
-        toLog.put(EventKeysConfig.USER_ID, (String) properties.get(EventKeysConfig.USER_ID));
+        toLog.put(
+            EventKeysConfig.USER_ID,
+            (String) ((User) properties.get(EventKeysConfig.USER)).getUsername());
         break;
-
       case CREATE_USER_ERROR:
         toLog.put(EventKeysConfig.REALM, realm);
         toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
@@ -463,6 +464,7 @@ public class SugoiEventLogProducer {
         toLog.put(EventKeysConfig.USER_ID, properties.get(EventKeysConfig.USER_ID));
         toLog.put(EventKeysConfig.ATTRIBUTE_KEY, properties.get(EventKeysConfig.ATTRIBUTE_KEY));
         toLog.put(EventKeysConfig.ATTRIBUTE_VALUE, properties.get(EventKeysConfig.ATTRIBUTE_VALUE));
+        break;
       case ADD_APP_MANAGED_ATTRIBUTES_ERROR:
         toLog.put(EventKeysConfig.REALM, realm);
         toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
@@ -470,19 +472,33 @@ public class SugoiEventLogProducer {
         toLog.put(EventKeysConfig.ATTRIBUTE_KEY, properties.get(EventKeysConfig.ATTRIBUTE_KEY));
         toLog.put(EventKeysConfig.ATTRIBUTE_VALUE, properties.get(EventKeysConfig.ATTRIBUTE_VALUE));
         toLog.put(EventKeysConfig.ERROR, properties.get(EventKeysConfig.ERROR));
+        break;
       case DELETE_APP_MANAGED_ATTRIBUTES:
         toLog.put(EventKeysConfig.REALM, realm);
         toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
         toLog.put(EventKeysConfig.USER_ID, properties.get(EventKeysConfig.USER_ID));
         toLog.put(EventKeysConfig.ATTRIBUTE_KEY, properties.get(EventKeysConfig.ATTRIBUTE_KEY));
         toLog.put(EventKeysConfig.ATTRIBUTE_VALUE, properties.get(EventKeysConfig.ATTRIBUTE_VALUE));
-
+        break;
       case DELETE_APP_MANAGED_ATTRIBUTES_ERROR:
         toLog.put(EventKeysConfig.REALM, realm);
         toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
         toLog.put(EventKeysConfig.USER_ID, properties.get(EventKeysConfig.USER_ID));
         toLog.put(EventKeysConfig.ATTRIBUTE_KEY, properties.get(EventKeysConfig.ATTRIBUTE_KEY));
         toLog.put(EventKeysConfig.ATTRIBUTE_VALUE, properties.get(EventKeysConfig.ATTRIBUTE_VALUE));
+        break;
+      case SEND_LOGIN:
+        toLog.put(EventKeysConfig.REALM, realm);
+        toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
+        toLog.put(
+            EventKeysConfig.USER_ID,
+            (String) ((User) properties.get(EventKeysConfig.USER)).getUsername());
+        break;
+      case SEND_LOGIN_ERROR:
+        toLog.put(EventKeysConfig.REALM, realm);
+        toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
+        toLog.put(EventKeysConfig.USER_ID, properties.get(EventKeysConfig.USER_ID));
+        break;
       default:
         break;
     }

@@ -54,6 +54,12 @@ public class CredentialsServiceImpl implements CredentialsService {
       PasswordChangeRequest pcr,
       ProviderRequest providerRequest) {
     try {
+      User user =
+          userService
+              .findById(realm, userStorage, userId)
+              .orElseThrow(
+                  () ->
+                      new UserNotFoundException("User " + userId + " not found in realm" + realm));
 
       Map<String, String> realmProperties =
           configService
@@ -94,7 +100,7 @@ public class CredentialsServiceImpl implements CredentialsService {
           SugoiEventTypeEnum.RESET_PASSWORD,
           Map.ofEntries(
               Map.entry(EventKeysConfig.PASSWORD_CHANGE_REQUEST, pcr),
-              Map.entry(EventKeysConfig.USER_ID, userId),
+              Map.entry(EventKeysConfig.USER, user),
               Map.entry(EventKeysConfig.PASSWORD, password)));
       return response;
     } catch (Exception e) {
@@ -264,5 +270,27 @@ public class CredentialsServiceImpl implements CredentialsService {
             ? Integer.parseInt(
                 realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_MIN_SIZE))
             : null);
+  }
+
+  @Override
+  public boolean sendLogin(
+      String realm, String userStorage, String id, Map<String, String> properties) {
+    try {
+      User user =
+          userService
+              .findById(realm, userStorage, id)
+              .orElseThrow(
+                  () -> new UserNotFoundException("User " + id + " not found in realm" + realm));
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          userStorage,
+          SugoiEventTypeEnum.SEND_LOGIN,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.USER, user),
+              Map.entry(EventKeysConfig.PROPERTIES, properties)));
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
   }
 }

@@ -22,4 +22,6 @@ public interface WebHookService {
   void resetPassword(String webHookName, Map<String, Object> value);
 
   void initPassword(String webHookName, Map<String, Object> value);
+
+  void sendLogin(String webHookName, Map<String, Object> value);
 }

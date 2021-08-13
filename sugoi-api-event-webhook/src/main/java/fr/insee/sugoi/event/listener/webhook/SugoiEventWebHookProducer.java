@@ -70,6 +70,28 @@ public class SugoiEventWebHookProducer {
                         .equalsIgnoreCase(webHookTag)))
             .forEach(webHookName -> webHookService.resetPassword(webHookName, values));
         break;
+      case SEND_LOGIN:
+        user = (User) cse.getProperties().get(EventKeysConfig.USER);
+        Map<String, String> properties =
+            (Map<String, String>) cse.getProperties().get(EventKeysConfig.PROPERTIES);
+        realm = cse.getRealm();
+        userStorage = cse.getUserStorage() != null ? cse.getUserStorage() : "default";
+        webHookTag = properties.get("tag") != null ? properties.get("tag") : "MAIL";
+        values = new HashMap<>();
+        values.put(EventKeysConfig.REALM, realm);
+        values.put(EventKeysConfig.USERSTORAGE, userStorage);
+        values.put(EventKeysConfig.USER_ID, user.getUsername());
+        values.put(
+            EventKeysConfig.MAIL,
+            properties.get("mail") != null ? properties.get("mail") : user.getMail());
+        values.put(EventKeysConfig.PROPERTIES, properties);
+        webHookNames.stream()
+            .filter(
+                webHookName ->
+                    (((String) env.getProperty("sugoi.api.event.webhook." + webHookName + ".tag"))
+                        .equalsIgnoreCase(webHookTag)))
+            .forEach(webHookName -> webHookService.sendLogin(webHookName, values));
+        break;
       default:
         break;
     }
