@@ -28,10 +28,10 @@ import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
-import fr.insee.sugoi.model.paging.PasswordChangeRequest;
 import fr.insee.sugoi.store.ldap.LdapReaderStore;
 import fr.insee.sugoi.store.ldap.LdapStoreBeans;
 import fr.insee.sugoi.store.ldap.LdapWriterStore;
@@ -490,13 +490,12 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testInitPasswordNullFails() {
-    assertThrows(
-        Exception.class, () -> ldapWriterStore.initPassword("testc", null, null, null, null));
+    assertThrows(Exception.class, () -> ldapWriterStore.initPassword("testc", null, null, null));
   }
 
   @Test
   public void testInitPassword() {
-    ldapWriterStore.initPassword("testo", "toto", null, null, null);
+    ldapWriterStore.initPassword("testo", "toto", null, null);
     assertThat(
         "Password toto should be validated",
         ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo"), "toto"));
@@ -510,14 +509,14 @@ public class LdapWriterStoreTest {
     assertThat(
         "Password should not be reinit",
         !ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo"), "reinit"));
-    ldapWriterStore.reinitPassword("testo", "reinit", new PasswordChangeRequest(), null, null);
+    ldapWriterStore.reinitPassword("testo", "reinit", new PasswordChangeRequest(), null);
     assertThat(
         "Password should be reinit",
         ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo"), "reinit"));
     assertThat(
         "Password should not be testo",
         !ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo"), "testo"));
-    ldapWriterStore.reinitPassword("testo", "reinit2", new PasswordChangeRequest(), null, null);
+    ldapWriterStore.reinitPassword("testo", "reinit2", new PasswordChangeRequest(), null);
     assertThat(
         "Password should be reinit2",
         ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo"), "reinit2"));

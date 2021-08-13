@@ -24,13 +24,11 @@ import fr.insee.sugoi.jms.writer.JmsWriter;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
-import fr.insee.sugoi.model.paging.PasswordChangeRequest;
-import fr.insee.sugoi.model.paging.SendMode;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.springframework.jms.JmsException;
 
@@ -181,35 +179,27 @@ public class JmsWriterStore implements WriterStore {
 
   @Override
   public ProviderResponse reinitPassword(
-      String userId,
-      String password,
-      PasswordChangeRequest pcr,
-      List<SendMode> sendModes,
-      ProviderRequest providerRequest) {
+      String userId, String password, PasswordChangeRequest pcr, ProviderRequest providerRequest) {
+    // Use init password to avoid a second generation of a random generation
+    pcr.setNewPassword(password);
     Map<String, Object> params = new HashMap<>();
     params.put(JmsAtttributes.USER_ID, userId);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
     params.put(JmsAtttributes.PASSWORD, password);
     params.put(JmsAtttributes.PASSWORD_CHANGE_REQUEST, pcr);
-    params.put(JmsAtttributes.SEND_MODE, sendModes);
-    return checkAndSend(Method.REINIT_PASSWORD, params, userId, providerRequest);
+    return checkAndSend(Method.INIT_PASSWORD, params, userId, providerRequest);
   }
 
   @Override
   public ProviderResponse initPassword(
-      String userId,
-      String password,
-      PasswordChangeRequest pcr,
-      List<SendMode> sendModes,
-      ProviderRequest providerRequest) {
+      String userId, String password, PasswordChangeRequest pcr, ProviderRequest providerRequest) {
     Map<String, Object> params = new HashMap<>();
     params.put(JmsAtttributes.USER_ID, userId);
     params.put(JmsAtttributes.PASSWORD, password);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
     params.put(JmsAtttributes.PASSWORD_CHANGE_REQUEST, pcr);
-    params.put(JmsAtttributes.SEND_MODE, sendModes);
     return checkAndSend(Method.INIT_PASSWORD, params, userId, providerRequest);
   }
 

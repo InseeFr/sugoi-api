@@ -11,7 +11,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.model.paging;
+package fr.insee.sugoi.model;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -19,16 +19,11 @@ import java.util.Map;
 public class PasswordChangeRequest implements Serializable {
 
   private String email;
-  private Map<String, String> address;
   private String oldPassword;
   private String newPassword;
   private Map<String, String> properties;
 
   public PasswordChangeRequest() {}
-
-  public Map<String, String> getAddress() {
-    return address;
-  }
 
   public String getEmail() {
     return email;
@@ -40,10 +35,6 @@ public class PasswordChangeRequest implements Serializable {
 
   public String getOldPassword() {
     return oldPassword;
-  }
-
-  public void setAddress(Map<String, String> address) {
-    this.address = address;
   }
 
   public void setEmail(String email) {

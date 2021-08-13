@@ -28,10 +28,8 @@ import fr.insee.sugoi.jms.utils.Method;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.User;
-import fr.insee.sugoi.model.paging.PasswordChangeRequest;
-import fr.insee.sugoi.model.paging.SendMode;
-import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,25 +123,12 @@ public class JmsRequestRouter {
           groupService.addUserToGroup(
               realm, userStorage, userId, appName, groupName, providerRequest);
           break;
-        case Method.REINIT_PASSWORD:
+        case Method.INIT_PASSWORD:
           userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
           PasswordChangeRequest pcr =
               converter.toPasswordChangeRequest(
                   request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
-          List<SendMode> sendMode =
-              converter.toSendModeList(request.getmethodParams().get(JmsAtttributes.SEND_MODE));
-          credentialsService.reinitPassword(
-              realm, userStorage, userId, pcr, sendMode, providerRequest);
-          break;
-        case Method.INIT_PASSWORD:
-          userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
-          pcr =
-              converter.toPasswordChangeRequest(
-                  request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
-          sendMode =
-              converter.toSendModeList(request.getmethodParams().get(JmsAtttributes.SEND_MODE));
-          credentialsService.initPassword(
-              realm, userStorage, userId, pcr, sendMode, providerRequest);
+          credentialsService.initPassword(realm, userStorage, userId, pcr, providerRequest);
           break;
         case Method.CREATE_APPLICATION:
           Application application =

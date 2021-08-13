@@ -27,7 +27,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,9 +114,7 @@ public class ContactPasswordDomaineController {
         realmUserStorage.getRealm(),
         realmUserStorage.getUserStorage(),
         identifiant,
-        ouganextSugoiMapper.serializeToSugoi(
-            pcr, fr.insee.sugoi.model.paging.PasswordChangeRequest.class),
-        new ArrayList<>(),
+        ouganextSugoiMapper.serializeToSugoi(pcr, fr.insee.sugoi.model.PasswordChangeRequest.class),
         new ProviderRequest(
             new SugoiUser(
                 authentication.getName(),
@@ -182,9 +179,7 @@ public class ContactPasswordDomaineController {
         realmUserStorage.getRealm(),
         realmUserStorage.getUserStorage(),
         identifiant,
-        ouganextSugoiMapper.serializeToSugoi(
-            pcr, fr.insee.sugoi.model.paging.PasswordChangeRequest.class),
-        new ArrayList<>(),
+        ouganextSugoiMapper.serializeToSugoi(pcr, fr.insee.sugoi.model.PasswordChangeRequest.class),
         new ProviderRequest(
             new SugoiUser(
                 authentication.getName(),
@@ -257,8 +252,7 @@ public class ContactPasswordDomaineController {
         realmUserStorage.getRealm(),
         realmUserStorage.getUserStorage(),
         identifiant,
-        ouganextSugoiMapper.serializeToSugoi(
-            pcr, fr.insee.sugoi.model.paging.PasswordChangeRequest.class),
+        ouganextSugoiMapper.serializeToSugoi(pcr, fr.insee.sugoi.model.PasswordChangeRequest.class),
         new ProviderRequest(
             new SugoiUser(
                 authentication.getName(),
