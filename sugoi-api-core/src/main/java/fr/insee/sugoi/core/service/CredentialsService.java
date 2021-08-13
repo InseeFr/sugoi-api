@@ -19,6 +19,7 @@ import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.model.PasswordChangeRequest;
+import java.util.Map;
 
 public interface CredentialsService {
 
@@ -90,4 +91,6 @@ public interface CredentialsService {
    * @return true if provided credentials are valid for user else false
    */
   boolean validateCredential(String realm, String userStorage, String userName, String password);
+
+  boolean sendLogin(String realm, String userStorage, String id, Map<String, String> properties);
 }

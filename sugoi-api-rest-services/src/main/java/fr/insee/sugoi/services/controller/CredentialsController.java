@@ -31,6 +31,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -73,7 +74,7 @@ public class CredentialsController {
             description = "Something went wrong",
             content = {@Content(mediaType = "application/json")})
       })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
   public ResponseEntity<ProviderResponse> reinitPassword(
       @Parameter(description = "Password change request&", required = true) @RequestBody
           PasswordChangeRequest pcr,
@@ -135,7 +136,7 @@ public class CredentialsController {
             description = "Something went wrong",
             content = {@Content(mediaType = "application/json")})
       })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
   public ResponseEntity<ProviderResponse> reinitPassword(
       @Parameter(description = "Password change request&", required = true) @RequestBody
           PasswordChangeRequest pcr,
@@ -186,7 +187,7 @@ public class CredentialsController {
             description = "Something went wrong",
             content = {@Content(mediaType = "application/json")})
       })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
   public ResponseEntity<ProviderResponse> changePassword(
       @Parameter(description = "Password change request", required = true) @RequestBody
           PasswordChangeRequest pcr,
@@ -287,7 +288,7 @@ public class CredentialsController {
   }
 
   @PostMapping(path = {"/realms/{realm}/storages/{storage}/users/{id}/initPassword"})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
   @Operation(summary = "Initialize user's password with the given password")
   @ApiResponses(
       value = {
@@ -350,7 +351,7 @@ public class CredentialsController {
   }
 
   @PostMapping(path = {"/realms/{realm}/users/{id}/initPassword"})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
   @Operation(summary = "Initialize user's password with the given password")
   @ApiResponses(
       value = {
@@ -404,7 +405,7 @@ public class CredentialsController {
   @PostMapping(
       path = {"/realms/{realm}/storages/{storage}/users/{id}/validate-password"},
       consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
   @Operation(summary = "Check if provided password is the user's one")
   @ApiResponses(
       value = {
@@ -449,7 +450,7 @@ public class CredentialsController {
   @PostMapping(
       path = {"/realms/{realm}/users/{id}/validate-password"},
       consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
   @Operation(summary = "Check if provided password is the user's one")
   @ApiResponses(
       value = {
@@ -483,5 +484,49 @@ public class CredentialsController {
                 () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
     return validatePassword(
         realm, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id, params);
+  }
+
+  @PostMapping(value = "/realms/{realm}/users/{id}/send-login")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
+  @Operation(summary = "Send login to user")
+  public ResponseEntity<Void> sendLogin(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "User's id to validate password", required = true)
+          @PathVariable("id")
+          String id,
+      @RequestBody Map<String, String> properties) {
+    User user =
+        userService
+            .findById(realm, null, id)
+            .orElseThrow(
+                () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
+    return sendLogin(
+        realm, id, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), properties);
+  }
+
+  @PostMapping(value = "/realms/{realm}/storages/{storage}/users/{id}/send-login")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
+  @Operation(summary = "Send login to user")
+  public ResponseEntity<Void> sendLogin(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "User's id to validate password", required = true)
+          @PathVariable("id")
+          String id,
+      @Parameter(
+              description = "Name of the userStorage where the operation will be made",
+              required = false)
+          @PathVariable(value = "storage", required = false)
+          String userStorage,
+      @RequestBody Map<String, String> properties) {
+    credentialsService.sendLogin(realm, userStorage, id, properties);
+    return ResponseEntity.status(HttpStatus.OK).build();
   }
 }
