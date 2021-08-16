@@ -171,6 +171,16 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
                       defaultAppManagedAttributePatternList);
                 }
                 realm.setUserStorages(loadUserStorages(e, ldapConnection));
+                realm
+                    .getUiMapping()
+                    .putIfAbsent(
+                        "uiUserMapping",
+                        (List<Object>) (Object) uiMappingService.getUserUiDefaultField());
+                realm
+                    .getUiMapping()
+                    .putIfAbsent(
+                        "uiOrganizationMapping",
+                        (List<Object>) (Object) uiMappingService.getOrganizationUiDefaultField());
                 return realm;
               })
           .collect(Collectors.toList());
