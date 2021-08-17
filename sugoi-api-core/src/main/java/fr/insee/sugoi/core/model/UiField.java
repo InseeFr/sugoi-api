@@ -17,8 +17,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UiField implements Serializable {
-  // userUiMapping$name;helpTextTitle;helpText;path;type;modifiable;tag;options1:value,options2:value;
+public class UiField implements Serializable, Comparable {
+  // userUiMapping$name;helpTextTitle;helpText;path;type;modifiable;tag;order;options1:value,options2:value;
 
   private String name;
   private String HelpTextTitle;
@@ -27,10 +27,21 @@ public class UiField implements Serializable {
   private String type;
   private Boolean modifiable;
   private String tag;
+  private int order;
 
   private Map<String, Object> options = new HashMap<>();
 
   public UiField() {}
+
+  @Override
+  public int compareTo(Object o) {
+    if (o instanceof UiField) {
+      UiField oUiField = (UiField) o;
+      return Integer.compare(this.getOrder(), oUiField.getOrder());
+    } else {
+      return 0;
+    }
+  }
 
   public String getName() {
     return this.name;
@@ -94,5 +105,13 @@ public class UiField implements Serializable {
 
   public void setOptions(Map<String, Object> options) {
     this.options = options;
+  }
+
+  public int getOrder() {
+    return order;
+  }
+
+  public void setOrder(int order) {
+    this.order = order;
   }
 }

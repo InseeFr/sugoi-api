@@ -83,7 +83,7 @@ public class UiMappingService {
 
   public UiField convertStringToUIField(String entry) {
     try {
-      String[] fieldProperties = entry.split(";", 8);
+      String[] fieldProperties = entry.split(";", 9);
       UiField uifield = new UiField();
       uifield.setName(fieldProperties[0]);
       uifield.setHelpTextTitle(fieldProperties[1]);
@@ -92,8 +92,11 @@ public class UiMappingService {
       uifield.setType(fieldProperties[4]);
       uifield.setModifiable(Boolean.parseBoolean(fieldProperties[5]));
       uifield.setTag(fieldProperties[6]);
-      if (fieldProperties[7].contains(";")) {
-        String[] optionsProperties = fieldProperties[7].split(";");
+      if (fieldProperties.length >= 8) {
+        uifield.setOrder(getIntOrInfty(fieldProperties[7]));
+      }
+      if (fieldProperties.length >= 9 && fieldProperties[8].contains(";")) {
+        String[] optionsProperties = fieldProperties[8].split(";");
         Map<String, Object> options = new HashMap<>();
         for (String optionProperty : optionsProperties) {
           options.put(optionProperty.split("=")[0], optionProperty.split("=")[1]);
@@ -104,6 +107,14 @@ public class UiMappingService {
     } catch (Exception e) {
       logger.info("Entry " + entry + " not parseable");
       return null;
+    }
+  }
+
+  private int getIntOrInfty(String intString) {
+    try {
+      return Integer.valueOf(intString);
+    } catch (NumberFormatException e) {
+      return Integer.MAX_VALUE;
     }
   }
 }

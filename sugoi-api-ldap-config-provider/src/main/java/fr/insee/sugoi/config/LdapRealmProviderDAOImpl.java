@@ -31,6 +31,7 @@ import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
+import fr.insee.sugoi.core.model.UiField;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.ldap.utils.LdapFilter;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
@@ -39,6 +40,7 @@ import fr.insee.sugoi.ldap.utils.mapper.RealmLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserStorageLdapMapper;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -129,6 +131,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
             .putIfAbsent(
                 "uiOrganizationMapping",
                 (List<Object>) (Object) uiMappingService.getOrganizationUiDefaultField());
+        sortUiLists(realm);
         realm.getProperties().putIfAbsent(LdapConfigKeys.SORT_KEY, defaultSortKey);
         return Optional.of(realm);
       }
@@ -181,12 +184,23 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
                     .putIfAbsent(
                         "uiOrganizationMapping",
                         (List<Object>) (Object) uiMappingService.getOrganizationUiDefaultField());
+                sortUiLists(realm);
                 return realm;
               })
           .collect(Collectors.toList());
     } catch (Exception e) {
       e.printStackTrace();
       throw new RealmNotFoundException("Impossible de charger les realms");
+    }
+  }
+
+  private void sortUiLists(Realm realm) {
+    try {
+      // sort ui list of field by order
+      Collections.sort((List<UiField>) (Object) realm.getUiMapping().get("uiUserMapping"));
+      Collections.sort((List<UiField>) (Object) realm.getUiMapping().get("uiOrganizationMapping"));
+    } catch (Exception e) {
+      logger.debug("ui fields are not sorted");
     }
   }
 
