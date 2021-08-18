@@ -421,9 +421,10 @@ public class AppManagedUserAttributeController {
         (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
         id,
         attributeKey,
+        attributeValue,
         isAsynchronous,
         isUrgent,
-        attributeValue,
+        transactionId,
         authentication);
   }
 
@@ -488,9 +489,10 @@ public class AppManagedUserAttributeController {
         (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
         id,
         attributeKey,
-        isUrgent,
-        isUrgent,
         attributeValue,
+        isAsynchronous,
+        isUrgent,
+        transactionId,
         authentication);
   }
 }
