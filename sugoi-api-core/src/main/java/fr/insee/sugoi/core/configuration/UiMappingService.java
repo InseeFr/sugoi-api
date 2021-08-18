@@ -95,7 +95,7 @@ public class UiMappingService {
       if (fieldProperties.length >= 8) {
         uifield.setOrder(getIntOrInfty(fieldProperties[7]));
       }
-      if (fieldProperties.length >= 9 && fieldProperties[8].contains(";")) {
+      if (fieldProperties.length >= 9 && !fieldProperties[8].isEmpty()) {
         String[] optionsProperties = fieldProperties[8].split(";");
         Map<String, Object> options = new HashMap<>();
         for (String optionProperty : optionsProperties) {
