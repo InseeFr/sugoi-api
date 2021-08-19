@@ -1,3 +1,60 @@
+# 0.8.4
+
+
+- [FIX] adjust habilitation endpoints
+- [ENH] Sort ui items
+- [FIX] adjust default values
+- [FIX] adjust default values
+- [FIX] adjust default values
+- [BUG] :bug: repair ui mapping
+- [BUG] :bug: retrieve good exception type after provider response post in broker
+- [ENH] :sparkles: add send login
+- [BUG] :bug: avoid null pointer exception when reset password
+- [ENH] :sparkles: add ui field configuration in realm
+- [ENH] role claim more generic
+- [ENH] Add authenticated connections for ldapReader
+- [FIX] Avoid null Ldap Connection
+- [REL] :rocket: release version 0.8.1
+- [FIX] Delete member group dont work when multi storage (#412)
+- [ENH] :sparkles: Allow to configure mail unicity by realm
+- [ENH] :sparkles: allow to add realm description on ui-side
+- [UP] :arrow_up: Bump git-commit-id-plugin from 4.0.5 to 4.9.10
+- [UP] :arrow_up: Bump org.springdoc.version from 1.5.9 to 1.5.10
+- [UP] :arrow_up: Bump commons-csv from 1.8 to 1.9.0
+- [ENH] :sparkles: Appmanager need to have reader and appmanager roles to update application groups (#331)
+- [UP] :arrow_up: Bump jansi from 2.3.3 to 2.3.4
+- [UP] :arrow_up: Bump passay from 1.6.0 to 1.6.1
+- [UP] :arrow_up: Bump spring-boot.version from 2.5.2 to 2.5.3
+- [UP] :arrow_up: Bump spotless-maven-plugin from 2.12.1 to 2.12.2
+- [ENH] :sparkles: make broker working synchrone asynchrone
+- [ENH] :rocket: manage exchange between front and a back
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 0.7.0
+- [BUG] 🐛 fix some sonar/compilation warnings
+- [BUG] :bug: renew connection with ldap if server is down (#391)
+- [UP] :arrow_up: Bump commons-io from 2.10.0 to 2.11.0
+- [UP] :arrow_up: Bump tomcat.version from 9.0.48 to 9.0.50
+- [ENH] :sparkles: Mapping Sugoi object with Ldap must be customisable (#191)
+- [ENH] :sparkles: Realm and UserStorage mapping attributes for Ldap Store Provider
+- [ENH] global export feature
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 0.6.0
+- [BUG] :bug: Signoff commit when preparing release
+- [META] :card_index: change commit message when releasing
+- [BUG] 🐛 Fix ldap connexion leak (#379)
+- [ENH] objectClass can be set by userStorage
+- [ENH] implement paging on ldap store
+- [UP] :arrow_up: Bump spring-boot.version from 2.5.1 to 2.5.2
+- [ENH] :sparkles: sort key must be customizable
+- [UP] :arrow_up: Bump spotless-maven-plugin from 2.12.0 to 2.12.1
+- [UP] :arrow_up: Bump tomcat.version from 9.0.46 to 9.0.48
+- [META] 📇 Fix changelog format and url
+- [REL] :rocket: prepare next version
+- [REL] :rocket: prepare new version 0.5.0
+- [REL] :rocket: Release 0.4.0
+- Resolve [250] Add paging properties on userstorage of type ldap + Resolve [247] Having a generic interface for paged requests  + Resolve [248] Refactor findByProperties services for multi-userstorage paging + Resolve [251] Implement paging on Ldap store
+
+
 # 0.8.1
 
 
