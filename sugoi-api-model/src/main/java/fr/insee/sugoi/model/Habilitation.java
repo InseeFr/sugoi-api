@@ -16,6 +16,7 @@ package fr.insee.sugoi.model;
 import java.io.Serializable;
 
 public class Habilitation implements Serializable {
+  private String id;
   private String application;
   private String role;
   private String property;
@@ -28,8 +29,11 @@ public class Habilitation implements Serializable {
     this.property = property;
   }
 
-  // Habilitation can be defined by a String of type [property_]role_application
+  // Habilitation can be defined by a String of type [property_]role_application or raw String for
+  // searching usage
   public Habilitation(String habilitationID) {
+    // id is in this case as raw text for searching usage
+    id = habilitationID;
     String[] splitHabilitation = habilitationID.split("_");
     if (splitHabilitation.length == 2) {
       this.role = splitHabilitation[0];
@@ -66,9 +70,12 @@ public class Habilitation implements Serializable {
   }
 
   public String getId() {
-    return this.property != null
-        ? this.property + "_" + this.role + "_" + this.application
-        : this.role + "_" + this.application;
+    // raw id if specified, or build id from app role and property
+    return id != null
+        ? id
+        : (this.property != null
+            ? this.property + "_" + this.role + "_" + this.application
+            : this.role + "_" + this.application);
   }
 
   @Override

@@ -246,9 +246,8 @@ public class GenericLdapMapper {
       case "LIST_HABILITATION":
         return ((List<Habilitation>) sugoiValue)
             .stream()
-                .filter(
-                    habilitation ->
-                        habilitation.getApplication() != null && habilitation.getRole() != null)
+                // Dont check contents (application nor role) for searching purpose
+                .filter(habilitation -> habilitation.getId() != null)
                 .map(habilitation -> new Attribute(ldapAttributeName, habilitation.getId()))
                 .collect(Collectors.toList());
       case "LIST_USER":
