@@ -23,6 +23,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,9 @@ public class CertificateServiceImpl implements CertificateService {
 
   private static final int EMPLACEMENT_KEY_USAGE_SIGNATURE = 0;
   private static final int EMPLACEMENT_KEY_USAGE_AC = 5;
+  public static final String BEGIN_CERT = "-----BEGIN CERTIFICATE-----";
+  public static final String END_CERT = "-----END CERTIFICATE-----";
+  public static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
   @Override
   public X509Certificate getCertificateClientFromMultipartFile(MultipartFile file)
@@ -132,5 +136,17 @@ public class CertificateServiceImpl implements CertificateService {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public byte[] getCertificateToPemFormat(byte[] cert) throws CertificateException {
+    ByteArrayInputStream inputStream = new ByteArrayInputStream(cert);
+    CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+    X509Certificate certificate = (X509Certificate) certFactory.generateCertificate(inputStream);
+    Base64.Encoder encoder = Base64.getMimeEncoder(64, LINE_SEPARATOR.getBytes());
+    String encodedCertText = new String(encoder.encode(certificate.getEncoded()));
+    String prettified_cert =
+        BEGIN_CERT + LINE_SEPARATOR + encodedCertText + LINE_SEPARATOR + END_CERT;
+    return prettified_cert.getBytes();
   }
 }

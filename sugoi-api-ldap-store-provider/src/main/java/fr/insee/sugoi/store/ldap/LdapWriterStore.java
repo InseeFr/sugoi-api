@@ -829,7 +829,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
                         certificate.getEncoded()),
                     new Modification(
                         ModificationType.DELETE,
-                        "inseePropriéte",
+                        "inseePropriete",
                         "certificateId$" + certificateId))));
       }
 
