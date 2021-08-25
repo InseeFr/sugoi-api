@@ -42,6 +42,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.net.URI;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -736,13 +737,16 @@ public class UserController {
               required = false)
           @PathVariable(name = "storage", required = false)
           String storage,
-      @Parameter(description = "Username to search", required = true) @PathVariable("id")
-          String id) {
-    Resource resource = new ByteArrayResource(userService.getCertificate(realm, storage, id));
+      @Parameter(description = "Username to search", required = true) @PathVariable("id") String id)
+      throws CertificateException {
+    Resource resource =
+        new ByteArrayResource(
+            certificateService.getCertificateToPemFormat(
+                userService.getCertificate(realm, storage, id)));
     return ResponseEntity.ok()
-        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+        .contentType(MediaType.parseMediaType("application/x-x509-ca-cert"))
         .header(
-            HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"cert-user-" + id + ".der\"")
+            HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"cert-user-" + id + ".cer\"")
         .body(resource);
   }
 
@@ -766,8 +770,8 @@ public class UserController {
               required = true)
           @PathVariable("realm")
           String realm,
-      @Parameter(description = "Username to search", required = true) @PathVariable("id")
-          String id) {
+      @Parameter(description = "Username to search", required = true) @PathVariable("id") String id)
+      throws CertificateException {
     User user =
         userService
             .findById(realm, null, id)

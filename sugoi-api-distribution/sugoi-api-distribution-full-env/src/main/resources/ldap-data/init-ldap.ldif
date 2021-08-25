@@ -316,6 +316,7 @@ inseepropriete: uiUserMapping$Certificat valide;;;metadatas.cert.isValid;string;
 inseepropriete: uiUserMapping$Certificat issuer;;;metadatas.cert.issuer;string;false;authentification;
 inseepropriete: uiUserMapping$Certificat subject;;;metadatas.cert.subject;string;false;authentification;
 inseepropriete: uiUserMapping$Certificat expiration;;;metadatas.cert.expiration;string;false;authentification;
+inseepropriete: uiUserMapping$Certificat;;;certificate;manageCertificate;false;authentification;
 description: domaine1
 
 dn: cn=Utilisateurs_contacts_domaine1_WebServicesLdap,ou=WebServicesLdap_Obje

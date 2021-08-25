@@ -88,4 +88,6 @@ public interface CertificateService {
    * @throws CertificateEncodingException si l'algorithme utilisé n'est pas applicable
    */
   public String encodeCertificate(X509Certificate cert) throws CertificateEncodingException;
+
+  public byte[] getCertificateToPemFormat(byte[] cert) throws CertificateException;
 }
