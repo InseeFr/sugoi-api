@@ -311,13 +311,13 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
         List<UserStorage> userStorages =
             load(realmName)
                 .orElseThrow(
-                    () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "))
+                    () -> new RealmNotFoundException("The realm " + realmName + " doesn't exist "))
                 .getUserStorages();
         if (userStorages.size() > 1) {
           for (UserStorage userStorage :
               load(realmName)
                   .orElseThrow(
-                      () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "))
+                      () -> new RealmNotFoundException("The realm " + realmName + " doesn't exist "))
                   .getUserStorages()) {
             ldapConnectionPool.delete(getUserStorageDn(userStorage.getName(), realmName));
           }
@@ -335,6 +335,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   }
 
   private synchronized LDAPConnectionPool initLdapPoolConnection() {
+    //TODO use an authenticated connexion 
     try {
       if (ldapConnectionPool == null
           || !ldapConnectionPool.getConnectionPoolName().equals(url + "-" + port)) {
