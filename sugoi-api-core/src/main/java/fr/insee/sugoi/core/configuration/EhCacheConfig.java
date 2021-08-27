@@ -14,6 +14,8 @@
 package fr.insee.sugoi.core.configuration;
 
 import net.sf.ehcache.config.CacheConfiguration;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.EnableCaching;
@@ -31,6 +33,9 @@ import org.springframework.context.annotation.Configuration;
 @EnableCaching
 public class EhCacheConfig implements CachingConfigurer {
 
+  @Value("fr.insee.sugoi.realms.cache-ttl-seconds")
+  private int cacheTtlSeconds = 3600;
+
   @Bean(destroyMethod = "shutdown")
   public net.sf.ehcache.CacheManager ehCacheManager() {
 
@@ -38,16 +43,11 @@ public class EhCacheConfig implements CachingConfigurer {
     cacheConfiguration.setName("Realms");
     cacheConfiguration.setMemoryStoreEvictionPolicy("LRU");
     cacheConfiguration.setMaxEntriesLocalHeap(1000);
-
-    CacheConfiguration cacheConfiguration1 = new CacheConfiguration();
-    cacheConfiguration1.setName("Realm");
-    cacheConfiguration1.setMemoryStoreEvictionPolicy("LRU");
-    cacheConfiguration1.setMaxEntriesLocalHeap(1000);
+    cacheConfiguration.setTimeToLiveSeconds(cacheTtlSeconds);
 
     net.sf.ehcache.config.Configuration config = new net.sf.ehcache.config.Configuration();
 
     config.addCache(cacheConfiguration);
-    config.addCache(cacheConfiguration1);
 
     return net.sf.ehcache.CacheManager.newInstance(config);
   }
