@@ -115,9 +115,9 @@ public class UserController {
       @Parameter(description = "User's mail of user to search ", required = false)
           @RequestParam(name = "mail", required = false)
           String mail,
-      @Parameter(description = "User's commun name of user to search ", required = false)
-          @RequestParam(name = "nomCommun", required = false)
-          String nomCommun,
+      @Parameter(description = "User's common name of user to search ", required = false)
+          @RequestParam(name = "CommonName", required = false)
+          String commonName,
       @Parameter(description = "User's description", required = false)
           @RequestParam(name = "description", required = false)
           String description,
@@ -138,15 +138,17 @@ public class UserController {
           SearchType typeRecherche,
       @Parameter(description = "User's habilitations of user to search ", required = false)
           @RequestParam(name = "habilitation", required = false)
-          List<String> habilitations,
-      @Parameter(description = "User's application of user to search ", required = false)
-          @RequestParam(name = "application", required = false)
-          String application) {
+          List<String> habilitations) {
 
     // set the user which will serve as a model to retrieve the matching users
     User searchUser = new User();
     searchUser.setUsername(identifiant);
-    searchUser.setLastName(nomCommun);
+    if (commonName != null) {
+      searchUser.getAttributes().put("common_name", commonName);
+    }
+    if (description != null) {
+      searchUser.getAttributes().put("description", commonName);
+    }
     searchUser.setMail(mail);
     if (organisationId != null) {
       Organization organizationSearch = new Organization();
@@ -205,9 +207,9 @@ public class UserController {
       @Parameter(description = "User's mail of user to search ", required = false)
           @RequestParam(name = "mail", required = false)
           String mail,
-      @Parameter(description = "User's commun name of user to search ", required = false)
-          @RequestParam(name = "nomCommun", required = false)
-          String nomCommun,
+      @Parameter(description = "User's common name of user to search ", required = false)
+          @RequestParam(name = "commonName", required = false)
+          String commonName,
       @Parameter(description = "User's description", required = false)
           @RequestParam(name = "description", required = false)
           String description,
@@ -228,24 +230,20 @@ public class UserController {
           SearchType typeRecherche,
       @Parameter(description = "User's habilitations of user to search ", required = false)
           @RequestParam(name = "habilitation", required = false)
-          List<String> habilitations,
-      @Parameter(description = "User's application of user to search ", required = false)
-          @RequestParam(name = "application", required = false)
-          String application) {
+          List<String> habilitations) {
     return getUsers(
         realm,
         null,
         identifiant,
         mail,
-        nomCommun,
+        commonName,
         description,
         organisationId,
         size,
         offset,
         searchCookie,
         typeRecherche,
-        habilitations,
-        application);
+        habilitations);
   }
 
   @PostMapping(
