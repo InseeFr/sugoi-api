@@ -168,12 +168,13 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public ProviderResponse updateUser(User updatedUser, ProviderRequest providerRequest) {
     if (ldapReaderStore.getUser(updatedUser.getUsername()) != null) {
-      User temp = ldapReaderStore.getUserByMail(updatedUser.getMail());
-      if (Boolean.parseBoolean(config.get(LdapConfigKeys.UNIQUE_EMAILS))
-          && updatedUser.getMail() != null
-          && temp != null
-          && !temp.getUsername().equals(updatedUser.getUsername())) {
-        throw new UserAlreadyExistException("An user with this email already exist");
+      if (Boolean.parseBoolean(config.get(LdapConfigKeys.UNIQUE_EMAILS))) {
+        User temp = ldapReaderStore.getUserByMail(updatedUser.getMail());
+        if (updatedUser.getMail() != null
+            && temp != null
+            && !temp.getUsername().equals(updatedUser.getUsername())) {
+          throw new UserAlreadyExistException("An user with this email already exist");
+        }
       }
       try {
         if (updatedUser != null) {

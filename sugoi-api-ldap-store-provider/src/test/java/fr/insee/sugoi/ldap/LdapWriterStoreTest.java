@@ -139,6 +139,7 @@ public class LdapWriterStoreTest {
     realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, appManagedAttributeKey);
     realm.addProperty(
         GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, appManagedAttributePattern);
+    realm.addProperty(LdapConfigKeys.UNIQUE_EMAILS, "false");
 
     Map<String, Map<String, String>> mappings = new HashMap<>();
     Map<String, String> applicationMapping = new HashMap<>();
@@ -257,6 +258,15 @@ public class LdapWriterStoreTest {
     User modifiedUser = ldapReaderStore.getUser("testo");
     assertThat("testo should have a new mail", modifiedUser.getMail(), is("nvtest@insee.fr"));
     assertThat("testo should have an address", modifiedUser.getAddress().get("line1"), is("Toto"));
+  }
+
+  @Test
+  public void testUpdateUserWithSameMailWithoutUnicityNeeded() {
+    User user = ldapReaderStore.getUser("testo");
+    user.setMail("test1@test.fr");
+    ldapWriterStore.updateUser(user, new ProviderRequest(null, false, null));
+    User modifiedUser = ldapReaderStore.getUser("testo");
+    assertThat("testo should have a new mail", modifiedUser.getMail(), is("test1@test.fr"));
   }
 
   @Test
