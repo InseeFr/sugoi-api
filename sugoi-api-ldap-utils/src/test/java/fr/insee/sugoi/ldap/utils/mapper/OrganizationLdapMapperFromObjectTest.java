@@ -90,8 +90,8 @@ public class OrganizationLdapMapperFromObjectTest {
   public void getOrganizationAddressAttributesFromJavaObject() {
 
     Map<String, String> address = new HashMap<>();
-    address.put("ligne1", "33 rue des Fleurs");
-    address.put("ligne2", "56700 Fleurville");
+    address.put("line1", "33 rue des Fleurs");
+    address.put("line2", "56700 Fleurville");
     address.put("id", "generatedBefore");
     organization.setAddress(address);
     List<Attribute> mappedAttributes = organizationLdapMapper.mapToAttributes(organization);

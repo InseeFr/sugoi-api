@@ -138,13 +138,13 @@ inseepropriete: uiUserMapping$Dernière modification;;;metadatas.modifyTimestamp
 inseepropriete: uiUserMapping$Realm;;;metadatas.realm;string;false;advanced;
 inseepropriete: uiUserMapping$UserStorage;;;metadatas.userStorage;string;false;advanced;
 inseepropriete: uiUserMapping$Identifiant adresse;Identifiant unique de l'adresse;Il servira pour le rechercher dans l'annuaire;address.id;string;false;advanced;
-inseepropriete: uiUserMapping$Identification du destinataire;;;address.ligne1;string;true;address;
-inseepropriete: uiUserMapping$N° appartement, boite aux lettres, étage, couloir;;;address.ligne2;string;true;address;
-inseepropriete: uiUserMapping$Entrée, tour, bâtiment, immeuble, résidence;;;address.ligne3;string;true;address;
-inseepropriete: uiUserMapping$Numéro et libellé de la voie;;;address.ligne4;string;true;address;
-inseepropriete: uiUserMapping$Lieu dit ou boîte postale;;;address.ligne5;string;true;address;
-inseepropriete: uiUserMapping$Code postal et localité de destination;;;address.ligne6;string;true;address;
-inseepropriete: uiUserMapping$Pays;;;address.ligne7;string;true;address;
+inseepropriete: uiUserMapping$Identification du destinataire;;;address.line1;string;true;address;
+inseepropriete: uiUserMapping$N° appartement, boite aux lettres, étage, couloir;;;address.line2;string;true;address;
+inseepropriete: uiUserMapping$Entrée, tour, bâtiment, immeuble, résidence;;;address.line3;string;true;address;
+inseepropriete: uiUserMapping$Numéro et libellé de la voie;;;address.line4;string;true;address;
+inseepropriete: uiUserMapping$Lieu dit ou boîte postale;;;address.line5;string;true;address;
+inseepropriete: uiUserMapping$Code postal et localité de destination;;;address.line6;string;true;address;
+inseepropriete: uiUserMapping$Pays;;;address.line7;string;true;address;
 inseepropriete: uiUserMapping$Habilitations;;;habilitations;habilitations;true;rights;attribute_key=inseeGroupeDefaut
 inseepropriete: uiUserMapping$Groupes;;;groups;groups;true;rights;addTitle=Ajouter un groupe;deleteTitle=Supprimer un groupe
 inseepropriete: uiUserMapping$Rôles applicatifs;;;attributes.insee_roles_applicatifs;simpleAppManagedAttributes;true;rights;addTitle=Ajouter un rôle;deleteTitle=Supprimer un rôle;attribute_key=inseeRoleApplicatif
@@ -300,13 +300,13 @@ inseepropriete: uiUserMapping$Dernière modification;;;metadatas.modifyTimestamp
 inseepropriete: uiUserMapping$Realm;;;metadatas.realm;string;false;advanced;
 inseepropriete: uiUserMapping$UserStorage;;;metadatas.userStorage;string;false;advanced;
 inseepropriete: uiUserMapping$Identifiant adresse;Identifiant unique de l'adresse;Il servira pour le rechercher dans l'annuaire;address.id;string;false;advanced;
-inseepropriete: uiUserMapping$Identification du destinataire;;;address.ligne1;string;true;address;
-inseepropriete: uiUserMapping$N° appartement, boite aux lettres, étage, couloir;;;address.ligne2;string;true;address;
-inseepropriete: uiUserMapping$Entrée, tour, bâtiment, immeuble, résidence;;;address.ligne3;string;true;address;
-inseepropriete: uiUserMapping$Numéro et libellé de la voie;;;address.ligne4;string;true;address;
-inseepropriete: uiUserMapping$Lieu dit ou boîte postale;;;address.ligne5;string;true;address;
-inseepropriete: uiUserMapping$Code postal et localité de destination;;;address.ligne6;string;true;address;
-inseepropriete: uiUserMapping$Pays;;;address.ligne7;string;true;address;
+inseepropriete: uiUserMapping$Identification du destinataire;;;address.line1;string;true;address;
+inseepropriete: uiUserMapping$N° appartement, boite aux lettres, étage, couloir;;;address.line2;string;true;address;
+inseepropriete: uiUserMapping$Entrée, tour, bâtiment, immeuble, résidence;;;address.line3;string;true;address;
+inseepropriete: uiUserMapping$Numéro et libellé de la voie;;;address.line4;string;true;address;
+inseepropriete: uiUserMapping$Lieu dit ou boîte postale;;;address.line5;string;true;address;
+inseepropriete: uiUserMapping$Code postal et localité de destination;;;address.line6;string;true;address;
+inseepropriete: uiUserMapping$Pays;;;address.line7;string;true;address;
 inseepropriete: uiUserMapping$Habilitations;;;habilitations;habilitations;true;rights;attribute_key=inseeGroupeDefaut
 inseepropriete: uiUserMapping$Groupes;;;groups;groups;true;rights;addTitle=Ajouter un groupe;deleteTitle=Supprimer un groupe
 inseepropriete: uiUserMapping$Rôles applicatifs;;;attributes.insee_roles_applicatifs;simpleAppManagedAttributes;true;rights;addTitle=Ajouter un rôle;deleteTitle=Supprimer un rôle;attribute_key=inseeRoleApplicatif

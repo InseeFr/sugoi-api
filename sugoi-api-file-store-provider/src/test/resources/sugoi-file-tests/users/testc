@@ -9,8 +9,8 @@
          "gpgkey":null,
          "organization":null,
          "address":{
-            "Ligne1":"Insee",
-            "Ligne4":"88 AVE VERDIER"
+            "line1":"Insee",
+            "line4":"88 AVE VERDIER"
          },
          "metadatas":{
             
@@ -20,8 +20,8 @@
          }
       },
       "address":{
-         "Ligne1":"Insee",
-         "Ligne4":"88 AVE VERDIER"
+         "line1":"Insee",
+         "line4":"88 AVE VERDIER"
       },
       "metadatas":{
          
@@ -73,8 +73,8 @@
       
    ],
    "address":{
-      "Ligne1":"Insee",
-      "Ligne4":"88 AVE VERDIER"
+      "line1":"Insee",
+      "line4":"88 AVE VERDIER"
    },
    "metadatas":{
       

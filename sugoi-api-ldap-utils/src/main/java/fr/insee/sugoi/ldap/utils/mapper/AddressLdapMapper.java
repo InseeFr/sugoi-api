@@ -39,7 +39,7 @@ public class AddressLdapMapper {
     Map<String, String> address = new HashMap<>();
     for (int i = 1; i < 8; i++) {
       address.put(
-          "Ligne" + String.valueOf(i),
+          "line" + String.valueOf(i),
           searchResultEntry.getAttributeValue(
               "inseeAdressePostaleCorrespondantLigne" + String.valueOf(i)));
     }
@@ -49,12 +49,12 @@ public class AddressLdapMapper {
   public List<Attribute> mapToAttributes(Map<String, String> address) {
     List<Attribute> attributes = new ArrayList<>();
     for (int i = 1; i < 8; i++) {
-      if (address.containsKey("Ligne" + String.valueOf(i))
-          && address.get("Ligne" + String.valueOf(i)) != null) {
+      if (address.containsKey("line" + String.valueOf(i))
+          && address.get("line" + String.valueOf(i)) != null) {
         attributes.add(
             new Attribute(
                 "inseeAdressePostaleCorrespondantLigne" + String.valueOf(i),
-                address.get("Ligne" + String.valueOf(i))));
+                address.get("line" + String.valueOf(i))));
       }
     }
     attributes.add(new Attribute("objectClass", objectClasses));
