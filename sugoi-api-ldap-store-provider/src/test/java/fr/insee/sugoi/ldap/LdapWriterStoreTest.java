@@ -171,14 +171,14 @@ public class LdapWriterStoreTest {
     organization.setIdentifiant("Titi");
     organization.addAttributes("description", "titi le test");
     Map<String, String> address = new HashMap<>();
-    address.put("Ligne1", "Orga");
-    address.put("Ligne2", "Chez orga");
+    address.put("line1", "Orga");
+    address.put("line2", "Chez orga");
     organization.setAddress(address);
     ldapWriterStore.createOrganization(organization, null);
     Organization retrievedOrga = ldapReaderStore.getOrganization("Titi");
 
     assertThat("Titi should have been added", retrievedOrga, not(nullValue()));
-    assertThat("Titi should have an address", retrievedOrga.getAddress().get("Ligne1"), is("Orga"));
+    assertThat("Titi should have an address", retrievedOrga.getAddress().get("line1"), is("Orga"));
   }
 
   @Test
@@ -186,8 +186,8 @@ public class LdapWriterStoreTest {
     Organization organization = ldapReaderStore.getOrganization("amodifier");
     organization.addAttributes("description", "nouvelle description");
     Map<String, String> address = new HashMap<>();
-    address.put("Ligne1", "Orga");
-    address.put("Ligne2", "Chez orga");
+    address.put("line1", "Orga");
+    address.put("line2", "Chez orga");
     organization.setAddress(address);
     ldapWriterStore.updateOrganization(organization, null);
     Organization retrievedOrga = ldapReaderStore.getOrganization("amodifier");
@@ -196,7 +196,7 @@ public class LdapWriterStoreTest {
         retrievedOrga.getAttributes().get("description"),
         is("nouvelle description"));
     assertThat(
-        "amodifier should have an address", retrievedOrga.getAddress().get("Ligne1"), is("Orga"));
+        "amodifier should have an address", retrievedOrga.getAddress().get("line1"), is("Orga"));
   }
 
   @Test
@@ -216,15 +216,15 @@ public class LdapWriterStoreTest {
     user.setFirstName("Petit");
     user.setMail("petittest@titi.fr");
     Map<String, String> address = new HashMap<>();
-    address.put("Ligne1", "Toto");
-    address.put("Ligne2", "Chez Toto");
+    address.put("line1", "Toto");
+    address.put("line2", "Chez Toto");
     user.setAddress(address);
     user.addAttributes("additionalMail", "other@insee.fr");
     user.addHabilitation(new Habilitation("application", "role", "property"));
     ldapWriterStore.createUser(user, null);
     User retrievedUser = ldapReaderStore.getUser("Titi");
     assertThat("Titi should have been added", retrievedUser, not(nullValue()));
-    assertThat("Titi should have an address", retrievedUser.getAddress().get("Ligne1"), is("Toto"));
+    assertThat("Titi should have an address", retrievedUser.getAddress().get("line1"), is("Toto"));
     assertThat(
         "Should have an alternative mail",
         retrievedUser.getAttributes().get("additionalMail"),
@@ -250,13 +250,13 @@ public class LdapWriterStoreTest {
     User user = ldapReaderStore.getUser("testo");
     user.setMail("nvtest@insee.fr");
     Map<String, String> address = new HashMap<>();
-    address.put("Ligne1", "Toto");
-    address.put("Ligne2", "Chez Toto");
+    address.put("line1", "Toto");
+    address.put("line2", "Chez Toto");
     user.setAddress(address);
     ldapWriterStore.updateUser(user, new ProviderRequest(null, false, null));
     User modifiedUser = ldapReaderStore.getUser("testo");
     assertThat("testo should have a new mail", modifiedUser.getMail(), is("nvtest@insee.fr"));
-    assertThat("testo should have an address", modifiedUser.getAddress().get("Ligne1"), is("Toto"));
+    assertThat("testo should have an address", modifiedUser.getAddress().get("line1"), is("Toto"));
   }
 
   @Test
