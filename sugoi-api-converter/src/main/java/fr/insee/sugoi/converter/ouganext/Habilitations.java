@@ -14,7 +14,7 @@
 package fr.insee.sugoi.converter.ouganext;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import fr.insee.sugoi.model.Habilitation;
 import java.util.ArrayList;
@@ -122,7 +122,7 @@ public class Habilitations {
     return habilitations;
   }
 
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
+  @JacksonXmlElementWrapper(useWrapping = false)
   protected List<Application> application = new ArrayList<Application>();
 
   /** @return la liste des applications avec habilitations ou une liste vide. */

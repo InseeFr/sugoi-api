@@ -114,89 +114,89 @@ import java.util.HashSet;
 @JacksonXmlRootElement(localName = "Contact", namespace = Namespace.ANNUAIRE)
 public class Contact {
 
-  @JacksonXmlProperty(localName = "Identifiant", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "Identifiant")
   @MapFromAttribute(attributeName = "username")
   @JsonProperty(value = "Identifiant")
   private String identifiant;
 
-  @JacksonXmlProperty(localName = "NomCommun", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "NomCommun")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "nomCommun")
   @JsonProperty(value = "NomCommun")
   private String nomCommun;
 
-  @JacksonXmlProperty(localName = "Nom", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "Nom")
   @MapFromAttribute(attributeName = "lastName")
   @JsonProperty(value = "Nom")
   private String nom;
 
-  @JacksonXmlProperty(localName = "Prenom", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "Prenom")
   @MapFromAttribute(attributeName = "firstName")
   @JsonProperty(value = "Prenom")
   private String prenom;
 
-  @JacksonXmlProperty(localName = "DomaineDeGestion", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "DomaineDeGestion")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "domaineDeGestion")
   @JsonProperty(value = "DomaineDeGestion")
   private String domaineDeGestion;
 
-  @JacksonXmlProperty(localName = "AdresseMessagerie", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "AdresseMessagerie")
   @MapFromAttribute(attributeName = "mail")
   @JsonProperty(value = "AdresseMessagerie")
   private String adresseMessagerie;
 
-  @JacksonXmlProperty(localName = "NumeroTelephone", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "NumeroTelephone")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "numeroTelephone")
   @JsonProperty(value = "NumeroTelephone")
   private String numeroTelephone;
 
-  @JacksonXmlProperty(localName = "Description", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "Description")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "description")
   @JsonProperty(value = "Description")
   private String description;
 
-  @JacksonXmlProperty(localName = "CertificatAuthentification", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "CertificatAuthentification")
   @MapFromAttribute(attributeName = "certificate")
   @JsonSerialize(using = CertificateSerializer.class)
   @JsonDeserialize(using = CertificateDeserializer.class)
   @JsonProperty(value = "CertificatAuthentification")
   private byte[] certificate;
 
-  @JacksonXmlProperty(localName = "AdressePostale", namespace = Namespace.INSEE)
+  @JacksonXmlProperty(localName = "AdressePostale")
   @JsonProperty(value = "AdressePostale")
   private Adresse adresse;
 
-  @JacksonXmlProperty(localName = "OrganisationDeRattachementUri", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "OrganisationDeRattachementUri")
   @JsonSerialize(using = OrganisationSerializer.class)
   @JsonDeserialize(using = OrganisationDeserializer.class)
   @JsonProperty(value = "OrganisationDeRattachementUri")
   private Organisation organisationDeRattachement;
 
-  @JacksonXmlProperty(localName = "Civilite", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "Civilite")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "civilite")
   @JsonProperty(value = "Civilite")
   private String civilite;
 
-  @JacksonXmlProperty(localName = "IdentifiantMetier", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "IdentifiantMetier")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "identifiantMetier")
   @JsonProperty(value = "IdentifiantMetier")
   private String identifiantMetier;
 
-  @JacksonXmlProperty(localName = "RepertoireDeDistribution", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "RepertoireDeDistribution")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "repertoireDeDistribution")
   @JsonProperty(value = "RepertoireDeDistribution")
   private String repertoireDeDistribution;
 
-  @JacksonXmlProperty(localName = "TelephonePortable", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "TelephonePortable")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "telephonePortable")
   @JsonProperty(value = "TelephonePortable")
   private String telephonePortable;
 
-  @JacksonXmlProperty(localName = "FacSimile", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "FacSimile")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "facSimile")
   @JsonProperty(value = "FacSimile")
   private String facSimile;
 
-  @JacksonXmlProperty(localName = "MotDePasseExiste", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "MotDePasseExiste")
   @MapFromHashmapElement(hashMapName = "metadatas", hashMapKey = "hasPassword")
   @JsonValue(value = false)
   @JsonProperty(value = "MotDePasseExiste")
@@ -204,21 +204,21 @@ public class Contact {
 
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "proprietes")
   @JacksonXmlElementWrapper(useWrapping = false)
-  @JacksonXmlProperty(localName = "propriete", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "propriete")
   @JsonProperty(value = "Propriete")
   private Collection<String> propriete;
 
-  @JacksonXmlProperty(localName = "InseeRoleApplicatif", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "InseeRoleApplicatif")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "insee_roles_applicatifs")
   @JsonProperty(value = "InseeRoleApplicatif")
   private Collection<String> inseeRoleApplicatif;
 
-  @JacksonXmlProperty(localName = "CodePin", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "CodePin")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "codePin")
   @JsonProperty(value = "CodePin")
   private byte[] codePin;
 
-  @JacksonXmlProperty(localName = "DateCreation", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "DateCreation")
   @MapFromHashmapElement(hashMapName = "metadatas", hashMapKey = "dateCreation")
   @JsonProperty(value = "DateCreation")
   private Date dateCreation;

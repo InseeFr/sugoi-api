@@ -23,7 +23,7 @@ import java.util.List;
 @JsonPropertyOrder({"liste"})
 public class Organisations {
 
-  @JacksonXmlProperty(localName = "Organisation", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "Organisation")
   protected List<Organisation> liste = new ArrayList<Organisation>();
 
   public List<Organisation> getListe() {

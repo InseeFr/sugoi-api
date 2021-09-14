@@ -73,53 +73,53 @@ import java.util.HashSet;
 @JacksonXmlRootElement(localName = "Organisation", namespace = Namespace.ANNUAIRE)
 public class Organisation {
 
-  @JacksonXmlProperty(localName = "Identifiant", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "Identifiant")
   @MapFromAttribute(attributeName = "identifiant")
   protected String identifiant;
 
-  @JacksonXmlProperty(localName = "NomCommun", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "NomCommun")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "nomCommun")
   protected String nomCommun;
 
-  @JacksonXmlProperty(localName = "DomaineDeGestion", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "DomaineDeGestion")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "domaineDeGestion")
   protected String domaineDeGestion;
 
-  @JacksonXmlProperty(localName = "AdresseMessagerie", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "AdresseMessagerie")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "mail")
   protected String adresseMessagerie;
 
-  @JacksonXmlProperty(localName = "NumeroTelephone", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "NumeroTelephone")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "numeroTelephone")
   protected String numeroTelephone;
 
-  @JacksonXmlProperty(localName = "Description", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "Description")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "description")
   protected String description;
 
-  @JacksonXmlProperty(localName = "FacSimile", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "FacSimile")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "facSimile")
   protected String facSimile;
 
-  @JacksonXmlProperty(localName = "adressePostale", namespace = Namespace.INSEE)
+  @JacksonXmlProperty(localName = "adressePostale")
   protected Adresse adresse;
 
-  @JacksonXmlProperty(localName = "CleDeChiffrement", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "CleDeChiffrement")
   @MapFromAttribute(attributeName = "gpgkey")
   protected byte[] cleDeChiffrement;
 
-  @JacksonXmlProperty(localName = "OrganisationDeRattachementUri", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "OrganisationDeRattachementUri")
   @JsonSerialize(using = OrganisationSerializer.class)
   @JsonDeserialize(using = OrganisationDeserializer.class)
   protected Organisation organisationDeRattachement;
 
-  @JacksonXmlProperty(localName = "RepertoireDeDistribution", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "RepertoireDeDistribution")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "repertoireDeDistribution")
   protected String repertoireDeDistribution;
 
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "proprietes")
   @JacksonXmlElementWrapper(useWrapping = false)
-  @JacksonXmlProperty(localName = "Propriete", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "Propriete")
   protected Collection<String> propriete;
 
   public String getIdentifiant() {

@@ -39,10 +39,10 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 @JacksonXmlRootElement(localName = "ErrorResult", namespace = Namespace.ANNUAIRE)
 public class ErrorResult {
 
-  @JacksonXmlProperty(localName = "Exception", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "Exception")
   protected String exception;
 
-  @JacksonXmlProperty(localName = "Message", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "Message")
   protected String message;
 
   public String getException() {

@@ -96,36 +96,26 @@ public class HabilitationsTest {
     Habilitations habs = generateHabilitations();
     String xmlExpected =
         "<?xml version='1.0' encoding='UTF-8'?>\r\n"
-            + "<Habilitations xmlns=\"http://xml.insee.fr/schema/annuaire\">\r\n"
-            + "  <application>\r\n"
-            + "    <application xmlns:wstxns1=\"http://xml.insee.fr/schema/annuaire\" wstxns1:name=\"app1\">\r\n"
-            + "      <role>\r\n"
-            + "        <role name=\"download\">\r\n"
-            + "          <propriete xmlns=\"\">\r\n"
-            + "            <propriete>DW2012</propriete>\r\n"
-            + "          </propriete>\r\n"
-            + "        </role>\r\n"
-            + "        <role name=\"upload\">\r\n"
-            + "          <propriete xmlns=\"\">\r\n"
-            + "            <propriete>UP2012</propriete>\r\n"
-            + "          </propriete>\r\n"
-            + "        </role>\r\n"
-            + "      </role>\r\n"
-            + "    </application>\r\n"
-            + "    <application xmlns:wstxns2=\"http://xml.insee.fr/schema/annuaire\" wstxns2:name=\"app2\">\r\n"
-            + "      <role>\r\n"
-            + "        <role name=\"download\">\r\n"
-            + "          <propriete xmlns=\"\"/>\r\n"
-            + "        </role>\r\n"
-            + "        <role name=\"dedfze\">\r\n"
-            + "          <propriete xmlns=\"\"/>\r\n"
-            + "        </role>\r\n"
-            + "      </role>\r\n"
-            + "    </application>\r\n"
+            + "<ns1:Habilitations xmlns:ns1=\"http://xml.insee.fr/schema/annuaire\">\r\n"
+            + "  <application name=\"app1\">\r\n"
+            + "    <role name=\"download\">\r\n"
+            + "      <propriete>DW2012</propriete>\r\n"
+            + "    </role>\r\n"
+            + "    <role name=\"upload\">\r\n"
+            + "      <propriete>UP2012</propriete>\r\n"
+            + "    </role>\r\n"
             + "  </application>\r\n"
-            + "</Habilitations>\r\n";
+            + "  <application name=\"app2\">\r\n"
+            + "    <role name=\"download\"/>\r\n"
+            + "    <role name=\"dedfze\"/>\r\n"
+            + "  </application>\r\n"
+            + "</ns1:Habilitations>\r\n";
+    String xml = CustomObjectMapper.XMLObjectMapper().writeValueAsString(habs);
+    System.out.println(xml);
+    System.out.println(xmlExpected);
     Diff myDiff =
         DiffBuilder.compare(xmlExpected)
+            .checkForSimilar()
             .withTest(CustomObjectMapper.XMLObjectMapper().writeValueAsString(habs))
             .build();
     assertFalse(myDiff.hasDifferences());
@@ -135,35 +125,26 @@ public class HabilitationsTest {
   public void testConvertHabilitationToApplicationXml() {
     String expectedXml =
         "<?xml version='1.0' encoding='UTF-8'?>\r\n"
-            + "<Habilitations xmlns=\"http://xml.insee.fr/schema/annuaire\">\r\n"
-            + "  <application>\r\n"
-            + "    <application xmlns:wstxns1=\"http://xml.insee.fr/schema/annuaire\" wstxns1:name=\"App2\">\r\n"
-            + "      <role>\r\n"
-            + "        <role name=\"consultant\">\r\n"
-            + "          <propriete xmlns=\"\">\r\n"
-            + "            <propriete>truc</propriete>\r\n"
-            + "          </propriete>\r\n"
-            + "        </role>\r\n"
-            + "      </role>\r\n"
-            + "    </application>\r\n"
-            + "    <application xmlns:wstxns2=\"http://xml.insee.fr/schema/annuaire\" wstxns2:name=\"App1\">\r\n"
-            + "      <role>\r\n"
-            + "        <role name=\"admin\">\r\n"
-            + "          <propriete xmlns=\"\">\r\n"
-            + "            <propriete>important</propriete>\r\n"
-            + "            <propriete>toto</propriete>\r\n"
-            + "          </propriete>\r\n"
-            + "        </role>\r\n"
-            + "      </role>\r\n"
-            + "    </application>\r\n"
+            + "<ns1:Habilitations xmlns:ns1=\"http://xml.insee.fr/schema/annuaire\">\r\n"
+            + "  <application name=\"App2\">\r\n"
+            + "    <role name=\"consultant\">\r\n"
+            + "      <propriete>truc</propriete>\r\n"
+            + "    </role>\r\n"
             + "  </application>\r\n"
-            + "</Habilitations>\r\n";
+            + "  <application name=\"App1\">\r\n"
+            + "    <role name=\"admin\">\r\n"
+            + "      <propriete>important</propriete>\r\n"
+            + "      <propriete>toto</propriete>\r\n"
+            + "    </role>\r\n"
+            + "  </application>\r\n"
+            + "</ns1:Habilitations>\r\n";
     List<Habilitation> habilitations = generateHabilitationsSugoi();
     Habilitations habilitationsOuganext =
         OuganextSugoiMapper.convertHabilitationToHabilitations(habilitations);
     try {
       Diff myDiff =
           DiffBuilder.compare(expectedXml)
+              .checkForSimilar()
               .withTest(
                   CustomObjectMapper.XMLObjectMapper().writeValueAsString(habilitationsOuganext))
               .build();

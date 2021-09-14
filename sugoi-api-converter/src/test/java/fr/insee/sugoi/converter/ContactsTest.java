@@ -129,7 +129,7 @@ public class ContactsTest {
       contact = generateContact();
       String expectedXml =
           "<?xml version='1.0' encoding='UTF-8'?>\r\n"
-              + "<Contact xmlns=\"http://xml.insee.fr/schema/annuaire\">\r\n"
+              + "<ns1:Contact xmlns:ns1=\"http://xml.insee.fr/schema/annuaire\" xmlns:ns2=\"http://xml.insee.fr/schema\">\r\n"
               + "  <Identifiant>test</Identifiant>\r\n"
               + "  <NomCommun>Test</NomCommun>\r\n"
               + "  <Nom>test</Nom>\r\n"
@@ -143,21 +143,22 @@ public class ContactsTest {
               + "  <TelephonePortable>061245789636</TelephonePortable>\r\n"
               + "  <FacSimile>0123456789</FacSimile>\r\n"
               + "  <MotDePasseExiste>false</MotDePasseExiste>\r\n"
-              + "  <wstxns1:AdressePostale xmlns:wstxns1=\"http://xml.insee.fr/schema\">\r\n"
-              + "    <wstxns1:LigneUne>15 rue Gabriel Peri</wstxns1:LigneUne>\r\n"
-              + "    <wstxns1:LigneDeux></wstxns1:LigneDeux>\r\n"
-              + "    <wstxns1:LigneTrois></wstxns1:LigneTrois>\r\n"
-              + "    <wstxns1:LigneQuatre></wstxns1:LigneQuatre>\r\n"
-              + "    <wstxns1:LigneCinq></wstxns1:LigneCinq>\r\n"
-              + "    <wstxns1:LigneSix></wstxns1:LigneSix>\r\n"
-              + "    <wstxns1:LigneSept>92240 Malakoff</wstxns1:LigneSept>\r\n"
-              + "  </wstxns1:AdressePostale>\r\n"
+              + "  <AdressePostale >\r\n"
+              + "    <ns2:LigneUne>15 rue Gabriel Peri</ns2:LigneUne>\r\n"
+              + "    <ns2:LigneDeux></ns2:LigneDeux>\r\n"
+              + "    <ns2:LigneTrois></ns2:LigneTrois>\r\n"
+              + "    <ns2:LigneQuatre></ns2:LigneQuatre>\r\n"
+              + "    <ns2:LigneCinq></ns2:LigneCinq>\r\n"
+              + "    <ns2:LigneSix></ns2:LigneSix>\r\n"
+              + "    <ns2:LigneSept>92240 Malakoff</ns2:LigneSept>\r\n"
+              + "  </AdressePostale>\r\n"
               + "  <InseeRoleApplicatif/>\r\n"
               + "  <CodePin>AAA=</CodePin>\r\n"
               + "  <OrganisationDeRattachementUri>lorganisation</OrganisationDeRattachementUri>\r\n"
-              + "</Contact>\r\n";
+              + "</ns1:Contact>\r\n";
       Diff myDiff =
           DiffBuilder.compare(expectedXml)
+              .checkForSimilar()
               .withTest(CustomObjectMapper.XMLObjectMapper().writeValueAsString(contact))
               .build();
       assertFalse(myDiff.hasDifferences());
@@ -173,23 +174,24 @@ public class ContactsTest {
     Contact contact = osm.serializeToOuganext(user, Contact.class);
     String expectedXml =
         "<?xml version='1.0' encoding='UTF-8'?>\r\n"
-            + "<Contact xmlns=\"http://xml.insee.fr/schema/annuaire\">\r\n"
+            + "<ns1:Contact xmlns:ns1=\"http://xml.insee.fr/schema/annuaire\" xmlns:ns2=\"http://xml.insee.fr/schema\">\r\n"
             + "  <Identifiant>toto</Identifiant>\r\n"
             + "  <Nom>Le Test</Nom>\r\n"
             + "  <Prenom>Toto</Prenom>\r\n"
             + "  <Description>ce user est trop cool</Description>\r\n"
             + "  <AdresseMessagerie>toto@test.fr</AdresseMessagerie>\r\n"
             + "  <MotDePasseExiste>false</MotDePasseExiste>\r\n"
-            + "  <wstxns1:AdressePostale xmlns:wstxns1=\"http://xml.insee.fr/schema\">\r\n"
-            + "    <wstxns1:LigneDeux>Lentreprise</wstxns1:LigneDeux>\r\n"
-            + "    <wstxns1:LigneCinq>CEDEX</wstxns1:LigneCinq>\r\n"
-            + "  </wstxns1:AdressePostale>\r\n"
+            + "  <AdressePostale>\r\n"
+            + "    <ns2:LigneDeux>Lentreprise</ns2:LigneDeux>\r\n"
+            + "    <ns2:LigneCinq>CEDEX</ns2:LigneCinq>\r\n"
+            + "  </AdressePostale>\r\n"
             + "  <InseeRoleApplicatif/>\r\n"
             + "  <DateCreation>1603294311926</DateCreation>\r\n"
             + "  <OrganisationDeRattachementUri>Lorganisation</OrganisationDeRattachementUri>\r\n"
-            + "</Contact>\r\n";
+            + "</ns1:Contact>\r\n";
     Diff myDiff =
         DiffBuilder.compare(expectedXml)
+            .checkForSimilar()
             .withTest(CustomObjectMapper.XMLObjectMapper().writeValueAsString(contact))
             .build();
     assertFalse(myDiff.hasDifferences());

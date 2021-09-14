@@ -96,28 +96,29 @@ public class OrganisationTest {
     Organisation organisation = generateOrganisation();
     String expectedXML =
         "<?xml version='1.0' encoding='UTF-8'?>\r\n"
-            + "<Organisation xmlns=\"http://xml.insee.fr/schema/annuaire\">\r\n"
+            + "<ns1:Organisation xmlns:ns1=\"http://xml.insee.fr/schema/annuaire\" xmlns:ns2=\"http://xml.insee.fr/schema\">\r\n"
             + "  <Identifiant>XJHFLG4</Identifiant>\r\n"
             + "  <NomCommun>INSEE-DG</NomCommun>\r\n"
             + "  <DomaineDeGestion>TEST</DomaineDeGestion>\r\n"
             + "  <Description>INSEE</Description>\r\n"
             + "  <AdresseMessagerie>accueil@domain.tld</AdresseMessagerie>\r\n"
             + "  <FacSimile>0123456789</FacSimile>\r\n"
-            + "  <wstxns1:adressePostale xmlns:wstxns1=\"http://xml.insee.fr/schema\">\r\n"
-            + "    <wstxns1:LigneUne>17 bd adolphe pinard</wstxns1:LigneUne>\r\n"
-            + "    <wstxns1:LigneDeux></wstxns1:LigneDeux>\r\n"
-            + "    <wstxns1:LigneTrois></wstxns1:LigneTrois>\r\n"
-            + "    <wstxns1:LigneQuatre></wstxns1:LigneQuatre>\r\n"
-            + "    <wstxns1:LigneCinq></wstxns1:LigneCinq>\r\n"
-            + "    <wstxns1:LigneSix></wstxns1:LigneSix>\r\n"
-            + "    <wstxns1:LigneSept>92240 Malakoff</wstxns1:LigneSept>\r\n"
-            + "  </wstxns1:adressePostale>\r\n"
+            + "  <adressePostale>\r\n"
+            + "    <ns2:LigneUne>17 bd adolphe pinard</ns2:LigneUne>\r\n"
+            + "    <ns2:LigneDeux></ns2:LigneDeux>\r\n"
+            + "    <ns2:LigneTrois></ns2:LigneTrois>\r\n"
+            + "    <ns2:LigneQuatre></ns2:LigneQuatre>\r\n"
+            + "    <ns2:LigneCinq></ns2:LigneCinq>\r\n"
+            + "    <ns2:LigneSix></ns2:LigneSix>\r\n"
+            + "    <ns2:LigneSept>92240 Malakoff</ns2:LigneSept>\r\n"
+            + "  </adressePostale>\r\n"
             + "  <OrganisationDeRattachementUri>133546546</OrganisationDeRattachementUri>\r\n"
             + "  <Propriete>Test1</Propriete>\r\n"
             + "  <Propriete>Test2</Propriete>\r\n"
-            + "</Organisation>\r\n";
+            + "</ns1:Organisation>\r\n";
     Diff myDiff =
         DiffBuilder.compare(expectedXML)
+            .checkForSimilar()
             .withTest(CustomObjectMapper.XMLObjectMapper().writeValueAsString(organisation))
             .build();
     assertFalse(myDiff.hasDifferences());
@@ -146,21 +147,22 @@ public class OrganisationTest {
       Organisation organisation = osm.serializeToOuganext(organization, Organisation.class);
       String expectedXml =
           "<?xml version='1.0' encoding='UTF-8'?>\r\n"
-              + "<Organisation xmlns=\"http://xml.insee.fr/schema/annuaire\">\r\n"
+              + "<ns1:Organisation xmlns:ns1=\"http://xml.insee.fr/schema/annuaire\" xmlns:ns2=\"http://xml.insee.fr/schema\">\r\n"
               + "  <Identifiant>Toto</Identifiant>\r\n"
               + "  <NomCommun>Commun</NomCommun>\r\n"
               + "  <DomaineDeGestion>tutu</DomaineDeGestion>\r\n"
-              + "  <wstxns1:adressePostale xmlns:wstxns1=\"http://xml.insee.fr/schema\">\r\n"
-              + "    <wstxns1:LigneDeux>Lentreprise</wstxns1:LigneDeux>\r\n"
-              + "    <wstxns1:LigneCinq>CEDEX</wstxns1:LigneCinq>\r\n"
-              + "  </wstxns1:adressePostale>\r\n"
+              + "  <adressePostale >\r\n"
+              + "    <ns2:LigneDeux>Lentreprise</ns2:LigneDeux>\r\n"
+              + "    <ns2:LigneCinq>CEDEX</ns2:LigneCinq>\r\n"
+              + "  </adressePostale>\r\n"
               + "  <OrganisationDeRattachementUri>Toto</OrganisationDeRattachementUri>\r\n"
               + "  <Propriete>prop</Propriete>\r\n"
               + "  <Propriete>prop2</Propriete>\r\n"
-              + "</Organisation>\r\n";
+              + "</ns1:Organisation>\r\n";
 
       Diff myDiff =
           DiffBuilder.compare(expectedXml)
+              .checkForSimilar()
               .withTest(CustomObjectMapper.XMLObjectMapper().writeValueAsString(organisation))
               .build();
       assertFalse(myDiff.hasDifferences());

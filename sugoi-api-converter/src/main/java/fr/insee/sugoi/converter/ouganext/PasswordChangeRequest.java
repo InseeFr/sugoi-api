@@ -49,25 +49,25 @@ import fr.insee.sugoi.converter.utils.MapFromAttribute;
 @JacksonXmlRootElement(localName = "PasswordChangeRequest", namespace = Namespace.ANNUAIRE)
 public class PasswordChangeRequest {
 
-  @JacksonXmlProperty(localName = "AdresseMessagerie", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "AdresseMessagerie")
   @MapFromAttribute(attributeName = "email")
   @JsonProperty(value = "AdresseMessagerie")
   protected String adresseMessagerie;
 
-  @JacksonXmlProperty(localName = "AdressePostale", namespace = Namespace.INSEE)
+  @JacksonXmlProperty(localName = "AdressePostale")
   private Adresse adressePostale;
 
-  @JacksonXmlProperty(localName = "AncienMotDePasse", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "AncienMotDePasse")
   @MapFromAttribute(attributeName = "oldPassword")
   @JsonProperty(value = "AncienMotDePasse")
   protected String ancienMotDePasse;
 
-  @JacksonXmlProperty(localName = "NouveauMotDePasse", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "NouveauMotDePasse")
   @MapFromAttribute(attributeName = "newPassword")
   @JsonProperty(value = "NouveauMotDePasse")
   protected String nouveauMotDePasse;
 
-  @JacksonXmlProperty(localName = "InfoFormattageEnvoi", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "InfoFormattageEnvoi")
   protected InfoFormattage infoFormattageEnvoi;
 
   public String getAdresseMessagerie() {

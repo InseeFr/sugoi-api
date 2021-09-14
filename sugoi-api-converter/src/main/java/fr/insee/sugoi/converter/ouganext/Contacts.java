@@ -24,7 +24,7 @@ import java.util.List;
 @JsonPropertyOrder({"liste"})
 public class Contacts {
 
-  @JacksonXmlProperty(localName = "Contact", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "Contact")
   @JacksonXmlElementWrapper(useWrapping = false)
   protected List<Contact> liste = new ArrayList<Contact>();
 

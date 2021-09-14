@@ -51,12 +51,13 @@ public class ErrorTest {
     ErrorResult errorResult = createErrorResult();
     String expectedErrorXml =
         "<?xml version='1.0' encoding='UTF-8'?>\r\n"
-            + "<ErrorResult xmlns=\"http://xml.insee.fr/schema/annuaire\">\r\n"
+            + "<ns1:ErrorResult xmlns:ns1=\"http://xml.insee.fr/schema/annuaire\">\r\n"
             + "  <Exception>java.io.IOException</Exception>\r\n"
             + "  <Message>Ioexception Test</Message>\r\n"
-            + "</ErrorResult>\r\n";
+            + "</ns1:ErrorResult>\r\n";
     Diff myDiff =
         DiffBuilder.compare(expectedErrorXml)
+            .checkForSimilar()
             .withTest(CustomObjectMapper.XMLObjectMapper().writeValueAsString(errorResult))
             .build();
     assertFalse(myDiff.hasDifferences());
