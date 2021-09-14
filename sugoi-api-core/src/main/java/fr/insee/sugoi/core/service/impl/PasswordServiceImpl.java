@@ -14,12 +14,12 @@
 package fr.insee.sugoi.core.service.impl;
 
 import fr.insee.sugoi.core.exceptions.PasswordPolicyNotMetException;
+import fr.insee.sugoi.core.model.SugoiCharacterData;
 import fr.insee.sugoi.core.service.PasswordService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.passay.CharacterRule;
-import org.passay.EnglishCharacterData;
 import org.passay.LengthRule;
 import org.passay.PasswordData;
 import org.passay.PasswordGenerator;
@@ -132,10 +132,10 @@ public class PasswordServiceImpl implements PasswordService {
   public List<CharacterRule> generateCharacterRules(
       Boolean withUpperCase, Boolean withLowerCase, Boolean withDigit, Boolean withSpecial) {
     List<CharacterRule> characterRules = new ArrayList<>();
-    if (withUpperCase) characterRules.add(new CharacterRule(EnglishCharacterData.UpperCase, 1));
-    if (withLowerCase) characterRules.add(new CharacterRule(EnglishCharacterData.LowerCase, 1));
-    if (withDigit) characterRules.add(new CharacterRule(EnglishCharacterData.Digit, 1));
-    if (withSpecial) characterRules.add(new CharacterRule(EnglishCharacterData.Special, 1));
+    if (withUpperCase) characterRules.add(new CharacterRule(SugoiCharacterData.UpperCase, 1));
+    if (withLowerCase) characterRules.add(new CharacterRule(SugoiCharacterData.LowerCase, 1));
+    if (withDigit) characterRules.add(new CharacterRule(SugoiCharacterData.Digit, 1));
+    if (withSpecial) characterRules.add(new CharacterRule(SugoiCharacterData.Special, 1));
     return characterRules;
   }
 }
