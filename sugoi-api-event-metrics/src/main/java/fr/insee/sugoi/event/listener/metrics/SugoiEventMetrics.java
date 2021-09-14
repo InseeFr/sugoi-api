@@ -66,7 +66,11 @@ public class SugoiEventMetrics {
                   cse.getUserStorage())
               .increment();
         } else {
-          meterRegistry.counter(cse.getEventType().name(), "realm", cse.getRealm()).increment();
+          if (cse.getRealm() != null) {
+            meterRegistry.counter(cse.getEventType().name(), "realm", cse.getRealm()).increment();
+          } else {
+            meterRegistry.counter(cse.getEventType().name()).increment();
+          }
         }
         break;
     }

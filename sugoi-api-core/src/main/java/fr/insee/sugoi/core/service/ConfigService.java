@@ -41,22 +41,21 @@ public interface ConfigService {
   List<Realm> getRealms();
 
   /**
-   * [NotYetImplemented] Check if the realm exists (by name) and delete realm using the name
+   * Check if the realm exists (by name) and delete realm using the name
    *
    * @throws RealmNotFoundException if realmName doesn't match with the name of an existing realm
    */
   ProviderResponse deleteRealm(String realmName, ProviderRequest providerRequest);
 
   /**
-   * [NotYetImplemented] Check if the realm exists and update realm
+   * Check if the realm exists and update realm
    *
    * @throws RealmNotFoundException if realm doesn't match (by name) with an existing realm
    */
   ProviderResponse updateRealm(Realm realm, ProviderRequest providerRequest);
 
   /**
-   * [NotYetImplemented] Check if a realm with the same name already exists, and creates it if it
-   * doesn't exist
+   * Check if a realm with the same name already exists, and creates it if it doesn't exist
    *
    * @throws RealmAlreadyExistException if realm already exists
    * @throws RealmNotCreatedException if fail to create realm
