@@ -79,8 +79,8 @@ public class FileWriterStoreTest {
           (FileWriterStore) context.getBean("FileWriterStore", realm(), userStorage());
 
       Map<String, String> testoOrgAdress = new HashMap<>();
-      testoOrgAdress.put("Ligne1", "Insee");
-      testoOrgAdress.put("Ligne4", "88 AVE VERDIER");
+      testoOrgAdress.put("line1", "Insee");
+      testoOrgAdress.put("line4", "88 AVE VERDIER");
 
       Group utilisateursApplitest = new Group("Applitest", "Utilisateurs_Applitest");
       Group adminApplitest = new Group("Applitest", "Administrateurs_Applitest");
@@ -160,15 +160,15 @@ public class FileWriterStoreTest {
     organization.setIdentifiant("Titi");
     organization.addAttributes("description", "titi le test");
     Map<String, String> address = new HashMap<>();
-    address.put("Ligne1", "Orga");
-    address.put("Ligne2", "Chez orga");
+    address.put("line1", "Orga");
+    address.put("line2", "Chez orga");
     organization.setAddress(address);
     fileWriterStore.createOrganization(organization, null);
     fileReaderStore.getOrganization("testo");
     Organization retrievedOrga = fileReaderStore.getOrganization("Titi");
 
     assertThat("Titi should have been added", retrievedOrga, not(nullValue()));
-    assertThat("Titi should have an address", retrievedOrga.getAddress().get("Ligne1"), is("Orga"));
+    assertThat("Titi should have an address", retrievedOrga.getAddress().get("line1"), is("Orga"));
   }
 
   @Test
@@ -176,8 +176,8 @@ public class FileWriterStoreTest {
     Organization organization = fileReaderStore.getOrganization("testo");
     organization.addAttributes("description", "nouvelle description");
     Map<String, String> address = new HashMap<>();
-    address.put("Ligne1", "Orga");
-    address.put("Ligne2", "Chez orga");
+    address.put("line1", "Orga");
+    address.put("line2", "Chez orga");
     organization.setAddress(address);
     fileWriterStore.updateOrganization(organization, null);
     Organization retrievedOrga = fileReaderStore.getOrganization("testo");
@@ -186,7 +186,7 @@ public class FileWriterStoreTest {
         retrievedOrga.getAttributes().get("description"),
         is("nouvelle description"));
     assertThat(
-        "amodifier should have an address", retrievedOrga.getAddress().get("Ligne1"), is("Orga"));
+        "amodifier should have an address", retrievedOrga.getAddress().get("line1"), is("Orga"));
   }
 
   @Test
@@ -213,13 +213,13 @@ public class FileWriterStoreTest {
     user.setFirstName("Petit");
     user.setMail("petittest@titi.fr");
     Map<String, String> address = new HashMap<>();
-    address.put("Ligne1", "Toto");
-    address.put("Ligne2", "Chez Toto");
+    address.put("line1", "Toto");
+    address.put("line2", "Chez Toto");
     user.setAddress(address);
     fileWriterStore.createUser(user, null);
     User retrievedUser = fileReaderStore.getUser("Titi");
     assertThat("Titi should have been added", retrievedUser, not(nullValue()));
-    assertThat("Titi should have an address", retrievedUser.getAddress().get("Ligne1"), is("Toto"));
+    assertThat("Titi should have an address", retrievedUser.getAddress().get("line1"), is("Toto"));
   }
 
   @Test
@@ -240,14 +240,14 @@ public class FileWriterStoreTest {
     User user = fileReaderStore.getUser("testo");
     user.setMail("nvtest@insee.fr");
     Map<String, String> address = new HashMap<>();
-    address.put("Ligne1", "Toto");
-    address.put("Ligne2", "Chez Toto");
+    address.put("line1", "Toto");
+    address.put("line2", "Chez Toto");
     user.setAddress(address);
     fileWriterStore.updateUser(user, null);
 
     User modifiedUser = fileReaderStore.getUser("testo");
     assertThat("testo should have a new mail", modifiedUser.getMail(), is("nvtest@insee.fr"));
-    assertThat("testo should have an address", modifiedUser.getAddress().get("Ligne1"), is("Toto"));
+    assertThat("testo should have an address", modifiedUser.getAddress().get("line1"), is("Toto"));
   }
 
   @Test
