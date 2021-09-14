@@ -54,83 +54,63 @@ public class Profil {
     ObjectClass.INSEE_ATTRIBUTS_COMMUNICATION
   };
 
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty
   @MapFromAttribute(attributeName = "url")
   private String ldapUrl;
 
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private int port;
+  @JacksonXmlProperty private int port;
 
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private String username;
+  @JacksonXmlProperty private String username;
 
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private String password;
+  @JacksonXmlProperty private String password;
 
   // Autorisation de mettre le mot de passe dans le DLM
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private boolean passwordReleasedAllowed = false;
+  @JacksonXmlProperty private boolean passwordReleasedAllowed = false;
 
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private boolean verifyChangePassword = false;
+  @JacksonXmlProperty private boolean verifyChangePassword = false;
 
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private String brancheContact;
+  @JacksonXmlProperty private String brancheContact;
 
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private String brancheAdresse;
+  @JacksonXmlProperty private String brancheAdresse;
 
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private String brancheOrganisation;
+  @JacksonXmlProperty private String brancheOrganisation;
 
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private String nomProfil;
+  @JacksonXmlProperty private String nomProfil;
 
   // Valorisation de l'attribut pwdreset lors d'une réinitialisation de mdp
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private boolean pwdResetAllowed = false;
+  @JacksonXmlProperty private boolean pwdResetAllowed = false;
 
   // Vérification de l'unicité du mail au sein du DDG
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private boolean mailUnicity = false;
+  @JacksonXmlProperty private boolean mailUnicity = false;
 
   // Longueur minimale de mot de passe imposée
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private int longueurMiniPassword = 8;
+  @JacksonXmlProperty private int longueurMiniPassword = 8;
 
   // L'unicité globale des identifiants doit etre controlé
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private boolean idGlobalUnicity = true;
+  @JacksonXmlProperty private boolean idGlobalUnicity = true;
 
   // Nombre maximal d'habilitation par contact
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private int nombreMaxHabilitations = 50;
+  @JacksonXmlProperty private int nombreMaxHabilitations = 50;
 
   // objectClass des entrees
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty
   private List<ObjectClass> objectClassContact = Arrays.asList(TABLEAU_CLASSES_DEFAUT);
 
   // Habilitation possibles
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private Habilitations habilitationsPossibles;
+  @JacksonXmlProperty private Habilitations habilitationsPossibles;
 
   // Branches applicatives dont la gestion des groupes est autorisée
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private List<String> branchesApplicativesPossibles;
+  @JacksonXmlProperty private List<String> branchesApplicativesPossibles;
   // groupes déduits du champ precedent
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private List<Groupe> groupesPossibles;
+  @JacksonXmlProperty private List<Groupe> groupesPossibles;
 
   // Support de la pagination ou du vlv
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private boolean vlvSupported = false;
+  @JacksonXmlProperty private boolean vlvSupported = false;
 
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private boolean pagingSupported = false;
+  @JacksonXmlProperty private boolean pagingSupported = false;
 
   // autorisation de l'usage de vlv dans les recherches
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
-  private boolean vlvEnabled = false;
+  @JacksonXmlProperty private boolean vlvEnabled = false;
 
   @Override
   public String toString() {

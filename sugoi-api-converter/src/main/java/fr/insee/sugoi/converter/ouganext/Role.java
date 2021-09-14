@@ -14,12 +14,12 @@
 package fr.insee.sugoi.converter.ouganext;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 
 @JacksonXmlRootElement(localName = "role", namespace = Namespace.ANNUAIRE)
 @JsonPropertyOrder({"name", "propriete"})
@@ -34,10 +34,11 @@ public class Role {
     this.name = name;
   }
 
-  @XmlAttribute(name = "name")
+  @JacksonXmlProperty(isAttribute = true)
   private String name;
 
-  @XmlElement private List<String> propriete = new ArrayList<>();
+  @JacksonXmlElementWrapper(useWrapping = false)
+  private List<String> propriete = new ArrayList<>();
 
   public String getName() {
     return name;

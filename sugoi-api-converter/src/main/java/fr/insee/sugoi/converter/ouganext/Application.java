@@ -14,6 +14,7 @@
 package fr.insee.sugoi.converter.ouganext;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import fr.insee.sugoi.converter.utils.MapFromAttribute;
@@ -26,11 +27,11 @@ import javax.xml.bind.annotation.XmlAttribute;
 @JsonPropertyOrder({"name", "role"})
 public class Application {
 
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(isAttribute = true)
   @MapFromAttribute(attributeName = "name")
   private String name;
 
-  @JacksonXmlProperty(namespace = Namespace.ANNUAIRE)
+  @JacksonXmlElementWrapper(useWrapping = false)
   private Collection<Role> role = new ArrayList<>();
 
   public Application(String appName) {

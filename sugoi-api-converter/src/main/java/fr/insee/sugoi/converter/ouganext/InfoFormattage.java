@@ -68,52 +68,52 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 })
 public class InfoFormattage {
 
-  @JacksonXmlProperty(localName = "ChefSignataire", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "ChefSignataire")
   protected String chefSignataire;
 
-  @JacksonXmlProperty(localName = "HotlineFax", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "HotlineFax")
   protected String hotlineFax;
 
-  @JacksonXmlProperty(localName = "HotlineMail", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "HotlineMail")
   protected String hotlineMail;
 
-  @JacksonXmlProperty(localName = "HotlineTel", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "HotlineTel")
   protected String hotlineTel;
 
-  @JacksonXmlProperty(localName = "IdentifiantApplication", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "IdentifiantApplication")
   protected String identifiantApplication;
 
-  @JacksonXmlProperty(localName = "IdentifiantEnt", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "IdentifiantEnt")
   protected String identifiantEnt;
 
-  @JacksonXmlProperty(localName = "ModeleCourrier", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "ModeleCourrier")
   protected String modeleCourrier;
 
-  @JacksonXmlProperty(localName = "NomDepartement", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "NomDepartement")
   protected String nomDepartement;
 
-  @JacksonXmlProperty(localName = "NomDirection", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "NomDirection")
   protected String nomDirection;
 
-  @JacksonXmlProperty(localName = "NomApplicationLettre", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "NomApplicationLettre")
   protected String nomApplicationLettre;
 
-  @JacksonXmlProperty(localName = "NomService", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "NomService")
   protected String nomService;
 
-  @JacksonXmlProperty(localName = "NomSignataire", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "NomSignataire")
   protected String nomSignataire;
 
-  @JacksonXmlProperty(localName = "UEIdentifiant", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "UEIdentifiant")
   protected String ueIdentifiant;
 
-  @JacksonXmlProperty(localName = "URLSite", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "URLSite")
   protected String urlSite;
 
-  @JacksonXmlProperty(localName = "Logo", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "Logo")
   protected String logo;
 
-  @JacksonXmlProperty(localName = "AdresseMessagerieEmettrice", namespace = Namespace.ANNUAIRE)
+  @JacksonXmlProperty(localName = "AdresseMessagerieEmettrice")
   protected String adresseMessagerieEmettrice;
 
   public String getChefSignataire() {
