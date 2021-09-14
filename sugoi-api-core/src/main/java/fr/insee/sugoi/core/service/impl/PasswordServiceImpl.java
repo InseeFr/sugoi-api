@@ -14,6 +14,7 @@
 package fr.insee.sugoi.core.service.impl;
 
 import fr.insee.sugoi.core.exceptions.PasswordPolicyNotMetException;
+import fr.insee.sugoi.core.model.SugoiRandomPasswordCharacterData;
 import fr.insee.sugoi.core.service.PasswordService;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +84,7 @@ public class PasswordServiceImpl implements PasswordService {
     if (password != null) {
       List<Rule> rules = new ArrayList<>();
       rules.add(new LengthRule(size != null ? size : pValidateSize, Integer.MAX_VALUE));
-      generateCharacterRules(
+      generateValidationCharacterRules(
               withUpperCase != null ? withUpperCase : pValidateWithUpperCase,
               withLowerCase != null ? withLowerCase : pValidateWithLowerCase,
               withDigit != null ? withDigit : pValidateWithDigits,
@@ -121,7 +122,7 @@ public class PasswordServiceImpl implements PasswordService {
     String password =
         passwordGenerator.generatePassword(
             size != null ? size : pCreateSize,
-            generateCharacterRules(
+            generateRandomPasswordCharacterRules(
                 withUpperCase != null ? withUpperCase : pCreateWithUpperCase,
                 withLowerCase != null ? withLowerCase : pCreateWithLowerCase,
                 withDigit != null ? withDigit : pCreateWithDigits,
@@ -129,7 +130,20 @@ public class PasswordServiceImpl implements PasswordService {
     return password;
   }
 
-  public List<CharacterRule> generateCharacterRules(
+  public List<CharacterRule> generateRandomPasswordCharacterRules(
+      Boolean withUpperCase, Boolean withLowerCase, Boolean withDigit, Boolean withSpecial) {
+    List<CharacterRule> characterRules = new ArrayList<>();
+    if (withUpperCase)
+      characterRules.add(new CharacterRule(SugoiRandomPasswordCharacterData.UpperCase, 1));
+    if (withLowerCase)
+      characterRules.add(new CharacterRule(SugoiRandomPasswordCharacterData.LowerCase, 1));
+    if (withDigit) characterRules.add(new CharacterRule(SugoiRandomPasswordCharacterData.Digit, 1));
+    if (withSpecial)
+      characterRules.add(new CharacterRule(SugoiRandomPasswordCharacterData.Special, 1));
+    return characterRules;
+  }
+
+  public List<CharacterRule> generateValidationCharacterRules(
       Boolean withUpperCase, Boolean withLowerCase, Boolean withDigit, Boolean withSpecial) {
     List<CharacterRule> characterRules = new ArrayList<>();
     if (withUpperCase) characterRules.add(new CharacterRule(EnglishCharacterData.UpperCase, 1));
