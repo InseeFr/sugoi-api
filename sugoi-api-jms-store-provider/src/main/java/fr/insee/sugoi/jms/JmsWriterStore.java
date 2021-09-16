@@ -258,6 +258,8 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.USER_ID, userId);
     params.put(JmsAtttributes.ATTRIBUTE_KEY, attributeKey);
     params.put(JmsAtttributes.ATTRIBUTE_VALUE, attribute);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
     return checkAndSend(Method.ADD_APP_MANAGED_ATTRIBUTE, params, userId, providerRequest);
   }
 
