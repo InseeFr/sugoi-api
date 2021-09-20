@@ -172,7 +172,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       if (Boolean.parseBoolean(config.get(LdapConfigKeys.UNIQUE_EMAILS))
           && updatedUser.getMail() != null
           && temp != null
-          && temp.getUsername() != updatedUser.getUsername()) {
+          && !temp.getUsername().equals(updatedUser.getUsername())) {
         throw new UserAlreadyExistException("An user with this email already exist");
       }
       try {
