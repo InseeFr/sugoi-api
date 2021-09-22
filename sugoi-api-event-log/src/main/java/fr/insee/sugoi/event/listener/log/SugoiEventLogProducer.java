@@ -27,18 +27,22 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 
-@Component
+@Configuration
 @ConditionalOnProperty(
     name = "sugoi.api.event.log.producer.enabled",
     havingValue = "true",
     matchIfMissing = false)
+@EnableAsync
 public class SugoiEventLogProducer {
 
   public static final Logger logger = LoggerFactory.getLogger(SugoiEventLogProducer.class);
 
+  @Async
   @EventListener
   public void handleContextStart(SugoiEvent cse) {
     boolean isEventError = false;
