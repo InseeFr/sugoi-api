@@ -25,12 +25,15 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 
-@Component
+@Configuration
 @ConditionalOnProperty(name = "sugoi.api.event.webhook.enabled", havingValue = "true")
+@EnableAsync
 public class SugoiEventWebHookProducer {
 
   @Value("${sugoi.api.event.webhook.name}")
@@ -40,6 +43,7 @@ public class SugoiEventWebHookProducer {
 
   @Autowired private WebHookService webHookService;
 
+  @Async
   @EventListener
   public void handleContextStart(SugoiEvent cse) {
     SugoiEventTypeEnum eventType = cse.getEventType();

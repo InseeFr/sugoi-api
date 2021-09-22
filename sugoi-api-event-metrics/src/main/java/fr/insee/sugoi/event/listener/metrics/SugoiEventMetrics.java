@@ -17,19 +17,23 @@ import fr.insee.sugoi.core.event.model.SugoiEvent;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 
-@Component
+@Configuration
 @ConditionalOnProperty(
     name = "fr.insee.sugoi.api.event.metrics.enabled",
     havingValue = "true",
     matchIfMissing = false)
+@EnableAsync
 public class SugoiEventMetrics {
 
   @Autowired private MeterRegistry meterRegistry;
 
   @EventListener
+  @Async
   public void handleContextStart(SugoiEvent cse) {
     switch (cse.getEventType()) {
       case CREATE_REALM:
