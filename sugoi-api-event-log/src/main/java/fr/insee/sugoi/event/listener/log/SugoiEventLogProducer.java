@@ -503,6 +503,42 @@ public class SugoiEventLogProducer {
         toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
         toLog.put(EventKeysConfig.USER_ID, properties.get(EventKeysConfig.USER_ID));
         break;
+      case ADD_USER_TO_GROUP_MANAGER:
+        toLog.put(EventKeysConfig.REALM, realm);
+        toLog.put(
+            EventKeysConfig.APPLICATION_NAME,
+            ((String) properties.get(EventKeysConfig.APPLICATION_NAME)));
+        break;
+      case ADD_USER_TO_GROUP_MANAGER_ERROR:
+        toLog.put(EventKeysConfig.REALM, realm);
+        toLog.put(
+            EventKeysConfig.APPLICATION_NAME,
+            ((String) properties.get(EventKeysConfig.APPLICATION_NAME)));
+        break;
+      case DELETE_USER_FROM_GROUP_MANAGER:
+        toLog.put(EventKeysConfig.REALM, realm);
+        toLog.put(
+            EventKeysConfig.APPLICATION_NAME,
+            ((String) properties.get(EventKeysConfig.APPLICATION_NAME)));
+        break;
+      case DELETE_USER_FROM_GROUP_MANAGER_ERROR:
+        toLog.put(EventKeysConfig.REALM, realm);
+        toLog.put(
+            EventKeysConfig.APPLICATION_NAME,
+            ((String) properties.get(EventKeysConfig.APPLICATION_NAME)));
+        break;
+      case GET_GROUP_MANAGER:
+        toLog.put(EventKeysConfig.REALM, realm);
+        toLog.put(
+            EventKeysConfig.APPLICATION_NAME,
+            ((String) properties.get(EventKeysConfig.APPLICATION_NAME)));
+        break;
+      case GET_GROUP_MANAGER_ERROR:
+        toLog.put(EventKeysConfig.REALM, realm);
+        toLog.put(
+            EventKeysConfig.APPLICATION_NAME,
+            ((String) properties.get(EventKeysConfig.APPLICATION_NAME)));
+        break;
       default:
         break;
     }

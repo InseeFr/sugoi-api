@@ -602,6 +602,12 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
         ldapPoolConnection.add(groupsAR);
         application.getGroups().stream()
             .forEach(group -> createGroup(application.getName(), group, providerRequest));
+        // Create group of app manager
+        AddRequest groupManagerAR =
+            new AddRequest(
+                getGroupManagerSource(application.getName()),
+                new Attribute("objectClass", "top", "groupOfUniqueNames"));
+        ldapPoolConnection.add(groupManagerAR);
       } catch (LDAPException e) {
         throw new RuntimeException("Failed to create application" + application.getName(), e);
       }
@@ -904,5 +910,68 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     response.setStatus(ProviderResponseStatus.OK);
     response.setEntityId(organization.getIdentifiant());
     return response;
+  }
+
+  @Override
+  public ProviderResponse addUserToGroupManager(
+      String applicationName, String userId, ProviderRequest providerRequest) {
+
+    if (ldapReaderStore.getUser(userId) == null) {
+      throw new UserNotFoundException(
+          "Cannot find user with id "
+              + userId
+              + " in realm "
+              + config.get(LdapConfigKeys.REALM_NAME));
+    }
+    try {
+      ModifyRequest mr =
+          new ModifyRequest(
+              getGroupManagerSource(applicationName),
+              new Modification(ModificationType.ADD, "uniqueMember", getUserDN(userId)));
+      ldapPoolConnection.modify(mr);
+      ProviderResponse response = new ProviderResponse();
+      response.setStatus(ProviderResponseStatus.OK);
+      response.setEntityId(userId);
+      return response;
+    } catch (LDAPException e) {
+      if (!e.getResultCode().equals(ResultCode.ATTRIBUTE_OR_VALUE_EXISTS)) {
+        throw new RuntimeException("Failed to add user to manager group ", e);
+      }
+      ProviderResponse response = new ProviderResponse();
+      response.setStatus(ProviderResponseStatus.OK);
+      response.setEntityId(userId);
+      return response;
+    }
+  }
+
+  @Override
+  public ProviderResponse deleteUserFromManagerGroup(
+      String applicationName, String userId, ProviderRequest providerRequest) {
+    if (ldapReaderStore.getUser(userId) == null) {
+      throw new UserNotFoundException(
+          "Cannot find user with id "
+              + userId
+              + " in realm "
+              + config.get(LdapConfigKeys.REALM_NAME));
+    }
+    try {
+      ModifyRequest mr =
+          new ModifyRequest(
+              getGroupManagerSource(applicationName),
+              new Modification(ModificationType.DELETE, "uniqueMember", getUserDN(userId)));
+      ldapPoolConnection.modify(mr);
+      ProviderResponse response = new ProviderResponse();
+      response.setStatus(ProviderResponseStatus.OK);
+      response.setEntityId(userId);
+      return response;
+    } catch (LDAPException e) {
+      if (!e.getResultCode().equals(ResultCode.NO_SUCH_ATTRIBUTE)) {
+        throw new RuntimeException("Failed to add user to manager group ", e);
+      }
+      ProviderResponse response = new ProviderResponse();
+      response.setStatus(ProviderResponseStatus.OK);
+      response.setEntityId(userId);
+      return response;
+    }
   }
 }

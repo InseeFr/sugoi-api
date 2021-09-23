@@ -157,5 +157,5 @@ public interface ReaderStore {
    */
   public boolean validateCredentials(User user, String credential);
 
-  public byte[] getUserCertificate(String id);
+  public Group getManagerGroup(String applicationName);
 }

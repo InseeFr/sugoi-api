@@ -318,6 +318,29 @@ public class JmsWriterStore implements WriterStore {
         Method.DELETE_GPG_KEY, params, organization.getIdentifiant(), providerRequest);
   }
 
+  @Override
+  public ProviderResponse addUserToGroupManager(
+      String applicationName, String userId, ProviderRequest providerRequest) {
+    Map<String, Object> params = new HashMap<>();
+    params.put(JmsAtttributes.APP_NAME, applicationName);
+    params.put(JmsAtttributes.USER_ID, userId);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    return checkAndSend(Method.ADD_USER_TO_MANAGER_GROUP, params, applicationName, providerRequest);
+  }
+
+  @Override
+  public ProviderResponse deleteUserFromManagerGroup(
+      String applicationName, String userId, ProviderRequest providerRequest) {
+    Map<String, Object> params = new HashMap<>();
+    params.put(JmsAtttributes.APP_NAME, applicationName);
+    params.put(JmsAtttributes.USER_ID, userId);
+    params.put(JmsAtttributes.REALM, realm.getName());
+    params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
+    return checkAndSend(
+        Method.DELETE_USER_FROM_MANAGER_GROUP, params, applicationName, providerRequest);
+  }
+
   private ProviderResponse checkAndSend(
       String method, Map<String, Object> params, String entityId, ProviderRequest providerRequest) {
     ProviderResponse response = new ProviderResponse();

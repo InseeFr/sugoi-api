@@ -51,6 +51,9 @@ public class LdapStoreBeans {
   @Value("${fr.insee.sugoi.ldap.default.group_source_pattern:}")
   private String defaultGroupSourcePattern;
 
+  @Value("${fr.insee.sugoi.ldap.default.group_manager_source_pattern:}")
+  private String defaultGroupManagerSourcePattern;
+
   @Value("${fr.insee.sugoi.ldap.default.vlv.enabled:false}")
   private String vlvEnabled;
 
@@ -126,6 +129,11 @@ public class LdapStoreBeans {
         userStorage.getProperties().get("group_source_pattern") != null
             ? userStorage.getProperties().get("group_source_pattern")
             : defaultGroupSourcePattern);
+    config.put(
+        LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN,
+        userStorage.getProperties().get("group_manager_source_pattern") != null
+            ? userStorage.getProperties().get("group_manager_source_pattern")
+            : defaultGroupManagerSourcePattern);
     config.put(
         LdapConfigKeys.GROUP_FILTER_PATTERN,
         userStorage.getProperties().get("group_filter_pattern") != null

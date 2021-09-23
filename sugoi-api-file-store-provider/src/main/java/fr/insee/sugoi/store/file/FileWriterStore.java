@@ -479,4 +479,18 @@ public class FileWriterStore implements WriterStore {
       Organization organization, ProviderRequest providerRequest) {
     throw new NotImplementedException();
   }
+
+  @Override
+  public ProviderResponse addUserToGroupManager(
+      String applicationName, String userId, ProviderRequest providerRequest) {
+    // TODO Auto-generated method stub
+    throw new NotImplementedException();
+  }
+
+  @Override
+  public ProviderResponse deleteUserFromManagerGroup(
+      String applicationName, String userId, ProviderRequest providerRequest) {
+    // TODO Auto-generated method stub
+    throw new NotImplementedException();
+  }
 }

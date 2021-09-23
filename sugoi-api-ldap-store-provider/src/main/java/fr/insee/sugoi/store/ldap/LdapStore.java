@@ -48,6 +48,18 @@ public class LdapStore {
     }
   }
 
+  protected String getGroupManagerSource(String appName) {
+    if (config.get(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN) != null
+        && config.get(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN) != "") {
+      return config
+          .get(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN)
+          .replace("{appliname}", appName);
+    } else {
+      throw new UnsupportedOperationException(
+          "Group manager feature is not set for this userstorage");
+    }
+  }
+
   protected String getGroupWildcardFilter(String appName) {
     if (config.get(LdapConfigKeys.GROUP_FILTER_PATTERN) != null) {
       return config

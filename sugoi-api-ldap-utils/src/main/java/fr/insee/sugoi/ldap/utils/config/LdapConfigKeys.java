@@ -24,6 +24,7 @@ public class LdapConfigKeys extends GlobalKeysConfig {
   public static final String PASSWORD = "password";
   public static final String POOL_SIZE = "pool_size";
   public static final String GROUP_SOURCE_PATTERN = "group_source_pattern";
+  public static final String GROUP_MANAGER_SOURCE_PATTERN = "group_manager_source_pattern";
   public static final String GROUP_FILTER_PATTERN = "group_filter_pattern";
   public static final String REALM_NAME = "realm_name";
   public static final String TYPE = "TYPE";
