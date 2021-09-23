@@ -280,8 +280,7 @@ public class FileReaderStore implements ReaderStore {
   }
 
   @Override
-  public byte[] getUserCertificate(String id) {
-    // TODO Auto-generated method stub
-    return null;
+  public Group getManagerGroup(String applicationName) {
+    throw new NotImplementedException();
   }
 }

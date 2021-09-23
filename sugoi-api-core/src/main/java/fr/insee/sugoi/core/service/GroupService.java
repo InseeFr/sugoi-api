@@ -117,4 +117,47 @@ public interface GroupService {
       String appName,
       String groupName,
       ProviderRequest providerRequest);
+
+  /**
+   * Add a user to the group manager of one Application
+   *
+   * @param realm
+   * @param storage
+   * @param userId
+   * @param applicationName
+   * @param providerRequest
+   * @return
+   */
+  ProviderResponse addUserToGroupManager(
+      String realm,
+      String storage,
+      String userId,
+      String applicationName,
+      ProviderRequest providerRequest);
+
+  /**
+   * Delete a user from the group manager of one Application
+   *
+   * @param realm
+   * @param storage
+   * @param userId
+   * @param applicationName
+   * @param providerRequest
+   * @return
+   */
+  ProviderResponse deleteUserFromManagerGroup(
+      String realm,
+      String storage,
+      String userId,
+      String applicationName,
+      ProviderRequest providerRequest);
+
+  /**
+   * Get the group of application manager user
+   *
+   * @param realm
+   * @param applicationName
+   * @return Group
+   */
+  Group getManagerGroup(String realm, String applicationName);
 }

@@ -47,6 +47,9 @@ public class UserStorageLdapMapper {
                   if (property[0].equalsIgnoreCase("groupSourcePattern")) {
                     userStorage.addProperty("group_source_pattern", property[1]);
                   }
+                  if (property[0].equalsIgnoreCase("groupManagerSourcePattern")) {
+                    userStorage.addProperty("group_manager_source_pattern", property[1]);
+                  }
                   if (property[0].equalsIgnoreCase("groupFilterPattern")) {
                     userStorage.addProperty("group_filter_pattern", property[1]);
                   }
@@ -114,6 +117,11 @@ public class UserStorageLdapMapper {
           new Attribute(
               "inseepropriete",
               String.format("brancheOrganisation$%s", userStorage.getOrganizationSource())));
+    }
+    if (userStorage.getProperties().containsKey("group_manager_source_pattern")) {
+      userStorage.addProperty(
+          "group_manager_source_pattern",
+          userStorage.getProperties().get("group_manager_source_pattern"));
     }
     if (userStorage.getProperties().containsKey("group_source_pattern")) {
       attributes.add(

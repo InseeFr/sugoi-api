@@ -56,6 +56,7 @@ public class SugoiEventMetrics {
       case FIND_USERS:
       case FIND_HABILITATIONS:
       case FIND_ORGANIZATIONS:
+      case GET_GROUP_MANAGER:
       case FIND_REALM_BY_ID_ERROR:
         // We don't increment those counters
         break;

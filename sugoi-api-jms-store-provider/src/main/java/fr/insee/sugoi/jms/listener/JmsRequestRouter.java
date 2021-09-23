@@ -215,6 +215,17 @@ public class JmsRequestRouter {
               (String) request.getmethodParams().get(JmsAtttributes.ORGANIZATION_NAME),
               providerRequest);
           break;
+        case Method.DELETE_USER_FROM_MANAGER_GROUP:
+          appName = (String) request.getmethodParams().get(JmsAtttributes.APP_NAME);
+          userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
+          groupService.deleteUserFromManagerGroup(
+              realm, userStorage, userId, appName, providerRequest);
+          break;
+        case Method.ADD_USER_TO_MANAGER_GROUP:
+          appName = (String) request.getmethodParams().get(JmsAtttributes.APP_NAME);
+          userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
+          groupService.addUserToGroupManager(realm, userStorage, userId, appName, providerRequest);
+          break;
         default:
           throw new Exception("Invalid Operation");
       }

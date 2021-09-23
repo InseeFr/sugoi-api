@@ -123,3 +123,21 @@ Feature: Groups scenario admin
         When the client perform DELETE request on url /realms/domaine1/applications/applitest/groups/Administrateurs_fake_AppliTest
         And show body received
         Then the client receives status code 404
+
+    Scenario: Get group manager
+        When the client perform GET request on url /realms/domaine1/applications/applitest/group_manager
+        And show body received
+        Then the client receives status code 200
+        Then the client expect to receive a group
+
+    Scenario: Add user group to group manager
+        When the client perform PUT request on url /realms/domaine1/applications/applitest/group_manager/members/testc
+        And show body received
+        Then the client receives status code 204
+
+    Scenario: Get group manager and check user testc is in
+        When the client perform GET request on url /realms/domaine1/applications/applitest/group_manager
+        And show body received
+        Then the client receives status code 200
+        Then the client expect to receive a group
+        Then the client expect the group contains user TESTC

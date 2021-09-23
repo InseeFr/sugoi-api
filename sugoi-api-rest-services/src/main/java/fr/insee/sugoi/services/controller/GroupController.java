@@ -498,4 +498,109 @@ public class GroupController {
         .header("X-SUGOI-REQUEST-STATUS", response.getStatus().toString())
         .build();
   }
+
+  @GetMapping(
+      value = {"/realms/{realm}/applications/{application}/group_manager"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Get users from manager group")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#applicationName)")
+  public ResponseEntity<?> getUserFromManagerGroup(
+      @PathVariable("realm") String realm, @PathVariable("application") String applicationName) {
+    Group managerGroup = groupService.getManagerGroup(realm, applicationName);
+    return ResponseEntity.status(HttpStatus.OK).body(managerGroup);
+  }
+
+  @PutMapping(
+      value = {"/realms/{realm}/applications/{application}/group_manager/members/{user_id}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Add user to manager group")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#applicationName)")
+  public ResponseEntity<?> addUserToManagerGroup(
+      @PathVariable("realm") String realm,
+      @PathVariable("user_id") String userId,
+      @PathVariable("application") String applicationName,
+      @Parameter(
+              description = "Name of the userStorage where the user is located",
+              required = false)
+          @RequestParam(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "Allowed asynchronous request", required = false)
+          @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
+          boolean isAsynchronous,
+      @Parameter(description = "Make request prioritary", required = false)
+          @RequestHeader(name = "X-SUGOI-URGENT-REQUEST", defaultValue = "false")
+          boolean isUrgent,
+      @Parameter(description = "Transaction Id", required = false)
+          @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
+          String transactionId,
+      Authentication authentication) {
+
+    ProviderResponse response =
+        groupService.addUserToGroupManager(
+            realm,
+            storage,
+            userId,
+            applicationName,
+            new ProviderRequest(
+                new SugoiUser(
+                    authentication.getName(),
+                    authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .map(String::toUpperCase)
+                        .collect(Collectors.toList())),
+                isAsynchronous,
+                transactionId,
+                isUrgent));
+    return ResponseEntity.status(Utils.convertStatusTHttpStatus(response, false, true))
+        .header("X-SUGOI-TRANSACTION-ID", response.getRequestId())
+        .header("X-SUGOI-REQUEST-STATUS", response.getStatus().toString())
+        .build();
+  }
+
+  @DeleteMapping(
+      value = {"/realms/{realm}/applications/{application}/group_manager/members/{user_id}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Operation(summary = "Delete user from manager group")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#applicationName)")
+  public ResponseEntity<?> deleteUserFromManagerGroup(
+      @PathVariable("realm") String realm,
+      @PathVariable("user_id") String userId,
+      @PathVariable("application") String applicationName,
+      @Parameter(
+              description = "Name of the userStorage where the user is located",
+              required = false)
+          @RequestParam(name = "storage", required = false)
+          String storage,
+      @Parameter(description = "Allowed asynchronous request", required = false)
+          @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
+          boolean isAsynchronous,
+      @Parameter(description = "Make request prioritary", required = false)
+          @RequestHeader(name = "X-SUGOI-URGENT-REQUEST", defaultValue = "false")
+          boolean isUrgent,
+      @Parameter(description = "Transaction Id", required = false)
+          @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
+          String transactionId,
+      Authentication authentication) {
+
+    ProviderResponse response =
+        groupService.deleteUserFromManagerGroup(
+            realm,
+            storage,
+            userId,
+            applicationName,
+            new ProviderRequest(
+                new SugoiUser(
+                    authentication.getName(),
+                    authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .map(String::toUpperCase)
+                        .collect(Collectors.toList())),
+                isAsynchronous,
+                transactionId,
+                isUrgent));
+    return ResponseEntity.status(Utils.convertStatusTHttpStatus(response, false, true))
+        .header("X-SUGOI-TRANSACTION-ID", response.getRequestId())
+        .header("X-SUGOI-REQUEST-STATUS", response.getStatus().toString())
+        .build();
+  }
 }

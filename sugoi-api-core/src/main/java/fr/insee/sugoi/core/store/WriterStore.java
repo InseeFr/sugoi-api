@@ -239,4 +239,10 @@ public interface WriterStore {
 
   ProviderResponse deleteOrganizationGpgKey(
       Organization organization, ProviderRequest providerRequest);
+
+  ProviderResponse addUserToGroupManager(
+      String applicationName, String userId, ProviderRequest providerRequest);
+
+  ProviderResponse deleteUserFromManagerGroup(
+      String applicationName, String userId, ProviderRequest providerRequest);
 }

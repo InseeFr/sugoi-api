@@ -392,8 +392,12 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
   }
 
   @Override
-  public byte[] getUserCertificate(String id) {
-    // TODO Auto-generated method stub
-    return null;
+  public Group getManagerGroup(String applicationName) {
+    try {
+      SearchResultEntry entry = getEntryByDn(getGroupManagerSource(applicationName));
+      return (entry != null) ? groupLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
+    } catch (Exception e) {
+      throw new RuntimeException("Fail to get group in ldap", e);
+    }
   }
 }

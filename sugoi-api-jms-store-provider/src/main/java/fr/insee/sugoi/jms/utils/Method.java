@@ -35,6 +35,10 @@ public class Method {
 
   public static final String ADD_USER_TO_GROUP = "addUserToGroup";
 
+  public static final String DELETE_USER_FROM_MANAGER_GROUP = "deleteUserFromManagerGroup";
+
+  public static final String ADD_USER_TO_MANAGER_GROUP = "addUserToManagerGroup";
+
   public static final String REINIT_PASSWORD = "reinitPassword";
 
   public static final String INIT_PASSWORD = "initPassword";

@@ -248,7 +248,7 @@ public class GroupServiceImpl implements GroupService {
         User user =
             userService
                 .findById(realm, null, userId)
-                .orElseThrow(() -> new UserNotFoundException("message"));
+                .orElseThrow(() -> new UserNotFoundException("Cannot find user in realm " + realm));
         storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE);
       }
       ProviderResponse response =
@@ -273,6 +273,112 @@ public class GroupServiceImpl implements GroupService {
               Map.entry(EventKeysConfig.USER, userId),
               Map.entry(EventKeysConfig.APPLICATION_NAME, appName),
               Map.entry(EventKeysConfig.GROUP_NAME, groupName),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
+      throw e;
+    }
+  }
+
+  @Override
+  public ProviderResponse addUserToGroupManager(
+      String realm,
+      String storage,
+      String userId,
+      String applicationName,
+      ProviderRequest providerRequest) {
+    try {
+      if (storage == null) {
+        User user =
+            userService
+                .findById(realm, null, userId)
+                .orElseThrow(() -> new UserNotFoundException("Cannot find user in realm " + realm));
+        storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE);
+      }
+      ProviderResponse response =
+          storeProvider
+              .getWriterStore(realm, storage)
+              .addUserToGroupManager(applicationName, userId, providerRequest);
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          storage,
+          SugoiEventTypeEnum.ADD_USER_TO_GROUP_MANAGER,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.USER, userId),
+              Map.entry(EventKeysConfig.APPLICATION_NAME, applicationName)));
+      return response;
+    } catch (Exception e) {
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          storage,
+          SugoiEventTypeEnum.ADD_USER_TO_GROUP_MANAGER_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.USER, userId),
+              Map.entry(EventKeysConfig.APPLICATION_NAME, applicationName),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
+      throw e;
+    }
+  }
+
+  @Override
+  public ProviderResponse deleteUserFromManagerGroup(
+      String realm,
+      String storage,
+      String userId,
+      String applicationName,
+      ProviderRequest providerRequest) {
+    try {
+      if (storage == null) {
+        User user =
+            userService
+                .findById(realm, null, userId)
+                .orElseThrow(() -> new UserNotFoundException("Cannot find user in realm " + realm));
+        storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE);
+      }
+      ProviderResponse response =
+          storeProvider
+              .getWriterStore(realm, storage)
+              .deleteUserFromManagerGroup(applicationName, userId, providerRequest);
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          null,
+          SugoiEventTypeEnum.DELETE_USER_FROM_GROUP_MANAGER,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.USER, userId),
+              Map.entry(EventKeysConfig.APPLICATION_NAME, applicationName)));
+      return response;
+    } catch (Exception e) {
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          null,
+          SugoiEventTypeEnum.DELETE_USER_FROM_GROUP_MANAGER_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.USER, userId),
+              Map.entry(EventKeysConfig.APPLICATION_NAME, applicationName),
+              Map.entry(EventKeysConfig.ERROR, e.toString())));
+      throw e;
+    }
+  }
+
+  @Override
+  public Group getManagerGroup(String realm, String applicationName) {
+    try {
+      Group group = storeProvider.getReaderStore(realm).getManagerGroup(applicationName);
+      if (group == null) {
+        throw new GroupNotFoundException(
+            "Cannot find group of manager in application " + applicationName);
+      }
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          null,
+          SugoiEventTypeEnum.GET_GROUP_MANAGER,
+          Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION_NAME, applicationName)));
+      return group;
+    } catch (Exception e) {
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          null,
+          SugoiEventTypeEnum.GET_GROUP_MANAGER_ERROR,
+          Map.ofEntries(
+              Map.entry(EventKeysConfig.APPLICATION_NAME, applicationName),
               Map.entry(EventKeysConfig.ERROR, e.toString())));
       throw e;
     }
