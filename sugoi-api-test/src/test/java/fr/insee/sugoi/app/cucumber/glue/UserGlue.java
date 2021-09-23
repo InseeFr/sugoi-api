@@ -15,6 +15,8 @@ package fr.insee.sugoi.app.cucumber.glue;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -93,6 +95,21 @@ public class UserGlue {
   @Then("the client expect the username of user to be {}")
   public void expect_username_of_user_to_be(String username) {
     assertThat(stepData.getUser().getUsername(), is(username));
+  }
+
+  @Then("the client expect the username of user not to be null")
+  public void expect_username_of_user_to_be_not_null() {
+    ObjectMapper mapper =
+        new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    User user;
+    try {
+      user = mapper.readValue(stepData.getLatestResponse().getBody(), User.class);
+      stepData.setUser(user);
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    assertThat(stepData.getUser().getUsername(), notNullValue());
+    assertThat(stepData.getUser().getUsername(), not("null"));
   }
 
   @Then("the client want to see the users list")

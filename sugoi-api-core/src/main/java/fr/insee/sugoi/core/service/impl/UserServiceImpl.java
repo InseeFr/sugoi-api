@@ -19,10 +19,12 @@ import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.exceptions.UnableToUpdateCertificateException;
+import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
+import fr.insee.sugoi.core.model.SugoiRandomIdCharacterData;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.seealso.SeeAlsoService;
 import fr.insee.sugoi.core.service.UserService;
@@ -40,11 +42,25 @@ import java.util.Map;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.passay.CharacterRule;
+import org.passay.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 @Service
+@ConfigurationProperties("fr.insee.sugoi")
 public class UserServiceImpl implements UserService {
+
+  /* Size of the ids randomly generated */
+  private int idCreateLength = 7;
+
+  /*
+   * Is the reader store asynchronous, ie a difference can exist between what we
+   * read in readerstore and the realty. Can occur if the current service is
+   * connected by a broker to the real service
+   */
+  private boolean readerStoreAsynchronous = false;
 
   @Autowired private StoreProvider storeProvider;
 
@@ -61,6 +77,54 @@ public class UserServiceImpl implements UserService {
   public ProviderResponse create(
       String realm, String storage, User user, ProviderRequest providerRequest) {
     try {
+
+      // Mail and Id unicity check, generated id if missing only when reader and
+      // writer are synchronous
+      if (!readerStoreAsynchronous) {
+
+        Realm realmLoaded = realmProvider.load(realm).get();
+        if (user.getUsername() == null) {
+          // generate id if null
+          boolean idGeneratedAndUnique = false;
+          do {
+            final String id = generateId(true, true, idCreateLength);
+            user.setUsername(id);
+            // unicity requiered at realm level
+            idGeneratedAndUnique =
+                !realmLoaded.getUserStorages().stream()
+                    .map(us -> storeProvider.getReaderStore(realm, us.getName()).getUser(id))
+                    .anyMatch(u -> u != null);
+          } while (!idGeneratedAndUnique);
+        } else {
+          // check id unicity
+          if (realmLoaded.getUserStorages().stream()
+              .map(
+                  us ->
+                      storeProvider.getReaderStore(realm, us.getName()).getUser(user.getUsername()))
+              .anyMatch(u -> u != null)) {
+            throw new UserAlreadyExistException(
+                "User " + user.getUsername() + " already exist in realm " + realm);
+          }
+        }
+
+        // check mail unicity if needed
+        if (Boolean.parseBoolean(
+                realmLoaded
+                    .getProperties()
+                    .getOrDefault(GlobalKeysConfig.VERIFY_MAIL_UNICITY, "false"))
+            && user.getMail() != null
+            && realmLoaded.getUserStorages().stream()
+                .map(
+                    us ->
+                        storeProvider
+                            .getReaderStore(realm, us.getName())
+                            .getUserByMail(user.getMail()))
+                .anyMatch(u -> u != null)) {
+          throw new UserAlreadyExistException(
+              "A user has the same mail " + user.getMail() + " in realm " + realm);
+        }
+      }
+
       ProviderResponse response =
           storeProvider.getWriterStore(realm, storage).createUser(user, providerRequest);
       sugoiEventPublisher.publishCustomEvent(
@@ -91,6 +155,34 @@ public class UserServiceImpl implements UserService {
   @Override
   public ProviderResponse update(
       String realm, String storage, User user, ProviderRequest providerRequest) {
+
+    // Mail unicity check only when reader and
+    // writer are synchronous
+    if (!readerStoreAsynchronous) {
+      Realm realmLoaded = realmProvider.load(realm).get();
+
+      // check mail unicity if needed
+      if (Boolean.parseBoolean(
+              realmLoaded
+                  .getProperties()
+                  .getOrDefault(GlobalKeysConfig.VERIFY_MAIL_UNICITY, "false"))
+          && user.getMail() != null) {
+        User temp =
+            realmLoaded.getUserStorages().stream()
+                .map(
+                    us ->
+                        storeProvider
+                            .getReaderStore(realm, us.getName())
+                            .getUserByMail(user.getMail()))
+                .filter(u -> u != null)
+                .findAny()
+                .orElse(null);
+        if (temp != null && !temp.getUsername().equals(user.getUsername())) {
+          throw new UserAlreadyExistException(
+              "A user has the same mail " + user.getMail() + " in realm " + realm);
+        }
+      }
+    }
 
     try {
       ProviderResponse response =
@@ -503,5 +595,41 @@ public class UserServiceImpl implements UserService {
             .getWriterStore(realm, userStorage)
             .deleteUserCertificate(user, providerRequest);
     return response;
+  }
+
+  public String generateId(Boolean withUpperCase, Boolean withDigit, Integer size) {
+
+    // Use of PasswordGenerator to generate random id
+    PasswordGenerator passwordGenerator = new PasswordGenerator();
+    String id =
+        passwordGenerator.generatePassword(
+            size != null ? size : idCreateLength,
+            generateRandomIdCharacterRules(withUpperCase, withDigit));
+    return id;
+  }
+
+  public List<CharacterRule> generateRandomIdCharacterRules(
+      Boolean withUpperCase, Boolean withDigit) {
+    List<CharacterRule> characterRules = new ArrayList<>();
+    if (withUpperCase)
+      characterRules.add(new CharacterRule(SugoiRandomIdCharacterData.UpperCase, 1));
+    if (withDigit) characterRules.add(new CharacterRule(SugoiRandomIdCharacterData.Digit, 1));
+    return characterRules;
+  }
+
+  public int getIdCreateLength() {
+    return idCreateLength;
+  }
+
+  public void setIdCreateLength(int idCreateLength) {
+    this.idCreateLength = idCreateLength;
+  }
+
+  public boolean isReaderStoreAsynchronous() {
+    return readerStoreAsynchronous;
+  }
+
+  public void setReaderStoreAsynchronous(boolean readerStoreAsynchronous) {
+    this.readerStoreAsynchronous = readerStoreAsynchronous;
   }
 }

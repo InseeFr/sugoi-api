@@ -40,6 +40,18 @@ Feature: User scenario
         Then the client receives status code 201
         Then the client expect to receive an user
 
+    Scenario: Post user with no username
+        When the client perform POST request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users body:
+            """
+            {
+                "mail": "test42@insee.fr"
+            }
+            """
+        And show body received
+        Then the client receives status code 201
+        Then the client expect to receive an user
+        Then the client expect the username of user not to be null
+
     Scenario: Post user with email already exit
         When the client perform POST request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users body:
             """
