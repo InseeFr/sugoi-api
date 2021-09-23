@@ -37,7 +37,6 @@ import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.core.exceptions.StoragePolicyNotMetException;
 import fr.insee.sugoi.core.exceptions.UnableToUpdateCertificateException;
 import fr.insee.sugoi.core.exceptions.UnabletoUpdateGPGKeyException;
-import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
@@ -132,50 +131,27 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
    */
   @Override
   public ProviderResponse createUser(User user, ProviderRequest providerRequest) {
-    if (ldapReaderStore.getUser(user.getUsername()) == null) {
-      if (Boolean.parseBoolean(config.get(LdapConfigKeys.UNIQUE_EMAILS))
-          && user.getMail() != null
-          && ldapReaderStore.getUserByMail(user.getMail()) != null) {
-        throw new UserAlreadyExistException("An user with this email already exist");
+    try {
+      if (user.getAddress() != null && user.getAddress().size() > 0) {
+        UUID addressUuid = createAddress(user.getAddress());
+        user.addAddress("id", addressUuid.toString());
       }
-      try {
-        if (user.getAddress() != null && user.getAddress().size() > 0) {
-          UUID addressUuid = createAddress(user.getAddress());
-          user.addAddress("id", addressUuid.toString());
-        }
-        AddRequest userAddRequest =
-            new AddRequest(getUserDN(user.getUsername()), userLdapMapper.mapToAttributes(user));
-        ldapPoolConnection.add(userAddRequest);
-      } catch (LDAPException e) {
-        throw new RuntimeException(
-            "Failed to create user. Provider message : " + e.getMessage(), e);
-      }
-      ProviderResponse response = new ProviderResponse();
-      response.setStatus(ProviderResponseStatus.OK);
-      response.setEntityId(user.getUsername());
-      return response;
+      AddRequest userAddRequest =
+          new AddRequest(getUserDN(user.getUsername()), userLdapMapper.mapToAttributes(user));
+      ldapPoolConnection.add(userAddRequest);
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to create user. Provider message : " + e.getMessage(), e);
     }
-    throw new UserAlreadyExistException(
-        "User "
-            + user.getUsername()
-            + " already exist in realm "
-            + config.get(LdapConfigKeys.REALM_NAME)
-            + "and userstorage "
-            + config.get(LdapConfigKeys.USERSTORAGE_NAME));
+    ProviderResponse response = new ProviderResponse();
+    response.setStatus(ProviderResponseStatus.OK);
+    response.setEntityId(user.getUsername());
+    return response;
   }
 
   /** Update the ldap properties of a user. Current user is read to retrieve user address link */
   @Override
   public ProviderResponse updateUser(User updatedUser, ProviderRequest providerRequest) {
     if (ldapReaderStore.getUser(updatedUser.getUsername()) != null) {
-      if (Boolean.parseBoolean(config.get(LdapConfigKeys.UNIQUE_EMAILS))) {
-        User temp = ldapReaderStore.getUserByMail(updatedUser.getMail());
-        if (updatedUser.getMail() != null
-            && temp != null
-            && !temp.getUsername().equals(updatedUser.getUsername())) {
-          throw new UserAlreadyExistException("An user with this email already exist");
-        }
-      }
       try {
         if (updatedUser != null) {
           User currentUser = ldapReaderStore.getUser(updatedUser.getUsername());

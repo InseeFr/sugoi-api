@@ -64,6 +64,8 @@ For each realm we have the possibility to configure a default reader and a defau
 | fr.insee.sugoi.ldap.default.organization-mapping      | List of mappings between sugoi organization attributes and ldap attributes divided by semicolon, see [Realm configuration](realm-configuration.md) | identifiant:uid,String,rw;address:inseeAdressePostaleDN,address,rw;organization:inseeOrganisationDN,organization,rw |
 | fr.insee.sugoi.ldap.default.group-mapping             |    List of mappings between sugoi group attributes and ldap attributes divided by semicolon, see [Realm configuration](realm-configuration.md)     |                                 name:cn,String,rw;description:description,String,rw;users:uniquemember,list_user,rw |
 | fr.insee.sugoi.ldap.default.application-mapping       | List of mappings between sugoi application attributes and ldap attributes divided by semicolon, see [Realm configuration](realm-configuration.md)  |                                                                                                   name:ou,String,rw |
+|fr.insee.sugoi.id-create-length|Size of the ids randomly generated | 7
+|fr.insee.sugoi.reader-store-asynchronous|Is the reader store asynchronous, ie a difference can exist between what we read in readerstore and the realty. Can occur if the current service is connected by a broker to the real service. If true MAIL and ID unicity control are NOT performed|false
 
 ### SpringDoc configuration
 
