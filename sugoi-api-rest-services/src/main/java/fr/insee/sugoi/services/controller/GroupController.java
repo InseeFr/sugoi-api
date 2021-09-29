@@ -53,6 +53,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RequestMapping(value = {"/v2", "/"})
@@ -170,6 +171,10 @@ public class GroupController {
       Authentication authentication,
       @Parameter(description = "Group to create", required = true) @RequestBody
           GroupView groupView) {
+
+    if (groupView.getName() == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Group should have a name");
+    }
 
     Group group = new Group();
     group.setAppName(groupView.getAppName());

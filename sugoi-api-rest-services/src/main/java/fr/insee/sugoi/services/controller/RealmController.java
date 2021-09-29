@@ -52,6 +52,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
@@ -145,6 +146,11 @@ public class RealmController {
           String transactionId,
       Authentication authentication,
       @RequestBody Realm realm) {
+
+    if (realm.getName() == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Realm should have a name");
+    }
+
     ProviderResponse response =
         configService.createRealm(
             realm,

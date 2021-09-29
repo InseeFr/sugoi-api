@@ -45,6 +45,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.server.ResponseStatusException;
 
 @ControllerAdvice
 public class SugoiAdviceController {
@@ -309,6 +310,16 @@ public class SugoiAdviceController {
     errorView.setMessage(e.getMessage());
     final ResponseEntity<ErrorView> response =
         new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
+    return response;
+  }
+
+  @ExceptionHandler(ResponseStatusException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(ResponseStatusException e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    final ResponseEntity<ErrorView> response =
+        new ResponseEntity<ErrorView>(errorView, e.getStatus());
     return response;
   }
 }

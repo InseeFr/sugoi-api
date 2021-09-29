@@ -52,6 +52,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
@@ -165,6 +166,10 @@ public class ApplicationController {
       Authentication authentication,
       @Parameter(description = "Application to create", required = true) @RequestBody
           Application application) {
+
+    if (application.getName() == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Application should have a name");
+    }
 
     ProviderResponse response =
         applicationService.create(

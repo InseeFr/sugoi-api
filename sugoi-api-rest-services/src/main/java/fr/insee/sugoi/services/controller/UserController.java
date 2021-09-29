@@ -67,6 +67,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
@@ -293,6 +294,10 @@ public class UserController {
           String transactionId,
       Authentication authentication,
       @Parameter(description = "User to create", required = true) @RequestBody User user) {
+
+    if (user.getUsername() == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User should have a username");
+    }
 
     ProviderResponse response =
         userService.create(
