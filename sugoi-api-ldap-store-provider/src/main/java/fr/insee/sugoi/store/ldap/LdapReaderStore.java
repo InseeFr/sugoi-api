@@ -336,7 +336,11 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     } catch (LDAPException e) {
       if (e.getResultCode().intValue() == ResultCode.SERVER_DOWN_INT_VALUE) {
         try {
-          ldapMonoConnection = LdapFactory.getSingleConnection(config, true);
+          if (Boolean.valueOf(config.get(LdapConfigKeys.READ_CONNECTION_AUTHENTICATED))) {
+            ldapMonoConnection = LdapFactory.getSingleConnectionAuthenticated(config, true);
+          } else {
+            ldapMonoConnection = LdapFactory.getSingleConnection(config, true);
+          }
         } catch (LDAPException e1) {
           throw new RuntimeException(e1);
         }
