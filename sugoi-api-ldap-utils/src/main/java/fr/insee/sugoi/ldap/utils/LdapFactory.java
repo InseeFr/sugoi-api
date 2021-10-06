@@ -87,7 +87,8 @@ public class LdapFactory {
         config.get(LdapConfigKeys.REALM_NAME) + "_" + config.get(LdapConfigKeys.NAME) + "_R";
 
     if (!openLdapMonoConnectionConfig.containsKey(key) || forceErase) {
-      if (openLdapMonoConnection.containsKey(name) || forceErase) {
+      if (openLdapMonoConnection.containsKey(name) && openLdapMonoConnection.get(name) != null
+          || forceErase) {
         openLdapMonoConnection.get(name).close();
       }
       openLdapMonoConnection.put(
@@ -142,6 +143,11 @@ public class LdapFactory {
 
   public static LDAPConnection getSingleConnectionAuthenticated(Map<String, String> config)
       throws LDAPException {
+    return getSingleConnectionAuthenticated(config, false);
+  }
+
+  public static LDAPConnection getSingleConnectionAuthenticated(
+      Map<String, String> config, boolean forceErase) throws LDAPException {
     String name =
         config.get(LdapConfigKeys.REALM_NAME) + "_" + config.get(LdapConfigKeys.NAME) + "_RW";
     String key =
@@ -151,8 +157,9 @@ public class LdapFactory {
             + "_"
             + config.hashCode()
             + "_RW";
-    if (!openLdapMonoConnectionConfig.containsKey(key)) {
-      if (openLdapMonoConnection.containsKey(name)) {
+    if (!openLdapMonoConnectionConfig.containsKey(key) || forceErase) {
+      if (openLdapMonoConnection.containsKey(name) && openLdapMonoConnection.get(name) != null
+          || forceErase) {
         openLdapMonoConnection.get(name).close();
       }
       openLdapMonoConnection.put(

@@ -21,12 +21,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 
 @Configuration
+@ConfigurationProperties("fr.insee.sugoi.ldap.default")
 public class LdapStoreBeans {
 
   @Value("${fr.insee.sugoi.ldap.default.username:}")
@@ -41,8 +43,7 @@ public class LdapStoreBeans {
   @Value("${fr.insee.sugoi.ldap.default.port:}")
   private String defaultPort;
 
-  @Value("${fr.insee.sugoi.ldap.default.use-authenticated-connection-for-reading:}")
-  private String defaultUseAuthenticatedConnectionForReading = String.valueOf(true);
+  private boolean useAuthenticatedConnectionForReading = true;
 
   @Value("${fr.insee.sugoi.ldap.default.group_filter_pattern:}")
   private String defaultGroupFilterPattern;
@@ -108,7 +109,8 @@ public class LdapStoreBeans {
     config.put(LdapConfigKeys.USERNAME, defaultUsername);
     config.put(LdapConfigKeys.PASSWORD, defaultPassword);
     config.put(
-        LdapConfigKeys.READ_CONNECTION_AUTHENTICATED, defaultUseAuthenticatedConnectionForReading);
+        LdapConfigKeys.READ_CONNECTION_AUTHENTICATED,
+        String.valueOf(useAuthenticatedConnectionForReading));
     config.put(LdapConfigKeys.POOL_SIZE, defaultPoolSize);
     config.put(
         LdapConfigKeys.UNIQUE_EMAILS,
@@ -208,5 +210,14 @@ public class LdapStoreBeans {
       resultMappings.put("groupMapping", realm.getMappings().get("groupMapping"));
     }
     return resultMappings;
+  }
+
+  public boolean isUseAuthenticatedConnectionForReading() {
+    return useAuthenticatedConnectionForReading;
+  }
+
+  public void setUseAuthenticatedConnectionForReading(
+      boolean useAuthenticatedConnectionForReading) {
+    this.useAuthenticatedConnectionForReading = useAuthenticatedConnectionForReading;
   }
 }
