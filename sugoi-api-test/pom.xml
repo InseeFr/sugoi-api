@@ -65,11 +65,10 @@
         </dependency>
 
         <dependency>
-            <groupId>de.monochromata.cucumber</groupId>
+            <groupId>me.jvt.cucumber</groupId>
             <artifactId>reporting-plugin</artifactId>
             <scope>test</scope>
         </dependency>
-
 
         <dependency>
             <groupId>commons-io</groupId>
