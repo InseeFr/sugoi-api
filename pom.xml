@@ -34,8 +34,8 @@
 		<org.fusesource.jansi.version>2.3.4</org.fusesource.jansi.version>
 		<commons-lang.version>2.6</commons-lang.version>
 		<org.springdoc.version>1.5.10</org.springdoc.version>
-		<cucumber.version>6.10.2</cucumber.version>
-		<cucumber-reporting-plugin.version>4.0.103</cucumber-reporting-plugin.version>
+		<cucumber.version>7.0.0</cucumber.version>
+		<cucumber-reporting-plugin.version>7.0.0</cucumber-reporting-plugin.version>
 		<httpclient.version>4.5.13</httpclient.version>
 		<apache.commons.version>1.9</apache.commons.version>
 		<apache.commons.csv.version>1.9.0</apache.commons.csv.version>
@@ -226,11 +226,10 @@
 			</dependency>
 
 			<dependency>
-				<groupId>de.monochromata.cucumber</groupId>
+            	<groupId>me.jvt.cucumber</groupId>
 				<artifactId>reporting-plugin</artifactId>
 				<version>${cucumber-reporting-plugin.version}</version>
 			</dependency>
-
 
 			<dependency>
 				<groupId>org.xmlunit</groupId>
