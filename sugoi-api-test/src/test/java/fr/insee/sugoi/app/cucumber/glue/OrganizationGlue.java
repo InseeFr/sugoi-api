@@ -73,7 +73,7 @@ public class OrganizationGlue {
 
   @Then("the client expect the identifiant of organization to be {}")
   public void expect_organizationname_of_organization_to_be(String organizationname) {
-    assertThat(stepData.getUser().getUsername(), is(organizationname));
+    assertThat(stepData.getOrganization().getIdentifiant(), is(organizationname));
   }
 
   @Then("the client want to see the organization list")

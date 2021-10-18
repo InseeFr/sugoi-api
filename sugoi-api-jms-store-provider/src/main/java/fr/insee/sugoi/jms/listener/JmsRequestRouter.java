@@ -42,7 +42,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class JmsRequestRouter {
 
-  private static final Logger logger = LogManager.getLogger(JmsReceiverRequest.class);
+  private static final Logger logger = LogManager.getLogger(JmsRequestRouter.class);
 
   @Autowired private StoreProvider storeProvider;
 
@@ -77,7 +77,8 @@ public class JmsRequestRouter {
           break;
         case Method.CREATE_USER:
           User user = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));
-          userService.create(realm, userStorage, user, providerRequest);
+          response.setEntityId(
+              userService.create(realm, userStorage, user, providerRequest).getEntityId());
           break;
         case Method.UPDATE_USER:
           User updatedUser = converter.toUser(request.getmethodParams().get(JmsAtttributes.USER));

@@ -23,6 +23,7 @@ import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
 import fr.insee.sugoi.core.exceptions.StoragePolicyNotMetException;
 import fr.insee.sugoi.core.model.ProviderRequest;
+import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
@@ -230,6 +231,15 @@ public class LdapWriterStoreTest {
         "Should have an alternative mail",
         retrievedUser.getAttributes().get("additionalMail"),
         is("other@insee.fr"));
+  }
+
+  @Test
+  public void testCreateUserReturnEntityId() {
+    User user = new User();
+    user.setUsername("TitiReturn");
+    user.setFirstName("Petit");
+    ProviderResponse providerResponse = ldapWriterStore.createUser(user, null);
+    assertThat("Response should contain id", providerResponse.getEntityId(), is("TitiReturn"));
   }
 
   @Test

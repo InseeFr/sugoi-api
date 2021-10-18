@@ -115,7 +115,7 @@ public class JmsWriterStore implements WriterStore {
   public ProviderResponse updateGroup(
       String appName, Group updatedGroup, ProviderRequest providerRequest) {
     Map<String, Object> params = new HashMap<>();
-    params.put(JmsAtttributes.APPLICATION, appName);
+    params.put(JmsAtttributes.APP_NAME, appName);
     params.put(JmsAtttributes.GROUP, updatedGroup);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
@@ -367,9 +367,7 @@ public class JmsWriterStore implements WriterStore {
           return response;
         }
         response = br.getProviderResponse();
-        if (response.getStatus() == ProviderResponseStatus.OK) {
-          response.setStatus(ProviderResponseStatus.ACCEPTED);
-        } else if (response.getStatus() == ProviderResponseStatus.KO) {
+        if (response.getStatus() == ProviderResponseStatus.KO) {
           throw response.getException();
         }
       } catch (JmsException e) {
@@ -415,9 +413,7 @@ public class JmsWriterStore implements WriterStore {
 
         response = br.getProviderResponse();
 
-        if (response.getStatus() == ProviderResponseStatus.OK) {
-          response.setStatus(ProviderResponseStatus.ACCEPTED);
-        } else if (response.getStatus() == ProviderResponseStatus.KO) {
+        if (response.getStatus() == ProviderResponseStatus.KO) {
           throw createExceptionFromResponse(response);
         }
       } catch (JmsException e) {
