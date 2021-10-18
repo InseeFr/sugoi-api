@@ -329,6 +329,12 @@ objectClass: inseeOrganisation
 uid: testo
 description: Insee
 
+dn: uid=testoJMS,ou=organisations,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeOrganisation
+uid: testoJMS
+description: Insee
+
 dn: l=testa, ou=adresses,ou=clients_domaine1,o=insee,c=fr
 objectClass: top
 objectClass: locality
