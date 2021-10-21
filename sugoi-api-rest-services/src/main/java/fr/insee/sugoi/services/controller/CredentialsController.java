@@ -23,6 +23,7 @@ import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.services.Utils;
+import fr.insee.sugoi.services.view.PasswordView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -40,13 +41,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -404,7 +403,7 @@ public class CredentialsController {
 
   @PostMapping(
       path = {"/realms/{realm}/storages/{storage}/users/{id}/validate-password"},
-      consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+      consumes = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
   @Operation(summary = "Check if provided password is the user's one")
   @ApiResponses(
@@ -432,15 +431,9 @@ public class CredentialsController {
       @Parameter(description = "User's id to validate password", required = true)
           @PathVariable("id")
           String id,
-      @Parameter(
-              description = "Map<String,String> containing the key password with user password",
-              required = true)
-          @RequestParam
-          MultiValueMap<String, String> params) {
-
-    if (params.containsKey("password")
-        && credentialsService.validateCredential(
-            realm, userStorage, id, params.getFirst("password"))) {
+      @Parameter(description = "User password to test", required = true) @RequestBody
+          PasswordView passwordView) {
+    if (credentialsService.validateCredential(realm, userStorage, id, passwordView.getPassword())) {
       return ResponseEntity.ok().build();
     } else {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -449,7 +442,7 @@ public class CredentialsController {
 
   @PostMapping(
       path = {"/realms/{realm}/users/{id}/validate-password"},
-      consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+      consumes = {MediaType.APPLICATION_JSON_VALUE})
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
   @Operation(summary = "Check if provided password is the user's one")
   @ApiResponses(
@@ -472,18 +465,15 @@ public class CredentialsController {
       @Parameter(description = "User's id to validate password", required = true)
           @PathVariable("id")
           String id,
-      @Parameter(
-              description = "Map<String,String> containing the key password with user password",
-              required = true)
-          @RequestParam
-          MultiValueMap<String, String> params) {
+      @Parameter(description = "User password to test", required = true) @RequestBody
+          PasswordView passwordView) {
     User user =
         userService
             .findById(realm, null, id)
             .orElseThrow(
                 () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
     return validatePassword(
-        realm, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id, params);
+        realm, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id, passwordView);
   }
 
   @PostMapping(value = "/realms/{realm}/users/{id}/send-login")
