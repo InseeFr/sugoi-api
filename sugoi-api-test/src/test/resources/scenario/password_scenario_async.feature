@@ -51,6 +51,28 @@ Feature: Credential scenario asynchrone
         And show body received
         Then the client receives status code 202
 
+    Scenario: Don't validate password
+        Given the client authentified with username appli_sugoi and password sugoi
+        When the client perform POST request with body on url /realms/domaine1/users/test_password/validate-password body:
+            """
+            {
+                "password": "Changeme1%000000000000000"
+            }
+            """
+        And show body received
+        Then the client receives status code 401
+
+    Scenario: Validate password
+        Given the client authentified with username appli_sugoi and password sugoi
+        When the client perform POST request with body on url /realms/domaine1/users/test_password/validate-password body:
+            """
+            {
+                "password": "Changeme1%000000000000001"
+            }
+            """
+        And show body received
+        Then the client receives status code 200
+
     Scenario: ResetPassword
         Given the client authentified with username appli_sugoi and password sugoi
         When the client perform POST request with body on url /realms/domaine1/users/test_password/reinitPassword body:

@@ -42,6 +42,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -264,6 +266,26 @@ public class SugoiAdviceController {
   @ExceptionHandler(HttpMessageNotReadableException.class)
   @ResponseBody
   public ResponseEntity<ErrorView> exception(HttpMessageNotReadableException e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    final ResponseEntity<ErrorView> response =
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.BAD_REQUEST);
+    return response;
+  }
+
+  @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(HttpMediaTypeNotSupportedException e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    final ResponseEntity<ErrorView> response =
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.BAD_REQUEST);
+    return response;
+  }
+
+  @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(HttpMediaTypeNotAcceptableException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
     final ResponseEntity<ErrorView> response =

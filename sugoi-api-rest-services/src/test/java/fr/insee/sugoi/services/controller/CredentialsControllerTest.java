@@ -15,11 +15,15 @@ package fr.insee.sugoi.services.controller;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
 import fr.insee.sugoi.core.service.CredentialsService;
 import fr.insee.sugoi.core.service.UserService;
+import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.services.view.PasswordView;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -36,7 +40,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @SpringBootTest(
-    classes = CredentialsController.class,
+    classes = {CredentialsController.class, SugoiAdviceController.class},
     properties = "spring.config.location=classpath:/controller/application.properties")
 @AutoConfigureMockMvc
 @EnableWebMvc
@@ -48,90 +52,169 @@ public class CredentialsControllerTest {
 
   @MockBean private UserService userService;
 
-  // User user1;
+  ObjectMapper objectMapper = new ObjectMapper();
 
   @BeforeEach
   public void setup() {}
 
   @Test
   @WithMockUser(roles = "Admin_Sugoi")
-  public void testWrongCredential() {
-    try {
-      Mockito.when(
-              credentialService.validateCredential(
-                  Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any()))
-          .thenReturn(false);
+  public void testWrongCredential() throws Exception {
 
-      Mockito.when(
-              credentialService.validateCredential(
-                  Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any()))
-          .thenReturn(false);
+    Mockito.when(
+            credentialService.validateCredential(
+                Mockito.eq("domaine1"),
+                Mockito.eq("userStorage"),
+                Mockito.eq("user"),
+                Mockito.eq("myPassword")))
+        .thenReturn(true);
 
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post(
-                  "/realms/domaine1/storages/userStorage/users/user/validate-password")
-              .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-              .param("password", "myPassword")
-              .with(csrf());
-      MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+    PasswordView passwordView = new PasswordView();
+    passwordView.setPassword("false");
 
-      assertThat("Response status should be 401", response.getStatus(), is(401));
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post(
+                "/realms/domaine1/storages/userStorage/users/user/validate-password")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(passwordView))
+            .with(csrf());
+    MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+    assertThat("Response status should be 401", response.getStatus(), is(401));
   }
 
   @Test
   @WithMockUser(roles = "Admin_Sugoi")
-  public void testRightCredential() {
-    try {
+  public void testRightCredential() throws Exception {
+    Mockito.when(
+            credentialService.validateCredential(
+                Mockito.eq("domaine1"),
+                Mockito.eq("userStorage"),
+                Mockito.eq("user"),
+                Mockito.eq("myPassword")))
+        .thenReturn(true);
 
-      Mockito.when(
-              credentialService.validateCredential(
-                  Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any()))
-          .thenReturn(true);
+    PasswordView passwordView = new PasswordView();
+    passwordView.setPassword("myPassword");
 
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post(
-                  "/realms/domaine1/storages/userStorage/users/user/validate-password")
-              .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-              .param("password", "myPassword")
-              .with(csrf());
-      MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post(
+                "/realms/domaine1/storages/userStorage/users/user/validate-password")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(passwordView))
+            .with(csrf());
+    MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
-      assertThat("Response status should be 200", response.getStatus(), is(200));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+    assertThat("Response status should be 200", response.getStatus(), is(200));
   }
 
   @Test
   @WithMockUser(roles = "Admin_Sugoi")
-  public void testNoPasswordParam() {
-    try {
+  public void testNoPasswordParam() throws Exception {
 
-      Mockito.when(
-              credentialService.validateCredential(
-                  Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any()))
-          .thenReturn(true);
+    Mockito.when(
+            credentialService.validateCredential(
+                Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
+        .thenReturn(true);
 
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post(
-                  "/realms/domaine1/storages/userStorage/users/user/validate-password")
-              .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-              .param("passwordd", "myPassword")
-              .with(csrf());
-      MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post(
+                "/realms/domaine1/storages/userStorage/users/user/validate-password")
+            .contentType(MediaType.APPLICATION_JSON)
+            .with(csrf());
+    MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
-      assertThat("Response status should be 401", response.getStatus(), is(401));
+    assertThat("Response status should be 400", response.getStatus(), is(400));
+  }
 
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+  @Test
+  @WithMockUser(roles = "Admin_Sugoi")
+  public void testValidatePasswordNoUserStorage() throws Exception {
+
+    Mockito.when(
+            credentialService.validateCredential(
+                Mockito.eq("domaine1"),
+                Mockito.eq("foundUserstorage"),
+                Mockito.eq("user"),
+                Mockito.eq("myPassword")))
+        .thenReturn(true);
+
+    User user = new User("user");
+    user.getMetadatas().put("userStorage", "foundUserstorage");
+
+    Mockito.when(userService.findById(Mockito.eq("domaine1"), Mockito.isNull(), Mockito.eq("user")))
+        .thenReturn(Optional.of(user));
+
+    PasswordView passwordView = new PasswordView();
+    passwordView.setPassword("myPassword");
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post("/realms/domaine1/users/user/validate-password")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(passwordView))
+            .with(csrf());
+    MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+    assertThat("Response status should be 200", response.getStatus(), is(200));
+  }
+  ;
+
+  @Test
+  @WithMockUser(roles = "Admin_Sugoi")
+  public void testInvalidatePasswordNoUserStorage() throws Exception {
+
+    Mockito.when(
+            credentialService.validateCredential(
+                Mockito.eq("domaine1"),
+                Mockito.eq("foundUserstorage"),
+                Mockito.eq("user"),
+                Mockito.eq("myPassword")))
+        .thenReturn(true);
+
+    User user = new User("user");
+    user.getMetadatas().put("userStorage", "foundUserstorage");
+
+    Mockito.when(userService.findById(Mockito.eq("domaine1"), Mockito.isNull(), Mockito.eq("user")))
+        .thenReturn(Optional.of(user));
+
+    PasswordView passwordView = new PasswordView();
+    passwordView.setPassword("badPassword");
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post("/realms/domaine1/users/user/validate-password")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(passwordView))
+            .with(csrf());
+    MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+    assertThat("Response status should be 401", response.getStatus(), is(401));
+  }
+  ;
+
+  @Test
+  @WithMockUser(roles = "Admin_Sugoi")
+  public void testValidatePasswordOfNoUser() throws Exception {
+
+    Mockito.when(
+            credentialService.validateCredential(
+                Mockito.eq("domaine1"),
+                Mockito.eq("foundUserstorage"),
+                Mockito.eq("user"),
+                Mockito.eq("myPassword")))
+        .thenReturn(true);
+
+    Mockito.when(userService.findById(Mockito.eq("domaine1"), Mockito.isNull(), Mockito.eq("user")))
+        .thenReturn(Optional.empty());
+
+    PasswordView passwordView = new PasswordView();
+    passwordView.setPassword("myPassword");
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post("/realms/domaine1/users/user/validate-password")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(passwordView))
+            .with(csrf());
+    MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+    assertThat("Response status should be 404", response.getStatus(), is(404));
   }
 }
