@@ -14,8 +14,8 @@
 package fr.insee.sugoi.old.services.controller;
 
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
-import fr.insee.sugoi.converter.ouganext.Organisation;
-import fr.insee.sugoi.converter.ouganext.Organisations;
+import fr.insee.sugoi.converter.ouganext.OrganisationOuganext;
+import fr.insee.sugoi.converter.ouganext.OrganisationsOuganext;
 import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
@@ -96,10 +96,10 @@ public class OrganisationDomaineController {
             content = {
               @Content(
                   mediaType = "application/json",
-                  schema = @Schema(implementation = Organisation.class)),
+                  schema = @Schema(implementation = OrganisationOuganext.class)),
               @Content(
                   mediaType = "application/xml",
-                  schema = @Schema(implementation = Organisation.class))
+                  schema = @Schema(implementation = OrganisationOuganext.class))
             }),
         @ApiResponse(
             responseCode = "404",
@@ -109,7 +109,7 @@ public class OrganisationDomaineController {
               @Content(mediaType = "application/xml")
             })
       })
-  public ResponseEntity<Organisation> createOrModifyOrganisation(
+  public ResponseEntity<OrganisationOuganext> createOrModifyOrganisation(
       @Parameter(
               description = "Name of the domaine where the operation will be made",
               required = true)
@@ -125,7 +125,7 @@ public class OrganisationDomaineController {
           @RequestParam(name = "creation", required = false)
           boolean creation,
       @Parameter(description = "Organization to create or modify", required = true) @RequestBody
-          Organisation organisation,
+          OrganisationOuganext organisation,
       Authentication authentication) {
     RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
@@ -156,7 +156,7 @@ public class OrganisationDomaineController {
                       realmUserStorage.getRealm(),
                       realmUserStorage.getUserStorage(),
                       response.getEntityId()),
-                  Organisation.class));
+                  OrganisationOuganext.class));
     }
 
     ProviderResponse response =
@@ -183,7 +183,7 @@ public class OrganisationDomaineController {
                         realmUserStorage.getUserStorage(),
                         response.getEntityId())
                     .get(),
-                Organisation.class));
+                OrganisationOuganext.class));
   }
 
   /**
@@ -206,13 +206,13 @@ public class OrganisationDomaineController {
             content = {
               @Content(
                   mediaType = "application/json",
-                  schema = @Schema(implementation = Organisation.class)),
+                  schema = @Schema(implementation = OrganisationOuganext.class)),
               @Content(
                   mediaType = "application/xml",
-                  schema = @Schema(implementation = Organisation.class))
+                  schema = @Schema(implementation = OrganisationOuganext.class))
             })
       })
-  public ResponseEntity<Organisation> getOrganisationDomaine(
+  public ResponseEntity<OrganisationOuganext> getOrganisationDomaine(
       @Parameter(
               description = "Name of the domaine where the operation will be made",
               required = true)
@@ -232,7 +232,7 @@ public class OrganisationDomaineController {
                         () ->
                             new OrganizationNotFoundException(
                                 "Organization " + id + " not found in realm " + domaine)),
-                Organisation.class));
+                OrganisationOuganext.class));
   }
 
   /**
@@ -328,7 +328,7 @@ public class OrganisationDomaineController {
           @PathVariable(name = "domaine", required = true)
           String domaine,
       @Parameter(description = "Organization to create", required = true) @RequestBody
-          Organisation organisation,
+          OrganisationOuganext organisation,
       @Parameter(
               description = "filled in header Slug, the id of the organisation if not already used",
               required = false)
@@ -463,12 +463,12 @@ public class OrganisationDomaineController {
           String certificat) {
     RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
-    Organisation searchOrganisation = new Organisation();
+    OrganisationOuganext searchOrganisation = new OrganisationOuganext();
     searchOrganisation.setIdentifiant(identifiant);
     searchOrganisation.setNomCommun(nomCommun);
     searchOrganisation.setDescription(description);
     if (organisationId != null) {
-      Organisation subOrganisation = new Organisation();
+      OrganisationOuganext subOrganisation = new OrganisationOuganext();
       subOrganisation.setIdentifiant(organisationId);
       searchOrganisation.setOrganisationDeRattachement(subOrganisation);
     }
@@ -521,7 +521,7 @@ public class OrganisationDomaineController {
               .collect(Collectors.toList()));
       return ResponseEntity.status(HttpStatus.NO_CONTENT).headers(headers).build();
     } else {
-      Organisations organisations = new Organisations();
+      OrganisationsOuganext organisations = new OrganisationsOuganext();
       if (identifiantsSeuls) {
         organisations
             .getListe()
@@ -529,7 +529,7 @@ public class OrganisationDomaineController {
                 foundOrganizations.getResults().stream()
                     .map(
                         organization -> {
-                          Organisation organisation = new Organisation();
+                          OrganisationOuganext organisation = new OrganisationOuganext();
                           organisation.setIdentifiant(organization.getIdentifiant());
                           return organisation;
                         })
@@ -542,7 +542,7 @@ public class OrganisationDomaineController {
                     .map(
                         organization ->
                             ouganextSugoiMapper.serializeToOuganext(
-                                organization, Organisation.class))
+                                organization, OrganisationOuganext.class))
                     .collect(Collectors.toList()));
       }
       return ResponseEntity.status(HttpStatus.OK).headers(headers).body(organisations);

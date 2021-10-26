@@ -14,18 +14,18 @@
 package fr.insee.sugoi.converter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.insee.sugoi.converter.ouganext.InfoFormattage;
+import fr.insee.sugoi.converter.ouganext.InfoFormattageOuganext;
 import fr.insee.sugoi.converter.utils.CustomObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class InfoFormattageTest {
 
-  private static InfoFormattage info;
+  private static InfoFormattageOuganext info;
 
   @BeforeAll
   private static void initialize() {
-    info = new InfoFormattage();
+    info = new InfoFormattageOuganext();
     info.setChefSignataire("Moi");
     info.setUrlSite("https://entreprises.insee.fr");
     info.setNomApplicationLettre("ESA");

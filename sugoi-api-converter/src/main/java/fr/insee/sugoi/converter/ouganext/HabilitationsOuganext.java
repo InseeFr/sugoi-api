@@ -54,11 +54,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 @JacksonXmlRootElement(localName = "Habilitations", namespace = Namespace.ANNUAIRE)
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonPropertyOrder({"application"})
-public class Habilitations {
+public class HabilitationsOuganext {
 
-  public Habilitations() {}
+  public HabilitationsOuganext() {}
 
-  public Habilitations(List<Habilitation> habilitations) {
+  public HabilitationsOuganext(List<Habilitation> habilitations) {
     List<Habilitation> filteredHabilitations =
         habilitations.stream()
             .filter(habilitation -> habilitation.getApplication() != null)
@@ -69,7 +69,7 @@ public class Habilitations {
             .distinct()
             .map(
                 appName -> {
-                  return new Application(appName);
+                  return new ApplicationOuganext(appName);
                 })
             .collect(Collectors.toList());
     application.forEach(
@@ -78,7 +78,7 @@ public class Habilitations {
               .filter(habilitation -> habilitation.getApplication().equals(app.getName()))
               .map(habilitation -> habilitation.getRole())
               .distinct()
-              .forEach(roleName -> app.addRole(new Role(roleName)));
+              .forEach(roleName -> app.addRole(new RoleOuganext(roleName)));
         });
     application.forEach(
         app ->
@@ -123,29 +123,29 @@ public class Habilitations {
   }
 
   @JacksonXmlElementWrapper(useWrapping = false)
-  protected List<Application> application = new ArrayList<Application>();
+  protected List<ApplicationOuganext> application = new ArrayList<ApplicationOuganext>();
 
   /** @return la liste des applications avec habilitations ou une liste vide. */
-  public List<Application> getApplication() {
+  public List<ApplicationOuganext> getApplication() {
     if (application == null) {
-      application = new ArrayList<Application>();
+      application = new ArrayList<ApplicationOuganext>();
     }
     return this.application;
   }
 
-  public void addApplication(Application application) {
+  public void addApplication(ApplicationOuganext application) {
     this.application.add(application);
   }
 
-  public void setApplicationList(List<Application> applicationList) {
+  public void setApplicationList(List<ApplicationOuganext> applicationList) {
     this.application = applicationList;
   }
 
   public void addHabilitation(String appName, List<String> nomRoles) {
     if (!this.application.stream().anyMatch(app -> app.getName().equalsIgnoreCase(appName))) {
-      this.application.add(new Application(appName));
+      this.application.add(new ApplicationOuganext(appName));
     }
-    Application appli =
+    ApplicationOuganext appli =
         this.application.stream()
             .filter(app -> app.getName().equalsIgnoreCase(appName))
             .collect(Collectors.toList())
@@ -155,14 +155,14 @@ public class Habilitations {
             roleName -> {
               if (!appli.getRole().stream()
                   .anyMatch(role -> role.getName().equalsIgnoreCase(roleName))) {
-                appli.addRole(new Role(roleName));
+                appli.addRole(new RoleOuganext(roleName));
               }
             });
   }
 
   public void removeHabilitation(String appName, List<String> nomRoles) {
     if (this.application.stream().anyMatch(app -> app.getName().equalsIgnoreCase(appName))) {
-      Application appli =
+      ApplicationOuganext appli =
           this.application.stream()
               .filter(app -> app.getName().equalsIgnoreCase(appName))
               .collect(Collectors.toList())
@@ -173,14 +173,14 @@ public class Habilitations {
 
   public void removeHabilitation(String appName, String roleName, List<String> proprietes) {
     if (this.application.stream().anyMatch(app -> app.getName().equalsIgnoreCase(appName))) {
-      Application appli =
+      ApplicationOuganext appli =
           this.application.stream()
               .filter(app -> app.getName().equalsIgnoreCase(appName))
               .collect(Collectors.toList())
               .get(0);
       if (appli.getRole().stream()
           .anyMatch(roleFilter -> roleFilter.getName().equalsIgnoreCase(roleName))) {
-        Role role =
+        RoleOuganext role =
             appli.getRole().stream()
                 .filter(roleFilter -> roleFilter.getName().equalsIgnoreCase(roleName))
                 .collect(Collectors.toList())
@@ -191,12 +191,12 @@ public class Habilitations {
   }
 
   public void addHabilitations(String appName, String roleName, List<String> proprietes) {
-    Application appli;
-    Role role;
+    ApplicationOuganext appli;
+    RoleOuganext role;
     if (!this.application.stream().anyMatch(app -> app.getName().equalsIgnoreCase(appName))) {
-      appli = new Application(appName);
+      appli = new ApplicationOuganext(appName);
       this.application.add(appli);
-      role = new Role(roleName);
+      role = new RoleOuganext(roleName);
       appli.addRole(role);
     } else {
       appli =
@@ -212,7 +212,7 @@ public class Habilitations {
                 .collect(Collectors.toList())
                 .get(0);
       } else {
-        role = new Role(roleName);
+        role = new RoleOuganext(roleName);
         appli.addRole(role);
       }
     }
@@ -226,8 +226,8 @@ public class Habilitations {
    */
   public List<String> toListString() {
     List<String> list = new ArrayList<>();
-    for (Application app : getApplication()) {
-      for (Role role : app.getRole()) {
+    for (ApplicationOuganext app : getApplication()) {
+      for (RoleOuganext role : app.getRole()) {
         StringBuilder sb = new StringBuilder();
         if (role.getPropriete().isEmpty()) {
           sb.append(role.getName()).append("_").append(app.getName());

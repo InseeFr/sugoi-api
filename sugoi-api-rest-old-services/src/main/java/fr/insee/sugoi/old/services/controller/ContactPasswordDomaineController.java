@@ -14,7 +14,7 @@
 package fr.insee.sugoi.old.services.controller;
 
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
-import fr.insee.sugoi.converter.ouganext.PasswordChangeRequest;
+import fr.insee.sugoi.converter.ouganext.PasswordChangeRequestOuganext;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.SugoiUser;
 import fr.insee.sugoi.core.service.CredentialsService;
@@ -106,7 +106,7 @@ public class ContactPasswordDomaineController {
               description = "Other infos to reset password: mail address, mail format",
               required = true)
           @RequestBody
-          PasswordChangeRequest pcr,
+          PasswordChangeRequestOuganext pcr,
       Authentication authentication) {
     RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
@@ -171,7 +171,7 @@ public class ContactPasswordDomaineController {
           String domaine,
       @Parameter(description = "Other infos to reset password: new password", required = true)
           @RequestBody
-          PasswordChangeRequest pcr,
+          PasswordChangeRequestOuganext pcr,
       Authentication authentication) {
     RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
@@ -244,7 +244,7 @@ public class ContactPasswordDomaineController {
                   "Other infos to reset password: mail to send the new password, format informations, ;address if modeEnvois is address, new password and old password",
               required = true)
           @RequestBody
-          PasswordChangeRequest pcr,
+          PasswordChangeRequestOuganext pcr,
       Authentication authentication) {
     RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 

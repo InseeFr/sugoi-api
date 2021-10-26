@@ -47,7 +47,7 @@ import fr.insee.sugoi.converter.utils.MapFromAttribute;
   "infoFormattageEnvoi"
 })
 @JacksonXmlRootElement(localName = "PasswordChangeRequest", namespace = Namespace.ANNUAIRE)
-public class PasswordChangeRequest {
+public class PasswordChangeRequestOuganext {
 
   @JacksonXmlProperty(localName = "AdresseMessagerie")
   @MapFromAttribute(attributeName = "email")
@@ -55,7 +55,7 @@ public class PasswordChangeRequest {
   protected String adresseMessagerie;
 
   @JacksonXmlProperty(localName = "AdressePostale")
-  private Adresse adressePostale;
+  private AdresseOuganext adressePostale;
 
   @JacksonXmlProperty(localName = "AncienMotDePasse")
   @MapFromAttribute(attributeName = "oldPassword")
@@ -68,7 +68,7 @@ public class PasswordChangeRequest {
   protected String nouveauMotDePasse;
 
   @JacksonXmlProperty(localName = "InfoFormattageEnvoi")
-  protected InfoFormattage infoFormattageEnvoi;
+  protected InfoFormattageOuganext infoFormattageEnvoi;
 
   public String getAdresseMessagerie() {
     return adresseMessagerie;
@@ -78,11 +78,11 @@ public class PasswordChangeRequest {
     this.adresseMessagerie = value;
   }
 
-  public Adresse getAdressePostale() {
+  public AdresseOuganext getAdressePostale() {
     return adressePostale;
   }
 
-  public void setAdressePostale(Adresse adressePostale) {
+  public void setAdressePostale(AdresseOuganext adressePostale) {
     this.adressePostale = adressePostale;
   }
 
@@ -102,11 +102,11 @@ public class PasswordChangeRequest {
     this.nouveauMotDePasse = value;
   }
 
-  public InfoFormattage getInfoFormattageEnvoi() {
+  public InfoFormattageOuganext getInfoFormattageEnvoi() {
     return infoFormattageEnvoi;
   }
 
-  public void setInfoFormattageEnvoi(InfoFormattage value) {
+  public void setInfoFormattageEnvoi(InfoFormattageOuganext value) {
     this.infoFormattageEnvoi = value;
   }
 }

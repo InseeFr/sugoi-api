@@ -14,7 +14,7 @@
 package fr.insee.sugoi.old.services.controller;
 
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
-import fr.insee.sugoi.converter.ouganext.Groupe;
+import fr.insee.sugoi.converter.ouganext.GroupeOuganext;
 import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
@@ -80,13 +80,13 @@ public class ContactGroupeDomaineController {
             content = {
               @Content(
                   mediaType = "application/json",
-                  schema = @Schema(implementation = Groupe.class)),
+                  schema = @Schema(implementation = GroupeOuganext.class)),
               @Content(
                   mediaType = "application/xml",
-                  schema = @Schema(implementation = Groupe.class))
+                  schema = @Schema(implementation = GroupeOuganext.class))
             })
       })
-  public ResponseEntity<List<Groupe>> getGroups(
+  public ResponseEntity<List<GroupeOuganext>> getGroups(
       @Parameter(description = "Contact to search groups", required = true)
           @PathVariable(name = "id", required = true)
           String identifiant,
@@ -107,7 +107,7 @@ public class ContactGroupeDomaineController {
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             user.getGroups().stream()
-                .map(group -> ouganextSugoiMapper.serializeToOuganext(group, Groupe.class))
+                .map(group -> ouganextSugoiMapper.serializeToOuganext(group, GroupeOuganext.class))
                 .collect(Collectors.toList()));
   }
 

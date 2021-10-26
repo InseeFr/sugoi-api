@@ -14,8 +14,8 @@
 package fr.insee.sugoi.old.services.controller;
 
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
-import fr.insee.sugoi.converter.ouganext.Contact;
-import fr.insee.sugoi.converter.ouganext.InfoFormattage;
+import fr.insee.sugoi.converter.ouganext.ContactOuganext;
+import fr.insee.sugoi.converter.ouganext.InfoFormattageOuganext;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.SugoiUser;
@@ -85,10 +85,10 @@ public class ContactDomaineController {
             content = {
               @Content(
                   mediaType = "application/json",
-                  schema = @Schema(implementation = Contact.class)),
+                  schema = @Schema(implementation = ContactOuganext.class)),
               @Content(
                   mediaType = "application/xml",
-                  schema = @Schema(implementation = Contact.class))
+                  schema = @Schema(implementation = ContactOuganext.class))
             }),
         @ApiResponse(
             responseCode = "404",
@@ -98,9 +98,9 @@ public class ContactDomaineController {
               @Content(mediaType = "application/xml")
             })
       })
-  public ResponseEntity<Contact> createOrModifyContact(
+  public ResponseEntity<ContactOuganext> createOrModifyContact(
       @Parameter(description = "Contact to create or modify", required = true) @RequestBody
-          Contact contact,
+          ContactOuganext contact,
       @Parameter(description = "Contact's id to modify", required = false)
           @PathVariable(name = "id", required = true)
           String identifiant,
@@ -144,7 +144,7 @@ public class ContactDomaineController {
                           realmUserStorage.getUserStorage(),
                           identifiant)
                       .get(),
-                  Contact.class));
+                  ContactOuganext.class));
     }
 
     userService.update(
@@ -168,7 +168,7 @@ public class ContactDomaineController {
                     .findById(
                         realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
                     .get(),
-                Contact.class));
+                ContactOuganext.class));
   }
 
   /**
@@ -191,13 +191,13 @@ public class ContactDomaineController {
             content = {
               @Content(
                   mediaType = "application/json",
-                  schema = @Schema(implementation = Contact.class)),
+                  schema = @Schema(implementation = ContactOuganext.class)),
               @Content(
                   mediaType = "application/xml",
-                  schema = @Schema(implementation = Contact.class))
+                  schema = @Schema(implementation = ContactOuganext.class))
             })
       })
-  public ResponseEntity<Contact> getContactDomaine(
+  public ResponseEntity<ContactOuganext> getContactDomaine(
       @Parameter(description = "Contact's id to search", required = true)
           @PathVariable(name = "id", required = true)
           String identifiant,
@@ -218,7 +218,7 @@ public class ContactDomaineController {
                         () ->
                             new UserNotFoundException(
                                 "User " + identifiant + " not found in realm " + domaine)),
-                Contact.class));
+                ContactOuganext.class));
   }
 
   /**
@@ -250,7 +250,7 @@ public class ContactDomaineController {
               @Content(mediaType = "application/xml")
             })
       })
-  public ResponseEntity<Contact> deleteContact(
+  public ResponseEntity<ContactOuganext> deleteContact(
       @Parameter(description = "Contact's id to search", required = true) @PathVariable("id")
           String identifiant,
       @Parameter(
@@ -316,7 +316,7 @@ public class ContactDomaineController {
           @RequestParam(name = "modeEnvoi", required = false)
           List<String> modeEnvoiStrings,
       @Parameter(description = "Other infos to send login", required = true) @RequestBody
-          InfoFormattage infoEnvoi) {
+          InfoFormattageOuganext infoEnvoi) {
     return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
   }
 }

@@ -112,7 +112,7 @@ import java.util.HashSet;
   "inseeTelephoneNumberCorrespondant"
 })
 @JacksonXmlRootElement(localName = "Contact", namespace = Namespace.ANNUAIRE)
-public class Contact {
+public class ContactOuganext {
 
   @JacksonXmlProperty(localName = "Identifiant")
   @MapFromAttribute(attributeName = "username")
@@ -163,13 +163,13 @@ public class Contact {
 
   @JacksonXmlProperty(localName = "AdressePostale")
   @JsonProperty(value = "AdressePostale")
-  private Adresse adresse;
+  private AdresseOuganext adresse;
 
   @JacksonXmlProperty(localName = "OrganisationDeRattachementUri")
   @JsonSerialize(using = OrganisationSerializer.class)
   @JsonDeserialize(using = OrganisationDeserializer.class)
   @JsonProperty(value = "OrganisationDeRattachementUri")
-  private Organisation organisationDeRattachement;
+  private OrganisationOuganext organisationDeRattachement;
 
   @JacksonXmlProperty(localName = "Civilite")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "civilite")
@@ -327,19 +327,19 @@ public class Contact {
     this.facSimile = facSimile;
   }
 
-  public Adresse getAdresse() {
+  public AdresseOuganext getAdresse() {
     return adresse;
   }
 
-  public void setAdresse(Adresse value) {
+  public void setAdresse(AdresseOuganext value) {
     this.adresse = value;
   }
 
-  public void setOrganisationDeRattachement(Organisation organisation) {
+  public void setOrganisationDeRattachement(OrganisationOuganext organisation) {
     this.organisationDeRattachement = organisation;
   }
 
-  public Organisation getOrganisationDeRattachement() {
+  public OrganisationOuganext getOrganisationDeRattachement() {
     return organisationDeRattachement;
   }
 

@@ -14,23 +14,23 @@
 package fr.insee.sugoi.converter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.insee.sugoi.converter.ouganext.InfoFormattage;
-import fr.insee.sugoi.converter.ouganext.PasswordChangeRequest;
+import fr.insee.sugoi.converter.ouganext.InfoFormattageOuganext;
+import fr.insee.sugoi.converter.ouganext.PasswordChangeRequestOuganext;
 import fr.insee.sugoi.converter.utils.CustomObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class PasswordChangeRequestTest {
 
-  private static PasswordChangeRequest pcr;
+  private static PasswordChangeRequestOuganext pcr;
 
   @BeforeAll
   private static void initialize() {
-    pcr = new PasswordChangeRequest();
+    pcr = new PasswordChangeRequestOuganext();
     pcr.setAncienMotDePasse("rrrèé~~~kfl)%");
     pcr.setNouveauMotDePasse("ffgjktiuyed_<gh>");
     pcr.setAdresseMessagerie("test@insee.fr");
-    InfoFormattage info = new InfoFormattage();
+    InfoFormattageOuganext info = new InfoFormattageOuganext();
     info.setChefSignataire("Moi");
     info.setUrlSite("https://entreprises.insee.fr");
     info.setNomApplicationLettre("ESA");
