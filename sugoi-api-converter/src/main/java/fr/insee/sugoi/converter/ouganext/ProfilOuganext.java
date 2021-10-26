@@ -43,7 +43,7 @@ import java.util.List;
   "groupesPossibles"
 })
 @JacksonXmlRootElement(localName = "Profil", namespace = Namespace.ANNUAIRE)
-public class Profil {
+public class ProfilOuganext {
 
   public static final ObjectClass[] TABLEAU_CLASSES_DEFAUT = {
     ObjectClass.TOP,
@@ -97,12 +97,12 @@ public class Profil {
   private List<ObjectClass> objectClassContact = Arrays.asList(TABLEAU_CLASSES_DEFAUT);
 
   // Habilitation possibles
-  @JacksonXmlProperty private Habilitations habilitationsPossibles;
+  @JacksonXmlProperty private HabilitationsOuganext habilitationsPossibles;
 
   // Branches applicatives dont la gestion des groupes est autorisée
   @JacksonXmlProperty private List<String> branchesApplicativesPossibles;
   // groupes déduits du champ precedent
-  @JacksonXmlProperty private List<Groupe> groupesPossibles;
+  @JacksonXmlProperty private List<GroupeOuganext> groupesPossibles;
 
   // Support de la pagination ou du vlv
   @JacksonXmlProperty private boolean vlvSupported = false;
@@ -299,11 +299,11 @@ public class Profil {
     this.nombreMaxHabilitations = nombreMaxHabilitations;
   }
 
-  public Habilitations getHabilitationsPossibles() {
+  public HabilitationsOuganext getHabilitationsPossibles() {
     return habilitationsPossibles;
   }
 
-  public void setHabilitationsPossibles(Habilitations habilitationsPossibles) {
+  public void setHabilitationsPossibles(HabilitationsOuganext habilitationsPossibles) {
     this.habilitationsPossibles = habilitationsPossibles;
   }
 
@@ -315,11 +315,11 @@ public class Profil {
     this.branchesApplicativesPossibles = branchesApplicativesPossibles;
   }
 
-  public List<Groupe> getGroupesPossibles() {
+  public List<GroupeOuganext> getGroupesPossibles() {
     return groupesPossibles;
   }
 
-  public void setGroupesPossibles(List<Groupe> groupesPossibles) {
+  public void setGroupesPossibles(List<GroupeOuganext> groupesPossibles) {
     this.groupesPossibles = groupesPossibles;
   }
 }

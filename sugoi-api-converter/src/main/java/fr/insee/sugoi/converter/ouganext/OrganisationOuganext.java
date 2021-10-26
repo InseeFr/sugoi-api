@@ -71,7 +71,7 @@ import java.util.HashSet;
   "propriete"
 })
 @JacksonXmlRootElement(localName = "Organisation", namespace = Namespace.ANNUAIRE)
-public class Organisation {
+public class OrganisationOuganext {
 
   @JacksonXmlProperty(localName = "Identifiant")
   @MapFromAttribute(attributeName = "identifiant")
@@ -102,7 +102,7 @@ public class Organisation {
   protected String facSimile;
 
   @JacksonXmlProperty(localName = "adressePostale")
-  protected Adresse adresse;
+  protected AdresseOuganext adresse;
 
   @JacksonXmlProperty(localName = "CleDeChiffrement")
   @MapFromAttribute(attributeName = "gpgkey")
@@ -111,7 +111,7 @@ public class Organisation {
   @JacksonXmlProperty(localName = "OrganisationDeRattachementUri")
   @JsonSerialize(using = OrganisationSerializer.class)
   @JsonDeserialize(using = OrganisationDeserializer.class)
-  protected Organisation organisationDeRattachement;
+  protected OrganisationOuganext organisationDeRattachement;
 
   @JacksonXmlProperty(localName = "RepertoireDeDistribution")
   @MapFromHashmapElement(hashMapName = "attributes", hashMapKey = "repertoireDeDistribution")
@@ -178,11 +178,11 @@ public class Organisation {
     this.facSimile = facSimile;
   }
 
-  public Adresse getAdresse() {
+  public AdresseOuganext getAdresse() {
     return adresse;
   }
 
-  public void setAdresse(Adresse value) {
+  public void setAdresse(AdresseOuganext value) {
     this.adresse = value;
   }
 
@@ -194,11 +194,11 @@ public class Organisation {
     return this.cleDeChiffrement;
   }
 
-  public Organisation getOrganisationDeRattachement() {
+  public OrganisationOuganext getOrganisationDeRattachement() {
     return organisationDeRattachement;
   }
 
-  public void setOrganisationDeRattachement(Organisation organisation) {
+  public void setOrganisationDeRattachement(OrganisationOuganext organisation) {
     this.organisationDeRattachement = organisation;
   }
 

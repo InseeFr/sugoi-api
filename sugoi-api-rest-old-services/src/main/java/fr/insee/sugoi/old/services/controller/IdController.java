@@ -14,8 +14,8 @@
 package fr.insee.sugoi.old.services.controller;
 
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
-import fr.insee.sugoi.converter.ouganext.Contact;
-import fr.insee.sugoi.converter.ouganext.Organisation;
+import fr.insee.sugoi.converter.ouganext.ContactOuganext;
+import fr.insee.sugoi.converter.ouganext.OrganisationOuganext;
 import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.service.ConfigService;
@@ -73,12 +73,12 @@ public class IdController {
             .filter(realm -> authorizeDecider.isAtLeastConsultant(realm.getName()))
             .collect(Collectors.toList());
 
-    Optional<Contact> contact =
+    Optional<ContactOuganext> contact =
         realms.stream().map(realm -> findContact(realm, id)).filter(c -> c != null).findFirst();
     if (contact.isPresent()) {
       return ResponseEntity.ok().body(contact.get());
     } else {
-      Optional<Organisation> organisation =
+      Optional<OrganisationOuganext> organisation =
           realms.stream()
               .map(realm -> findOrganisation(realm, id))
               .filter(o -> o != null)
@@ -91,15 +91,15 @@ public class IdController {
     }
   }
 
-  private Contact findContact(Realm realm, String id) {
+  private ContactOuganext findContact(Realm realm, String id) {
     return ouganextSugoiMapper.serializeToOuganext(
         userService
             .findById(realm.getName(), null, id)
             .orElseThrow(() -> new UserNotFoundException("User" + id + " not found in " + realm)),
-        Contact.class);
+        ContactOuganext.class);
   }
 
-  private Organisation findOrganisation(Realm realm, String id) {
+  private OrganisationOuganext findOrganisation(Realm realm, String id) {
     return ouganextSugoiMapper.serializeToOuganext(
         organizationService
             .findById(realm.getName(), null, id)
@@ -107,6 +107,6 @@ public class IdController {
                 () ->
                     new OrganizationNotFoundException(
                         "Organization" + id + " not found in " + realm)),
-        Organisation.class);
+        OrganisationOuganext.class);
   }
 }

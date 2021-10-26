@@ -17,29 +17,30 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import fr.insee.sugoi.converter.utils.MapFromAttribute;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
+import javax.xml.bind.annotation.XmlAttribute;
 
-@JacksonXmlRootElement(localName = "role", namespace = Namespace.ANNUAIRE)
-@JsonPropertyOrder({"name", "propriete"})
-public class Role {
-
-  public Role() {
-    super();
-  }
-
-  public Role(String name) {
-    super();
-    this.name = name;
-  }
+@JacksonXmlRootElement(localName = "application", namespace = Namespace.ANNUAIRE)
+@JsonPropertyOrder({"name", "role"})
+public class ApplicationOuganext {
 
   @JacksonXmlProperty(isAttribute = true)
+  @MapFromAttribute(attributeName = "name")
   private String name;
 
   @JacksonXmlElementWrapper(useWrapping = false)
-  private List<String> propriete = new ArrayList<>();
+  private Collection<RoleOuganext> role = new ArrayList<>();
 
+  public ApplicationOuganext(String appName) {
+    this.name = appName;
+  }
+
+  public ApplicationOuganext() {}
+
+  @XmlAttribute(name = "name")
   public String getName() {
     return name;
   }
@@ -48,22 +49,22 @@ public class Role {
     this.name = name;
   }
 
-  /** @return la liste des propriétés ou une liste vide. */
-  public List<String> getPropriete() {
-    if (propriete == null) {
-      propriete = new ArrayList<String>();
+  /** @return la liste des roles ou une liste vide. */
+  public Collection<RoleOuganext> getRole() {
+    if (role == null) {
+      role = new ArrayList<RoleOuganext>();
     }
-    return propriete;
+    return role;
   }
 
-  public void addPropriete(String prop) {
-    this.propriete.add(prop);
+  public void addRole(RoleOuganext role) {
+    this.role.add(role);
   }
 
-  public void removePropriete(String propName) {
-    this.propriete =
-        this.propriete.stream()
-            .filter(prop -> !prop.equalsIgnoreCase(propName))
+  public void removeRole(String roleName) {
+    this.role =
+        this.role.stream()
+            .filter(r -> !r.getName().equalsIgnoreCase(roleName))
             .collect(Collectors.toList());
   }
 }

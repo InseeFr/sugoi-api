@@ -16,16 +16,16 @@ package fr.insee.sugoi.converter.ouganext.adapters;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import fr.insee.sugoi.converter.ouganext.Organisation;
+import fr.insee.sugoi.converter.ouganext.OrganisationOuganext;
 import java.io.IOException;
 
-public class OrganisationSerializer extends StdSerializer<Organisation> {
+public class OrganisationSerializer extends StdSerializer<OrganisationOuganext> {
 
   public OrganisationSerializer() {
     this(null);
   }
 
-  public OrganisationSerializer(Class<Organisation> t) {
+  public OrganisationSerializer(Class<OrganisationOuganext> t) {
     super(t);
   }
 
@@ -33,7 +33,7 @@ public class OrganisationSerializer extends StdSerializer<Organisation> {
   private static final long serialVersionUID = 1L;
 
   @Override
-  public void serialize(Organisation value, JsonGenerator gen, SerializerProvider provider)
+  public void serialize(OrganisationOuganext value, JsonGenerator gen, SerializerProvider provider)
       throws IOException {
     gen.writeString(value.getIdentifiant());
   }

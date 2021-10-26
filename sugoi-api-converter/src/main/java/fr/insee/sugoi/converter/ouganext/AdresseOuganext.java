@@ -44,7 +44,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
  */
 @JsonInclude(Include.NON_NULL)
 @JacksonXmlRootElement(localName = "AdressePostale", namespace = Namespace.INSEE)
-public class Adresse {
+public class AdresseOuganext {
 
   @JsonIgnore private String identifiant;
 

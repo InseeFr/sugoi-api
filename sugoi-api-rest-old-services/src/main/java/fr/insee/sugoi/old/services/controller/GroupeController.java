@@ -14,8 +14,8 @@
 package fr.insee.sugoi.old.services.controller;
 
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
-import fr.insee.sugoi.converter.ouganext.Contact;
-import fr.insee.sugoi.converter.ouganext.Contacts;
+import fr.insee.sugoi.converter.ouganext.ContactOuganext;
+import fr.insee.sugoi.converter.ouganext.ContactsOuganext;
 import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.model.Group;
@@ -106,12 +106,14 @@ public class GroupeController {
       if (group.getUsers().isEmpty()) {
         return new ResponseEntity<>("No users in group", HttpStatus.NOT_FOUND);
       } else {
-        Contacts contacts = new Contacts();
+        ContactsOuganext contacts = new ContactsOuganext();
         contacts
             .getListe()
             .addAll(
                 group.getUsers().stream()
-                    .map(user -> ouganextSugoiMapper.serializeToOuganext(user, Contact.class))
+                    .map(
+                        user ->
+                            ouganextSugoiMapper.serializeToOuganext(user, ContactOuganext.class))
                     .collect(Collectors.toList()));
         return ResponseEntity.ok().body(contacts);
       }

@@ -37,7 +37,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
  */
 @JsonPropertyOrder({"exception", "message"})
 @JacksonXmlRootElement(localName = "ErrorResult", namespace = Namespace.ANNUAIRE)
-public class ErrorResult {
+public class ErrorResultOuganext {
 
   @JacksonXmlProperty(localName = "Exception")
   protected String exception;

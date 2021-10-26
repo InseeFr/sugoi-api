@@ -14,18 +14,18 @@
 package fr.insee.sugoi.converter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.insee.sugoi.converter.ouganext.Profil;
+import fr.insee.sugoi.converter.ouganext.ProfilOuganext;
 import fr.insee.sugoi.converter.utils.CustomObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class ProfilXmlTest {
 
-  private static Profil profil;
+  private static ProfilOuganext profil;
 
   @BeforeAll
   public static void initialize() {
-    profil = new Profil();
+    profil = new ProfilOuganext();
     profil.setBrancheAdresse("ou=adresse,o=insee,c=fr");
     profil.setBrancheContact("ou=contact,o=insee,c=fr");
     profil.setBrancheOrganisation("ou=organisation,o=insee,c=fr");

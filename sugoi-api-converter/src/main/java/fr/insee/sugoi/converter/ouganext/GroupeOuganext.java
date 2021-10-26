@@ -14,9 +14,11 @@
 package fr.insee.sugoi.converter.ouganext;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import fr.insee.sugoi.converter.utils.MapFromAttribute;
 
-public class Groupe {
+@JacksonXmlRootElement(localName = "Groupe", namespace = Namespace.ANNUAIRE)
+public class GroupeOuganext {
 
   @JsonAlias({"application", "Application"})
   @MapFromAttribute(attributeName = "appName")

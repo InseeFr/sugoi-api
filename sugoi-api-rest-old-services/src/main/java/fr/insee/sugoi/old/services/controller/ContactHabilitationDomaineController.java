@@ -13,7 +13,7 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
-import fr.insee.sugoi.converter.ouganext.Habilitations;
+import fr.insee.sugoi.converter.ouganext.HabilitationsOuganext;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.SugoiUser;
@@ -79,13 +79,13 @@ public class ContactHabilitationDomaineController {
             content = {
               @Content(
                   mediaType = "application/json",
-                  schema = @Schema(implementation = Habilitations.class)),
+                  schema = @Schema(implementation = HabilitationsOuganext.class)),
               @Content(
                   mediaType = "application/xml",
-                  schema = @Schema(implementation = Habilitations.class))
+                  schema = @Schema(implementation = HabilitationsOuganext.class))
             })
       })
-  public ResponseEntity<Habilitations> getHabilitation(
+  public ResponseEntity<HabilitationsOuganext> getHabilitation(
       @Parameter(description = "Contact's id to look for habilitations", required = true)
           @PathVariable(name = "id", required = true)
           String identifiant,
@@ -98,7 +98,7 @@ public class ContactHabilitationDomaineController {
 
     return ResponseEntity.status(HttpStatus.OK)
         .body(
-            new Habilitations(
+            new HabilitationsOuganext(
                 userService
                     .findById(
                         realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
@@ -169,7 +169,7 @@ public class ContactHabilitationDomaineController {
                 () ->
                     new UserNotFoundException(
                         "Cannot find user " + identifiant + " in domaine " + domaine));
-    Habilitations habilitations = new Habilitations(user.getHabilitations());
+    HabilitationsOuganext habilitations = new HabilitationsOuganext(user.getHabilitations());
     habilitations.addHabilitation(appName, nomRoles);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
     userService.update(
@@ -244,7 +244,7 @@ public class ContactHabilitationDomaineController {
                 () ->
                     new UserNotFoundException(
                         "Cannot find user " + identifiant + " in domaine " + domaine));
-    Habilitations habilitations = new Habilitations(user.getHabilitations());
+    HabilitationsOuganext habilitations = new HabilitationsOuganext(user.getHabilitations());
     habilitations.addHabilitations(appName, role, proprietes);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
     userService.update(
@@ -311,7 +311,7 @@ public class ContactHabilitationDomaineController {
                 () ->
                     new UserNotFoundException(
                         "Cannot find user " + identifiant + " in domaine " + domaine));
-    Habilitations habilitations = new Habilitations(user.getHabilitations());
+    HabilitationsOuganext habilitations = new HabilitationsOuganext(user.getHabilitations());
     habilitations.removeHabilitation(appName, nomRoles);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
     userService.update(
@@ -385,7 +385,7 @@ public class ContactHabilitationDomaineController {
                 () ->
                     new UserNotFoundException(
                         "Cannot find user " + identifiant + " in domaine " + domaine));
-    Habilitations habilitations = new Habilitations(user.getHabilitations());
+    HabilitationsOuganext habilitations = new HabilitationsOuganext(user.getHabilitations());
     habilitations.removeHabilitation(appName, nomRole, proprietes);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
     userService.update(

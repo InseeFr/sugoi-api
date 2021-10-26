@@ -17,10 +17,10 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import fr.insee.sugoi.converter.ouganext.Organisation;
+import fr.insee.sugoi.converter.ouganext.OrganisationOuganext;
 import java.io.IOException;
 
-public class OrganisationDeserializer extends StdDeserializer<Organisation> {
+public class OrganisationDeserializer extends StdDeserializer<OrganisationOuganext> {
 
   /** */
   private static final long serialVersionUID = 1L;
@@ -29,14 +29,14 @@ public class OrganisationDeserializer extends StdDeserializer<Organisation> {
     this(null);
   }
 
-  public OrganisationDeserializer(Class<Organisation> t) {
+  public OrganisationDeserializer(Class<OrganisationOuganext> t) {
     super(t);
   }
 
   @Override
-  public Organisation deserialize(JsonParser p, DeserializationContext ctxt)
+  public OrganisationOuganext deserialize(JsonParser p, DeserializationContext ctxt)
       throws IOException, JsonProcessingException {
-    Organisation organisation = new Organisation();
+    OrganisationOuganext organisation = new OrganisationOuganext();
     organisation.setIdentifiant(p.getText());
     return organisation;
   }

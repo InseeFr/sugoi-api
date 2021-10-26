@@ -19,9 +19,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
-import fr.insee.sugoi.converter.ouganext.Application;
-import fr.insee.sugoi.converter.ouganext.Habilitations;
-import fr.insee.sugoi.converter.ouganext.Role;
+import fr.insee.sugoi.converter.ouganext.ApplicationOuganext;
+import fr.insee.sugoi.converter.ouganext.HabilitationsOuganext;
+import fr.insee.sugoi.converter.ouganext.RoleOuganext;
 import fr.insee.sugoi.converter.utils.CustomObjectMapper;
 import fr.insee.sugoi.model.Habilitation;
 import java.util.ArrayList;
@@ -32,31 +32,31 @@ import org.xmlunit.diff.Diff;
 
 public class HabilitationsTest {
 
-  private static Habilitations generateHabilitations() {
-    Role roleUpload = new Role();
+  private static HabilitationsOuganext generateHabilitations() {
+    RoleOuganext roleUpload = new RoleOuganext();
     roleUpload.setName("upload");
-    Role roleDownload = new Role();
+    RoleOuganext roleDownload = new RoleOuganext();
     roleDownload.setName("download");
-    Role rolededfze = new Role();
+    RoleOuganext rolededfze = new RoleOuganext();
     rolededfze.setName("dedfze");
     roleUpload.getPropriete().add("UP2012");
-    Role roleDoublon = new Role();
+    RoleOuganext roleDoublon = new RoleOuganext();
     roleDoublon.setName("download");
     roleDoublon.getPropriete().add("DW2012");
-    List<Role> roles = new ArrayList<Role>();
+    List<RoleOuganext> roles = new ArrayList<RoleOuganext>();
     roles.add(roleDoublon);
     roles.add(roleDownload);
     roles.add(roleUpload);
     roles.add(rolededfze);
-    Application application1 = new Application();
-    Application application2 = new Application();
+    ApplicationOuganext application1 = new ApplicationOuganext();
+    ApplicationOuganext application2 = new ApplicationOuganext();
     application1.setName("app1");
     application2.setName("app2");
     application1.addRole(roleDoublon);
     application2.addRole(roleDownload);
     application1.addRole(roleUpload);
     application2.addRole(rolededfze);
-    Habilitations habs = new Habilitations();
+    HabilitationsOuganext habs = new HabilitationsOuganext();
     habs.addApplication(application1);
     habs.addApplication(application2);
     return habs;
@@ -84,7 +84,7 @@ public class HabilitationsTest {
 
   @Test
   public void testJson() throws JsonProcessingException {
-    Habilitations habs = generateHabilitations();
+    HabilitationsOuganext habs = generateHabilitations();
     String jsonExpected =
         "{\"application\":[{\"name\":\"app1\",\"role\":[{\"name\":\"download\",\"propriete\":[\"DW2012\"]},{\"name\":\"upload\",\"propriete\":[\"UP2012\"]}]},{\"name\":\"app2\",\"role\":[{\"name\":\"download\",\"propriete\":[]},{\"name\":\"dedfze\",\"propriete\":[]}]}]}";
     System.out.println(CustomObjectMapper.JsonObjectMapper().writeValueAsString(habs));
@@ -93,7 +93,7 @@ public class HabilitationsTest {
 
   @Test
   public void testXMLJackson() throws JsonProcessingException {
-    Habilitations habs = generateHabilitations();
+    HabilitationsOuganext habs = generateHabilitations();
     String xmlExpected =
         "<?xml version='1.0' encoding='UTF-8'?>\r\n"
             + "<ns1:Habilitations xmlns:ns1=\"http://xml.insee.fr/schema/annuaire\">\r\n"
@@ -139,7 +139,7 @@ public class HabilitationsTest {
             + "  </application>\r\n"
             + "</ns1:Habilitations>\r\n";
     List<Habilitation> habilitations = generateHabilitationsSugoi();
-    Habilitations habilitationsOuganext =
+    HabilitationsOuganext habilitationsOuganext =
         OuganextSugoiMapper.convertHabilitationToHabilitations(habilitations);
     try {
       Diff myDiff =

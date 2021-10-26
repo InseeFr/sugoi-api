@@ -66,7 +66,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
   "logo",
   "adresseMessagerieEmettrice"
 })
-public class InfoFormattage {
+public class InfoFormattageOuganext {
 
   @JacksonXmlProperty(localName = "ChefSignataire")
   protected String chefSignataire;

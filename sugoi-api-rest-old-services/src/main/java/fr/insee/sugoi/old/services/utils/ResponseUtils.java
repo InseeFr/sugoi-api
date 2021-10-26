@@ -13,7 +13,7 @@
 */
 package fr.insee.sugoi.old.services.utils;
 
-import fr.insee.sugoi.converter.ouganext.Profil;
+import fr.insee.sugoi.converter.ouganext.ProfilOuganext;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.ArrayList;
@@ -21,10 +21,10 @@ import java.util.List;
 
 public class ResponseUtils {
 
-  public static List<Profil> convertRealmToProfils(Realm realm) {
-    List<Profil> profils = new ArrayList<>();
+  public static List<ProfilOuganext> convertRealmToProfils(Realm realm) {
+    List<ProfilOuganext> profils = new ArrayList<>();
     for (UserStorage userStorage : realm.getUserStorages()) {
-      Profil profil = new Profil();
+      ProfilOuganext profil = new ProfilOuganext();
       profil.setBrancheOrganisation(realm.getAppSource());
       profil.setLdapUrl(realm.getUrl());
       profil.setNomProfil(userStorage.getName());

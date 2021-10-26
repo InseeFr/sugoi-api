@@ -19,8 +19,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
-import fr.insee.sugoi.converter.ouganext.Adresse;
-import fr.insee.sugoi.converter.ouganext.Organisation;
+import fr.insee.sugoi.converter.ouganext.AdresseOuganext;
+import fr.insee.sugoi.converter.ouganext.OrganisationOuganext;
 import fr.insee.sugoi.converter.utils.CustomObjectMapper;
 import fr.insee.sugoi.model.Organization;
 import java.util.ArrayList;
@@ -33,12 +33,12 @@ import org.xmlunit.diff.Diff;
 
 public class OrganisationTest {
 
-  private static Organisation generateOrganisation() {
-    Organisation organisation = new Organisation();
+  private static OrganisationOuganext generateOrganisation() {
+    OrganisationOuganext organisation = new OrganisationOuganext();
     organisation.setAdresseMessagerie("accueil@domain.tld");
     organisation.getPropriete().add("Test1");
     organisation.getPropriete().add("Test2");
-    Adresse adresse = new Adresse();
+    AdresseOuganext adresse = new AdresseOuganext();
     adresse.setLigneUne("17 bd adolphe pinard");
     adresse.setLigneDeux("");
     adresse.setLigneTrois("");
@@ -52,10 +52,10 @@ public class OrganisationTest {
     organisation.setFacSimile("0123456789");
     organisation.setIdentifiant("XJHFLG4");
     organisation.setNomCommun("INSEE-DG");
-    Organisation organisationRattachee = new Organisation();
+    OrganisationOuganext organisationRattachee = new OrganisationOuganext();
     organisationRattachee.setIdentifiant("133546546");
     organisationRattachee.setNomCommun("Test Organisation");
-    Organisation o2 = new Organisation();
+    OrganisationOuganext o2 = new OrganisationOuganext();
     o2.setIdentifiant("133546547");
     o2.setNomCommun("Test Organisation");
     organisation.setOrganisationDeRattachement(organisationRattachee);
@@ -84,7 +84,7 @@ public class OrganisationTest {
 
   @Test
   public void testOrganisationJson() throws JsonProcessingException {
-    Organisation organisation = generateOrganisation();
+    OrganisationOuganext organisation = generateOrganisation();
     String expectedJson =
         "{\"identifiant\":\"XJHFLG4\",\"nomCommun\":\"INSEE-DG\",\"domaineDeGestion\":\"TEST\",\"description\":\"INSEE\",\"adresseMessagerie\":\"accueil@domain.tld\",\"facSimile\":\"0123456789\",\"adresse\":{\"ligneUne\":\"17 bd adolphe pinard\",\"ligneDeux\":\"\",\"ligneTrois\":\"\",\"ligneQuatre\":\"\",\"ligneCinq\":\"\",\"ligneSix\":\"\",\"ligneSept\":\"92240 Malakoff\"},\"organisationDeRattachement\":\"133546546\",\"propriete\":[\"Test1\",\"Test2\"]}";
     assertEquals(
@@ -93,7 +93,7 @@ public class OrganisationTest {
 
   @Test
   public void testXMLJackson() throws JsonProcessingException {
-    Organisation organisation = generateOrganisation();
+    OrganisationOuganext organisation = generateOrganisation();
     String expectedXML =
         "<?xml version='1.0' encoding='UTF-8'?>\r\n"
             + "<ns1:Organisation xmlns:ns1=\"http://xml.insee.fr/schema/annuaire\" xmlns:ns2=\"http://xml.insee.fr/schema\">\r\n"
@@ -127,7 +127,7 @@ public class OrganisationTest {
   @Test
   public void testConvertOrganisationToOrganizationJson() throws JsonProcessingException {
     try {
-      Organisation organisation = generateOrganisation();
+      OrganisationOuganext organisation = generateOrganisation();
       OuganextSugoiMapper osm = new OuganextSugoiMapper();
       Organization organization = osm.serializeToSugoi(organisation, Organization.class);
       String expectedJson =
@@ -144,7 +144,8 @@ public class OrganisationTest {
     try {
       Organization organization = generateOrganization(true);
       OuganextSugoiMapper osm = new OuganextSugoiMapper();
-      Organisation organisation = osm.serializeToOuganext(organization, Organisation.class);
+      OrganisationOuganext organisation =
+          osm.serializeToOuganext(organization, OrganisationOuganext.class);
       String expectedXml =
           "<?xml version='1.0' encoding='UTF-8'?>\r\n"
               + "<ns1:Organisation xmlns:ns1=\"http://xml.insee.fr/schema/annuaire\" xmlns:ns2=\"http://xml.insee.fr/schema\">\r\n"

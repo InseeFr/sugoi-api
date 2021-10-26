@@ -13,12 +13,12 @@
 */
 package fr.insee.sugoi.converter.mapper;
 
-import fr.insee.sugoi.converter.ouganext.Adresse;
-import fr.insee.sugoi.converter.ouganext.Application;
-import fr.insee.sugoi.converter.ouganext.Habilitations;
-import fr.insee.sugoi.converter.ouganext.Organisation;
-import fr.insee.sugoi.converter.ouganext.Profil;
-import fr.insee.sugoi.converter.ouganext.Role;
+import fr.insee.sugoi.converter.ouganext.AdresseOuganext;
+import fr.insee.sugoi.converter.ouganext.ApplicationOuganext;
+import fr.insee.sugoi.converter.ouganext.HabilitationsOuganext;
+import fr.insee.sugoi.converter.ouganext.OrganisationOuganext;
+import fr.insee.sugoi.converter.ouganext.ProfilOuganext;
+import fr.insee.sugoi.converter.ouganext.RoleOuganext;
 import fr.insee.sugoi.converter.utils.MapFromAttribute;
 import fr.insee.sugoi.converter.utils.MapFromHashmapElement;
 import fr.insee.sugoi.model.Habilitation;
@@ -91,7 +91,8 @@ public class OuganextSugoiMapper {
             Field sugoiField = sugoiObject.getClass().getDeclaredField("address");
             sugoiField.setAccessible(true);
             if (ouganextFieldObject != null) {
-              Map<String, String> address = createAddressFromAdresse((Adresse) ouganextFieldObject);
+              Map<String, String> address =
+                  createAddressFromAdresse((AdresseOuganext) ouganextFieldObject);
               sugoiField.set(sugoiObject, address);
             }
           }
@@ -168,7 +169,8 @@ public class OuganextSugoiMapper {
             Field sugoiField = sugoiObject.getClass().getDeclaredField("address");
             sugoiField.setAccessible(true);
             Object sugoiFieldObject = sugoiField.get(sugoiObject);
-            Adresse adresse = createAdresseFromAddress((Map<String, String>) sugoiFieldObject);
+            AdresseOuganext adresse =
+                createAdresseFromAddress((Map<String, String>) sugoiFieldObject);
             ouganextObjectField.set(ouganextObject, adresse);
           }
 
@@ -178,7 +180,8 @@ public class OuganextSugoiMapper {
             sugoiField.setAccessible(true);
             Organization organization = (Organization) sugoiField.get(sugoiObject);
             if (organization != null) {
-              Organisation organisation = serializeToOuganext(organization, Organisation.class);
+              OrganisationOuganext organisation =
+                  serializeToOuganext(organization, OrganisationOuganext.class);
               ouganextObjectField.set(ouganextObject, organisation);
             }
           }
@@ -198,8 +201,8 @@ public class OuganextSugoiMapper {
     }
   }
 
-  private Adresse createAdresseFromAddress(Map<String, String> address) {
-    Adresse adresse = new Adresse();
+  private AdresseOuganext createAdresseFromAddress(Map<String, String> address) {
+    AdresseOuganext adresse = new AdresseOuganext();
     adresse.setLigneUne(address.get("ligneUne"));
     adresse.setLigneDeux(address.get("ligneDeux"));
     adresse.setLigneTrois(address.get("ligneTrois"));
@@ -210,7 +213,7 @@ public class OuganextSugoiMapper {
     return adresse;
   }
 
-  private Map<String, String> createAddressFromAdresse(Adresse adresse)
+  private Map<String, String> createAddressFromAdresse(AdresseOuganext adresse)
       throws IllegalAccessException, NoSuchFieldException {
     Map<String, String> address = new HashMap<>();
     address.put("LigneUne", (String) adresse.getLigneUne());
@@ -250,11 +253,12 @@ public class OuganextSugoiMapper {
   // return habilitations;
   // }
 
-  public static Habilitations convertHabilitationToHabilitations(List<Habilitation> habilitations) {
-    Map<String, Application> applications = new HashMap<>();
+  public static HabilitationsOuganext convertHabilitationToHabilitations(
+      List<Habilitation> habilitations) {
+    Map<String, ApplicationOuganext> applications = new HashMap<>();
     for (Habilitation habilitation : habilitations) {
       if (applications.containsKey(habilitation.getApplication())) {
-        Application application = applications.get(habilitation.getApplication());
+        ApplicationOuganext application = applications.get(habilitation.getApplication());
         // Role already exist
         if (application.getRole().stream()
                 .filter(role -> role.getName().equalsIgnoreCase(habilitation.getRole()))
@@ -267,7 +271,7 @@ public class OuganextSugoiMapper {
         }
         // role doesn't exist
         else {
-          Role role = new Role();
+          RoleOuganext role = new RoleOuganext();
           role.setName(habilitation.getRole());
           role.getPropriete().add(habilitation.getProperty());
           application.getRole().add(role);
@@ -275,17 +279,18 @@ public class OuganextSugoiMapper {
         applications.put(application.getName(), application);
       } else {
         // applictaion doesn't exist
-        Application application = new Application();
+        ApplicationOuganext application = new ApplicationOuganext();
         application.setName(habilitation.getApplication());
-        Role role = new Role();
+        RoleOuganext role = new RoleOuganext();
         role.setName(habilitation.getRole());
         role.getPropriete().add(habilitation.getProperty());
         application.getRole().add(role);
         applications.put(application.getName(), application);
       }
     }
-    Habilitations habilitationsOuganext = new Habilitations();
-    List<Application> applicationList = new ArrayList<Application>(applications.values());
+    HabilitationsOuganext habilitationsOuganext = new HabilitationsOuganext();
+    List<ApplicationOuganext> applicationList =
+        new ArrayList<ApplicationOuganext>(applications.values());
     habilitationsOuganext.setApplicationList(applicationList);
     return habilitationsOuganext;
   }
@@ -295,7 +300,7 @@ public class OuganextSugoiMapper {
    * which must be extracted from the pattern (which is ouganext pattern :
    * Profil_{realm}_WebservicesLdap) - the UserStorage which takes several values from profil
    */
-  public Realm convertProfilToRealm(Profil profil) {
+  public Realm convertProfilToRealm(ProfilOuganext profil) {
     // fields can be treated the usual way on Profil
     Realm realm = serializeToSugoi(profil, Realm.class);
     UserStorage userStorage = new UserStorage();

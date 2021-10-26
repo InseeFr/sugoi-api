@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.insee.sugoi.converter.ouganext.ErrorResult;
+import fr.insee.sugoi.converter.ouganext.ErrorResultOuganext;
 import fr.insee.sugoi.converter.utils.CustomObjectMapper;
 import java.io.IOException;
 import org.junit.jupiter.api.Test;
@@ -26,8 +26,8 @@ import org.xmlunit.diff.Diff;
 
 public class ErrorTest {
 
-  private ErrorResult createErrorResult() {
-    ErrorResult errorResult = new ErrorResult();
+  private ErrorResultOuganext createErrorResult() {
+    ErrorResultOuganext errorResult = new ErrorResultOuganext();
     try {
       throw new IOException("Ioexception Test");
     } catch (IOException e) {
@@ -39,7 +39,7 @@ public class ErrorTest {
 
   @Test
   public void testJsonError() throws JsonProcessingException {
-    ErrorResult errorResult = createErrorResult();
+    ErrorResultOuganext errorResult = createErrorResult();
     String expectedErrorJson =
         "{\"exception\":\"java.io.IOException\",\"message\":\"Ioexception Test\"}";
     assertEquals(
@@ -48,7 +48,7 @@ public class ErrorTest {
 
   @Test
   public void testXMLJacksonError() throws JsonProcessingException {
-    ErrorResult errorResult = createErrorResult();
+    ErrorResultOuganext errorResult = createErrorResult();
     String expectedErrorXml =
         "<?xml version='1.0' encoding='UTF-8'?>\r\n"
             + "<ns1:ErrorResult xmlns:ns1=\"http://xml.insee.fr/schema/annuaire\">\r\n"

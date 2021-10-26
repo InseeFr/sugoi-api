@@ -14,9 +14,9 @@
 package fr.insee.sugoi.old.services.controller;
 
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
-import fr.insee.sugoi.converter.ouganext.Contact;
-import fr.insee.sugoi.converter.ouganext.Contacts;
-import fr.insee.sugoi.converter.ouganext.Organisation;
+import fr.insee.sugoi.converter.ouganext.ContactOuganext;
+import fr.insee.sugoi.converter.ouganext.ContactsOuganext;
+import fr.insee.sugoi.converter.ouganext.OrganisationOuganext;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.SugoiUser;
 import fr.insee.sugoi.core.service.UserService;
@@ -96,13 +96,13 @@ public class ContactsDomaineController {
             content = {
               @Content(
                   mediaType = "application/json",
-                  schema = @Schema(implementation = Contact.class)),
+                  schema = @Schema(implementation = ContactOuganext.class)),
               @Content(
                   mediaType = "application/xml",
-                  schema = @Schema(implementation = Contact.class))
+                  schema = @Schema(implementation = ContactOuganext.class))
             })
       })
-  public ResponseEntity<Contact> createContactIdentifiant(
+  public ResponseEntity<ContactOuganext> createContactIdentifiant(
       @Parameter(
               description = "Name of the domaine where the operation will be made",
               required = true)
@@ -111,7 +111,8 @@ public class ContactsDomaineController {
       @Parameter(description = "the id of the contact if not already used", required = false)
           @RequestHeader(value = "Slug", required = false)
           String slug,
-      @Parameter(description = "Contact to create", required = true) @RequestBody Contact contact,
+      @Parameter(description = "Contact to create", required = true) @RequestBody
+          ContactOuganext contact,
       Authentication authentication) {
     RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
@@ -189,10 +190,10 @@ public class ContactsDomaineController {
             content = {
               @Content(
                   mediaType = "application/json",
-                  schema = @Schema(implementation = Contact[].class)),
+                  schema = @Schema(implementation = ContactOuganext[].class)),
               @Content(
                   mediaType = "application/xml",
-                  schema = @Schema(implementation = Contact[].class))
+                  schema = @Schema(implementation = ContactOuganext[].class))
             })
       })
   public ResponseEntity<?> getContacts(
@@ -254,12 +255,12 @@ public class ContactsDomaineController {
           String certificat) {
     RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
-    Contact searchContact = new Contact();
+    ContactOuganext searchContact = new ContactOuganext();
     searchContact.setIdentifiant(identifiant);
     searchContact.setNomCommun(nomCommun);
     searchContact.setDescription(description);
     if (organisationId != null) {
-      Organisation searchOrganisation = new Organisation();
+      OrganisationOuganext searchOrganisation = new OrganisationOuganext();
       searchOrganisation.setIdentifiant(organisationId);
       searchContact.setOrganisationDeRattachement(searchOrganisation);
     }
@@ -324,7 +325,7 @@ public class ContactsDomaineController {
               .collect(Collectors.toList()));
       return ResponseEntity.status(HttpStatus.NO_CONTENT).headers(headers).build();
     } else {
-      Contacts contacts = new Contacts();
+      ContactsOuganext contacts = new ContactsOuganext();
       if (identifiantsSeuls) {
         contacts
             .getListe()
@@ -332,7 +333,7 @@ public class ContactsDomaineController {
                 foundUsers.getResults().stream()
                     .map(
                         user -> {
-                          Contact contact = new Contact();
+                          ContactOuganext contact = new ContactOuganext();
                           contact.setIdentifiant(user.getUsername());
                           return contact;
                         })
@@ -342,7 +343,9 @@ public class ContactsDomaineController {
             .getListe()
             .addAll(
                 foundUsers.getResults().stream()
-                    .map(user -> ouganextSugoiMapper.serializeToOuganext(user, Contact.class))
+                    .map(
+                        user ->
+                            ouganextSugoiMapper.serializeToOuganext(user, ContactOuganext.class))
                     .collect(Collectors.toList()));
       }
       return ResponseEntity.status(HttpStatus.OK).headers(headers).body(contacts);

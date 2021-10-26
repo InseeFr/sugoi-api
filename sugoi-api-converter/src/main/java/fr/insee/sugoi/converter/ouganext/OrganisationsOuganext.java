@@ -14,21 +14,19 @@
 package fr.insee.sugoi.converter.ouganext;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 
-@JacksonXmlRootElement(localName = "ListeCompte", namespace = Namespace.ANNUAIRE)
+@JacksonXmlRootElement(localName = "ListeOrganisations", namespace = Namespace.ANNUAIRE)
 @JsonPropertyOrder({"liste"})
-public class Contacts {
+public class OrganisationsOuganext {
 
-  @JacksonXmlProperty(localName = "Contact")
-  @JacksonXmlElementWrapper(useWrapping = false)
-  protected List<Contact> liste = new ArrayList<Contact>();
+  @JacksonXmlProperty(localName = "Organisation")
+  protected List<OrganisationOuganext> liste = new ArrayList<OrganisationOuganext>();
 
-  public List<Contact> getListe() {
+  public List<OrganisationOuganext> getListe() {
     return this.liste;
   }
 }

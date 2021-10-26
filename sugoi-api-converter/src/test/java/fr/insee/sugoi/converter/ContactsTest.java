@@ -19,9 +19,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
-import fr.insee.sugoi.converter.ouganext.Adresse;
-import fr.insee.sugoi.converter.ouganext.Contact;
-import fr.insee.sugoi.converter.ouganext.Organisation;
+import fr.insee.sugoi.converter.ouganext.AdresseOuganext;
+import fr.insee.sugoi.converter.ouganext.ContactOuganext;
+import fr.insee.sugoi.converter.ouganext.OrganisationOuganext;
 import fr.insee.sugoi.converter.utils.CustomObjectMapper;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Habilitation;
@@ -40,8 +40,8 @@ import org.xmlunit.diff.Diff;
 
 public class ContactsTest {
 
-  private static Contact generateContact() throws CertificateException, JAXBException {
-    Contact contact = new Contact();
+  private static ContactOuganext generateContact() throws CertificateException, JAXBException {
+    ContactOuganext contact = new ContactOuganext();
     contact.setIdentifiant("test");
     contact.setNomCommun("Test");
     contact.setAdresseMessagerie("tes.tkmgfdl@jhk.gmail");
@@ -60,7 +60,7 @@ public class ContactsTest {
     // X509Certificate cert = (X509Certificate) cf
     // .generateCertificate(ContactsTest.class.getResourceAsStream("/cert.crt"));
     // contact.setCertificate(cert);
-    Adresse adresse = new Adresse();
+    AdresseOuganext adresse = new AdresseOuganext();
     adresse.setLigneUne("15 rue Gabriel Peri");
     adresse.setLigneDeux("");
     adresse.setLigneTrois("");
@@ -70,7 +70,7 @@ public class ContactsTest {
     adresse.setLigneSept("92240 Malakoff");
     contact.setAdresse(adresse);
     contact.setCodePin(new byte[2]);
-    Organisation organisation = new Organisation();
+    OrganisationOuganext organisation = new OrganisationOuganext();
     organisation.setIdentifiant("lorganisation");
     contact.setOrganisationDeRattachement(organisation);
     return contact;
@@ -113,7 +113,7 @@ public class ContactsTest {
   @Test
   public void testJson() throws JsonProcessingException {
     try {
-      Contact object = generateContact();
+      ContactOuganext object = generateContact();
       String expectedJson =
           "{\"Identifiant\":\"test\",\"NomCommun\":\"Test\",\"Nom\":\"test\",\"Prenom\":\"test\",\"DomaineDeGestion\":\"testDG\",\"Description\":\"description\",\"Civilite\":\"Camarade\",\"IdentifiantMetier\":\"123456789\",\"AdresseMessagerie\":\"tes.tkmgfdl@jhk.gmail\",\"NumeroTelephone\":\"0123456789\",\"TelephonePortable\":\"061245789636\",\"FacSimile\":\"0123456789\",\"MotDePasseExiste\":false,\"AdressePostale\":{\"ligneUne\":\"15 rue Gabriel Peri\",\"ligneDeux\":\"\",\"ligneTrois\":\"\",\"ligneQuatre\":\"\",\"ligneCinq\":\"\",\"ligneSix\":\"\",\"ligneSept\":\"92240 Malakoff\"},\"Propriete\":[],\"InseeRoleApplicatif\":[],\"CodePin\":\"AAA=\",\"OrganisationDeRattachementUri\":\"lorganisation\"}";
       assertEquals(expectedJson, CustomObjectMapper.JsonObjectMapper().writeValueAsString(object));
@@ -124,7 +124,7 @@ public class ContactsTest {
 
   @Test
   public void testXMLJackson() throws JsonProcessingException {
-    Contact contact;
+    ContactOuganext contact;
     try {
       contact = generateContact();
       String expectedXml =
@@ -171,7 +171,7 @@ public class ContactsTest {
   public void testConvertUserToContactXML() throws JsonProcessingException {
     User user = generateUser();
     OuganextSugoiMapper osm = new OuganextSugoiMapper();
-    Contact contact = osm.serializeToOuganext(user, Contact.class);
+    ContactOuganext contact = osm.serializeToOuganext(user, ContactOuganext.class);
     String expectedXml =
         "<?xml version='1.0' encoding='UTF-8'?>\r\n"
             + "<ns1:Contact xmlns:ns1=\"http://xml.insee.fr/schema/annuaire\" xmlns:ns2=\"http://xml.insee.fr/schema\">\r\n"
@@ -200,7 +200,7 @@ public class ContactsTest {
   @Test
   public void testConvertContactToUserJson() throws JsonProcessingException {
     try {
-      Contact contact = generateContact();
+      ContactOuganext contact = generateContact();
       OuganextSugoiMapper osm = new OuganextSugoiMapper();
       User user = osm.serializeToSugoi(contact, User.class);
       String expectedJson =
