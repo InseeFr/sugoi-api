@@ -157,10 +157,13 @@ public class JmsRequestRouter {
           break;
         case Method.CHANGE_PASSWORD:
           userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
-          pcr =
-              converter.toPasswordChangeRequest(
-                  request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
-          credentialsService.changePassword(realm, userStorage, userId, pcr, providerRequest);
+          credentialsService.changePassword(
+              realm,
+              userStorage,
+              userId,
+              (String) request.getmethodParams().get(JmsAtttributes.OLD_PASSWORD),
+              (String) request.getmethodParams().get(JmsAtttributes.NEW_PASSWORD),
+              providerRequest);
           break;
         case Method.ADD_APP_MANAGED_ATTRIBUTE:
           userService.addAppManagedAttribute(

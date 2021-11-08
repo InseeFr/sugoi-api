@@ -527,11 +527,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
 
   @Override
   public ProviderResponse changePassword(
-      String userId,
-      String oldPassword,
-      String newPassword,
-      PasswordChangeRequest pcr,
-      ProviderRequest providerRequest) {
+      String userId, String oldPassword, String newPassword, ProviderRequest providerRequest) {
     User user = ldapReaderStore.getUser(userId);
 
     if (user == null) {

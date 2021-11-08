@@ -121,7 +121,8 @@ public class CredentialsServiceImpl implements CredentialsService {
       String realm,
       String userStorage,
       String userId,
-      PasswordChangeRequest pcr,
+      String oldPassword,
+      String newPassword,
       ProviderRequest providerRequest) {
     try {
 
@@ -132,20 +133,20 @@ public class CredentialsServiceImpl implements CredentialsService {
                   () -> new RealmNotFoundException("Cannot load properties for realm " + realm))
               .getProperties();
 
-      boolean newPasswordIsValid = validatePassword(pcr.getNewPassword(), realmProperties);
+      boolean newPasswordIsValid = validatePassword(newPassword, realmProperties);
 
       if (newPasswordIsValid) {
         ProviderResponse providerResponse =
             storeProvider
                 .getWriterStore(realm, userStorage)
-                .changePassword(
-                    userId, pcr.getOldPassword(), pcr.getNewPassword(), pcr, providerRequest);
+                .changePassword(userId, oldPassword, newPassword, providerRequest);
         sugoiEventPublisher.publishCustomEvent(
             realm,
             userStorage,
             SugoiEventTypeEnum.CHANGE_PASSWORD,
             Map.ofEntries(
-                Map.entry(EventKeysConfig.PASSWORD_CHANGE_REQUEST, pcr),
+                Map.entry(EventKeysConfig.NEW_PASSWORD, newPassword),
+                Map.entry(EventKeysConfig.OLD_PASSWORD, newPassword),
                 Map.entry(EventKeysConfig.USER, userId)));
         return providerResponse;
       } else {
@@ -157,7 +158,6 @@ public class CredentialsServiceImpl implements CredentialsService {
           userStorage,
           SugoiEventTypeEnum.CHANGE_PASSWORD_ERROR,
           Map.ofEntries(
-              Map.entry(EventKeysConfig.PASSWORD_CHANGE_REQUEST, pcr),
               Map.entry(EventKeysConfig.ERROR, e.toString()),
               Map.entry(EventKeysConfig.USER_ID, userId)));
       throw e;

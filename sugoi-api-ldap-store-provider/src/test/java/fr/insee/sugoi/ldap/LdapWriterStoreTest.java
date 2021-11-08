@@ -24,6 +24,7 @@ import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
 import fr.insee.sugoi.core.exceptions.StoragePolicyNotMetException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
+import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
@@ -549,9 +550,7 @@ public class LdapWriterStoreTest {
   public void testChangePasswordWithFalseOld() {
     assertThrows(
         InvalidPasswordException.class,
-        () ->
-            ldapWriterStore.changePassword(
-                "rawpassword", "falsepassword", "newpassword", null, null));
+        () -> ldapWriterStore.changePassword("rawpassword", "falsepassword", "newpassword", null));
     assertThat(
         "Password should not be newpassword",
         !ldapReaderStore.validateCredentials(
@@ -560,7 +559,10 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testChangePasswordWithTrueOld() {
-    ldapWriterStore.changePassword("rawpassword", "truepassword", "newpassword", null, null);
+    ProviderResponse response =
+        ldapWriterStore.changePassword("rawpassword", "truepassword", "newpassword", null);
+    assertThat(
+        "Response should have status OK", response.getStatus(), is(ProviderResponseStatus.OK));
     assertThat(
         "Should have a new password",
         ldapReaderStore.validateCredentials(ldapReaderStore.getUser("rawpassword"), "newpassword"));
@@ -574,8 +576,11 @@ public class LdapWriterStoreTest {
   public void testChangePasswordWithoutOld() {
     assertThrows(
         InvalidPasswordException.class,
-        () -> ldapWriterStore.changePassword("nopassword", "", "newpassword", null, null));
-    ldapWriterStore.changePassword("nopassword", null, "newpassword", null, null);
+        () -> ldapWriterStore.changePassword("nopassword", "", "newpassword", null));
+    ProviderResponse response =
+        ldapWriterStore.changePassword("nopassword", null, "newpassword", null);
+    assertThat(
+        "Response should have status 204", response.getStatus(), is(ProviderResponseStatus.OK));
     assertThat(
         "Should have a new password",
         ldapReaderStore.validateCredentials(ldapReaderStore.getUser("nopassword"), "newpassword"));
@@ -584,7 +589,7 @@ public class LdapWriterStoreTest {
   @Test
   public void testChangeShaPassword() {
     ldapWriterStore.changePassword(
-        "shapassword", "{SHA}c3q3RSeNwMY7E09Ve9oBHw+MVXg=", "newpassword", null, null);
+        "shapassword", "{SHA}c3q3RSeNwMY7E09Ve9oBHw+MVXg=", "newpassword", null);
     assertThat(
         "Should have a new password",
         ldapReaderStore.validateCredentials(ldapReaderStore.getUser("shapassword"), "newpassword"));
