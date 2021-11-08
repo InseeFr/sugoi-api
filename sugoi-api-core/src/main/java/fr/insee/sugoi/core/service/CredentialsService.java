@@ -18,7 +18,6 @@ import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
-import fr.insee.sugoi.model.PasswordChangeRequest;
 import java.util.Map;
 
 public interface CredentialsService {
@@ -84,7 +83,7 @@ public interface CredentialsService {
       String realm,
       String userStorage,
       String userId,
-      PasswordChangeRequest pcr,
+      String newPassword,
       ProviderRequest providerRequest);
 
   /**

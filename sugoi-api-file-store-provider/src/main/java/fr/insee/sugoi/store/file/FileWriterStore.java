@@ -25,7 +25,6 @@ import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
-import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.store.file.configuration.FileKeysConfig;
 import java.io.File;
@@ -348,7 +347,7 @@ public class FileWriterStore implements WriterStore {
 
   @Override
   public ProviderResponse initPassword(
-      String userId, String password, PasswordChangeRequest pcr, ProviderRequest providerRequest) {
+      String userId, String password, ProviderRequest providerRequest) {
     throw new UnsupportedOperationException("Password actions are not supported on file storage");
   }
 

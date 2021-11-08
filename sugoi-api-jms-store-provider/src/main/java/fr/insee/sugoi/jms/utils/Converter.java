@@ -20,7 +20,6 @@ import fr.insee.sugoi.core.model.SugoiUser;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
-import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.User;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -105,19 +104,6 @@ public class Converter {
       group.setUsers(
           usersList.stream().map((userObject) -> toUser(object)).collect(Collectors.toList()));
       return group;
-    }
-    return null;
-  }
-
-  public PasswordChangeRequest toPasswordChangeRequest(Object object) {
-    LinkedHashMap linkedHashMap = (LinkedHashMap) object;
-    if (linkedHashMap != null) {
-      PasswordChangeRequest pcr = new PasswordChangeRequest();
-      pcr.setProperties((Map<String, String>) linkedHashMap.get("properties"));
-      pcr.setEmail((String) linkedHashMap.get("email"));
-      pcr.setNewPassword((String) linkedHashMap.get("newPassword"));
-      pcr.setOldPassword((String) linkedHashMap.get("oldPassword"));
-      return pcr;
     }
     return null;
   }

@@ -53,7 +53,6 @@ import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
-import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.User;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -472,7 +471,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
 
   @Override
   public ProviderResponse initPassword(
-      String userId, String password, PasswordChangeRequest pcr, ProviderRequest providerRequest) {
+      String userId, String password, ProviderRequest providerRequest) {
     Modification mod = new Modification(ModificationType.REPLACE, "userPassword", password);
     User user =
         ldapReaderStore
