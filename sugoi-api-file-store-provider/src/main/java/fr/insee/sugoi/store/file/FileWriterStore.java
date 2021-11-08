@@ -329,7 +329,9 @@ public class FileWriterStore implements WriterStore {
   public ProviderResponse reinitPassword(
       String userId,
       String generatedPassword,
-      PasswordChangeRequest pcr,
+      boolean changePasswordResetStatus,
+      Map<String, String> templateProperties,
+      String webhookTag,
       ProviderRequest providerRequest) {
     throw new UnsupportedOperationException("Password actions are not supported on file storage");
   }

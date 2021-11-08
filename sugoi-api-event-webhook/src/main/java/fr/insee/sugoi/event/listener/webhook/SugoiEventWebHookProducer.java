@@ -17,7 +17,6 @@ import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEvent;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.event.listener.webhook.service.WebHookService;
-import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.User;
 import java.util.HashMap;
 import java.util.List;
@@ -51,22 +50,20 @@ public class SugoiEventWebHookProducer {
       case RESET_PASSWORD:
         User user = (User) cse.getProperties().get(EventKeysConfig.USER);
         String password = (String) cse.getProperties().get(EventKeysConfig.PASSWORD);
-        PasswordChangeRequest pcr =
-            (PasswordChangeRequest)
-                cse.getProperties().get(EventKeysConfig.PASSWORD_CHANGE_REQUEST);
         String realm = cse.getRealm();
         String userStorage = cse.getUserStorage() != null ? cse.getUserStorage() : "default";
+
         String webHookTag =
-            pcr.getProperties().get("tag") != null ? pcr.getProperties().get("tag") : "MAIL";
+            cse.getProperties().get(EventKeysConfig.WEBSERVICE_TAG) != null
+                ? (String) cse.getProperties().get(EventKeysConfig.WEBSERVICE_TAG)
+                : "MAIL";
         Map<String, Object> values = new HashMap<>();
         values.put(EventKeysConfig.REALM, realm);
         values.put(EventKeysConfig.USERSTORAGE, userStorage);
         values.put(EventKeysConfig.USER, user);
-        values.put(EventKeysConfig.MAIL, pcr.getEmail() != null ? pcr.getEmail() : user.getMail());
+        values.put(EventKeysConfig.MAIL, cse.getProperties().get(EventKeysConfig.MAIL));
         values.put(EventKeysConfig.PASSWORD, password);
-        values.put(
-            EventKeysConfig.PROPERTIES,
-            pcr.getProperties() != null ? pcr.getProperties() : new HashMap<String, String>());
+        values.put(EventKeysConfig.PROPERTIES, cse.getProperties().get(EventKeysConfig.PROPERTIES));
         webHookNames.stream()
             .filter(
                 webHookName ->

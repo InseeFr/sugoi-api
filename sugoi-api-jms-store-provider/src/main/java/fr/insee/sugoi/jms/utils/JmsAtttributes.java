@@ -54,4 +54,10 @@ public class JmsAtttributes {
   public static final String CERTIFICATE = "certificate";
 
   public static final String GPG_KEY = "gpgKey";
+
+  public static final String PASSORD_SHOULD_RESET = "changePasswordResetStatus";
+
+  public static final String TEMPLATE_PROPERTIES = "templateProperties";
+
+  public static final String WEBHOOK_TAG = "webhookTag";
 }

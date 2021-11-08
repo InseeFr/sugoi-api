@@ -51,7 +51,9 @@ public class CredentialsServiceImpl implements CredentialsService {
       String realm,
       String userStorage,
       String userId,
-      PasswordChangeRequest pcr,
+      Map<String, String> templateProperties,
+      String webserviceTag,
+      boolean changePasswordResetStatus,
       ProviderRequest providerRequest) {
     try {
       User user =
@@ -93,14 +95,27 @@ public class CredentialsServiceImpl implements CredentialsService {
       ProviderResponse response =
           storeProvider
               .getWriterStore(realm, userStorage)
-              .reinitPassword(userId, password, pcr, providerRequest);
+              .reinitPassword(
+                  userId,
+                  password,
+                  changePasswordResetStatus,
+                  templateProperties,
+                  webserviceTag,
+                  providerRequest);
       sugoiEventPublisher.publishCustomEvent(
           realm,
           userStorage,
           SugoiEventTypeEnum.RESET_PASSWORD,
           Map.ofEntries(
-              Map.entry(EventKeysConfig.PASSWORD_CHANGE_REQUEST, pcr),
+              Map.entry(EventKeysConfig.PROPERTIES, templateProperties),
+              Map.entry(
+                  EventKeysConfig.MAIL,
+                  templateProperties.get("mail") != null
+                      ? templateProperties.get("mail")
+                      : (user.getMail() != null ? user.getMail() : "")),
               Map.entry(EventKeysConfig.USER, user),
+              Map.entry(
+                  EventKeysConfig.WEBSERVICE_TAG, webserviceTag != null ? webserviceTag : "MAIL"),
               Map.entry(EventKeysConfig.PASSWORD, password)));
       return response;
     } catch (Exception e) {
@@ -109,7 +124,6 @@ public class CredentialsServiceImpl implements CredentialsService {
           userStorage,
           SugoiEventTypeEnum.RESET_PASSWORD_ERROR,
           Map.ofEntries(
-              Map.entry(EventKeysConfig.PASSWORD_CHANGE_REQUEST, pcr),
               Map.entry(EventKeysConfig.USER_ID, userId),
               Map.entry(EventKeysConfig.ERROR, e.toString())));
       throw e;

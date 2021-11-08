@@ -62,4 +62,5 @@ public class EventKeysConfig extends GlobalKeysConfig {
   public static final String ATTRIBUTE_VALUE = "attribute-value";
 
   public static final String TYPE = "type";
+  public static final String WEBSERVICE_TAG = "webserviceTag";
 }

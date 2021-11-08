@@ -198,6 +198,25 @@ public class OuganextSugoiMapper {
     }
   }
 
+  public <OuganextType> Map<String, String> serializeOuganextToMap(OuganextType ouganextObject) {
+    Map<String, String> map = new HashMap<>();
+    try {
+      Field[] ouganextObjectFields = ouganextObject.getClass().getDeclaredFields();
+      for (Field ouganextObjectField : ouganextObjectFields) {
+        ouganextObjectField.setAccessible(true);
+        String fieldValue;
+        if (ouganextObjectField.get(ouganextObject) != null) {
+          fieldValue = ouganextObjectField.get(ouganextObject).toString();
+          String fieldName = ouganextObjectField.getName();
+          map.put(fieldName, fieldValue);
+        }
+      }
+      return map;
+    } catch (IllegalArgumentException | IllegalAccessException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   private Adresse createAdresseFromAddress(Map<String, String> address) {
     Adresse adresse = new Adresse();
     adresse.setLigneUne(address.get("ligneUne"));

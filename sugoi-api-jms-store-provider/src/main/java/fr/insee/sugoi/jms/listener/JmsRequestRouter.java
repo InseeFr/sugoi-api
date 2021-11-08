@@ -34,6 +34,7 @@ import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,6 +128,23 @@ public class JmsRequestRouter {
           userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
           groupService.addUserToGroup(
               realm, userStorage, userId, appName, groupName, providerRequest);
+          break;
+        case Method.REINIT_PASSWORD:
+          userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
+          boolean pwdChangeRequest =
+              ((Boolean) request.getmethodParams().get(JmsAtttributes.PASSORD_SHOULD_RESET));
+          Map<String, String> templateProperties =
+              converter.toMapStringString(
+                  request.getmethodParams().get(JmsAtttributes.TEMPLATE_PROPERTIES));
+          String webhookTag = (String) request.getmethodParams().get(JmsAtttributes.WEBHOOK_TAG);
+          credentialsService.reinitPassword(
+              realm,
+              userStorage,
+              userId,
+              templateProperties,
+              webhookTag,
+              pwdChangeRequest,
+              providerRequest);
           break;
         case Method.INIT_PASSWORD:
           userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);

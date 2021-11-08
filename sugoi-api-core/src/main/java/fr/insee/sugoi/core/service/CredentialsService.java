@@ -29,7 +29,9 @@ public interface CredentialsService {
    * @param realm
    * @param userStorage
    * @param userId
-   * @param pcr
+   * @param templateProperties properties that are injected in template for use of webhook
+   * @param webhookTag define the webhook that will be call
+   * @param changePasswordResetStatus
    * @throws RealmNotFoundException if realm doesn't exist
    * @throws UserNotFoundException if user doesn't exist in realm
    */
@@ -37,7 +39,9 @@ public interface CredentialsService {
       String realm,
       String userStorage,
       String userId,
-      PasswordChangeRequest pcr,
+      Map<String, String> templateProperties,
+      String webhookTag,
+      boolean changePasswordResetStatus,
       ProviderRequest providerRequest);
 
   /**
