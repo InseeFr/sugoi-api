@@ -19,7 +19,6 @@ import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
-import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.User;
 import java.util.Map;
 
@@ -175,11 +174,8 @@ public interface WriterStore {
    *
    * @param user
    * @param initPassword, password to set to the user, cannot be null
-   * @param pcr not used
-   * @param sendModes not used
    */
-  ProviderResponse initPassword(
-      String user, String initPassword, PasswordChangeRequest pcr, ProviderRequest providerRequest);
+  ProviderResponse initPassword(String user, String initPassword, ProviderRequest providerRequest);
 
   /**
    * Set the password of user to generatedPassword. Same behaviour than initPassword.

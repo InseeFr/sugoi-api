@@ -9,7 +9,7 @@ Feature: Credential scenario synchronous jms
         When the client perform POST request with body on url /realms/domaine1/users/test_password/init-password body:
             """
             {
-                "newPassword": "Changeme1%0000000000"
+                "password": "Changeme1%0000000000"
             }
             """
         And show body received
@@ -20,7 +20,7 @@ Feature: Credential scenario synchronous jms
         When the client perform POST request with body on url /realms/domaine1/users/test_password/init-password body:
             """
             {
-                "newPassword": "Changeme1%000000000000000"
+                "password": "Changeme1%000000000000000"
             }
             """
         And show body received

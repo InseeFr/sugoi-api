@@ -28,7 +28,6 @@ import fr.insee.sugoi.jms.utils.Method;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
-import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.User;
 import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateFactory;
@@ -148,10 +147,8 @@ public class JmsRequestRouter {
           break;
         case Method.INIT_PASSWORD:
           userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
-          PasswordChangeRequest pcr =
-              converter.toPasswordChangeRequest(
-                  request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
-          credentialsService.initPassword(realm, userStorage, userId, pcr, providerRequest);
+          String password = (String) request.getmethodParams().get(JmsAtttributes.PASSWORD);
+          credentialsService.initPassword(realm, userStorage, userId, password, providerRequest);
           break;
         case Method.CREATE_APPLICATION:
           Application application =
