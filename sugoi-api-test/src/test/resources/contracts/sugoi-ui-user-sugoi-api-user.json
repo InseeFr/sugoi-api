@@ -1,0 +1,46 @@
+{
+  "consumer": {
+    "name": "Sugoi-UI-User"
+  },
+  "provider": {
+    "name": "Sugoi-API-User"
+  },
+  "interactions": [
+    {
+      "description": "a GET request to fetch a user",
+      "providerState": "Provider retrieve user",
+      "request": {
+        "method": "GET",
+        "path": "/realms/domaine1/users/toto",
+        "headers": {
+          "Accept": "application/json, text/plain, */*"
+        }
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "username": "toto",
+          "groups": [
+
+          ],
+          "habilitations": [
+
+          ]
+        },
+        "matchingRules": {
+          "$.body": {
+            "match": "type"
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "2.0.0"
+    }
+  }
+}
