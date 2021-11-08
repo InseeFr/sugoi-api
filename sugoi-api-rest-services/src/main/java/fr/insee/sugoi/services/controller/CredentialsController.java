@@ -218,7 +218,8 @@ public class CredentialsController {
             realm,
             userStorage,
             id,
-            pcr,
+            pcr.getOldPassword(),
+            pcr.getNewPassword(),
             new ProviderRequest(
                 new SugoiUser(
                     authentication.getName(),

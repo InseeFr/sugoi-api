@@ -47,7 +47,9 @@ public interface CredentialsService {
    * @param realm
    * @param userStorage
    * @param userId
-   * @param pcr
+   * @param oldPassword the password is changed only if the oldPassword match the current user
+   *     password
+   * @param newPassword password to set to the user
    * @throws RealmNotFoundException if realm doesn't exist
    * @throws UserNotFoundException if user doesn't exist in realm
    * @throws PasswordPolicyNotMetException if password doesn't meet the password policy set for the
@@ -57,7 +59,8 @@ public interface CredentialsService {
       String realm,
       String userStorage,
       String userId,
-      PasswordChangeRequest pcr,
+      String oldPassword,
+      String newPassword,
       ProviderRequest providerRequest);
 
   /**

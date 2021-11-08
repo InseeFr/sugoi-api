@@ -236,18 +236,13 @@ public class JmsWriterStore implements WriterStore {
 
   @Override
   public ProviderResponse changePassword(
-      String userId,
-      String oldPassword,
-      String newPassword,
-      PasswordChangeRequest pcr,
-      ProviderRequest providerRequest) {
+      String userId, String oldPassword, String newPassword, ProviderRequest providerRequest) {
     Map<String, Object> params = new HashMap<>();
     params.put(JmsAtttributes.USER_ID, userId);
     params.put(JmsAtttributes.NEW_PASSWORD, newPassword);
     params.put(JmsAtttributes.OLD_PASSWORD, oldPassword);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    params.put(JmsAtttributes.PASSWORD_CHANGE_REQUEST, pcr);
     return checkAndSend(Method.CHANGE_PASSWORD, params, userId, providerRequest);
   }
 

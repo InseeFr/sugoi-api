@@ -201,15 +201,10 @@ public interface WriterStore {
    * @param user
    * @param oldPassword
    * @param newPassword
-   * @param pcr not used
    * @throws InvalidPasswordException if oldPassword doesn't match the actual password.
    */
   ProviderResponse changePassword(
-      String user,
-      String oldPassword,
-      String newPassword,
-      PasswordChangeRequest pcr,
-      ProviderRequest providerRequest);
+      String user, String oldPassword, String newPassword, ProviderRequest providerRequest);
 
   /**
    * Add the attribute to the app-managed-attribute-key in the store
