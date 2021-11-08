@@ -77,7 +77,7 @@ public interface CredentialsService {
       String realm,
       String userStorage,
       String userId,
-      PasswordChangeRequest pcr,
+      String newPassword,
       ProviderRequest providerRequest);
 
   /**

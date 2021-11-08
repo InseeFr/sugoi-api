@@ -314,8 +314,8 @@ public class CredentialsController {
       @Parameter(description = "User's id to initialize password", required = true)
           @PathVariable("id")
           String id,
-      @Parameter(description = "Password change request&", required = true) @RequestBody
-          PasswordChangeRequest pcr,
+      @Parameter(description = "Password to set to the user", required = true) @RequestBody
+          PasswordView passwordView,
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
@@ -332,7 +332,7 @@ public class CredentialsController {
             realm,
             userStorage,
             id,
-            pcr,
+            passwordView.getPassword(),
             new ProviderRequest(
                 new SugoiUser(
                     authentication.getName(),
@@ -372,8 +372,8 @@ public class CredentialsController {
       @Parameter(description = "User's id to initialize password", required = true)
           @PathVariable("id")
           String id,
-      @Parameter(description = "Password change request&", required = true) @RequestBody
-          PasswordChangeRequest pcr,
+      @Parameter(description = "Password to set to the user", required = true) @RequestBody
+          PasswordView passwordView,
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
@@ -394,7 +394,7 @@ public class CredentialsController {
         realm,
         (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
         id,
-        pcr,
+        passwordView,
         isAsynchronous,
         isUrgent,
         transactionId,

@@ -10,7 +10,7 @@ Feature: Credential scenario asynchrone
         When the client perform POST request with body on url /realms/domaine1/users/test_password/initPassword body:
             """
             {
-                "newPassword": "Changeme1%0000000000"
+                "password": "Changeme1%0000000000"
             }
             """
         And show body received
@@ -21,7 +21,7 @@ Feature: Credential scenario asynchrone
         When the client perform POST request with body on url /realms/domaine1/users/test_password/initPassword body:
             """
             {
-                "newPassword": "Changeme1%000000000000000"
+                "password": "Changeme1%000000000000000"
             }
             """
         And show body received

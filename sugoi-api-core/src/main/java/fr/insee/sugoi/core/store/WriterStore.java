@@ -174,11 +174,8 @@ public interface WriterStore {
    *
    * @param user
    * @param initPassword, password to set to the user, cannot be null
-   * @param pcr not used
-   * @param sendModes not used
    */
-  ProviderResponse initPassword(
-      String user, String initPassword, PasswordChangeRequest pcr, ProviderRequest providerRequest);
+  ProviderResponse initPassword(String user, String initPassword, ProviderRequest providerRequest);
 
   /**
    * Set the password of user to generatedPassword. Same behaviour than initPassword.

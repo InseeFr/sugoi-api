@@ -179,7 +179,7 @@ public class ContactPasswordDomaineController {
         realmUserStorage.getRealm(),
         realmUserStorage.getUserStorage(),
         identifiant,
-        ouganextSugoiMapper.serializeToSugoi(pcr, fr.insee.sugoi.model.PasswordChangeRequest.class),
+        pcr.getNouveauMotDePasse(),
         new ProviderRequest(
             new SugoiUser(
                 authentication.getName(),

@@ -510,12 +510,12 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testInitPasswordNullFails() {
-    assertThrows(Exception.class, () -> ldapWriterStore.initPassword("testc", null, null, null));
+    assertThrows(Exception.class, () -> ldapWriterStore.initPassword("testc", null, null));
   }
 
   @Test
   public void testInitPassword() {
-    ldapWriterStore.initPassword("testo", "toto", null, null);
+    ldapWriterStore.initPassword("testo", "toto", null);
     assertThat(
         "Password toto should be validated",
         ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo"), "toto"));

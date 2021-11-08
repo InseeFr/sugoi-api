@@ -130,10 +130,8 @@ public class JmsRequestRouter {
           break;
         case Method.INIT_PASSWORD:
           userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
-          PasswordChangeRequest pcr =
-              converter.toPasswordChangeRequest(
-                  request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
-          credentialsService.initPassword(realm, userStorage, userId, pcr, providerRequest);
+          String password = (String) request.getmethodParams().get(JmsAtttributes.PASSWORD);
+          credentialsService.initPassword(realm, userStorage, userId, password, providerRequest);
           break;
         case Method.CREATE_APPLICATION:
           Application application =
@@ -157,7 +155,7 @@ public class JmsRequestRouter {
           break;
         case Method.CHANGE_PASSWORD:
           userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
-          pcr =
+          PasswordChangeRequest pcr =
               converter.toPasswordChangeRequest(
                   request.getmethodParams().get(JmsAtttributes.PASSWORD_CHANGE_REQUEST));
           credentialsService.changePassword(realm, userStorage, userId, pcr, providerRequest);
