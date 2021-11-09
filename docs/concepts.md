@@ -17,10 +17,14 @@
       - [File Store Provider](#file-store-provider)
       - [Ldap Store Provider](#ldap-store-provider)
       - [JMS Store Provider](#jms-store-provider)
-    - [Services](#services)
-      - [Rest Services](#rest-services)
-      - [JMS Services](#jms-services)
-      
+  - [Services](#services)
+    - [Rest Services](#rest-services)
+    - [JMS Services](#jms-services)
+  - [SeeAlso](#seealso)
+    - [SeeAlso http+json](#seealso-httpjson)
+    - [SeeAlso ldap](#seealso-ldap)
+  - [Notify external webservices](#notify-external-webservices)
+
 ## Use cases
 
 - Read and write information on users and organization
@@ -149,11 +153,11 @@ Sugoi objects are read and written in an ldap. Attributes for each objects are d
 
 This allows you to send write requests to a JMS queue (tested with ActiveMQ), to be managed by the [JMS Service]() 
 
-### Services
+## Services
 
 Those are responsible to accept Write or read requests from sugoi users.
 
-#### Rest Services
+### Rest Services
 
 Simple http rest services.
 
@@ -161,7 +165,7 @@ Simple http rest services.
 
 Listen to message on a JMS queue, made to work well with JMS write provider
 
-### SeeAlso
+## SeeAlso
 
 Sometimes user informations that are not stored in the sugoi realm are needed. It can be for instance a logo or an information on another directory. If these informations are free to read it is possible to use the SeeAlso functionnality to fetch those informations.
 
@@ -178,7 +182,7 @@ To enable the SeeAlso functionality a realm property as to be set : seealso_attr
 
 Two parsers exist for now but other can be added (see a future Development documentation). They have to be added as a module to the application.
 
-#### SeeAlso http+json
+### SeeAlso http+json
 
 If the protocol is http or https then the resource will be considered to be a valid json data.
 
@@ -191,7 +195,7 @@ A valid seealso would be :
 
 The attribute http_string of the user would be set to the value of the name of the third item of the resource at `http://example.org/toto`
 
-#### SeeAlso ldap
+### SeeAlso ldap
 
 If the protocol is ldap, url is expected to be the value of a ldap url without attribute. The ldap server should be openly readable. The suboject should be the name of the attribute we want to get from the ldap resource.
 
@@ -200,3 +204,12 @@ A valid seealso would be :
 ldap://localhost:10389/uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr|cn|ldap_string
 
 The user attribute ldap_string would be set to the cn of the testc resource on localhost:10389 ldap server.
+
+## Notify external webservices
+
+On /reinitPassword and /send-login endpoints, Sugoi can be configured to POST a message on an external webservice.
+See [Webhook configuration](configuration.md#webhooks-configuration) to define the uri of the webservice, how to authenticate or how to choose the default template and [Realm configuration](realm-configuration.md#generic-userstorage-properties) to see how to define a template by realm.
+
+Several webservices can be configured. The webservice is chosen by the user by specifying a TAG in their request. If no tag is specified the webservice configured for the tag MAIL will be used by default.
+
+A possible usecase of these notifications is to call a webservice that send email when a password is changed.

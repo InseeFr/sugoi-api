@@ -112,19 +112,21 @@ Sugoi-api implements spring security with full customization allowed
 
 ### WebHooks configuration
 
-Sugoi-api allowed
+Sugoi-api can be configured to call another webservice. One or several can be configured. It can be used to call a webservice that sends email.
+To learn more about this feature see : [Notify external webservices](concepts.md#notify-external-webservices)
 
 | Properties                                            | Description | Default value | example |
 | ----------------------------------------------------- | :---------: | ------------: | ------: |
-| sugoi.api.event.webhook.enabled                       |             |               |         |
-| sugoi.api.event.webhook.name                          |             |               |         |
-| sugoi.api.event.webhook.{name}.target                 |             |               |         |
-| sugoi.api.event.webhook.{name}.auth.type              |             |               |         |
-| sugoi.api.event.webhook.{name}.auth.user              |             |               |         |
-| sugoi.api.event.webhook.{name}.auth.password          |             |               |         |
-| sugoi.api.event.webhook.{name}.tag                    |             |               |         |
-| sugoi.api.event.webhook.{name}.default.reset.template |             |               |         |
-| sugoi.api.event.webhook.{name}.default.init.template  |             |               |         |
+| sugoi.api.event.webhook.enabled                       | Turns on the webhook feature | false |         |
+| sugoi.api.event.webhook.name                          | The name of the webservice. Is is only used to find the other configuration properties and the templates |               | mail-service |
+| sugoi.api.event.webhook.{name}.target                 | Webservice url |  | https://mail-service.insee.fr |
+| sugoi.api.event.webhook.{name}.auth.type              | Type of authentication | |  Can be basic, oauth or none |
+| sugoi.api.event.webhook.{name}.auth.user              | If auth.type is basic : the name of the account to authenticate on the webservice |               |         |
+| sugoi.api.event.webhook.{name}.auth.password          |  If auth.type is basic : the password of the account to authenticate on the webservice |               |         |
+| sugoi.api.event.webhook.{name}.auth.token | If auth.type is oauth : the token to pass in Bearer header | |
+| sugoi.api.event.webhook.{name}.tag                    | The tag define the type of webhook to call. When a request use a webhook, a tag can be set. By default the tag in the request will be MAIL.  |  |  MAIL or anything else |
+| sugoi.api.event.webhook.{name}.default.send-login.template | Define the path to a default template to send to the webhook on send-login request. It can be overidden by userstorage configuration. | | ([see template](../sugoi-api-event-webhook/src/main/resources/template/login_default.ftl))  |
+| sugoi.api.event.webhook.{name}.default.init.template | Define the path to a default template to send to the webhook on reinitPassword request. It can be overidden by userstorage configuration. | | ([see template](../sugoi-api-event-webhook/src/main/resources/template/reset_default.ftl))  |
 
 ### Spring actuator configuration
 

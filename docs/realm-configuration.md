@@ -1,5 +1,13 @@
 # Realm and userstorage configuration
 
+- [Realm and userstorage configuration](#realm-and-userstorage-configuration)
+  - [Realm configuration](#realm-configuration)
+    - [Realm configuration properties](#realm-configuration-properties)
+  - [UserStorage configuration](#userstorage-configuration)
+    - [Generic UserStorage properties](#generic-userstorage-properties)
+    - [Userstorage properties with a LDAP Store Provider](#userstorage-properties-with-a-ldap-store-provider)
+  - [Realm and Userstorage mappings with a LDAP Store Provider](#realm-and-userstorage-mappings-with-a-ldap-store-provider)
+
 A realm can be created, modified or deleted from Sugoi. This documentation aims to explain each possible configuration. Some configurations depends on the type of the Store Provider.
 
 Here is an example of a Realm which is configured to be used by an Ldap Store Provider :
@@ -68,6 +76,15 @@ These configuration should be set for each UserStorage contained in a Realm :
 | writeType                    |            "JMSWriterStore", "LdapWriterStore", "FileWriterStore"             |                                                                                         no |  the default can be set via the instance property : fr.insee.sugoi.store.writerType  | Indicates wich type of store is used for writing. This attribute is read-only for now and should be set via default.                                    |
 | mappings                     |                             see mappings section                              |                                             should be set when using a ldap store provider |                                                                 see mappings section | Description of how to map Sugoi user and organization attributes with ldap attributes when using a ldap store provider                                  |
 | group_manager_source_pattern |                "uid=ASI\_$(app),ou=Applications,o=insee,c=fr"                 |                 should be set when wanted to have a kind of group of group manager for app |                                                                                      | Description of where to put user who can manage apps groups                                                                                             |
+
+### Generic UserStorage properties
+
+Those are optional properties to set on a userstorage :
+
+| Key  | Description |
+| ----------------- | :---------------------------------------------:  |
+| {name}_send_login_template with name being a configured external webservice | A template to complete and send to the {name} webservice on /send-login call (see [Notify external webservices](concepts.md#notify-external-webservices) and [Webhooks configuration](configuration.md#webhooks-configuration)) |
+| {name}_reset_template with name being a configured webservice | A template to complete and send to the {name} webservice on /reinitPassword call (see [Notify external webservices](concepts.md#notify-external-webservices) and [Webhooks configuration](configuration.md#webhooks-configuration)) |
 
 ### Userstorage properties with a LDAP Store Provider
 

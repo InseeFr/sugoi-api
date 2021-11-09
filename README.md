@@ -43,7 +43,9 @@ The source code format should be in conformance with google guidestyles for java
 
 We also check that all commit are signed-off in accordance with [DCO](https://developercertificate.org/)
 
-Please make sure to update or create tests as appropriate.
+**All feature creation or update should be reflected in the documentation. All new configuration keys of the instance or realm should be documented.**
+
+**Please make sure to update or create tests as appropriate.**
 
 ## License
 
