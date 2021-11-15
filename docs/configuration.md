@@ -10,6 +10,7 @@
       - [Password configuration](#password-configuration)
     - [WebHooks configuration](#webhooks-configuration)
     - [Spring actuator configuration](#spring-actuator-configuration)
+    - [Export configuration](#export-configuration)
     - [Other info configuration](#other-info-configuration)
     - [Old endpoints configuration](#old-endpoints-configuration)
 
@@ -185,6 +186,15 @@ fr.insee.sugoi.security.monitor-user-password=monitor
 ```
 
 This user only has rights on `/actuator` endpoints.
+
+### Export configuration
+
+Configure the /export.csv endpoint with :
+
+| Properties                                   | Description | Default value |
+| ---------------------------------------------| :---------: | ------------: |
+| fr.insee.sugoi.export.maxSizeOutput          | The export function will stop when the number of entities reach this limit   | 10000 |
+| fr.insee.sugoi.export.pagesize               | The maximum size of pages to request on the store provider when exporting. With a pagesize of 10 the store will be requested for pages 10 by 10 before aggregating the results   | 2000  |
 
 ### Other info configuration
 
