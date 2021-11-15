@@ -6,7 +6,7 @@ Feature: Credential scenario synchronous jms
 
     Scenario: Init password
         Given the client authentified with username appli_sugoi and password sugoi
-        When the client perform POST request with body on url /realms/domaine1/users/test_password/initPassword body:
+        When the client perform POST request with body on url /realms/domaine1/users/test_password/init-password body:
             """
             {
                 "newPassword": "Changeme1%0000000000"
@@ -17,7 +17,7 @@ Feature: Credential scenario synchronous jms
 
     Scenario: Init password already init
         Given the client authentified with username appli_sugoi and password sugoi
-        When the client perform POST request with body on url /realms/domaine1/users/test_password/initPassword body:
+        When the client perform POST request with body on url /realms/domaine1/users/test_password/init-password body:
             """
             {
                 "newPassword": "Changeme1%000000000000000"
@@ -28,7 +28,7 @@ Feature: Credential scenario synchronous jms
 
     Scenario: Change password with bad oldPassword
         Given the client authentified with username appli_sugoi and password sugoi
-        When the client perform POST request with body on url /realms/domaine1/users/test_password/changePassword body:
+        When the client perform POST request with body on url /realms/domaine1/users/test_password/change-password body:
             """
             {
                 "oldPassword": "Changeme1%00000000000000",
@@ -40,7 +40,7 @@ Feature: Credential scenario synchronous jms
 
     Scenario: Change password
         Given the client authentified with username appli_sugoi and password sugoi
-        When the client perform POST request with body on url /realms/domaine1/users/test_password/changePassword body:
+        When the client perform POST request with body on url /realms/domaine1/users/test_password/change-password body:
             """
             {
                 "oldPassword": "Changeme1%000000000000000",
@@ -52,7 +52,7 @@ Feature: Credential scenario synchronous jms
 
     Scenario: ResetPassword
         Given the client authentified with username appli_sugoi and password sugoi
-        When the client perform POST request with body on url /realms/domaine1/users/test_password/reinitPassword body:
+        When the client perform POST request with body on url /realms/domaine1/users/test_password/reinit-password body:
             """
             {
                 "templateProperties": {

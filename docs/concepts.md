@@ -208,7 +208,7 @@ The user attribute ldap_string would be set to the cn of the testc resource on l
 
 ## Notify external webservices
 
-On /reinitPassword and /send-login endpoints, Sugoi can be configured to POST a message on an external webservice.
+On /reinit-password and /send-login endpoints, Sugoi can be configured to POST a message on an external webservice.
 See [Webhook configuration](configuration.md#webhooks-configuration) to define the uri of the webservice, how to authenticate or how to choose the default template and [Realm configuration](realm-configuration.md#generic-userstorage-properties) to see how to define a template by realm.
 
 Several webservices can be configured. The webservice is chosen by the user by specifying a TAG in their request. If no tag is specified the webservice configured for the tag MAIL will be used by default.
