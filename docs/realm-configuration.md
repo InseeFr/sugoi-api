@@ -107,7 +107,7 @@ Those are optional properties to set on a userstorage :
 | Key  | Description |
 | ----------------- | :---------------------------------------------:  |
 | {name}_send_login_template with name being a configured external webservice | A template to complete and send to the {name} webservice on /send-login call (see [Notify external webservices](concepts.md#notify-external-webservices) and [Webhooks configuration](configuration.md#webhooks-configuration)) |
-| {name}_reset_template with name being a configured webservice | A template to complete and send to the {name} webservice on /reinitPassword call (see [Notify external webservices](concepts.md#notify-external-webservices) and [Webhooks configuration](configuration.md#webhooks-configuration)) |
+| {name}_reset_template with name being a configured webservice | A template to complete and send to the {name} webservice on /reinit-password call (see [Notify external webservices](concepts.md#notify-external-webservices) and [Webhooks configuration](configuration.md#webhooks-configuration)) |
 
 ### Userstorage properties with a LDAP Store Provider
 
