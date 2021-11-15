@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -220,6 +221,18 @@ public class LdapReaderStoreTest {
     assertThat(
         "Should contain testc",
         users.stream().anyMatch(user -> user.getUsername().equals("testc")));
+  }
+
+  @Test
+  @DisplayName(
+      "When the size of the pagerequest is less than the total result, the pageresult should have isHasMoreResult")
+  public void testAllUsersHasMoreResult() {
+    PageableResult pageableResult = new PageableResult();
+    pageableResult.setSize(1);
+    PageResult<User> result = ldapReaderStore.searchUsers(new User(), pageableResult, "AND");
+    assertThat("Should get one result", 1, is(result.getResults().size()));
+    assertThat("Page size should still be 1", 1, is(result.getResults().size()));
+    assertThat("Should be tagged with more results", result.isHasMoreResult());
   }
 
   @Test

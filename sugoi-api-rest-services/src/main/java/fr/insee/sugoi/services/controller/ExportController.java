@@ -143,10 +143,9 @@ public class ExportController {
     }
 
     int allResultsSize = 0;
-    try {
+    try (CSVPrinter csvPrinter = new CSVPrinter(response.getWriter(), CSVFormat.DEFAULT)) {
       response.setCharacterEncoding("UTF-8");
       response.setContentType("text/csv");
-      CSVPrinter csvPrinter = new CSVPrinter(response.getWriter(), CSVFormat.DEFAULT);
       // print headers on the first line
       csvPrinter.printRecord(getFieldsAsStringList(new User()));
 
@@ -165,10 +164,10 @@ public class ExportController {
           csvPrinter.flush();
 
           if (foundUsers.isHasMoreResult()) {
-            if (allResultsSize > maxSizeOutput) {
-              csvPrinter.close();
-              throw new RuntimeException("too much result");
+            if (allResultsSize + pageSize >= maxSizeOutput) {
+              break;
             }
+            allResultsSize += foundUsers.getResults().size();
             pageable = new PageableResult(pageSize, 0, foundUsers.getSearchToken());
           } else {
             break;
