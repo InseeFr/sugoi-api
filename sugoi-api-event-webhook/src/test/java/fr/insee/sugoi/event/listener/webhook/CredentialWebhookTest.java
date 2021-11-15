@@ -145,4 +145,29 @@ public class CredentialWebhookTest {
         "admin@insee.fr",
         is(properties.get("mail")));
   }
+
+  @Test
+  @DisplayName(
+      "When the send login service is called, with the appropriate webhook being configured,"
+          + " this webhook should be called and the template completed.")
+  public void callResetWebhookWhenSendLoginTest() {
+
+    credentialsServiceImpl.sendLogin(
+        "domaine1", "default", "toto", Map.of("new_property", "prop"), "SPOOC");
+
+    Mockito.verify(webHookServiceImpl, Mockito.timeout(1000))
+        .sendLogin(Mockito.eq("spooc"), argumentCaptorProperties.capture());
+
+    Map<String, Object> properties = argumentCaptorProperties.getValue();
+
+    Map<?, ?> propertiesOfProperties = (Map<?, ?>) properties.get("properties");
+
+    assertThat(
+        "Property from template properties should have been kept",
+        "prop",
+        is(propertiesOfProperties.get("new_property")));
+    assertThat("Mail should be the user one", properties.get("mail"), is("toto@insee.fr"));
+    assertThat(
+        "User should have its username", ((User) properties.get("user")).getUsername(), is("toto"));
+  }
 }

@@ -506,45 +506,60 @@ public class CredentialsController {
 
   @PostMapping(value = "/realms/{realm}/users/{id}/send-login")
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
-  @Operation(summary = "Send login to user")
+  @Operation(summary = "Call an external webservice with the predefined template send-login")
   public ResponseEntity<Void> sendLogin(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
           @PathVariable("realm")
           String realm,
-      @Parameter(description = "User's id to validate password", required = true)
-          @PathVariable("id")
+      @Parameter(description = "User whose login will be send", required = true) @PathVariable("id")
           String id,
-      @RequestBody Map<String, String> properties) {
+      @RequestParam(name = "webhook-tag", required = false) String webserviceTag,
+      @RequestBody(required = false) TemplatePropertiesView templatePropertiesView) {
     User user =
         userService
             .findById(realm, null, id)
             .orElseThrow(
                 () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
     return sendLogin(
-        realm, id, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), properties);
+        realm,
+        id,
+        webserviceTag,
+        (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
+        templatePropertiesView);
   }
 
   @PostMapping(value = "/realms/{realm}/storages/{storage}/users/{id}/send-login")
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
-  @Operation(summary = "Send login to user")
+  @Operation(summary = "Call an external webservice with the predifined template send-login")
   public ResponseEntity<Void> sendLogin(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
           @PathVariable("realm")
           String realm,
-      @Parameter(description = "User's id to validate password", required = true)
-          @PathVariable("id")
+      @Parameter(description = "User whose login will be send", required = true) @PathVariable("id")
           String id,
       @Parameter(
               description = "Name of the userStorage where the operation will be made",
               required = false)
-          @PathVariable(value = "storage", required = false)
+          @PathVariable(value = "storage")
           String userStorage,
-      @RequestBody Map<String, String> properties) {
-    credentialsService.sendLogin(realm, userStorage, id, properties);
+      @Parameter(
+              description =
+                  "Tag to define which webhook to call. If not provided, the MAIL service will be used.")
+          @RequestParam(name = "webhook-tag", required = false)
+          String webserviceTag,
+      @RequestBody(required = false) TemplatePropertiesView templatePropertiesView) {
+    credentialsService.sendLogin(
+        realm,
+        userStorage,
+        id,
+        templatePropertiesView != null && templatePropertiesView.getTemplateProperties() != null
+            ? templatePropertiesView.getTemplateProperties()
+            : Map.of(),
+        webserviceTag);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 }

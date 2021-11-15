@@ -261,6 +261,38 @@ public class CredentialsServiceImpl implements CredentialsService {
     }
   }
 
+  @Override
+  public boolean sendLogin(
+      String realm,
+      String userStorage,
+      String id,
+      Map<String, String> templateProperties,
+      String webhookTag) {
+    try {
+      User user =
+          userService
+              .findById(realm, userStorage, id)
+              .orElseThrow(
+                  () -> new UserNotFoundException("User " + id + " not found in realm" + realm));
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          userStorage,
+          SugoiEventTypeEnum.SEND_LOGIN,
+          Map.ofEntries(
+              Map.entry(
+                  EventKeysConfig.MAIL,
+                  templateProperties.get("mail") != null
+                      ? templateProperties.get("mail")
+                      : (user.getMail() != null ? user.getMail() : "")),
+              Map.entry(EventKeysConfig.WEBSERVICE_TAG, webhookTag != null ? webhookTag : "MAIL"),
+              Map.entry(EventKeysConfig.USER, user),
+              Map.entry(EventKeysConfig.PROPERTIES, templateProperties)));
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
   private Boolean validatePassword(String password, Map<String, String> realmProperties) {
     return passwordService.validatePassword(
         password,
@@ -284,27 +316,5 @@ public class CredentialsServiceImpl implements CredentialsService {
             ? Integer.parseInt(
                 realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_MIN_SIZE))
             : null);
-  }
-
-  @Override
-  public boolean sendLogin(
-      String realm, String userStorage, String id, Map<String, String> properties) {
-    try {
-      User user =
-          userService
-              .findById(realm, userStorage, id)
-              .orElseThrow(
-                  () -> new UserNotFoundException("User " + id + " not found in realm" + realm));
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          userStorage,
-          SugoiEventTypeEnum.SEND_LOGIN,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.USER, user),
-              Map.entry(EventKeysConfig.PROPERTIES, properties)));
-      return true;
-    } catch (Exception e) {
-      return false;
-    }
   }
 }

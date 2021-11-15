@@ -73,19 +73,19 @@ public class SugoiEventWebHookProducer {
         break;
       case SEND_LOGIN:
         user = (User) cse.getProperties().get(EventKeysConfig.USER);
-        Map<String, String> properties =
-            (Map<String, String>) cse.getProperties().get(EventKeysConfig.PROPERTIES);
+        webHookTag =
+            cse.getProperties().get(EventKeysConfig.WEBSERVICE_TAG) != null
+                ? (String) cse.getProperties().get(EventKeysConfig.WEBSERVICE_TAG)
+                : "MAIL";
         realm = cse.getRealm();
         userStorage = cse.getUserStorage() != null ? cse.getUserStorage() : "default";
-        webHookTag = properties.get("tag") != null ? properties.get("tag") : "MAIL";
         values = new HashMap<>();
         values.put(EventKeysConfig.REALM, realm);
         values.put(EventKeysConfig.USERSTORAGE, userStorage);
+        values.put(EventKeysConfig.USER, user);
         values.put(EventKeysConfig.USER_ID, user.getUsername());
-        values.put(
-            EventKeysConfig.MAIL,
-            properties.get("mail") != null ? properties.get("mail") : user.getMail());
-        values.put(EventKeysConfig.PROPERTIES, properties);
+        values.put(EventKeysConfig.MAIL, cse.getProperties().get(EventKeysConfig.MAIL));
+        values.put(EventKeysConfig.PROPERTIES, cse.getProperties().get(EventKeysConfig.PROPERTIES));
         webHookNames.stream()
             .filter(
                 webHookName ->

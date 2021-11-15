@@ -96,5 +96,20 @@ public interface CredentialsService {
    */
   boolean validateCredential(String realm, String userStorage, String userName, String password);
 
-  boolean sendLogin(String realm, String userStorage, String id, Map<String, String> properties);
+  /**
+   * Send a message containing user data to the external webservice.
+   *
+   * @param realm
+   * @param userStorage
+   * @param username name of the user which data will be send
+   * @param templateProperties properties to add to the templated body to send to the webservice
+   * @param webhookTag tag indicating which webservice will be called
+   * @return true if no exception occured
+   */
+  boolean sendLogin(
+      String realm,
+      String userStorage,
+      String username,
+      Map<String, String> templateProperties,
+      String webhookTag);
 }
