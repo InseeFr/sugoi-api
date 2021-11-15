@@ -62,7 +62,7 @@ public class CredentialsController {
   @Autowired private CredentialsService credentialsService;
   @Autowired private UserService userService;
 
-  @PostMapping(path = {"/realms/{realm}/storages/{storage}/users/{id}/reinitPassword"})
+  @PostMapping(path = {"/realms/{realm}/storages/{storage}/users/{id}/reinit-password"})
   @Operation(
       summary =
           "Reinitialize the user password with a new random password. A webhook can be called at the same time. "
@@ -138,7 +138,7 @@ public class CredentialsController {
         .build();
   }
 
-  @PostMapping(path = {"/realms/{realm}/users/{id}/reinitPassword"})
+  @PostMapping(path = {"/realms/{realm}/users/{id}/reinit-password"})
   @Operation(
       summary =
           "Reinitialize the user password with a new random password. A webhook can be called at the same time. "
@@ -201,7 +201,7 @@ public class CredentialsController {
         authentication);
   }
 
-  @PostMapping(path = {"/realms/{realm}/storages/{storage}/users/{id}/changePassword"})
+  @PostMapping(path = {"/realms/{realm}/storages/{storage}/users/{id}/change-password"})
   @Operation(summary = "Change user password with the new one provided")
   @ApiResponses(
       value = {
@@ -263,7 +263,7 @@ public class CredentialsController {
         .build();
   }
 
-  @PostMapping(path = {"/realms/{realm}/users/{id}/changePassword"})
+  @PostMapping(path = {"/realms/{realm}/users/{id}/change-password"})
   @Operation(summary = "Change user password with the new one provided")
   @ApiResponses(
       value = {
@@ -314,7 +314,7 @@ public class CredentialsController {
         authentication);
   }
 
-  @PostMapping(path = {"/realms/{realm}/storages/{storage}/users/{id}/initPassword"})
+  @PostMapping(path = {"/realms/{realm}/storages/{storage}/users/{id}/init-password"})
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
   @Operation(summary = "Initialize user's password with the given password")
   @ApiResponses(
@@ -377,7 +377,7 @@ public class CredentialsController {
         .build();
   }
 
-  @PostMapping(path = {"/realms/{realm}/users/{id}/initPassword"})
+  @PostMapping(path = {"/realms/{realm}/users/{id}/init-password"})
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
   @Operation(summary = "Initialize user's password with the given password")
   @ApiResponses(
