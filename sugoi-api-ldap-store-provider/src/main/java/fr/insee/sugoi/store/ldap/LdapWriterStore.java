@@ -513,9 +513,15 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     }
 
     try {
-
       ldapPoolConnection.modify(
           "uid=" + user.getUsername() + "," + config.get(LdapConfigKeys.USER_SOURCE), mod);
+      changePasswordResetStatus(
+          userId,
+          (pcr.getProperties() != null
+                  && pcr.getProperties().get(EventKeysConfig.MUST_CHANGE_PASSWORD) != null)
+              ? Boolean.parseBoolean(pcr.getProperties().get(EventKeysConfig.MUST_CHANGE_PASSWORD))
+              : false,
+          providerRequest);
       ProviderResponse response = new ProviderResponse();
       response.setStatus(ProviderResponseStatus.OK);
       response.setEntityId(user.getUsername());
@@ -800,8 +806,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       if (user.getCertificate() != null) {
 
         X509Certificate certificate = cfs.getCertificateFromByte(user.getCertificate());
-        String certificateId =
-            (String) ((Map<String, Object>) user.getMetadatas().get("cert")).get("id");
+        String certificateId = (String) ((Map<?, ?>) user.getMetadatas().get("cert")).get("id");
         ldapPoolConnection.modify(
             new ModifyRequest(
                 getUserDN(user.getUsername()),
