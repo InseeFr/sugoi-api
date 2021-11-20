@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
+import fr.insee.sugoi.core.exceptions.NoCertificateOnUserException;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.realm.RealmProvider;
@@ -30,6 +31,11 @@ import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;
+import java.io.ByteArrayInputStream;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,6 +76,30 @@ public class UserServiceTest {
     user1.setUsername("Toto");
     user1.setMail("toto@insee.fr");
 
+    User userWithCertificate = new User("UserWithCertificate");
+    userWithCertificate.setCertificate(
+        Base64.getDecoder()
+            .decode(
+                "MIIDJDCCAgwCCQDzaF9oNeXFKTANBgkqhkiG9w0BAQsFADBUMQswCQYDVQQGEwJG"
+                    + "UjEOMAwGA1UECAwFUGFyaXMxDjAMBgNVBAoMBUluc2VlMRIwEAYDVQQLDAlVbml0"
+                    + "IFRlc3QxETAPBgNVBAMMCEpvaG4gRG9lMB4XDTIxMTExOTE3NDUxMloXDTIyMTEx"
+                    + "OTE3NDUxMlowVDELMAkGA1UEBhMCRlIxDjAMBgNVBAgMBVBhcmlzMQ4wDAYDVQQK"
+                    + "DAVJbnNlZTESMBAGA1UECwwJVW5pdCBUZXN0MREwDwYDVQQDDAhKb2huIERvZTCC"
+                    + "ASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJ5YQ14T/YjlKwE341JrzMbQ"
+                    + "58ZK6/4n3W194/txrIFMThyVMF76YxZj8qTcufqLHv6XXZtWMWupPhG2PtzhkAfL"
+                    + "Cxeb+92HjKmCMRi35VvtMQn9VExmpm467tMnCoMdM50Y8FBKdvFJwDIbL48LqA11"
+                    + "UyVwibyT9NPcjtd5Xr4ZOQqvoqonPbYp7Atbl1hEtVNkJNvU/W7I15u6NRzY6VvB"
+                    + "UGwYR0z+/sGq3fPzEU7YQefaa1mJYKoT+A5ITDUDtT72SGU/WnYX2ShcpN6G8oWk"
+                    + "BrH4DZk8r4nSGXDz6DQSwX7ssA/bHERf0oaLh/1f6zIh8HJISyzLGC998ALl2xsC"
+                    + "AwEAATANBgkqhkiG9w0BAQsFAAOCAQEAHQ0p9QsU9kXMAjQKUkKgE6bGack2GzGJ"
+                    + "CZEvlrOeqfYyhujtg2sdDln5Mj+fn5i1l23U7qXkzwj7aiVSAZ2tLIVmZgoLYcyi"
+                    + "bP4Gjwen1vV8GmYd0XHONx6fmuuPEObl5mXKz8Eovxw9TYYMcUeZQ8gRnp+t0jfz"
+                    + "5Q7ZoQVm5Nkbkz8gZpTLoOL6S8aUI0C93GzZZwYkWwrFzpsssAJk/6oz1ugUiFI2"
+                    + "TZF/XgwdfQCOFjSF1NX2ED9sLsiBBvjYaavk/NO9vNH6eDTZH5n1UO3/fA+bTRUj"
+                    + "UYRN0GdkHQCliefZ0Y6XEususCiTApLYfdjUHsIWGldf8C2vxRv+mw=="));
+
+    Mockito.when(realmProvider.load("idonotexist")).thenReturn(Optional.empty());
+
     realm = new Realm();
     realm.setName("realm");
     UserStorage us1 = new UserStorage();
@@ -85,6 +115,8 @@ public class UserServiceTest {
     Mockito.when(storeProvider.getReaderStore("realm", "us2")).thenReturn(readerStore2);
     Mockito.when(readerStore2.getUser("Toto")).thenReturn(Optional.of(user1));
     Mockito.when(readerStore2.getUser("donotexist")).thenReturn(Optional.empty());
+    Mockito.when(readerStore2.getUser("UserWithCertificate"))
+        .thenReturn(Optional.of(userWithCertificate));
 
     Mockito.when(storeProvider.getReaderStore(Mockito.eq("idonotexist"), Mockito.anyString()))
         .thenThrow(RealmNotFoundException.class);
@@ -147,5 +179,55 @@ public class UserServiceTest {
   public void deleteUserShouldFailWhenRealmNotFound() {
     assertThrows(
         RealmNotFoundException.class, () -> userService.delete("idonotexist", "us2", "toto", null));
+  }
+
+  @Test
+  @DisplayName("Given a user has a well set certificate, then it should be returned by the service")
+  public void getCertificateShouldSucceedWhenItIsSetOnUser() throws CertificateException {
+    X509Certificate certificate =
+        (X509Certificate)
+            CertificateFactory.getInstance("X509")
+                .generateCertificate(
+                    new ByteArrayInputStream(
+                        userService.getCertificate("realm", "us2", "UserWithCertificate")));
+    assertThat(
+        "Certificate should have a john doe subject",
+        "CN=John Doe,OU=Unit Test,O=Insee,ST=Paris,C=FR",
+        is(certificate.getSubjectX500Principal().getName()));
+  }
+
+  @Test
+  @DisplayName(
+      "Given we fetch a certificate on a user that does not exist, "
+          + "then the service should fail with UserNotFoundException")
+  public void getCertificateShouldFailWhenNoUser() {
+    assertThrows(
+        UserNotFoundException.class,
+        () -> userService.getCertificate("realm", "us2", "donotexist"));
+  }
+
+  @Test
+  @DisplayName(
+      "Given we fetch a certificate that does not have a certificate, "
+          + "then the service should fail with NoCertificateOnUserException")
+  public void getCertificateShouldFailWhenNoCertificateOnUser() {
+    NoCertificateOnUserException exception =
+        assertThrows(
+            NoCertificateOnUserException.class,
+            () -> userService.getCertificate("realm", "us2", "Toto"));
+    assertThat(
+        "Exception message should contain name and realm",
+        "User Toto on realm realm does not have a certificate",
+        is(exception.getMessage()));
+  }
+
+  @Test
+  @DisplayName(
+      "Given we fetch a certificate on a realm that does not exist, "
+          + "then the service should fail with NoCertificateOnUserException")
+  public void getCertificateShouldFailWhenRealmNotFound() {
+    assertThrows(
+        RealmNotFoundException.class,
+        () -> userService.getCertificate("idonotexist", "us2", "Toto"));
   }
 }

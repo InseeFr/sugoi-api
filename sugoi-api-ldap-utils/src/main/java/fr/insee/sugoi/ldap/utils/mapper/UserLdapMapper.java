@@ -15,6 +15,7 @@ package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
+import fr.insee.sugoi.core.exceptions.InvalidCertificateException;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.User;
 import java.io.ByteArrayInputStream;
@@ -48,30 +49,10 @@ public class UserLdapMapper implements LdapMapper<User> {
     User user =
         GenericLdapMapper.mapLdapAttributesToObject(attributes, User.class, config, mapping);
     if (user.getCertificate() != null) {
-      CertificateFactory cf;
       try {
-        cf = CertificateFactory.getInstance("X509");
-        X509Certificate myCert =
-            (X509Certificate)
-                cf.generateCertificate(new ByteArrayInputStream(user.getCertificate()));
-        user.setCertificate(myCert.getEncoded());
-        Map<String, Object> certDetails = new HashMap<>();
-        certDetails.put("expiration", myCert.getNotAfter());
-        String certificateIdEntry =
-            ((List<String>) user.getAttributes().get("properties"))
-                .stream().filter(entry -> entry.contains("certificateId$")).findFirst().get();
-        certDetails.put("id", certificateIdEntry.split("\\$")[1]);
-        try {
-          myCert.checkValidity();
-          certDetails.put("isValid", true);
-        } catch (CertificateExpiredException | CertificateNotYetValidException e) {
-          certDetails.put("isValid", false);
-        }
-        certDetails.put("issuer", myCert.getIssuerX500Principal().getName());
-        certDetails.put("subject", myCert.getSubjectX500Principal().getName());
-        user.addMetadatas("cert", certDetails);
+        user.addMetadatas("cert", getParsedCertMetadatas(user));
       } catch (CertificateException e) {
-        e.printStackTrace();
+        throw new InvalidCertificateException();
       }
     }
     return user;
@@ -86,5 +67,34 @@ public class UserLdapMapper implements LdapMapper<User> {
   @Override
   public List<Modification> createMods(User updatedUser) {
     return GenericLdapMapper.createMods(updatedUser, User.class, config, mapping);
+  }
+
+  private Map<String, String> getParsedCertMetadatas(User user) throws CertificateException {
+    Map<String, String> certDetails = new HashMap<>();
+    X509Certificate myCert =
+        (X509Certificate)
+            CertificateFactory.getInstance("X509")
+                .generateCertificate(new ByteArrayInputStream(user.getCertificate()));
+    certDetails.put("expiration", myCert.getNotAfter().toString());
+    certDetails.put("issuer", myCert.getIssuerX500Principal().getName());
+    certDetails.put("subject", myCert.getSubjectX500Principal().getName());
+    if (user.getAttributes().containsKey("properties")
+        && user.getAttributes().get("properties") instanceof List) {
+      ((List<?>) user.getAttributes().get("properties"))
+          .stream()
+              .filter(
+                  entry -> entry instanceof String && ((String) entry).contains("certificateId$"))
+              .findFirst()
+              .ifPresent(
+                  certificateIdEntry ->
+                      certDetails.put("id", ((String) certificateIdEntry).split("\\$")[1]));
+    }
+    try {
+      myCert.checkValidity();
+      certDetails.put("isValid", "true");
+    } catch (CertificateExpiredException | CertificateNotYetValidException e) {
+      certDetails.put("isValid", "false");
+    }
+    return certDetails;
   }
 }

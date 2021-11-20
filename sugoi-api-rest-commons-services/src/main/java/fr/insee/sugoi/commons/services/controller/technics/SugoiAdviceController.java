@@ -26,6 +26,7 @@ import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
 import fr.insee.sugoi.core.exceptions.InvalidTransactionIdException;
 import fr.insee.sugoi.core.exceptions.InvalidUserStorageException;
 import fr.insee.sugoi.core.exceptions.ManagerGroupNotFoundException;
+import fr.insee.sugoi.core.exceptions.NoCertificateOnUserException;
 import fr.insee.sugoi.core.exceptions.NoDomaineMappingException;
 import fr.insee.sugoi.core.exceptions.OrganizationAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.OrganizationNotCreatedException;
@@ -140,6 +141,16 @@ public class SugoiAdviceController {
   @ExceptionHandler(GroupNotFoundException.class)
   @ResponseBody
   public ResponseEntity<ErrorView> exception(GroupNotFoundException e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    final ResponseEntity<ErrorView> response =
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
+    return response;
+  }
+
+  @ExceptionHandler(NoCertificateOnUserException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(NoCertificateOnUserException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
     final ResponseEntity<ErrorView> response =

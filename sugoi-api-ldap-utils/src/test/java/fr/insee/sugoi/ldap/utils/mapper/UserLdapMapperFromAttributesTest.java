@@ -18,8 +18,16 @@ import static org.hamcrest.Matchers.*;
 
 import com.unboundid.ldap.sdk.Attribute;
 import fr.insee.sugoi.model.User;
+import java.io.ByteArrayInputStream;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.text.ParseException;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +63,7 @@ public class UserLdapMapperFromAttributesTest {
     mapping.put("groups", "memberOf,list_group,ro");
     mapping.put("attributes.insee_roles_applicatifs", "inseeRoleApplicatif,list_string,rw");
     mapping.put("attributes.hasPassword", "userPassword,exists,ro");
+    mapping.put("certificate", "userCertificate,byte_array,ro");
     userLdapMapper = new UserLdapMapper(config, mapping);
   }
 
@@ -221,5 +230,57 @@ public class UserLdapMapperFromAttributesTest {
   public void getHasPasswordFromAttributeWhenPasswordIsNotSet() {
     User mappedUser = userLdapMapper.mapFromAttributes(List.of());
     assertThat(mappedUser.getAttributes().get("hasPassword"), is(false));
+  }
+
+  @Test
+  public void getUserCertificateFromAttributes() throws ParseException, CertificateException {
+    Attribute certificatAttribute =
+        new Attribute(
+            "userCertificate",
+            Base64.getDecoder()
+                .decode(
+                    "MIIDJDCCAgwCCQDzaF9oNeXFKTANBgkqhkiG9w0BAQsFADBUMQswCQYDVQQGEwJG"
+                        + "UjEOMAwGA1UECAwFUGFyaXMxDjAMBgNVBAoMBUluc2VlMRIwEAYDVQQLDAlVbml0"
+                        + "IFRlc3QxETAPBgNVBAMMCEpvaG4gRG9lMB4XDTIxMTExOTE3NDUxMloXDTIyMTEx"
+                        + "OTE3NDUxMlowVDELMAkGA1UEBhMCRlIxDjAMBgNVBAgMBVBhcmlzMQ4wDAYDVQQK"
+                        + "DAVJbnNlZTESMBAGA1UECwwJVW5pdCBUZXN0MREwDwYDVQQDDAhKb2huIERvZTCC"
+                        + "ASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJ5YQ14T/YjlKwE341JrzMbQ"
+                        + "58ZK6/4n3W194/txrIFMThyVMF76YxZj8qTcufqLHv6XXZtWMWupPhG2PtzhkAfL"
+                        + "Cxeb+92HjKmCMRi35VvtMQn9VExmpm467tMnCoMdM50Y8FBKdvFJwDIbL48LqA11"
+                        + "UyVwibyT9NPcjtd5Xr4ZOQqvoqonPbYp7Atbl1hEtVNkJNvU/W7I15u6NRzY6VvB"
+                        + "UGwYR0z+/sGq3fPzEU7YQefaa1mJYKoT+A5ITDUDtT72SGU/WnYX2ShcpN6G8oWk"
+                        + "BrH4DZk8r4nSGXDz6DQSwX7ssA/bHERf0oaLh/1f6zIh8HJISyzLGC998ALl2xsC"
+                        + "AwEAATANBgkqhkiG9w0BAQsFAAOCAQEAHQ0p9QsU9kXMAjQKUkKgE6bGack2GzGJ"
+                        + "CZEvlrOeqfYyhujtg2sdDln5Mj+fn5i1l23U7qXkzwj7aiVSAZ2tLIVmZgoLYcyi"
+                        + "bP4Gjwen1vV8GmYd0XHONx6fmuuPEObl5mXKz8Eovxw9TYYMcUeZQ8gRnp+t0jfz"
+                        + "5Q7ZoQVm5Nkbkz8gZpTLoOL6S8aUI0C93GzZZwYkWwrFzpsssAJk/6oz1ugUiFI2"
+                        + "TZF/XgwdfQCOFjSF1NX2ED9sLsiBBvjYaavk/NO9vNH6eDTZH5n1UO3/fA+bTRUj"
+                        + "UYRN0GdkHQCliefZ0Y6XEususCiTApLYfdjUHsIWGldf8C2vxRv+mw=="));
+    Collection<Attribute> attributes = List.of(certificatAttribute);
+    User mappedUser = userLdapMapper.mapFromAttributes(attributes);
+
+    X509Certificate certificate =
+        (X509Certificate)
+            CertificateFactory.getInstance("X509")
+                .generateCertificate(new ByteArrayInputStream(mappedUser.getCertificate()));
+
+    assertThat(
+        "Certificate should have a john doe subject",
+        "CN=John Doe,OU=Unit Test,O=Insee,ST=Paris,C=FR",
+        is(certificate.getSubjectX500Principal().getName()));
+
+    Map<?, ?> certMetadatas = (Map<?, ?>) mappedUser.getMetadatas().get("cert");
+    assertThat(
+        "Issuer should be john doe",
+        certMetadatas.get("subject"),
+        is("CN=John Doe,OU=Unit Test,O=Insee,ST=Paris,C=FR"));
+    assertThat(
+        "Should see in metadatas that is selfsigned",
+        certMetadatas.get("subject"),
+        is(certMetadatas.get("issuer")));
+    assertThat(
+        "Expiration date should be Nov 19 2022",
+        certMetadatas.get("expiration"),
+        is(Date.from(Instant.parse("2022-11-19T17:45:12.00Z")).toString()));
   }
 }
