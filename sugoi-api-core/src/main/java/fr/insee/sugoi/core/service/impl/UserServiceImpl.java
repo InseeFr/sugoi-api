@@ -17,6 +17,7 @@ import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
+import fr.insee.sugoi.core.exceptions.NoCertificateOnUserException;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.exceptions.UnableToUpdateCertificateException;
 import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
@@ -481,7 +482,12 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public byte[] getCertificate(String realm, String userStorage, String userId) {
-    return findById(realm, userStorage, userId).getCertificate();
+    User user = findById(realm, userStorage, userId);
+    if (user.getCertificate() == null) {
+      throw new NoCertificateOnUserException(realm, userId);
+    } else {
+      return user.getCertificate();
+    }
   }
 
   @Override

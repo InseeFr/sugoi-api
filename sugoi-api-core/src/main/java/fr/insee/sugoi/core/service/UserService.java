@@ -132,6 +132,16 @@ public interface UserService {
       String attribute,
       ProviderRequest providerRequest);
 
+  /**
+   * Retrieve the certificate of a user on userStorage. If no user is found then throw
+   * UserNotFoundException. If the user does not have a certificate then throw
+   * NoCertificateOnUserException.
+   *
+   * @param realm
+   * @param userStorage
+   * @param userId
+   * @return byte array of the user userId der-encoded certificate
+   */
   byte[] getCertificate(String realm, String userStorage, String userId);
 
   ProviderResponse updateCertificate(

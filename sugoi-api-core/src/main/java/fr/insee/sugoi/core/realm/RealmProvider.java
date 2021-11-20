@@ -47,7 +47,7 @@ public interface RealmProvider {
    * @return the realm found
    */
   @Cacheable(value = "Realm", key = "#realmName")
-  public Optional<Realm> load(String realmName) throws RealmNotFoundException;
+  public Optional<Realm> load(String realmName);
 
   /**
    * Find an userStorage by name. Default implementation is to call 'load(realmName) and browse

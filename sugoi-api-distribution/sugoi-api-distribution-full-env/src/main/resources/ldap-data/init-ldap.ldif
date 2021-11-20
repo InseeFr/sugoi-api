@@ -255,7 +255,7 @@ inseepropriete: organization_object_classes$top,inseeOrganisation
 inseepropriete: userMapping$username:uid,String,rw
 inseepropriete: userMapping$lastName:sn,String,rw
 inseepropriete: userMapping$mail:mail,String,rw
-inseepropriete: userMapping$certificate:userCertificate;binary,byte_array,ro
+inseepropriete: userMapping$certificate:userCertificate,byte_array,ro
 inseepropriete: organizationMapping$gpgkey:inseeClefChiffrement,byte_array,ro
 inseepropriete: userMapping$mail:mail,String,rw
 inseepropriete: userMapping$firstName:givenname,String,rw
