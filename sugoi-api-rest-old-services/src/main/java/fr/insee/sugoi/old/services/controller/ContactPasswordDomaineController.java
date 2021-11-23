@@ -112,14 +112,7 @@ public class ContactPasswordDomaineController {
       Authentication authentication) {
     RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
-    Map<String, String> templateProperties =
-        pcr.getInfoFormattageEnvoi() != null
-            ? ouganextSugoiMapper.serializeOuganextToMap(pcr.getInfoFormattageEnvoi())
-            : new HashMap<>();
-
-    if (pcr.getAdresseMessagerie() != null) {
-      templateProperties.put("mail", pcr.getAdresseMessagerie());
-    }
+    Map<String, String> templateProperties = getTemplatePropertiesFromPCR(pcr);
 
     credentialsService.reinitPassword(
         realmUserStorage.getRealm(),
@@ -268,6 +261,8 @@ public class ContactPasswordDomaineController {
         identifiant,
         pcr.getAncienMotDePasse(),
         pcr.getNouveauMotDePasse(),
+        modeEnvoisString != null && modeEnvoisString.size() > 0 ? modeEnvoisString.get(0) : "MAIL",
+        getTemplatePropertiesFromPCR(pcr),
         new ProviderRequest(
             new SugoiUser(
                 authentication.getName(),
@@ -279,5 +274,17 @@ public class ContactPasswordDomaineController {
             null,
             false));
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
+
+  private Map<String, String> getTemplatePropertiesFromPCR(PasswordChangeRequestOuganext pcr) {
+    Map<String, String> templateProperties =
+        pcr.getInfoFormattageEnvoi() != null
+            ? ouganextSugoiMapper.serializeOuganextToMap(pcr.getInfoFormattageEnvoi())
+            : new HashMap<>();
+
+    if (pcr.getAdresseMessagerie() != null) {
+      templateProperties.put("mail", pcr.getAdresseMessagerie());
+    }
+    return templateProperties;
   }
 }

@@ -126,7 +126,8 @@ To learn more about this feature see : [Notify external webservices](concepts.md
 | sugoi.api.event.webhook.{name}.auth.token | If auth.type is oauth : the token to pass in Bearer header | |
 | sugoi.api.event.webhook.{name}.tag                    | The tag define the type of webhook to call. When a request use a webhook, a tag can be set. By default the tag in the request will be MAIL.  |  |  MAIL or anything else |
 | sugoi.api.event.webhook.{name}.default.send-login.template | Define the path to a default template to send to the webhook on send-login request. It can be overidden by userstorage configuration. | | ([see template](../sugoi-api-event-webhook/src/main/resources/template/login_default.ftl))  |
-| sugoi.api.event.webhook.{name}.default.init.template | Define the path to a default template to send to the webhook on reinit-password request. It can be overidden by userstorage configuration. | | ([see template](../sugoi-api-event-webhook/src/main/resources/template/reset_default.ftl))  |
+| sugoi.api.event.webhook.{name}.default.reset.template | Define the path to a default template to send to the webhook on reinit-password request. It can be overidden by userstorage configuration. | | ([see template](../sugoi-api-event-webhook/src/main/resources/template/reset_default.ftl))  |
+| sugoi.api.event.webhook.{name}.default.changepwd.template | Define the path to a default template to send to the webhook on change-password request. It can be overidden by userstorage configuration. | | ([see template](../sugoi-api-event-webhook/src/main/resources/template/changepwd_default.ftl))  |
 
 ### Spring actuator configuration
 

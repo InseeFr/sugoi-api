@@ -209,7 +209,12 @@ public interface WriterStore {
    * @throws InvalidPasswordException if oldPassword doesn't match the actual password.
    */
   ProviderResponse changePassword(
-      String user, String oldPassword, String newPassword, ProviderRequest providerRequest);
+      String user,
+      String oldPassword,
+      String newPassword,
+      String webhookTag,
+      Map<String, String> templateProperties,
+      ProviderRequest providerRequest);
 
   /**
    * Add the attribute to the app-managed-attribute-key in the store

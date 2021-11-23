@@ -419,7 +419,12 @@ public class FileWriterStore implements WriterStore {
 
   @Override
   public ProviderResponse changePassword(
-      String userId, String oldPassword, String newPassword, ProviderRequest providerRequest) {
+      String userId,
+      String oldPassword,
+      String newPassword,
+      String webhookTag,
+      Map<String, String> templateProperties,
+      ProviderRequest providerRequest) {
     throw new NotImplementedException();
   }
 

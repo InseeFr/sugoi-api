@@ -181,6 +181,9 @@ public class JmsRequestRouter {
               userId,
               (String) request.getmethodParams().get(JmsAtttributes.OLD_PASSWORD),
               (String) request.getmethodParams().get(JmsAtttributes.NEW_PASSWORD),
+              (String) request.getmethodParams().get(JmsAtttributes.WEBHOOK_TAG),
+              converter.toMapStringString(
+                  request.getmethodParams().get(JmsAtttributes.TEMPLATE_PROPERTIES)),
               providerRequest);
           break;
         case Method.ADD_APP_MANAGED_ATTRIBUTE:

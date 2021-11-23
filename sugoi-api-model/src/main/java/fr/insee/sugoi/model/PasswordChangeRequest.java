@@ -18,16 +18,9 @@ import java.util.Map;
 
 public class PasswordChangeRequest implements Serializable {
 
-  private String email;
   private String oldPassword;
   private String newPassword;
   private Map<String, String> properties;
-
-  public PasswordChangeRequest() {}
-
-  public String getEmail() {
-    return email;
-  }
 
   public String getNewPassword() {
     return newPassword;
@@ -35,10 +28,6 @@ public class PasswordChangeRequest implements Serializable {
 
   public String getOldPassword() {
     return oldPassword;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
   }
 
   public void setNewPassword(String newPassword) {

@@ -225,6 +225,7 @@ public class CredentialsController {
           String userStorage,
       @Parameter(description = "User's id to change password", required = true) @PathVariable("id")
           String id,
+      @RequestParam(name = "webhook-tag", required = false) String webserviceTag,
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
@@ -243,6 +244,8 @@ public class CredentialsController {
             id,
             pcr.getOldPassword(),
             pcr.getNewPassword(),
+            webserviceTag,
+            pcr.getProperties() != null ? pcr.getProperties() : Map.of(),
             new ProviderRequest(
                 new SugoiUser(
                     authentication.getName(),
@@ -283,6 +286,7 @@ public class CredentialsController {
           String realm,
       @Parameter(description = "User's id to change password", required = true) @PathVariable("id")
           String id,
+      @RequestParam(name = "webhook-tag", required = false) String webserviceTag,
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
@@ -300,6 +304,7 @@ public class CredentialsController {
         realm,
         (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
         id,
+        webserviceTag,
         isAsynchronous,
         isUrgent,
         transactionId,

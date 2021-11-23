@@ -76,6 +76,17 @@ public class CredentialWebhookTest {
                 Mockito.isNull(),
                 Mockito.isNull()))
         .thenReturn("verycomplicatedpassword");
+
+    Mockito.when(
+            passwordService.validatePassword(
+                Mockito.eq("avalidpassword"),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any()))
+        .thenReturn(true);
+
     Mockito.when(storeProvider.getWriterStore("domaine1", "default")).thenReturn(writerStore);
 
     User toto = new User("toto");
@@ -165,5 +176,35 @@ public class CredentialWebhookTest {
     assertThat("Mail should be the user one", properties.get("mail"), is("toto@insee.fr"));
     assertThat(
         "User should have its username", ((User) properties.get("user")).getUsername(), is("toto"));
+  }
+
+  @Test
+  @DisplayName(
+      "When the changepwd service is called, with the appropriate webhook being configured,"
+          + " this webhook should be called and the template completed.")
+  public void callChangePwdWebhookWhenChangePwdTest() {
+
+    credentialsServiceImpl.changePassword(
+        "domaine1",
+        "default",
+        "toto",
+        "oldpassword",
+        "avalidpassword",
+        "SPOOC",
+        Map.of("new_property", "prop"),
+        new ProviderRequest());
+
+    Mockito.verify(webHookServiceImpl, Mockito.timeout(1000))
+        .changePassword(Mockito.eq("spooc"), argumentCaptorProperties.capture());
+
+    Map<String, Object> properties = argumentCaptorProperties.getValue();
+
+    Map<?, ?> propertiesOfProperties = (Map<?, ?>) properties.get("properties");
+
+    assertThat(
+        "Property from template properties should have been kept",
+        "prop",
+        is(propertiesOfProperties.get("new_property")));
+    assertThat("Mail should be the user one", properties.get("mail"), is("toto@insee.fr"));
   }
 }

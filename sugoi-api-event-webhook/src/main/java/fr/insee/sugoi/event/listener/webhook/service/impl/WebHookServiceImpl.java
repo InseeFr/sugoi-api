@@ -14,6 +14,8 @@
 package fr.insee.sugoi.event.listener.webhook.service.impl;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
+import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
+import fr.insee.sugoi.core.exceptions.NoReceiverMailException;
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.event.listener.webhook.service.WebHookService;
 import freemarker.template.Configuration;
@@ -45,129 +47,97 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class WebHookServiceImpl implements WebHookService {
 
-  public static final Logger logger = LoggerFactory.getLogger(WebHookService.class);
+  public static final Logger logger = LoggerFactory.getLogger(WebHookServiceImpl.class);
+  private static final String WEBHOOK_PROPERTY_PREFIX = "sugoi.api.event.webhook.";
 
   @Autowired private Environment env;
 
   @Autowired private ConfigService configService;
 
   @Override
-  public void send(String webHookName, String target, String content, Map<String, String> headers) {
+  public void resetPassword(String webHookName, Map<String, Object> values) {
+    if (!((String) values.get(EventKeysConfig.MAIL)).isBlank()) {
+      sendRequestToWebhookFromTemplate(
+          values, webHookName, "_reset_template", ".default.reset.template");
+    } else {
+      throw new NoReceiverMailException("There is no mail address to send the message to");
+    }
+  }
+
+  @Override
+  public void changePassword(String webHookName, Map<String, Object> values) {
+    sendRequestToWebhookFromTemplate(
+        values, webHookName, "_changepwd_template", ".default.changepwd.template");
+  }
+
+  @Override
+  public void sendLogin(String webHookName, Map<String, Object> values) {
+    if (!((String) values.get(EventKeysConfig.MAIL)).isBlank()) {
+      sendRequestToWebhookFromTemplate(
+          values, webHookName, "_send_login_template", ".default.send-login.template");
+    } else {
+      throw new NoReceiverMailException("There is no mail address to send the message to");
+    }
+  }
+
+  private void sendRequestToWebhookFromTemplate(
+      Map<String, Object> templateProperties,
+      String webHookName,
+      String realmTemplateSuffix,
+      String propertyTemplateSuffix) {
+    String template =
+        loadTemplate(
+            webHookName + realmTemplateSuffix,
+            WEBHOOK_PROPERTY_PREFIX + webHookName + propertyTemplateSuffix,
+            (String) templateProperties.get(GlobalKeysConfig.REALM),
+            (String) templateProperties.get(GlobalKeysConfig.USERSTORAGE));
+    if (template != null) {
+      String content = injectValueInTemplate(template, templateProperties);
+      String target = env.getProperty(WEBHOOK_PROPERTY_PREFIX + webHookName + ".target");
+      String authType = env.getProperty(WEBHOOK_PROPERTY_PREFIX + webHookName + ".auth.type");
+      Map<String, String> headers = new HashMap<>();
+      headers.put("content-type", "application/json");
+      if (authType != null) {
+        addAuthHeader(webHookName, authType, headers);
+      }
+      send(target, content, headers);
+    }
+  }
+
+  public void send(String target, String content, Map<String, String> headers) {
     try {
-      HttpHeaders _headers = new HttpHeaders();
-      headers.keySet().stream().forEach(header -> _headers.add(header, headers.get(header)));
+      HttpHeaders finalHeaders = new HttpHeaders();
+      headers.keySet().stream().forEach(header -> finalHeaders.add(header, headers.get(header)));
       RestTemplate restTemplate = new RestTemplate();
-      HttpEntity<String> request = new HttpEntity<String>(content, _headers);
+      HttpEntity<String> request = new HttpEntity<>(content, finalHeaders);
       restTemplate.postForEntity(target, request, String.class);
       logger.info("Sending webHook to {} success", target);
-    } catch (HttpClientErrorException e) {
-      logger.info(
-          "Something went wrong when sending request to {} receive status {} response {}",
-          target,
-          e.getRawStatusCode(),
-          e.getResponseBodyAsString());
+    } catch (HttpServerErrorException | HttpClientErrorException e) {
       throw new RuntimeException(
-          "Something went wrong when sending webhook to target " + target, e);
-    } catch (HttpServerErrorException e) {
-      logger.info(
-          "Something went wrong on server when sending request to {} receive status {} response {}",
-          target,
-          e.getRawStatusCode(),
-          e.getResponseBodyAsString());
-      throw new RuntimeException(
-          "Something went wrong when sending webhook to target " + target, e);
+          String.format(
+              "Something went wrong on server when sending request to %s receive status %s response %s",
+              target, e.getRawStatusCode(), e.getResponseBodyAsString()),
+          e);
     } catch (Exception e) {
-      logger.info("Unexpected error when producing webhook");
       throw new RuntimeException(
           "Something went wrong when sending webhook to target " + target, e);
     }
-  }
-
-  @Override
-  public void resetPassword(String webHookName, Map<String, Object> values) {
-    String template = null;
-    try {
-      template =
-          configService
-              .getRealm((String) values.get(GlobalKeysConfig.REALM))
-              .getUserStorages()
-              .stream()
-              .filter(
-                  us ->
-                      us.getName()
-                          .equalsIgnoreCase((String) values.get(GlobalKeysConfig.USERSTORAGE)))
-              .findFirst()
-              .get()
-              .getProperties()
-              .get(webHookName + "_reset_template");
-    } catch (Exception e) {
-      // we don't need to manage this exception here
-    }
-    if (template == null) {
-      template =
-          loadResource(
-              env.getProperty(
-                  "sugoi.api.event.webhook." + webHookName + ".default.reset.template"));
-    }
-
-    String content = injectValueInTemplate(template, values);
-    String target = env.getProperty("sugoi.api.event.webhook." + webHookName + ".target");
-    String authType = env.getProperty("sugoi.api.event.webhook." + webHookName + ".auth.type");
-    Map<String, String> headers = new HashMap<>();
-    headers.put("content-type", "application/json");
-    addAuthHeader(webHookName, authType, headers);
-    send(webHookName, target, content, headers);
-  }
-
-  @Override
-  public void initPassword(String webHookName, Map<String, Object> values) {
-    String template = null;
-    try {
-      template =
-          configService
-              .getRealm((String) values.get(GlobalKeysConfig.REALM))
-              .getUserStorages()
-              .stream()
-              .filter(
-                  us ->
-                      us.getName()
-                          .equalsIgnoreCase((String) values.get(GlobalKeysConfig.USERSTORAGE)))
-              .findFirst()
-              .get()
-              .getProperties()
-              .get(webHookName + "_init_template");
-    } catch (Exception e) {
-      // we don't need to manage this exception here
-    }
-    if (template == null) {
-      template =
-          loadResource(
-              env.getProperty(
-                  "sugoi.api.event.webhook." + webHookName + ".default.reset.template"));
-    }
-    String content = injectValueInTemplate(template, values);
-    String target = env.getProperty("sugoi.api.event.webhook." + webHookName + ".target");
-    String authType = env.getProperty("sugoi.api.event.webhook." + webHookName + ".auth.type");
-    Map<String, String> headers = new HashMap<>();
-    headers.put("content-type", "application/json");
-    addAuthHeader(webHookName, authType, headers);
-    send(webHookName, target, content, headers);
   }
 
   private void addAuthHeader(String webHookName, String authType, Map<String, String> headers) {
     if (authType.equalsIgnoreCase("basic")) {
-      String username = env.getProperty("sugoi.api.event.webhook." + webHookName + ".auth.user");
-      String password =
-          env.getProperty("sugoi.api.event.webhook." + webHookName + ".auth.password");
+      String username = env.getProperty(WEBHOOK_PROPERTY_PREFIX + webHookName + ".auth.user");
+      String password = env.getProperty(WEBHOOK_PROPERTY_PREFIX + webHookName + ".auth.password");
       String auth = username + ":" + password;
       byte[] encodedAuth = Base64Utils.encode(auth.getBytes());
       String authHeader = "Basic " + new String(encodedAuth);
       headers.put("Authorization", authHeader);
     } else if (authType.equalsIgnoreCase("oauth")) {
-      String token =
-          env.getProperty(
-              env.getProperty("sugoi.api.event.webhook." + webHookName + ".auth.token"));
-      headers.put("Authorization", "bearer " + token);
+      String tokenProperty = env.getProperty(WEBHOOK_PROPERTY_PREFIX + webHookName + ".auth.token");
+      if (tokenProperty != null) {
+        String token = env.getProperty(tokenProperty);
+        headers.put("Authorization", "bearer " + token);
+      }
     }
   }
 
@@ -175,7 +145,7 @@ public class WebHookServiceImpl implements WebHookService {
     try {
       ResourceLoader resourceLoader = new DefaultResourceLoader();
       Resource resource = resourceLoader.getResource(path);
-      return new String(IOUtils.toString(resource.getInputStream(), StandardCharsets.UTF_8.name()));
+      return IOUtils.toString(resource.getInputStream(), StandardCharsets.UTF_8.name());
     } catch (IOException e) {
       throw new RuntimeException("Unable to load " + path, e);
     }
@@ -194,38 +164,26 @@ public class WebHookServiceImpl implements WebHookService {
     }
   }
 
-  @Override
-  public void sendLogin(String webHookName, Map<String, Object> values) {
+  private String loadTemplate(
+      String realmTemplateConfiguration,
+      String propertyTemplateConfiguration,
+      String realmName,
+      String userStorageName) {
     String template = null;
     try {
       template =
-          configService
-              .getRealm((String) values.get(GlobalKeysConfig.REALM))
-              .getUserStorages()
-              .stream()
-              .filter(
-                  us ->
-                      us.getName()
-                          .equalsIgnoreCase((String) values.get(GlobalKeysConfig.USERSTORAGE)))
+          configService.getRealm(realmName).getUserStorages().stream()
+              .filter(us -> us.getName().equalsIgnoreCase(userStorageName))
               .findFirst()
-              .get()
+              .orElseThrow()
               .getProperties()
-              .get(webHookName + "_send_login_template");
+              .get(realmTemplateConfiguration);
     } catch (Exception e) {
       // we don't need to manage this exception here
     }
-    if (template == null) {
-      template =
-          loadResource(
-              env.getProperty(
-                  "sugoi.api.event.webhook." + webHookName + ".default.send-login.template"));
+    if (template == null && propertyTemplateConfiguration != null) {
+      template = loadResource(env.getProperty(propertyTemplateConfiguration));
     }
-    String content = injectValueInTemplate(template, values);
-    String target = env.getProperty("sugoi.api.event.webhook." + webHookName + ".target");
-    String authType = env.getProperty("sugoi.api.event.webhook." + webHookName + ".auth.type");
-    Map<String, String> headers = new HashMap<>();
-    headers.put("content-type", "application/json");
-    addAuthHeader(webHookName, authType, headers);
-    send(webHookName, target, content, headers);
+    return template;
   }
 }
