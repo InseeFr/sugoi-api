@@ -347,7 +347,10 @@ public class FileWriterStore implements WriterStore {
 
   @Override
   public ProviderResponse initPassword(
-      String userId, String password, ProviderRequest providerRequest) {
+      String userId,
+      String password,
+      boolean changePasswordResetStatus,
+      ProviderRequest providerRequest) {
     throw new UnsupportedOperationException("Password actions are not supported on file storage");
   }
 

@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -109,6 +110,7 @@ public class LdapWriterStoreTest {
     userMapping.put("attributes.insee_roles_applicatifs", "inseeRoleApplicatif,list_string,rw");
     userMapping.put("attributes.common_name", "cn,String,rw");
     userMapping.put("attributes.additionalMail", "inseeMailCorrespondant,String,rw");
+    userMapping.put("attributes.passwordShouldBeReset", "pwdReset,String,ro");
     Map<String, String> organizationMapping = new HashMap<>();
     organizationMapping.put("identifiant", "uid,String,rw");
     organizationMapping.put("attributes.description", "description,String,rw");
@@ -514,12 +516,12 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testInitPasswordNullFails() {
-    assertThrows(Exception.class, () -> ldapWriterStore.initPassword("testc", null, null));
+    assertThrows(Exception.class, () -> ldapWriterStore.initPassword("testc", null, true, null));
   }
 
   @Test
   public void testInitPassword() {
-    ldapWriterStore.initPassword("testo", "toto", null);
+    ldapWriterStore.initPassword("testo", "toto", false, null);
     assertThat(
         "Password toto should be validated",
         ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo").get(), "toto"));
@@ -548,6 +550,63 @@ public class LdapWriterStoreTest {
     assertThat(
         "Password should not be reinit",
         !ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo").get(), "reinit"));
+  }
+
+  @Test
+  @DisplayName(
+      "When a password is renitialized on a user that doesn't have the flag reinit, "
+          + "with the request indicating password must be changed, "
+          + "then a flag pwdReset on the user can be retrieved and set to true")
+  public void reinitPasswordSetsReinitUserNotHavingPwdReset() {
+    ldapWriterStore.reinitPassword("nopwdreset", "reinit", true, new HashMap<>(), "", null);
+    assertThat(
+        "user should have an attribute passwordShouldBeReset",
+        ((String)
+                ldapReaderStore
+                    .getUser("nopwdreset")
+                    .get()
+                    .getAttributes()
+                    .get("passwordShouldBeReset"))
+            .toLowerCase(),
+        is("true"));
+  }
+
+  @Test
+  @DisplayName(
+      "When a password is renitialized on a user that already has the flag reinit, "
+          + "with the request indicating password must be changed, "
+          + "then a flag pwdReset on the user can be retrieved and set to true")
+  public void reinitPasswordSetsReinitUseHavingPwdReset() {
+    ldapWriterStore.reinitPassword("havepwdreset", "reinit", true, new HashMap<>(), "", null);
+    assertThat(
+        "user should have an attribute passwordShouldBeReset",
+        ((String)
+                ldapReaderStore
+                    .getUser("havepwdreset")
+                    .get()
+                    .getAttributes()
+                    .get("passwordShouldBeReset"))
+            .toLowerCase(),
+        is("true"));
+  }
+
+  @Test
+  @DisplayName(
+      "When a password is initalized on a user that doesn't have the flag reinit, "
+          + "with the request indicating password must be changed, "
+          + "then a flag pwdReset on the user can be retrieved and set to true")
+  public void initPasswordSetsReinitUserNotHavingPwdReset() {
+    ldapWriterStore.initPassword("nopwdreset", "reinit", true, null);
+    assertThat(
+        "user should have an attribute passwordShouldBeReset",
+        ((String)
+                ldapReaderStore
+                    .getUser("nopwdreset")
+                    .get()
+                    .getAttributes()
+                    .get("passwordShouldBeReset"))
+            .toLowerCase(),
+        is("true"));
   }
 
   @Test

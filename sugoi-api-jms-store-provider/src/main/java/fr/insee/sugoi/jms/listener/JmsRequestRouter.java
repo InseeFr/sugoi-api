@@ -148,7 +148,10 @@ public class JmsRequestRouter {
         case Method.INIT_PASSWORD:
           userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
           String password = (String) request.getmethodParams().get(JmsAtttributes.PASSWORD);
-          credentialsService.initPassword(realm, userStorage, userId, password, providerRequest);
+          boolean changePasswordResetStatus =
+              (Boolean) request.getmethodParams().get(JmsAtttributes.SHOULD_RESET_PASSWORD);
+          credentialsService.initPassword(
+              realm, userStorage, userId, password, changePasswordResetStatus, providerRequest);
           break;
         case Method.CREATE_APPLICATION:
           Application application =
