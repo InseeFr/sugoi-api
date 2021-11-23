@@ -121,8 +121,12 @@ public class CredentialsServiceImpl implements CredentialsService {
       String userId,
       String oldPassword,
       String newPassword,
+      String webserviceTag,
+      Map<String, String> templateProperties,
       ProviderRequest providerRequest) {
     try {
+
+      User user = userService.findById(realm, userStorage, userId);
 
       Map<String, String> realmProperties = configService.getRealm(realm).getProperties();
 
@@ -132,7 +136,13 @@ public class CredentialsServiceImpl implements CredentialsService {
         ProviderResponse providerResponse =
             storeProvider
                 .getWriterStore(realm, userStorage)
-                .changePassword(userId, oldPassword, newPassword, providerRequest);
+                .changePassword(
+                    userId,
+                    oldPassword,
+                    newPassword,
+                    webserviceTag,
+                    templateProperties,
+                    providerRequest);
         sugoiEventPublisher.publishCustomEvent(
             realm,
             userStorage,
@@ -140,7 +150,12 @@ public class CredentialsServiceImpl implements CredentialsService {
             Map.ofEntries(
                 Map.entry(EventKeysConfig.NEW_PASSWORD, newPassword),
                 Map.entry(EventKeysConfig.OLD_PASSWORD, newPassword),
-                Map.entry(EventKeysConfig.USER, userId)));
+                Map.entry(EventKeysConfig.USER_ID, userId),
+                Map.entry(EventKeysConfig.PROPERTIES, templateProperties),
+                Map.entry(
+                    EventKeysConfig.MAIL, computeReceiverMail(templateProperties, user.getMail())),
+                Map.entry(
+                    EventKeysConfig.WEBSERVICE_TAG, webserviceTag != null ? webserviceTag : "")));
         return providerResponse;
       } else {
         throw new PasswordPolicyNotMetException("New password is not valid");

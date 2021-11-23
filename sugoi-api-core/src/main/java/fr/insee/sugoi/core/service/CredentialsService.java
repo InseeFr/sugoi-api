@@ -53,6 +53,9 @@ public interface CredentialsService {
    * @param oldPassword the password is changed only if the oldPassword match the current user
    *     password
    * @param newPassword password to set to the user
+   * @param webserviceTag tag indicating which webservice will be called
+   * @param templateProperties properties to add to the templated body to send to the webservice
+   * @param providerRequest
    * @throws RealmNotFoundException if realm doesn't exist
    * @throws UserNotFoundException if user doesn't exist in realm
    * @throws PasswordPolicyNotMetException if password doesn't meet the password policy set for the
@@ -64,6 +67,8 @@ public interface CredentialsService {
       String userId,
       String oldPassword,
       String newPassword,
+      String webserviceTag,
+      Map<String, String> templateProperties,
       ProviderRequest providerRequest);
 
   /**

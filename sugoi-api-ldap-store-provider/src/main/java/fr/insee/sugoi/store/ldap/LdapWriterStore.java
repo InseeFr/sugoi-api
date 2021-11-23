@@ -496,7 +496,12 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
 
   @Override
   public ProviderResponse changePassword(
-      String userId, String oldPassword, String newPassword, ProviderRequest providerRequest) {
+      String userId,
+      String oldPassword,
+      String newPassword,
+      String webhookTag,
+      Map<String, String> templateProperties,
+      ProviderRequest providerRequest) {
     User user =
         ldapReaderStore
             .getUser(userId)

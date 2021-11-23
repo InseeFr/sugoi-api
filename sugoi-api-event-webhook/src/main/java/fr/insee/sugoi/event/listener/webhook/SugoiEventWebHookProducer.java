@@ -22,6 +22,7 @@ import fr.insee.sugoi.model.User;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -51,20 +52,16 @@ public class SugoiEventWebHookProducer {
     Map<String, Object> values = getValuesForTemplateFromEvent(cse);
     switch (eventType) {
       case RESET_PASSWORD:
-        webHookNames.stream()
-            .filter(
-                webHookName ->
-                    ((env.getProperty("sugoi.api.event.webhook." + webHookName + ".tag"))
-                        .equalsIgnoreCase(webHookTag)))
+        getServiceConfiguredForTag(getTagWithDefaultMail(webHookTag))
             .forEach(webHookName -> webHookService.resetPassword(webHookName, values));
         break;
       case SEND_LOGIN:
-        webHookNames.stream()
-            .filter(
-                webHookName ->
-                    ((env.getProperty("sugoi.api.event.webhook." + webHookName + ".tag"))
-                        .equalsIgnoreCase(webHookTag)))
+        getServiceConfiguredForTag(getTagWithDefaultMail(webHookTag))
             .forEach(webHookName -> webHookService.sendLogin(webHookName, values));
+        break;
+      case CHANGE_PASSWORD:
+        getServiceConfiguredForTag(webHookTag)
+            .forEach(webHookName -> webHookService.changePassword(webHookName, values));
         break;
       default:
         break;
@@ -74,19 +71,31 @@ public class SugoiEventWebHookProducer {
   private Map<String, Object> getValuesForTemplateFromEvent(SugoiEvent event) {
     Map<String, Object> values = new HashMap<>();
 
-    User user = (User) event.getProperties().get(EventKeysConfig.USER);
+    if (event.getProperties().containsKey(EventKeysConfig.USER)) {
+      User user = (User) event.getProperties().get(EventKeysConfig.USER);
+      values.put(EventKeysConfig.USER, user);
+      values.put(EventKeysConfig.USER_ID, user.getUsername());
+    } else if (event.getProperties().containsKey(EventKeysConfig.USER_ID)) {
+      values.put(EventKeysConfig.USER_ID, event.getProperties().get(EventKeysConfig.USER_ID));
+    }
     String password = (String) event.getProperties().get(EventKeysConfig.PASSWORD);
     String realm = event.getRealm();
     String userStorage = event.getUserStorage() != null ? event.getUserStorage() : "default";
 
     values.put(GlobalKeysConfig.REALM, realm);
     values.put(GlobalKeysConfig.USERSTORAGE, userStorage);
-    values.put(EventKeysConfig.USER, user);
     values.put(EventKeysConfig.MAIL, event.getProperties().get(EventKeysConfig.MAIL));
     values.put(EventKeysConfig.PASSWORD, password);
-    values.put(EventKeysConfig.USER_ID, user.getUsername());
     values.put(EventKeysConfig.PROPERTIES, event.getProperties().get(EventKeysConfig.PROPERTIES));
     return values;
+  }
+
+  private Stream<String> getServiceConfiguredForTag(String webhookTag) {
+    return webHookNames.stream()
+        .filter(
+            webHookName ->
+                ((env.getProperty("sugoi.api.event.webhook." + webHookName + ".tag"))
+                    .equalsIgnoreCase(webhookTag)));
   }
 
   private String getTagWithDefaultMail(String maybeNullTag) {

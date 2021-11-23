@@ -17,11 +17,9 @@ import java.util.Map;
 
 public interface WebHookService {
 
-  void send(String webHookName, String target, String content, Map<String, String> headers);
-
   void resetPassword(String webHookName, Map<String, Object> value);
 
-  void initPassword(String webHookName, Map<String, Object> value);
-
   void sendLogin(String webHookName, Map<String, Object> value);
+
+  void changePassword(String webHookName, Map<String, Object> value);
 }

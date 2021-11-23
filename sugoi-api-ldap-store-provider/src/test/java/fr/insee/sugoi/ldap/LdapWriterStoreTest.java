@@ -613,7 +613,9 @@ public class LdapWriterStoreTest {
   public void testChangePasswordWithFalseOld() {
     assertThrows(
         InvalidPasswordException.class,
-        () -> ldapWriterStore.changePassword("rawpassword", "falsepassword", "newpassword", null));
+        () ->
+            ldapWriterStore.changePassword(
+                "rawpassword", "falsepassword", "newpassword", null, null, null));
     assertThat(
         "Password should not be newpassword",
         !ldapReaderStore.validateCredentials(
@@ -623,7 +625,8 @@ public class LdapWriterStoreTest {
   @Test
   public void testChangePasswordWithTrueOld() {
     ProviderResponse response =
-        ldapWriterStore.changePassword("rawpassword", "truepassword", "newpassword", null);
+        ldapWriterStore.changePassword(
+            "rawpassword", "truepassword", "newpassword", null, null, null);
     assertThat(
         "Response should have status OK", response.getStatus(), is(ProviderResponseStatus.OK));
     assertThat(
@@ -640,9 +643,9 @@ public class LdapWriterStoreTest {
   public void testChangePasswordWithoutOld() {
     assertThrows(
         InvalidPasswordException.class,
-        () -> ldapWriterStore.changePassword("nopassword", "", "newpassword", null));
+        () -> ldapWriterStore.changePassword("nopassword", "", "newpassword", null, null, null));
     ProviderResponse response =
-        ldapWriterStore.changePassword("nopassword", null, "newpassword", null);
+        ldapWriterStore.changePassword("nopassword", null, "newpassword", null, null, null);
     assertThat(
         "Response should have status 204", response.getStatus(), is(ProviderResponseStatus.OK));
     assertThat(
@@ -654,7 +657,7 @@ public class LdapWriterStoreTest {
   @Test
   public void testChangeShaPassword() {
     ldapWriterStore.changePassword(
-        "shapassword", "{SHA}c3q3RSeNwMY7E09Ve9oBHw+MVXg=", "newpassword", null);
+        "shapassword", "{SHA}c3q3RSeNwMY7E09Ve9oBHw+MVXg=", "newpassword", null, null, null);
     assertThat(
         "Should have a new password",
         ldapReaderStore.validateCredentials(
