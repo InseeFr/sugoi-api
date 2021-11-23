@@ -31,6 +31,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -54,6 +55,7 @@ public class CredentialsJmsTest {
   JmsTemplate jmsTemplate;
 
   private JmsWriterStore jmsWriterStore;
+  @Mock private JmsWriterStore doNothingWriterStore;
 
   @MockBean private StoreProvider storeProvider;
   @MockBean private PasswordService passwordService;
@@ -81,9 +83,15 @@ public class CredentialsJmsTest {
             realm,
             userStorage);
 
+    Mockito.when(
+            doNothingWriterStore.initPassword(
+                Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any()))
+        .thenReturn(null);
+
     Mockito.when(configService.getRealm("domaine1")).thenReturn(new Realm());
     Mockito.when(storeProvider.getWriterStore(Mockito.eq("domaine1"), Mockito.eq("default")))
-        .thenReturn(jmsWriterStore);
+        .thenReturn(jmsWriterStore)
+        .thenReturn(doNothingWriterStore);
     Mockito.when(
             passwordService.validatePassword(
                 Mockito.eq("averycomplexpassword"),
@@ -104,13 +112,14 @@ public class CredentialsJmsTest {
     ProviderRequest providerRequest = new ProviderRequest();
     providerRequest.setAsynchronousAllowed(true);
     credentialsServiceImpl.initPassword(
-        "domaine1", "default", "toto", "averycomplexpassword", providerRequest);
+        "domaine1", "default", "toto", "averycomplexpassword", true, providerRequest);
     Mockito.verify(credentialsServiceImpl, Mockito.timeout(1000).times(2))
         .initPassword(
             Mockito.eq("domaine1"),
             Mockito.eq("default"),
             Mockito.eq("toto"),
             Mockito.eq("averycomplexpassword"),
+            Mockito.eq(true),
             Mockito.any());
   }
 }

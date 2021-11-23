@@ -73,7 +73,9 @@ public interface CredentialsService {
    * @param realm
    * @param userStorage
    * @param userId
-   * @param pcr
+   * @param newPassowrd passowrd set on user
+   * @param changePasswordResetStatus indicates if a flag should be set on user to indicate they
+   *     should reset password
    * @throws RealmNotFoundException if realm doesn't exist
    * @throws UserNotFoundException if user doesn't exist in realm
    * @throws PasswordPolicyNotMetException if password doesn't meet the password policy set for the
@@ -84,6 +86,7 @@ public interface CredentialsService {
       String userStorage,
       String userId,
       String newPassword,
+      boolean changePasswordResetStatus,
       ProviderRequest providerRequest);
 
   /**

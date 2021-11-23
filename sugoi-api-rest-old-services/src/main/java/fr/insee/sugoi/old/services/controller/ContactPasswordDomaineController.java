@@ -193,6 +193,7 @@ public class ContactPasswordDomaineController {
         realmUserStorage.getUserStorage(),
         identifiant,
         pcr.getNouveauMotDePasse(),
+        true,
         new ProviderRequest(
             new SugoiUser(
                 authentication.getName(),

@@ -355,6 +355,27 @@ userPassword: {SHA}c3q3RSeNwMY7E09Ve9oBHw+MVXg=
 uid: shapassword2
 cn: shapassword2
 
+dn: uid=nopwdreset,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+uid: nopwdreset
+cn: nopwdreset
+
+dn: uid=havepwdreset,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+pwdReset: false
+uid: havepwdreset
+cn: havepwdreset
+
 dn: uid=testo,ou=organisations,ou=clients_domaine1,o=insee,c=fr
 objectClass: top
 objectClass: inseeOrganisation

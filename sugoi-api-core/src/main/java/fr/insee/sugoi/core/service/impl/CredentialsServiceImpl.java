@@ -163,6 +163,7 @@ public class CredentialsServiceImpl implements CredentialsService {
       String userStorage,
       String userId,
       String newPassword,
+      boolean changePasswordResetStatus,
       ProviderRequest providerRequest) {
     try {
 
@@ -173,7 +174,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         ProviderResponse response =
             storeProvider
                 .getWriterStore(realm, userStorage)
-                .initPassword(userId, newPassword, providerRequest);
+                .initPassword(userId, newPassword, changePasswordResetStatus, providerRequest);
         sugoiEventPublisher.publishCustomEvent(
             realm,
             userStorage,

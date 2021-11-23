@@ -336,6 +336,9 @@ public class CredentialsController {
           String id,
       @Parameter(description = "Password to set to the user", required = true) @RequestBody
           PasswordView passwordView,
+      @Parameter(description = "Indicate if a flag password should be reset should be set on user")
+          @RequestParam(name = "change-password-reset-status", defaultValue = "false")
+          boolean changePasswordResetStatus,
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
@@ -353,6 +356,7 @@ public class CredentialsController {
             userStorage,
             id,
             passwordView.getPassword(),
+            changePasswordResetStatus,
             new ProviderRequest(
                 new SugoiUser(
                     authentication.getName(),
@@ -394,6 +398,9 @@ public class CredentialsController {
           String id,
       @Parameter(description = "Password to set to the user", required = true) @RequestBody
           PasswordView passwordView,
+      @Parameter(description = "Indicate if a flag password should be reset should be set on user")
+          @RequestParam(name = "change-password-reset-status", defaultValue = "false")
+          boolean changePasswordResetStatus,
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
@@ -411,6 +418,7 @@ public class CredentialsController {
         (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
         id,
         passwordView,
+        changePasswordResetStatus,
         isAsynchronous,
         isUrgent,
         transactionId,

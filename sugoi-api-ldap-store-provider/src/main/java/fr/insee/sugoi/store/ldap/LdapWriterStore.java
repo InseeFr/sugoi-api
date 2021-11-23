@@ -471,7 +471,10 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
 
   @Override
   public ProviderResponse initPassword(
-      String userId, String password, ProviderRequest providerRequest) {
+      String userId,
+      String password,
+      boolean changePasswordResetStatus,
+      ProviderRequest providerRequest) {
     Modification mod = new Modification(ModificationType.REPLACE, "userPassword", password);
     User user =
         ldapReaderStore
@@ -479,9 +482,9 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
             .orElseThrow(
                 () -> new UserNotFoundException(config.get(LdapConfigKeys.REALM_NAME), userId));
     try {
-
       ldapPoolConnection.modify(
           "uid=" + user.getUsername() + "," + config.get(LdapConfigKeys.USER_SOURCE), mod);
+      changePasswordResetStatus(userId, changePasswordResetStatus);
       ProviderResponse response = new ProviderResponse();
       response.setStatus(ProviderResponseStatus.OK);
       response.setEntityId(user.getUsername());
