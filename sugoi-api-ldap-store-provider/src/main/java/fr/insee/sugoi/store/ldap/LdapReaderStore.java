@@ -100,20 +100,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
   @Override
   public Optional<Organization> getOrganization(String id) {
     if (config.get(LdapConfigKeys.ORGANIZATION_SOURCE) != null) {
-      SearchResultEntry entry = getEntryByDn(getOrganizationDN(id));
-      Organization org =
-          (entry != null) ? organizationLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
-      if (org != null && org.getAddress() != null && org.getAddress().containsKey("id")) {
-        Map<String, String> address = getAddress(org.getAddress().get("id"));
-        if (address != null) {
-          address.put("id", org.getAddress().get("id"));
-          org.setAddress(address);
-        }
-      }
-      if (org != null && org.getOrganization() != null) {
-        org.setOrganization(getOrganization(org.getOrganization().getIdentifiant()).orElse(null));
-      }
-      return Optional.ofNullable(org);
+      return getOrganization(id, false);
     } else {
       throw new UnsupportedOperationException(
           "Organizations feature not configured for this storage");
@@ -403,5 +390,23 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     } catch (Exception e) {
       throw new RuntimeException("Fail to get group in ldap", e);
     }
+  }
+
+  private Optional<Organization> getOrganization(String id, boolean isSubOrganization) {
+    SearchResultEntry entry = getEntryByDn(getOrganizationDN(id));
+    Organization org =
+        (entry != null) ? organizationLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
+    if (org != null && org.getAddress() != null && org.getAddress().containsKey("id")) {
+      Map<String, String> address = getAddress(org.getAddress().get("id"));
+      if (address != null) {
+        address.put("id", org.getAddress().get("id"));
+        org.setAddress(address);
+      }
+    }
+    if (org != null && !isSubOrganization && org.getOrganization() != null) {
+      org.setOrganization(
+          getOrganization(org.getOrganization().getIdentifiant(), true).orElse(null));
+    }
+    return Optional.ofNullable(org);
   }
 }
