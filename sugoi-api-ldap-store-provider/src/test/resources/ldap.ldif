@@ -394,6 +394,12 @@ description: Insee
 inseeOrganisationDN: uid=testi,ou=organisations,ou=clients_domaine1,o=insee,c=fr
 inseeAdressePostaleDN: l=testa,ou=adresses,ou=clients_domaine1,o=insee,c=fr
 
+dn: uid=loopednested,ou=organisations,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeOrganisation
+uid: loopednested
+inseeOrganisationDN: uid=loopednested,ou=organisations,ou=clients_domaine1,o=insee,c=fr
+
 dn: uid=testi,ou=organisations,ou=clients_domaine1,o=insee,c=fr
 objectClass: top
 objectClass: inseeOrganisation

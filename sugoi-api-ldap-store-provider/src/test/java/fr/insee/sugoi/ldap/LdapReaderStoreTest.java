@@ -154,6 +154,14 @@ public class LdapReaderStoreTest {
   }
 
   @Test
+  public void testGetLoopedNestedOrganization() {
+    assertThat(
+        "An organization which is its own suborganization should not lead to loop",
+        ldapReaderStore.getOrganization("loopednested").get().getOrganization().getIdentifiant(),
+        is("loopednested"));
+  }
+
+  @Test
   public void testSearchAllOrganizations() {
     PageableResult pageableResult = new PageableResult();
     List<Organization> organizations =
