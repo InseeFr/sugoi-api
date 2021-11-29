@@ -13,7 +13,6 @@
 */
 package fr.insee.sugoi.services.controller;
 
-import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -382,18 +381,7 @@ public class GroupController {
       @Parameter(description = "Group's name to search", required = true) @PathVariable("groupname")
           String id) {
 
-    Group group =
-        groupService
-            .findById(realm, applicationName, id)
-            .orElseThrow(
-                () ->
-                    new GroupNotFoundException(
-                        "Cannot find group "
-                            + id
-                            + " in app "
-                            + applicationName
-                            + " in realm "
-                            + realm));
+    Group group = groupService.findById(realm, applicationName, id);
     return ResponseEntity.status(HttpStatus.OK).body(group);
   }
 

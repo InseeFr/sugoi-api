@@ -284,7 +284,7 @@ public class LdapReaderStoreTest {
 
   @Test
   public void testGetGroup() {
-    Group group = ldapReaderStore.getGroup("Applitest", "Utilisateurs_Applitest");
+    Group group = ldapReaderStore.getGroup("Applitest", "Utilisateurs_Applitest").get();
     assertThat(
         "Should be Utilisateurs_Applitest group", group.getName(), is("Utilisateurs_Applitest"));
     assertThat(

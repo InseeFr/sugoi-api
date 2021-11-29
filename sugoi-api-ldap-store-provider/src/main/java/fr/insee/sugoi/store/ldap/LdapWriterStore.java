@@ -187,19 +187,18 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   public ProviderResponse deleteGroup(
       String appName, String groupName, ProviderRequest providerRequest) {
     try {
-      if (ldapReaderStore.getGroup(appName, groupName) == null) {
-        throw new GroupNotFoundException(
-            String.format(
-                "Group %s doesn't exist in application %s in realm %s",
-                groupName, appName, config.get(LdapConfigKeys.REALM_NAME)));
-      } else {
-        DeleteRequest dr = new DeleteRequest(getGroupDN(appName, groupName));
-        ldapPoolConnection.delete(dr);
-        ProviderResponse response = new ProviderResponse();
-        response.setStatus(ProviderResponseStatus.OK);
-        response.setEntityId(groupName);
-        return response;
-      }
+      ldapReaderStore
+          .getGroup(appName, groupName)
+          .orElseThrow(
+              () ->
+                  new GroupNotFoundException(
+                      config.get(LdapConfigKeys.REALM_NAME), appName, groupName));
+      DeleteRequest dr = new DeleteRequest(getGroupDN(appName, groupName));
+      ldapPoolConnection.delete(dr);
+      ProviderResponse response = new ProviderResponse();
+      response.setStatus(ProviderResponseStatus.OK);
+      response.setEntityId(groupName);
+      return response;
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to delete group " + groupName, e);
     }
@@ -209,7 +208,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   public ProviderResponse createGroup(
       String appName, Group group, ProviderRequest providerRequest) {
     try {
-      if (ldapReaderStore.getGroup(appName, group.getName()) != null) {
+      if (ldapReaderStore.getGroup(appName, group.getName()).isPresent()) {
         throw new GroupAlreadyExistException(
             String.format(
                 "Group %s already exist in application %s in realm %s",
@@ -245,18 +244,17 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   public ProviderResponse updateGroup(
       String appName, Group updatedGroup, ProviderRequest providerRequest) {
     try {
-      if (ldapReaderStore.getGroup(appName, updatedGroup.getName()) == null) {
-        throw new GroupNotFoundException(
-            String.format(
-                "Group %s doesn't exist in application %s in realm %s",
-                updatedGroup.getName(), appName, config.get(LdapConfigKeys.REALM_NAME)));
-      } else {
-        ModifyRequest mr =
-            new ModifyRequest(
-                getGroupDN(appName, updatedGroup.getName()),
-                groupLdapMapper.createMods(updatedGroup));
-        ldapPoolConnection.modify(mr);
-      }
+      ldapReaderStore
+          .getGroup(appName, updatedGroup.getName())
+          .orElseThrow(
+              () ->
+                  new GroupNotFoundException(
+                      config.get(LdapConfigKeys.REALM_NAME), appName, updatedGroup.getName()));
+      ModifyRequest mr =
+          new ModifyRequest(
+              getGroupDN(appName, updatedGroup.getName()),
+              groupLdapMapper.createMods(updatedGroup));
+      ldapPoolConnection.modify(mr);
     } catch (LDAPException e) {
       throw new RuntimeException(
           "Failed to update group " + updatedGroup.getName() + " while writing to LDAP", e);
@@ -379,15 +377,12 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public ProviderResponse deleteUserFromGroup(
       String appName, String groupName, String userId, ProviderRequest providerRequest) {
-    if (ldapReaderStore.getGroup(appName, groupName) == null) {
-      throw new GroupNotFoundException(
-          "Cannot find group "
-              + groupName
-              + " in app "
-              + appName
-              + " in realm "
-              + config.get(LdapConfigKeys.REALM_NAME));
-    }
+    ldapReaderStore
+        .getGroup(appName, groupName)
+        .orElseThrow(
+            () ->
+                new GroupNotFoundException(
+                    config.get(LdapConfigKeys.REALM_NAME), appName, groupName));
     ldapReaderStore
         .getUser(userId)
         .orElseThrow(
@@ -416,15 +411,12 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public ProviderResponse addUserToGroup(
       String appName, String groupName, String userId, ProviderRequest providerRequest) {
-    if (ldapReaderStore.getGroup(appName, groupName) == null) {
-      throw new GroupNotFoundException(
-          "Cannot find group "
-              + groupName
-              + " in app "
-              + appName
-              + " in realm "
-              + config.get(LdapConfigKeys.REALM_NAME));
-    }
+    ldapReaderStore
+        .getGroup(appName, groupName)
+        .orElseThrow(
+            () ->
+                new GroupNotFoundException(
+                    config.get(LdapConfigKeys.REALM_NAME), appName, groupName));
     ldapReaderStore
         .getUser(userId)
         .orElseThrow(

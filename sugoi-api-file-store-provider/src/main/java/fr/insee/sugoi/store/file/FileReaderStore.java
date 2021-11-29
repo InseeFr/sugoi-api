@@ -115,10 +115,10 @@ public class FileReaderStore implements ReaderStore {
   @Override
   public PageResult<User> getUsersInGroup(String appName, String groupName) {
     PageResult<User> pageResult = new PageResult<>();
-    Group group = getGroup(appName, groupName);
-    if (group != null && group.getUsers() != null) {
+    Optional<Group> optionalGroup = getGroup(appName, groupName);
+    if (optionalGroup.isPresent() && optionalGroup.get().getUsers() != null) {
       pageResult.setResults(
-          group.getUsers().stream()
+          optionalGroup.get().getUsers().stream()
               .map(simplifiedUser -> getUser(simplifiedUser.getUsername()))
               .filter(optionalUser -> optionalUser.isPresent())
               .map(optionalUser -> optionalUser.get())
@@ -147,15 +147,14 @@ public class FileReaderStore implements ReaderStore {
   }
 
   @Override
-  public Group getGroup(String appName, String groupName) {
+  public Optional<Group> getGroup(String appName, String groupName) {
     Application application =
         getApplication(appName).orElseThrow(() -> new ApplicationNotFoundException(appName));
     return application.getGroups() != null
         ? application.getGroups().stream()
             .filter(group -> group.getName().equalsIgnoreCase(groupName))
             .findFirst()
-            .orElse(null)
-        : null;
+        : Optional.empty();
   }
 
   @Override
@@ -281,7 +280,7 @@ public class FileReaderStore implements ReaderStore {
   }
 
   @Override
-  public Group getManagerGroup(String applicationName) {
+  public Optional<Group> getManagerGroup(String applicationName) {
     throw new NotImplementedException();
   }
 }

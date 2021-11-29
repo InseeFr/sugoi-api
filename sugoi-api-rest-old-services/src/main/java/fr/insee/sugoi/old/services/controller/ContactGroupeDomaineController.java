@@ -15,7 +15,6 @@ package fr.insee.sugoi.old.services.controller;
 
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
 import fr.insee.sugoi.converter.ouganext.GroupeOuganext;
-import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.SugoiUser;
 import fr.insee.sugoi.core.service.GroupService;
@@ -162,17 +161,7 @@ public class ContactGroupeDomaineController {
       Authentication authentication) {
     RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
-    groupService
-        .findById(realmUserStorage.getRealm(), nomAppli, nomGroupe)
-        .orElseThrow(
-            () ->
-                new GroupNotFoundException(
-                    "Cannot find group "
-                        + nomGroupe
-                        + " in app "
-                        + nomAppli
-                        + "in domaine "
-                        + domaine));
+    groupService.findById(realmUserStorage.getRealm(), nomAppli, nomGroupe);
     User user =
         userService.findById(
             realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);

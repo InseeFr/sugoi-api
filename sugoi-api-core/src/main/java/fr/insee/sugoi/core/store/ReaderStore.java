@@ -117,9 +117,9 @@ public interface ReaderStore {
    * @param groupName
    * @throws UnsupportedOperationException if the configuration for applications or groups is not
    *     set.
-   * @return the group with its simplified list of users. Null if no group found.
+   * @return optional of the group with its simplified list of users, empty if not found
    */
-  public Group getGroup(String appName, String groupName);
+  public Optional<Group> getGroup(String appName, String groupName);
 
   /**
    * Search groups in application appName matching groupFilter filled attributes. Groups are
@@ -159,5 +159,11 @@ public interface ReaderStore {
    */
   public boolean validateCredentials(User user, String credential);
 
-  public Group getManagerGroup(String applicationName);
+  /**
+   * Retrieve the group used to give appmanager rights on appName.
+   *
+   * @param appName
+   * @return optional of the manager group with its simplified list of users, empty if not found
+   */
+  public Optional<Group> getManagerGroup(String applicationName);
 }

@@ -283,7 +283,7 @@ public class LdapWriterStoreTest {
   public void testDeleteUser() {
     assertThat(
         "byebye is in Utilisateurs_Applitest",
-        ldapReaderStore.getGroup("Applitest", "Utilisateurs_Applitest").getUsers().stream()
+        ldapReaderStore.getGroup("Applitest", "Utilisateurs_Applitest").get().getUsers().stream()
             .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
     assertThat(
         "byebye is in Utilisateurs_Applitest",
@@ -293,7 +293,7 @@ public class LdapWriterStoreTest {
     assertThat("byebye should have been deleted", ldapReaderStore.getUser("byebye").isEmpty());
     assertThat(
         "byebye should no more be in Utilisateurs_Applitest",
-        !ldapReaderStore.getGroup("Applitest", "Utilisateurs_Applitest").getUsers().stream()
+        !ldapReaderStore.getGroup("Applitest", "Utilisateurs_Applitest").get().getUsers().stream()
             .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
     assertThat(
         "byebye is in Utilisateurs_Applitest",
@@ -398,8 +398,7 @@ public class LdapWriterStoreTest {
         ldapReaderStore.getApplication("NotEmptyApplication").isEmpty());
     assertThat(
         "Group1 should not exist in NotEmptyApplication",
-        ldapReaderStore.getGroup("NotEmptyApplication", "Group1_NotEmptyApplication"),
-        is(nullValue()));
+        ldapReaderStore.getGroup("NotEmptyApplication", "Group1_NotEmptyApplication").isEmpty());
   }
 
   @Test
@@ -415,7 +414,7 @@ public class LdapWriterStoreTest {
     ldapWriterStore.createGroup("Applitest", group, null);
     assertThat(
         "Should retrieve Groupy",
-        ldapReaderStore.getGroup("Applitest", "Groupy_Applitest").getName(),
+        ldapReaderStore.getGroup("Applitest", "Groupy_Applitest").get().getName(),
         is("Groupy_Applitest"));
   }
 
@@ -428,8 +427,7 @@ public class LdapWriterStoreTest {
     ldapWriterStore.deleteGroup("WebServicesLdap", "Asupprimer_WebServicesLdap", null);
     assertThat(
         "Should have been deleted",
-        ldapReaderStore.getGroup("WebServicesLdap", "Asupprimer_WebServicesLdap"),
-        is(nullValue()));
+        ldapReaderStore.getGroup("WebServicesLdap", "Asupprimer_WebServicesLdap").isEmpty());
   }
 
   @Test
@@ -483,12 +481,12 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testUpdateGroup() {
-    Group group = ldapReaderStore.getGroup("Applitest", "Amodifier_Applitest");
+    Group group = ldapReaderStore.getGroup("Applitest", "Amodifier_Applitest").get();
     group.setDescription("new description");
     ldapWriterStore.updateGroup("Applitest", group, null);
     assertThat(
         "SuperGroup description should be new description",
-        ldapReaderStore.getGroup("Applitest", "Amodifier_Applitest").getDescription(),
+        ldapReaderStore.getGroup("Applitest", "Amodifier_Applitest").get().getDescription(),
         is("new description"));
   }
 

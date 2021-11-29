@@ -22,7 +22,6 @@ import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
-import java.util.Optional;
 
 public interface GroupService {
 
@@ -66,9 +65,10 @@ public interface GroupService {
    * @param realm
    * @param appName
    * @param id
-   * @return an optional with the group found
+   * @throws GroupNotFoundException if group was not found
+   * @return the group found
    */
-  Optional<Group> findById(String realm, String appName, String id);
+  Group findById(String realm, String appName, String id);
 
   /**
    * Find a groups matching criterias
