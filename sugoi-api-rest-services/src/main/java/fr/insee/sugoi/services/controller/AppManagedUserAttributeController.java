@@ -15,11 +15,10 @@ package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.exceptions.AppCannotManagedAttributeException;
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.SugoiUser;
-import fr.insee.sugoi.core.realm.RealmProvider;
+import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.core.service.PermissionService;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.Realm;
@@ -63,7 +62,7 @@ public class AppManagedUserAttributeController {
 
   @Autowired private PermissionService permissionService;
 
-  @Autowired private RealmProvider realmProvider;
+  @Autowired private ConfigService configService;
 
   @PatchMapping(
       value = {
@@ -126,11 +125,7 @@ public class AppManagedUserAttributeController {
             .map(String::toUpperCase)
             .collect(Collectors.toList());
     SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
-    Realm _realm =
-        realmProvider
-            .load(realm)
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm _realm = configService.getRealm(realm);
     List<String> attributes_allowed =
         Arrays.asList(
             _realm
@@ -273,7 +268,7 @@ public class AppManagedUserAttributeController {
             .map(String::toUpperCase)
             .collect(Collectors.toList());
     SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
-    Realm _realm = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
+    Realm _realm = configService.getRealm(realm);
     List<String> attributes_allowed =
         Arrays.asList(
             _realm
