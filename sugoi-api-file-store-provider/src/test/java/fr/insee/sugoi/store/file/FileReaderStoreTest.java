@@ -170,7 +170,7 @@ public class FileReaderStoreTest {
 
   @Test
   public void testGetApplication() {
-    Application application = fileReaderStore.getApplication("Applitest");
+    Application application = fileReaderStore.getApplication("Applitest").get();
     assertThat("Should get applitest", application.getName(), is("Applitest"));
     List<Group> groups = application.getGroups();
     assertThat(
@@ -191,7 +191,8 @@ public class FileReaderStoreTest {
 
   @Test
   public void testGetNonexistentApplication() {
-    assertThat("Should get null", fileReaderStore.getApplication("nottestc"), is(nullValue()));
+    assertThat(
+        "Should get empty application", fileReaderStore.getApplication("nottestc").isEmpty());
   }
 
   @Test

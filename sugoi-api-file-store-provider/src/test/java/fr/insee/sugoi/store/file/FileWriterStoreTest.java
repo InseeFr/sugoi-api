@@ -295,7 +295,7 @@ public class FileWriterStoreTest {
     groups.add(group2);
     application.setGroups(groups);
     fileWriterStore.createApplication(application, null);
-    Application retrievedApp = fileReaderStore.getApplication("MyApplication");
+    Application retrievedApp = fileReaderStore.getApplication("MyApplication").get();
     assertThat("MyApplication should have been added", retrievedApp, not(nullValue()));
     assertThat(
         "My application should have groups",
@@ -308,7 +308,7 @@ public class FileWriterStoreTest {
 
   @Test
   public void testUpdateApplication() {
-    Application application = fileReaderStore.getApplication("Applitest");
+    Application application = fileReaderStore.getApplication("Applitest").get();
     Group group1 = new Group();
     group1.setName("Group1_Applitest");
     application.getGroups().add(group1);
@@ -320,7 +320,7 @@ public class FileWriterStoreTest {
         .getUsers()
         .remove(0);
     fileWriterStore.updateApplication(application, null);
-    Application retrievedApplication = fileReaderStore.getApplication("Applitest");
+    Application retrievedApplication = fileReaderStore.getApplication("Applitest").get();
     assertThat(
         "Applitest should have group1",
         retrievedApplication.getGroups().stream()
@@ -354,8 +354,7 @@ public class FileWriterStoreTest {
     fileWriterStore.deleteApplication("NotEmptyApplication", null);
     assertThat(
         "NotEmptyApplication should have been deleted",
-        fileReaderStore.getApplication("NotEmptyApplication"),
-        is(nullValue()));
+        fileReaderStore.getApplication("NotEmptyApplication").isEmpty());
   }
 
   @Test

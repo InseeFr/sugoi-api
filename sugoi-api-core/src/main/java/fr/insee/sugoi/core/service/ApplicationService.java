@@ -21,7 +21,6 @@ import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
-import java.util.Optional;
 
 public interface ApplicationService {
 
@@ -62,9 +61,10 @@ public interface ApplicationService {
    *
    * @param realm
    * @param id
-   * @return an Optional with the app found (with list of members for each groups)
+   * @return app found (with list of members for each groups)
+   * @throws ApplicationNotFoundException if no application was found
    */
-  Optional<Application> findById(String realm, String id);
+  Application findById(String realm, String id);
 
   /**
    * Finds an application by some properties

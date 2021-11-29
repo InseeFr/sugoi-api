@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class LdapReaderStore extends LdapStore implements ReaderStore {
@@ -215,7 +216,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
   }
 
   @Override
-  public Application getApplication(String applicationName) {
+  public Optional<Application> getApplication(String applicationName) {
     SearchResultEntry entry = getEntryByDn(getApplicationDN(applicationName));
     Application application =
         (entry != null) ? applicationLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
@@ -230,7 +231,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       }
       application.setGroups(groups);
     }
-    return application;
+    return Optional.ofNullable(application);
   }
 
   /** Search applications matching applicationFilter set properties just under application source */

@@ -15,6 +15,8 @@ package fr.insee.sugoi.store.file;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
+import fr.insee.sugoi.core.exceptions.GroupAlreadyExistException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -97,42 +99,41 @@ public class FileWriterStore implements WriterStore {
   public ProviderResponse deleteGroup(
       String appName, String groupName, ProviderRequest providerRequest) {
     fileReaderStore.setResourceLoader(resourceLoader);
-    Application application = fileReaderStore.getApplication(appName);
-    if (application != null) {
-      application.getGroups().removeIf(group -> group.getName().equalsIgnoreCase(groupName));
-      updateApplication(application, providerRequest);
-      ProviderResponse response = new ProviderResponse();
-      response.setEntityId(appName);
-      response.setStatus(ProviderResponseStatus.OK);
-      return response;
-    } else {
-      throw new RuntimeException("Application " + appName + " doesn't exist");
-    }
+    Application application =
+        fileReaderStore
+            .getApplication(appName)
+            .orElseThrow(() -> new ApplicationNotFoundException(appName));
+    application.getGroups().removeIf(group -> group.getName().equalsIgnoreCase(groupName));
+    updateApplication(application, providerRequest);
+    ProviderResponse response = new ProviderResponse();
+    response.setEntityId(appName);
+    response.setStatus(ProviderResponseStatus.OK);
+    return response;
   }
 
   @Override
   public ProviderResponse createGroup(
       String appName, Group appGroup, ProviderRequest providerRequest) {
     fileReaderStore.setResourceLoader(resourceLoader);
-    Application application = fileReaderStore.getApplication(appName);
-    if (application != null) {
-      if (application.getGroups() == null) {
-        application.setGroups(new ArrayList<>());
-      }
-      if (!application.getGroups().stream()
-          .anyMatch(group -> group.getName().equalsIgnoreCase(appGroup.getName()))) {
-        appGroup.setAppName(appName);
-        application.getGroups().add(appGroup);
-        updateApplication(application, providerRequest);
-        ProviderResponse response = new ProviderResponse();
-        response.setEntityId(appGroup.getName());
-        response.setStatus(ProviderResponseStatus.OK);
-        return response;
-      } else {
-        throw new RuntimeException("Group " + appGroup.getName() + " already exists in " + appName);
-      }
+    Application application =
+        fileReaderStore
+            .getApplication(appName)
+            .orElseThrow(() -> new ApplicationNotFoundException(appName));
+    if (application.getGroups() == null) {
+      application.setGroups(new ArrayList<>());
+    }
+    if (!application.getGroups().stream()
+        .anyMatch(group -> group.getName().equalsIgnoreCase(appGroup.getName()))) {
+      appGroup.setAppName(appName);
+      application.getGroups().add(appGroup);
+      updateApplication(application, providerRequest);
+      ProviderResponse response = new ProviderResponse();
+      response.setEntityId(appGroup.getName());
+      response.setStatus(ProviderResponseStatus.OK);
+      return response;
     } else {
-      throw new RuntimeException("Application " + appName + " doesn't exist");
+      throw new GroupAlreadyExistException(
+          "Group " + appGroup.getName() + " already exists in " + appName);
     }
   }
 
@@ -140,29 +141,27 @@ public class FileWriterStore implements WriterStore {
   public ProviderResponse updateGroup(
       String appName, Group updatedGroup, ProviderRequest providerRequest) {
     fileReaderStore.setResourceLoader(resourceLoader);
-    Application application = fileReaderStore.getApplication(appName);
-    if (application != null) {
-      if (application.getGroups() != null
-          && application.getGroups().stream()
-              .anyMatch(
-                  filterGroup -> filterGroup.getName().equalsIgnoreCase(updatedGroup.getName()))) {
+    Application application =
+        fileReaderStore
+            .getApplication(appName)
+            .orElseThrow(() -> new ApplicationNotFoundException(appName));
+    if (application.getGroups() != null
+        && application.getGroups().stream()
+            .anyMatch(
+                filterGroup -> filterGroup.getName().equalsIgnoreCase(updatedGroup.getName()))) {
 
-        application
-            .getGroups()
-            .removeIf(
-                filterGroup -> filterGroup.getName().equalsIgnoreCase(updatedGroup.getName()));
-        application.getGroups().add(updatedGroup);
-        updateApplication(application, providerRequest);
-        ProviderResponse response = new ProviderResponse();
-        response.setEntityId(updatedGroup.getName());
-        response.setStatus(ProviderResponseStatus.OK);
-        return response;
-      } else {
-        throw new RuntimeException(
-            "Group " + updatedGroup.getName() + " doesn't exist in " + appName);
-      }
+      application
+          .getGroups()
+          .removeIf(filterGroup -> filterGroup.getName().equalsIgnoreCase(updatedGroup.getName()));
+      application.getGroups().add(updatedGroup);
+      updateApplication(application, providerRequest);
+      ProviderResponse response = new ProviderResponse();
+      response.setEntityId(updatedGroup.getName());
+      response.setStatus(ProviderResponseStatus.OK);
+      return response;
     } else {
-      throw new RuntimeException("Application " + appName + " doesn't exist");
+      throw new GroupAlreadyExistException(
+          "Group " + updatedGroup.getName() + " already exists in " + appName);
     }
   }
 
@@ -231,45 +230,44 @@ public class FileWriterStore implements WriterStore {
   public ProviderResponse deleteUserFromGroup(
       String appName, String groupName, String userId, ProviderRequest providerRequest) {
     fileReaderStore.setResourceLoader(resourceLoader);
-    Application application = fileReaderStore.getApplication(appName);
-    if (application != null) {
-      Group group =
-          application.getGroups() != null
-              ? application.getGroups().stream()
-                  .filter(filterGroup -> filterGroup.getName().equalsIgnoreCase(groupName))
-                  .findFirst()
-                  .orElse(null)
-              : null;
-      if (group != null) {
-        User user = fileReaderStore.getUser(userId);
-        user.getGroups()
-            .removeIf(
-                groupFilter ->
-                    groupFilter.getAppName().equalsIgnoreCase(appName)
-                        && groupFilter.getName().equalsIgnoreCase(groupName));
-        updateUser(user, providerRequest);
-        if (group.getUsers() != null) {
-          try {
-            group
-                .getUsers()
-                .removeIf(userFilter -> userFilter.getUsername().equalsIgnoreCase(userId));
-            updateResourceFile(
-                config.get(FileKeysConfig.APP_SOURCE),
-                application.getName(),
-                mapper.writeValueAsString(application));
-          } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error mapping application " + application.getName(), e);
-          }
+    Application application =
+        fileReaderStore
+            .getApplication(appName)
+            .orElseThrow(() -> new ApplicationNotFoundException(appName));
+    Group group =
+        application.getGroups() != null
+            ? application.getGroups().stream()
+                .filter(filterGroup -> filterGroup.getName().equalsIgnoreCase(groupName))
+                .findFirst()
+                .orElse(null)
+            : null;
+    if (group != null) {
+      User user = fileReaderStore.getUser(userId);
+      user.getGroups()
+          .removeIf(
+              groupFilter ->
+                  groupFilter.getAppName().equalsIgnoreCase(appName)
+                      && groupFilter.getName().equalsIgnoreCase(groupName));
+      updateUser(user, providerRequest);
+      if (group.getUsers() != null) {
+        try {
+          group
+              .getUsers()
+              .removeIf(userFilter -> userFilter.getUsername().equalsIgnoreCase(userId));
+          updateResourceFile(
+              config.get(FileKeysConfig.APP_SOURCE),
+              application.getName(),
+              mapper.writeValueAsString(application));
+        } catch (JsonProcessingException e) {
+          throw new RuntimeException("Error mapping application " + application.getName(), e);
         }
-        ProviderResponse response = new ProviderResponse();
-        response.setEntityId(userId);
-        response.setStatus(ProviderResponseStatus.OK);
-        return response;
-      } else {
-        throw new RuntimeException("Group " + groupName + " doesn't exist in " + appName);
       }
+      ProviderResponse response = new ProviderResponse();
+      response.setEntityId(userId);
+      response.setStatus(ProviderResponseStatus.OK);
+      return response;
     } else {
-      throw new RuntimeException("Application " + appName + " doesn't exist");
+      throw new RuntimeException("Group " + groupName + " doesn't exist in " + appName);
     }
   }
 
@@ -281,47 +279,47 @@ public class FileWriterStore implements WriterStore {
   public ProviderResponse addUserToGroup(
       String appName, String groupName, String userId, ProviderRequest providerRequest) {
     fileReaderStore.setResourceLoader(resourceLoader);
-    Application application = fileReaderStore.getApplication(appName);
-    if (application != null) {
-      Group group =
-          application.getGroups() != null
-              ? application.getGroups().stream()
-                  .filter(filterGroup -> filterGroup.getName().equalsIgnoreCase(groupName))
-                  .findFirst()
-                  .orElse(null)
-              : null;
-      if (group != null) {
-        User user = fileReaderStore.getUser(userId);
-        if (user != null) {
-          try {
-            if (user.getGroups() == null) {
-              user.setGroups(new ArrayList<>());
-            }
-            user.getGroups().add(new Group(appName, groupName));
-            updateUser(user, new ProviderRequest(null, false, null));
-            if (group.getUsers() == null) {
-              group.setUsers(new ArrayList<>());
-            }
-            group.getUsers().add(user);
-            updateResourceFile(
-                config.get(FileKeysConfig.APP_SOURCE),
-                application.getName(),
-                mapper.writeValueAsString(application));
-            ProviderResponse response = new ProviderResponse();
-            response.setEntityId(userId);
-            response.setStatus(ProviderResponseStatus.OK);
-            return response;
-          } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error mapping application " + application.getName(), e);
+    Application application =
+        fileReaderStore
+            .getApplication(appName)
+            .orElseThrow(() -> new ApplicationNotFoundException(appName));
+    ;
+    Group group =
+        application.getGroups() != null
+            ? application.getGroups().stream()
+                .filter(filterGroup -> filterGroup.getName().equalsIgnoreCase(groupName))
+                .findFirst()
+                .orElse(null)
+            : null;
+    if (group != null) {
+      User user = fileReaderStore.getUser(userId);
+      if (user != null) {
+        try {
+          if (user.getGroups() == null) {
+            user.setGroups(new ArrayList<>());
           }
-        } else {
-          throw new RuntimeException("User " + userId + " not found");
+          user.getGroups().add(new Group(appName, groupName));
+          updateUser(user, new ProviderRequest(null, false, null));
+          if (group.getUsers() == null) {
+            group.setUsers(new ArrayList<>());
+          }
+          group.getUsers().add(user);
+          updateResourceFile(
+              config.get(FileKeysConfig.APP_SOURCE),
+              application.getName(),
+              mapper.writeValueAsString(application));
+          ProviderResponse response = new ProviderResponse();
+          response.setEntityId(userId);
+          response.setStatus(ProviderResponseStatus.OK);
+          return response;
+        } catch (JsonProcessingException e) {
+          throw new RuntimeException("Error mapping application " + application.getName(), e);
         }
       } else {
-        throw new RuntimeException("Group " + groupName + " doesn't exist in " + appName);
+        throw new RuntimeException("User " + userId + " not found");
       }
     } else {
-      throw new RuntimeException("Application " + appName + " doesn't exist");
+      throw new RuntimeException("Group " + groupName + " doesn't exist in " + appName);
     }
   }
 

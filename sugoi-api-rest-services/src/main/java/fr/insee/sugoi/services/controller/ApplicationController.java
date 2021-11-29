@@ -13,7 +13,6 @@
 */
 package fr.insee.sugoi.services.controller;
 
-import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -345,13 +344,6 @@ public class ApplicationController {
           String realm,
       @Parameter(description = "Name of the app searched", required = true) @PathVariable("name")
           String name) {
-    Application application =
-        applicationService
-            .findById(realm, name)
-            .orElseThrow(
-                () ->
-                    new ApplicationNotFoundException(
-                        "Application " + name + " not found in realm " + realm));
-    return ResponseEntity.status(HttpStatus.OK).body(application);
+    return ResponseEntity.status(HttpStatus.OK).body(applicationService.findById(realm, name));
   }
 }

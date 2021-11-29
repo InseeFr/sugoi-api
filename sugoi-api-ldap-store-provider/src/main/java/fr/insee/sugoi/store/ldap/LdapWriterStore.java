@@ -584,7 +584,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public ProviderResponse createApplication(
       Application application, ProviderRequest providerRequest) {
-    if (ldapReaderStore.getApplication(application.getName()) == null) {
+    if (ldapReaderStore.getApplication(application.getName()).isEmpty()) {
       try {
         AddRequest ar =
             new AddRequest(
@@ -622,73 +622,73 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public ProviderResponse updateApplication(
       Application updatedApplication, ProviderRequest providerRequest) {
-    if (ldapReaderStore.getApplication(updatedApplication.getName()) != null) {
-      try {
-        ModifyRequest mr =
-            new ModifyRequest(
-                getApplicationDN(updatedApplication.getName()),
-                applicationLdapMapper.createMods(updatedApplication));
-        ldapPoolConnection.modify(mr);
-        List<Group> alreadyExistingGroups =
-            ldapReaderStore.getApplication(updatedApplication.getName()).getGroups();
-        for (Group existingGroup : alreadyExistingGroups) {
-          Optional<Group> optionalGroup =
-              updatedApplication.getGroups().stream()
-                  .filter(group -> group.getName().equalsIgnoreCase(existingGroup.getName()))
-                  .findFirst();
-          if (optionalGroup.isPresent()) {
-            updateGroup(updatedApplication.getName(), optionalGroup.get(), providerRequest);
-          } else {
-            deleteGroup(updatedApplication.getName(), existingGroup.getName(), providerRequest);
-          }
+    ldapReaderStore
+        .getApplication(updatedApplication.getName())
+        .orElseThrow(
+            () ->
+                new ApplicationNotFoundException(
+                    config.get(LdapConfigKeys.REALM_NAME), updatedApplication.getName()));
+    try {
+      ModifyRequest mr =
+          new ModifyRequest(
+              getApplicationDN(updatedApplication.getName()),
+              applicationLdapMapper.createMods(updatedApplication));
+      ldapPoolConnection.modify(mr);
+      List<Group> alreadyExistingGroups =
+          ldapReaderStore
+              .getApplication(updatedApplication.getName())
+              .orElseThrow(
+                  () ->
+                      new ApplicationNotFoundException(
+                          config.get(LdapConfigKeys.REALM_NAME), updatedApplication.getName()))
+              .getGroups();
+      for (Group existingGroup : alreadyExistingGroups) {
+        Optional<Group> optionalGroup =
+            updatedApplication.getGroups().stream()
+                .filter(group -> group.getName().equalsIgnoreCase(existingGroup.getName()))
+                .findFirst();
+        if (optionalGroup.isPresent()) {
+          updateGroup(updatedApplication.getName(), optionalGroup.get(), providerRequest);
+        } else {
+          deleteGroup(updatedApplication.getName(), existingGroup.getName(), providerRequest);
         }
-        for (Group updatedGroup : updatedApplication.getGroups()) {
-          if (alreadyExistingGroups.stream()
-              .allMatch(group -> !group.getName().equalsIgnoreCase(updatedGroup.getName())))
-            createGroup(updatedApplication.getName(), updatedGroup, providerRequest);
-        }
-
-      } catch (LDAPException e) {
-        throw new RuntimeException(
-            "Failed to update application "
-                + updatedApplication.getName()
-                + "while writing to LDAP",
-            e);
       }
-      ProviderResponse response = new ProviderResponse();
-      response.setStatus(ProviderResponseStatus.OK);
-      response.setEntityId(updatedApplication.getName());
-      return response;
+      for (Group updatedGroup : updatedApplication.getGroups()) {
+        if (alreadyExistingGroups.stream()
+            .allMatch(group -> !group.getName().equalsIgnoreCase(updatedGroup.getName())))
+          createGroup(updatedApplication.getName(), updatedGroup, providerRequest);
+      }
+
+    } catch (LDAPException e) {
+      throw new RuntimeException(
+          "Failed to update application " + updatedApplication.getName() + "while writing to LDAP",
+          e);
     }
-    throw new ApplicationNotFoundException(
-        "Application "
-            + updatedApplication.getName()
-            + " doesn't exist in realm "
-            + config.get(LdapConfigKeys.REALM_NAME));
+    ProviderResponse response = new ProviderResponse();
+    response.setStatus(ProviderResponseStatus.OK);
+    response.setEntityId(updatedApplication.getName());
+    return response;
   }
 
   /** Delete application branch */
   @Override
   public ProviderResponse deleteApplication(
       String applicationName, ProviderRequest providerRequest) {
-    if (ldapReaderStore.getApplication(applicationName) != null) {
-      try {
-        // DeleteRequest dr = new DeleteRequest(getApplicationDN(applicationName));
-        // ldapPoolConnection.delete(dr);
-        (new SubtreeDeleter()).delete(ldapPoolConnection, getApplicationDN(applicationName));
-      } catch (LDAPException e) {
-        throw new RuntimeException("Failed to delete application " + applicationName, e);
-      }
-      ProviderResponse response = new ProviderResponse();
-      response.setStatus(ProviderResponseStatus.OK);
-      response.setEntityId(applicationName);
-      return response;
+    ldapReaderStore
+        .getApplication(applicationName)
+        .orElseThrow(
+            () ->
+                new ApplicationNotFoundException(
+                    config.get(LdapConfigKeys.REALM_NAME), applicationName));
+    try {
+      (new SubtreeDeleter()).delete(ldapPoolConnection, getApplicationDN(applicationName));
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to delete application " + applicationName, e);
     }
-    throw new ApplicationNotFoundException(
-        "Application "
-            + applicationName
-            + " doesn't exist in realm "
-            + config.get(LdapConfigKeys.REALM_NAME));
+    ProviderResponse response = new ProviderResponse();
+    response.setStatus(ProviderResponseStatus.OK);
+    response.setEntityId(applicationName);
+    return response;
   }
 
   @Override
