@@ -54,6 +54,7 @@ public class UserLdapMapperFromAttributesTest {
     mapping.put("address", "inseeAdressePostaleDN,address,rw");
     mapping.put("groups", "memberOf,list_group,ro");
     mapping.put("attributes.insee_roles_applicatifs", "inseeRoleApplicatif,list_string,rw");
+    mapping.put("attributes.hasPassword", "userPassword,exists,ro");
     userLdapMapper = new UserLdapMapper(config, mapping);
   }
 
@@ -207,5 +208,18 @@ public class UserLdapMapperFromAttributesTest {
     assertThat(
         "Should have inseeRoleapplicatif tata",
         inseeRoleApplicatifs.stream().anyMatch(role -> role.equals("tata")));
+  }
+
+  @Test
+  public void getHasPasswordFromAttributeWhenPasswordIsSet() {
+    Attribute passwordAttribute = new Attribute("userPassword", "mypassword");
+    User mappedUser = userLdapMapper.mapFromAttributes(List.of(passwordAttribute));
+    assertThat(mappedUser.getAttributes().get("hasPassword"), is(true));
+  }
+
+  @Test
+  public void getHasPasswordFromAttributeWhenPasswordIsNotSet() {
+    User mappedUser = userLdapMapper.mapFromAttributes(List.of());
+    assertThat(mappedUser.getAttributes().get("hasPassword"), is(false));
   }
 }

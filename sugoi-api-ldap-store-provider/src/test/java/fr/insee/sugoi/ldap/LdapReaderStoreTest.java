@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -89,6 +90,7 @@ public class LdapReaderStoreTest {
     userMapping.put("attributes.insee_roles_applicatifs", "inseeRoleApplicatif,list_string,rw");
     userMapping.put("attributes.common_name", "cn,String,rw");
     userMapping.put("attributes.additionalMail", "inseeMailCorrespondant,String,rw");
+    userMapping.put("attributes.hasPassword", "userPassword,exists,ro");
     Map<String, String> organizationMapping = new HashMap<>();
     organizationMapping.put("identifiant", "uid,String,rw");
     organizationMapping.put("attributes.description", "description,String,rw");
@@ -356,5 +358,27 @@ public class LdapReaderStoreTest {
         ldapReaderStore.getUsersInGroup("Applitest", "FalseGroup_Applitest");
     assertThat(
         "PageResult should exist but without users", usersPageResult.getResults().size(), is(0));
+  }
+
+  @Test
+  @DisplayName(
+      "Given a user on which the attribute userPassword is set, "
+          + "the user should have an attribute hasPassword set to true")
+  public void userWithPasswordShouldHaveValueHasPassword() {
+    assertThat(
+        "Should have hasPassword to true",
+        ldapReaderStore.getUser("testc").getAttributes().get("hasPassword"),
+        is(true));
+  }
+
+  @Test
+  @DisplayName(
+      "Given a user on which the attribute userPassword is not set, "
+          + "the user should have an attribute hasPassword set to false")
+  public void userWithoutPasswordShouldHaveValueHasPassword() {
+    assertThat(
+        "Should have hasPassword to false",
+        ldapReaderStore.getUser("agarder").getAttributes().get("hasPassword"),
+        is(false));
   }
 }
