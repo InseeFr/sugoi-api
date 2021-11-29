@@ -14,7 +14,6 @@
 package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
-import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.core.exceptions.UnabletoUpdateGPGKeyException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
@@ -384,16 +383,7 @@ public class OrganizationController {
     if (!organization.getIdentifiant().equals(id)) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
-    Organization org =
-        organizationService
-            .findById(realm, null, id)
-            .orElseThrow(
-                () ->
-                    new OrganizationNotFoundException(
-                        "Cannot find organization "
-                            + organization.getIdentifiant()
-                            + " in realm "
-                            + realm));
+    Organization org = organizationService.findById(realm, null, id);
     return updateOrganizations(
         realm,
         (String) org.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
@@ -500,13 +490,7 @@ public class OrganizationController {
           String transactionId,
       Authentication authentication) {
 
-    Organization org =
-        organizationService
-            .findById(realm, null, id)
-            .orElseThrow(
-                () ->
-                    new OrganizationNotFoundException(
-                        "Cannot find organization " + id + " in realm " + realm));
+    Organization org = organizationService.findById(realm, null, id);
     return deleteOrganizations(
         realm,
         (String) org.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
@@ -547,18 +531,8 @@ public class OrganizationController {
       @Parameter(description = "Organization's id to search", required = false)
           @PathVariable("orgId")
           String id) {
-    Organization organization =
-        organizationService
-            .findById(realm, storage, id)
-            .orElseThrow(
-                () ->
-                    new OrganizationNotFoundException(
-                        "Cannot find organization "
-                            + id
-                            + (storage != null ? " in userStorage " + storage : "")
-                            + " in realm "
-                            + realm));
-    return ResponseEntity.status(HttpStatus.OK).body(organization);
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(organizationService.findById(realm, storage, id));
   }
 
   @GetMapping(
@@ -627,15 +601,14 @@ public class OrganizationController {
           String realm,
       @Parameter(description = "Organization ID to search", required = true) @PathVariable("id")
           String id) {
-    Organization organization =
-        organizationService
-            .findById(realm, null, id)
-            .orElseThrow(
-                () ->
-                    new OrganizationNotFoundException(
-                        "Cannot find organization with id " + id + " in realm " + realm));
     return getOrganizationGPGKey(
-        realm, (String) organization.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id);
+        realm,
+        (String)
+            organizationService
+                .findById(realm, null, id)
+                .getMetadatas()
+                .get(GlobalKeysConfig.USERSTORAGE),
+        id);
   }
 
   @PutMapping(
@@ -726,13 +699,7 @@ public class OrganizationController {
           String transactionId,
       Authentication authentication) {
 
-    Organization organization =
-        organizationService
-            .findById(realm, null, id)
-            .orElseThrow(
-                () ->
-                    new OrganizationNotFoundException(
-                        "Cannot find organization with id " + id + " in realm " + realm));
+    Organization organization = organizationService.findById(realm, null, id);
     return updateOrganizationGpgKey(
         realm,
         (String) organization.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
@@ -827,13 +794,7 @@ public class OrganizationController {
           String transactionId,
       Authentication authentication) {
 
-    Organization organization =
-        organizationService
-            .findById(realm, null, id)
-            .orElseThrow(
-                () ->
-                    new OrganizationNotFoundException(
-                        "Cannot find organization with id " + id + " in realm " + realm));
+    Organization organization = organizationService.findById(realm, null, id);
     return deleteOrganizationGpgKey(
         realm,
         (String) organization.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),

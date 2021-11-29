@@ -137,7 +137,7 @@ public class LdapReaderStoreTest {
 
   @Test
   public void testGetOrganization() {
-    Organization organization = ldapReaderStore.getOrganization("testo");
+    Organization organization = ldapReaderStore.getOrganization("testo").get();
     assertThat("Should get testo", organization.getIdentifiant(), is("testo"));
     assertThat(
         "Should get address first line", organization.getAddress().get("line1"), is("Insee"));
@@ -156,7 +156,7 @@ public class LdapReaderStoreTest {
 
   @Test
   public void testGetNonexistentOrganization() {
-    assertThat("Should get null", ldapReaderStore.getOrganization("nottesto"), is(nullValue()));
+    assertThat("Should get null", ldapReaderStore.getOrganization("nottesto").isEmpty());
   }
 
   @Test

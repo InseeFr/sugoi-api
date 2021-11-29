@@ -31,7 +31,6 @@ import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.paging.PageResult;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -135,7 +134,7 @@ public class OrganizationControllerTest {
     try {
 
       Mockito.when(organizationService.findById("domaine1", null, "BigOrga"))
-          .thenReturn(Optional.of(organization1));
+          .thenReturn(organization1);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.get("/realms/domaine1/organizations/BigOrga")
@@ -181,8 +180,8 @@ public class OrganizationControllerTest {
     try {
 
       Mockito.when(organizationService.findById("domaine1", null, "SimpleOrga"))
-          .thenReturn(Optional.of(organization2))
-          .thenReturn(Optional.of(organization2Updated));
+          .thenReturn(organization2)
+          .thenReturn(organization2Updated);
       Mockito.doReturn(
               new ProviderResponse(
                   "", "requestId", ProviderResponseStatus.OK, organization2Updated, null))
@@ -287,7 +286,7 @@ public class OrganizationControllerTest {
 
       Mockito.when(organizationService.findById(Mockito.any(), Mockito.any(), Mockito.any()))
           .thenThrow(OrganizationNotFoundException.class)
-          .thenReturn(Optional.of(organization1));
+          .thenReturn(organization1);
       Mockito.when(
               organizationService.create(
                   Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any()))
@@ -415,7 +414,7 @@ public class OrganizationControllerTest {
     try {
 
       Mockito.when(organizationService.findById("domaine1", null, "dontexist"))
-          .thenReturn(Optional.empty());
+          .thenThrow(new OrganizationNotFoundException("domaine1", "dontexist"));
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.get("/realms/domaine1/organizations/dontexist")
@@ -459,12 +458,11 @@ public class OrganizationControllerTest {
   @WithMockUser
   public void get404WhenNoOrganizationIsFoundWhenUpdate() {
     try {
-
       Mockito.doThrow(new OrganizationNotFoundException(""))
           .when(organizationService)
           .update(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any());
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/realms/domaine1/organizations/BigOrga")
+          MockMvcRequestBuilders.put("/realms/domaine1/userstorage/us/organizations/BigOrga")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(organization1))
               .accept(MediaType.APPLICATION_JSON)
@@ -491,7 +489,7 @@ public class OrganizationControllerTest {
           .delete(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any());
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/realms/domaine1/organizations/dontexist")
+          MockMvcRequestBuilders.delete("/realms/domaine1/userstorage/us/organizations/dontexist")
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 

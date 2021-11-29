@@ -178,7 +178,7 @@ public class LdapWriterStoreTest {
     address.put("line2", "Chez orga");
     organization.setAddress(address);
     ldapWriterStore.createOrganization(organization, null);
-    Organization retrievedOrga = ldapReaderStore.getOrganization("Titi");
+    Organization retrievedOrga = ldapReaderStore.getOrganization("Titi").get();
 
     assertThat("Titi should have been added", retrievedOrga, not(nullValue()));
     assertThat("Titi should have an address", retrievedOrga.getAddress().get("line1"), is("Orga"));
@@ -186,14 +186,14 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testUpdateOrganization() {
-    Organization organization = ldapReaderStore.getOrganization("amodifier");
+    Organization organization = ldapReaderStore.getOrganization("amodifier").get();
     organization.addAttributes("description", "nouvelle description");
     Map<String, String> address = new HashMap<>();
     address.put("line1", "Orga");
     address.put("line2", "Chez orga");
     organization.setAddress(address);
     ldapWriterStore.updateOrganization(organization, null);
-    Organization retrievedOrga = ldapReaderStore.getOrganization("amodifier");
+    Organization retrievedOrga = ldapReaderStore.getOrganization("amodifier").get();
     assertThat(
         "amodifier should have a new description",
         retrievedOrga.getAttributes().get("description"),
@@ -207,8 +207,7 @@ public class LdapWriterStoreTest {
     ldapWriterStore.deleteOrganization("asupprimer", null);
     assertThat(
         "asupprimer should have been deleted",
-        ldapReaderStore.getOrganization("asupprimer"),
-        is(nullValue()));
+        ldapReaderStore.getOrganization("asupprimer").isEmpty());
   }
 
   @Test

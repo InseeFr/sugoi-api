@@ -16,7 +16,6 @@ package fr.insee.sugoi.old.services.controller;
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
 import fr.insee.sugoi.converter.ouganext.OrganisationOuganext;
 import fr.insee.sugoi.converter.ouganext.OrganisationsOuganext;
-import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.SugoiUser;
@@ -177,12 +176,10 @@ public class OrganisationDomaineController {
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             ouganextSugoiMapper.serializeToOuganext(
-                organizationService
-                    .findById(
-                        realmUserStorage.getRealm(),
-                        realmUserStorage.getUserStorage(),
-                        response.getEntityId())
-                    .get(),
+                organizationService.findById(
+                    realmUserStorage.getRealm(),
+                    realmUserStorage.getUserStorage(),
+                    response.getEntityId()),
                 OrganisationOuganext.class));
   }
 
@@ -226,12 +223,8 @@ public class OrganisationDomaineController {
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             ouganextSugoiMapper.serializeToOuganext(
-                organizationService
-                    .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), id)
-                    .orElseThrow(
-                        () ->
-                            new OrganizationNotFoundException(
-                                "Organization " + id + " not found in realm " + domaine)),
+                organizationService.findById(
+                    realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), id),
                 OrganisationOuganext.class));
   }
 
@@ -340,9 +333,8 @@ public class OrganisationDomaineController {
     Organization sugoiOrganization =
         ouganextSugoiMapper.serializeToSugoi(organisation, Organization.class);
     if (slug != null
-        && organizationService
-            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), slug)
-            .isEmpty()) {
+        && !organizationService.exist(
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), slug)) {
       sugoiOrganization.setIdentifiant(slug);
     } else if (sugoiOrganization.getIdentifiant() == null) {
       sugoiOrganization.setIdentifiant(UUID.randomUUID().toString());

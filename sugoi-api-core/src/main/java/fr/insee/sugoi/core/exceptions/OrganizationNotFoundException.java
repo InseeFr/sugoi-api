@@ -21,7 +21,19 @@ public class OrganizationNotFoundException extends RuntimeException {
     super(message, cause);
   }
 
-  public OrganizationNotFoundException(String message) {
-    super(message);
+  public OrganizationNotFoundException(
+      String realmName, String userstorage, String organizationId) {
+    super(
+        String.format(
+            "Organization %s does not exist in realm %s and userstorage %s",
+            organizationId, realmName, userstorage));
+  }
+
+  public OrganizationNotFoundException(String realmName, String organizationId) {
+    super(String.format("Organization %s does not exist in realm %s", organizationId, realmName));
+  }
+
+  public OrganizationNotFoundException(String organizationId) {
+    super(String.format("Organization %s was not found", organizationId));
   }
 }

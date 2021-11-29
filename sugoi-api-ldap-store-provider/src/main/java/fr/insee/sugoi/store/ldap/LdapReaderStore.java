@@ -87,7 +87,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       }
     }
     if (user != null && user.getOrganization() != null) {
-      user.setOrganization(getOrganization(user.getOrganization().getIdentifiant()));
+      user.setOrganization(getOrganization(user.getOrganization().getIdentifiant()).orElse(null));
     }
     return user;
   }
@@ -97,7 +97,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
    * resource and the sub organization ldap resource
    */
   @Override
-  public Organization getOrganization(String id) {
+  public Optional<Organization> getOrganization(String id) {
     if (config.get(LdapConfigKeys.ORGANIZATION_SOURCE) != null) {
       SearchResultEntry entry = getEntryByDn(getOrganizationDN(id));
       Organization org =
@@ -110,9 +110,9 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
         }
       }
       if (org != null && org.getOrganization() != null) {
-        org.setOrganization(getOrganization(org.getOrganization().getIdentifiant()));
+        org.setOrganization(getOrganization(org.getOrganization().getIdentifiant()).orElse(null));
       }
-      return org;
+      return Optional.ofNullable(org);
     } else {
       throw new UnsupportedOperationException(
           "Organizations feature not configured for this storage");
@@ -383,7 +383,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
         }
       }
       if (user.getOrganization() != null) {
-        user.setOrganization(getOrganization(user.getOrganization().getIdentifiant()));
+        user.setOrganization(getOrganization(user.getOrganization().getIdentifiant()).orElse(null));
       }
     } else if (users.getResults().size() > 1) {
       throw new RuntimeException(
