@@ -69,7 +69,7 @@ public class FileReaderStoreTest {
 
   @Test
   public void testGetOrganization() {
-    Organization organization = fileReaderStore.getOrganization("testo");
+    Organization organization = fileReaderStore.getOrganization("testo").get();
     assertThat("Should get testo", organization.getIdentifiant(), is("testo"));
     assertThat(
         "Should get address first line", organization.getAddress().get("line1"), is("Insee"));
@@ -88,13 +88,12 @@ public class FileReaderStoreTest {
 
   @Test
   public void shouldNotPathtraversalOrganization() {
-    Organization organization = fileReaderStore.getOrganization("testo/../testc");
-    assertThat("Should not get testc", organization, is(nullValue()));
+    assertThat("Should not get testc", fileReaderStore.getOrganization("testo/../testc").isEmpty());
   }
 
   @Test
   public void testGetNonexistentOrganization() {
-    assertThat("Should get null", fileReaderStore.getOrganization("nottesto"), is(nullValue()));
+    assertThat("Should get empty", fileReaderStore.getOrganization("nottesto").isEmpty());
   }
 
   @Test

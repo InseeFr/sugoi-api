@@ -277,29 +277,28 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   /** Delete an organization and its address */
   @Override
   public ProviderResponse deleteOrganization(String name, ProviderRequest providerRequest) {
-    if (ldapReaderStore.getOrganization(name) != null) {
-      try {
-        Organization currentOrganization = ldapReaderStore.getOrganization(name);
-        if (currentOrganization.getAddress().get("id") != null) {
-          deleteAddress(currentOrganization.getAddress().get("id"));
-        }
-        DeleteRequest dr = new DeleteRequest(getOrganizationDN(name));
-        ldapPoolConnection.delete(dr);
-        ProviderResponse response = new ProviderResponse();
-        response.setStatus(ProviderResponseStatus.OK);
-        response.setEntityId(name);
-        return response;
-      } catch (LDAPException e) {
-        throw new RuntimeException("Failed to delete organisation " + name, e);
+    try {
+      Organization currentOrganization =
+          ldapReaderStore
+              .getOrganization(name)
+              .orElseThrow(
+                  () ->
+                      new OrganizationNotFoundException(
+                          config.get(LdapConfigKeys.REALM_NAME),
+                          config.get(LdapConfigKeys.USERSTORAGE_NAME),
+                          name));
+      if (currentOrganization.getAddress().get("id") != null) {
+        deleteAddress(currentOrganization.getAddress().get("id"));
       }
+      DeleteRequest dr = new DeleteRequest(getOrganizationDN(name));
+      ldapPoolConnection.delete(dr);
+      ProviderResponse response = new ProviderResponse();
+      response.setStatus(ProviderResponseStatus.OK);
+      response.setEntityId(name);
+      return response;
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to delete organisation " + name, e);
     }
-    throw new OrganizationNotFoundException(
-        "Cannot find organization "
-            + name
-            + " in realm "
-            + config.get(LdapConfigKeys.REALM_NAME)
-            + " in userstorage "
-            + config.get(LdapConfigKeys.USERSTORAGE_NAME));
   }
 
   /**
@@ -309,7 +308,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public ProviderResponse createOrganization(
       Organization organization, ProviderRequest providerRequest) {
-    if (ldapReaderStore.getOrganization(organization.getIdentifiant()) == null) {
+    if (ldapReaderStore.getOrganization(organization.getIdentifiant()).isEmpty()) {
       try {
         if (organization.getAddress() != null && organization.getAddress().size() > 0) {
           UUID addressUuid = createAddress(organization.getAddress());
@@ -328,14 +327,15 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       response.setStatus(ProviderResponseStatus.OK);
       response.setEntityId(organization.getIdentifiant());
       return response;
+    } else {
+      throw new OrganizationAlreadyExistException(
+          "Organization "
+              + organization.getIdentifiant()
+              + " already exist in realm "
+              + config.get(LdapConfigKeys.REALM_NAME)
+              + " userstorage "
+              + config.get(LdapConfigKeys.USERSTORAGE_NAME));
     }
-    throw new OrganizationAlreadyExistException(
-        "Organization "
-            + organization.getIdentifiant()
-            + " already exist in realm "
-            + config.get(LdapConfigKeys.REALM_NAME)
-            + " userstorage "
-            + config.get(LdapConfigKeys.USERSTORAGE_NAME));
   }
 
   /**
@@ -345,46 +345,42 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public ProviderResponse updateOrganization(
       Organization updatedOrganization, ProviderRequest providerRequest) {
-    if (ldapReaderStore.getOrganization(updatedOrganization.getIdentifiant()) != null) {
-
-      try {
-        Organization currentOrganization =
-            ldapReaderStore.getOrganization(updatedOrganization.getIdentifiant());
-        if (updatedOrganization.getAddress() != null
-            && updatedOrganization.getAddress().size() > 0) {
-          if (currentOrganization.getAddress().containsKey("id")) {
-            updateAddress(
-                currentOrganization.getAddress().get("id"), updatedOrganization.getAddress());
-          } else {
-            Map<String, String> newAddress = new HashMap<>();
-            newAddress.put("id", createAddress(updatedOrganization.getAddress()).toString());
-            updatedOrganization.setAddress(newAddress);
-          }
+    try {
+      Organization currentOrganization =
+          ldapReaderStore
+              .getOrganization(updatedOrganization.getIdentifiant())
+              .orElseThrow(
+                  () ->
+                      new OrganizationNotFoundException(
+                          config.get(LdapConfigKeys.REALM_NAME),
+                          config.get(LdapConfigKeys.USERSTORAGE_NAME),
+                          updatedOrganization.getIdentifiant()));
+      if (updatedOrganization.getAddress() != null && updatedOrganization.getAddress().size() > 0) {
+        if (currentOrganization.getAddress().containsKey("id")) {
+          updateAddress(
+              currentOrganization.getAddress().get("id"), updatedOrganization.getAddress());
+        } else {
+          Map<String, String> newAddress = new HashMap<>();
+          newAddress.put("id", createAddress(updatedOrganization.getAddress()).toString());
+          updatedOrganization.setAddress(newAddress);
         }
-        ModifyRequest mr =
-            new ModifyRequest(
-                getOrganizationDN(updatedOrganization.getIdentifiant()),
-                organizationLdapMapper.createMods(updatedOrganization));
-        ldapPoolConnection.modify(mr);
-      } catch (LDAPException e) {
-        throw new RuntimeException(
-            "Failed to update organization "
-                + updatedOrganization.getIdentifiant()
-                + "while writing to LDAP",
-            e);
       }
-      ProviderResponse response = new ProviderResponse();
-      response.setStatus(ProviderResponseStatus.OK);
-      response.setEntityId(updatedOrganization.getIdentifiant());
-      return response;
+      ModifyRequest mr =
+          new ModifyRequest(
+              getOrganizationDN(updatedOrganization.getIdentifiant()),
+              organizationLdapMapper.createMods(updatedOrganization));
+      ldapPoolConnection.modify(mr);
+    } catch (LDAPException e) {
+      throw new RuntimeException(
+          "Failed to update organization "
+              + updatedOrganization.getIdentifiant()
+              + "while writing to LDAP",
+          e);
     }
-    throw new OrganizationNotFoundException(
-        "Cannot find organization "
-            + updatedOrganization.getIdentifiant()
-            + " in realm "
-            + config.get(LdapConfigKeys.REALM_NAME)
-            + " in userstorage "
-            + config.get(LdapConfigKeys.USERSTORAGE_NAME));
+    ProviderResponse response = new ProviderResponse();
+    response.setStatus(ProviderResponseStatus.OK);
+    response.setEntityId(updatedOrganization.getIdentifiant());
+    return response;
   }
 
   @Override

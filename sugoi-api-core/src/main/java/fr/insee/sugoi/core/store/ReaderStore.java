@@ -65,9 +65,10 @@ public interface ReaderStore {
    * @param id the id of the organization
    * @throws UnsupportedOperationException if the configuration for organizations is not set on the
    *     UserStorage.
-   * @return the organization with matching id, null if no user matches
+   * @return optional of the organization with matching id. Optional is empty if no organization was
+   *     found
    */
-  public Organization getOrganization(String id);
+  public Optional<Organization> getOrganization(String id);
 
   /**
    * Search organizations matching organizationFilter filled attributes.

@@ -22,7 +22,6 @@ import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;
-import java.util.Optional;
 
 public interface OrganizationService {
 
@@ -55,9 +54,10 @@ public interface OrganizationService {
    * @param realm
    * @param storage
    * @param id
-   * @return an optional of organization
+   * @return found organization
+   * @throws OrganizationNotFoundException if no organization was found
    */
-  Optional<Organization> findById(String realm, String storage, String id);
+  Organization findById(String realm, String storage, String id);
 
   /**
    * Find organizations by criterias in the realm
@@ -94,4 +94,14 @@ public interface OrganizationService {
       String realm, String storage, String id, ProviderRequest providerRequest);
 
   byte[] getGpgkey(String realm, String storage, String id);
+
+  /**
+   * Check the existence of an organization on a realm and userstorage
+   *
+   * @param realm
+   * @param userStorage
+   * @param organizationId
+   * @return true if organizationId exist on realm/userStorage, else false
+   */
+  boolean exist(String realm, String userStorage, String organizationId);
 }

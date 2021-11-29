@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,22 +166,23 @@ public class FileWriterStoreTest {
     organization.setAddress(address);
     fileWriterStore.createOrganization(organization, null);
     fileReaderStore.getOrganization("testo");
-    Organization retrievedOrga = fileReaderStore.getOrganization("Titi");
+    Optional<Organization> retrievedOrga = fileReaderStore.getOrganization("Titi");
 
-    assertThat("Titi should have been added", retrievedOrga, not(nullValue()));
-    assertThat("Titi should have an address", retrievedOrga.getAddress().get("line1"), is("Orga"));
+    assertThat("Titi should have been added", retrievedOrga.isPresent());
+    assertThat(
+        "Titi should have an address", retrievedOrga.get().getAddress().get("line1"), is("Orga"));
   }
 
   @Test
   public void testUpdateOrganization() {
-    Organization organization = fileReaderStore.getOrganization("testo");
+    Organization organization = fileReaderStore.getOrganization("testo").get();
     organization.addAttributes("description", "nouvelle description");
     Map<String, String> address = new HashMap<>();
     address.put("line1", "Orga");
     address.put("line2", "Chez orga");
     organization.setAddress(address);
     fileWriterStore.updateOrganization(organization, null);
-    Organization retrievedOrga = fileReaderStore.getOrganization("testo");
+    Organization retrievedOrga = fileReaderStore.getOrganization("testo").get();
     assertThat(
         "testo should have a new description",
         retrievedOrga.getAttributes().get("description"),
@@ -196,13 +198,11 @@ public class FileWriterStoreTest {
     fileWriterStore.createOrganization(organization, null);
     assertThat(
         "asupprimer should have been created",
-        fileReaderStore.getOrganization("asupprimer"),
-        is(not(nullValue())));
+        fileReaderStore.getOrganization("asupprimer").isPresent());
     fileWriterStore.deleteOrganization("asupprimer", null);
     assertThat(
         "asupprimer should have been deleted",
-        fileReaderStore.getOrganization("asupprimer"),
-        is(nullValue()));
+        fileReaderStore.getOrganization("asupprimer").isEmpty());
   }
 
   @Test
