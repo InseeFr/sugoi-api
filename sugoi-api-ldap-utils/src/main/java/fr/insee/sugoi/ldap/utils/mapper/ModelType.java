@@ -15,12 +15,13 @@ package fr.insee.sugoi.ldap.utils.mapper;
 
 public enum ModelType {
   STRING,
-  BYTES,
+  BYTE_ARRAY,
   ORGANIZATION,
   HABILITATION,
   LIST_HABILITATION,
   ADDRESS,
   LIST_GROUP,
   LIST_USER,
-  LIST_STRING
+  LIST_STRING,
+  EXISTS
 }

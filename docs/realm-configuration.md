@@ -120,6 +120,7 @@ Type of attribute can be :
 - list_user
 - list_group
 - list_string
+- exists (retrieve if the attribute exists instead of its value)
 
 Mapping is to be set at the userstorage level for users and organizations and at the realm level for groupes and applications.
 

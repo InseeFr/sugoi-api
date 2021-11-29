@@ -38,7 +38,6 @@ import java.util.stream.Collectors;
 
 public class GenericLdapMapper {
 
-  @SuppressWarnings("unchecked")
   public static <ReturnType> ReturnType mapLdapAttributesToObject(
       Collection<Attribute> attributes,
       Class<ReturnType> returnClazz,
@@ -50,7 +49,7 @@ public class GenericLdapMapper {
         try {
           String[] splitedMappingDefinition = mappingDefinition.getValue().split(",");
           String attributeLdapName = splitedMappingDefinition[0];
-          String mappingType = splitedMappingDefinition[1];
+          ModelType mappingType = ModelType.valueOf(splitedMappingDefinition[1].toUpperCase());
           String fieldToSetName = mappingDefinition.getKey();
           List<Attribute> correspondingAttributes =
               attributes.stream()
@@ -58,22 +57,21 @@ public class GenericLdapMapper {
                   .collect(Collectors.toList());
           if (correspondingAttributes.size() > 0) {
             if (fieldToSetName.contains(".")) {
-              String[] splitedFieldName = fieldToSetName.split("\\.");
-              String mapToModifyName = splitedFieldName[0];
-              String keyToModify = splitedFieldName[1];
-              Field modelField = mappedEntity.getClass().getDeclaredField(mapToModifyName);
-              modelField.setAccessible(true);
-              Map<String, Object> map = (Map<String, Object>) modelField.get(mappedEntity);
-              map.put(
-                  keyToModify,
-                  transformAttributeToSugoi(mappingType, correspondingAttributes, config));
+              Object sugoiAttribute =
+                  transformLdapAttributeToSugoiAttribute(
+                      mappingType, correspondingAttributes, config);
+              putSugoiAttributeInEntityMapField(sugoiAttribute, fieldToSetName, mappedEntity);
             } else {
-              Field modelField =
-                  mappedEntity.getClass().getDeclaredField(mappingDefinition.getKey());
-              modelField.setAccessible(true);
-              modelField.set(
-                  mappedEntity,
-                  transformAttributeToSugoi(mappingType, correspondingAttributes, config));
+              Object sugoiAttribute =
+                  transformLdapAttributeToSugoiAttribute(
+                      mappingType, correspondingAttributes, config);
+              putSugoiAttributeInEntityField(sugoiAttribute, fieldToSetName, mappedEntity);
+            }
+          } else if (mappingType == ModelType.EXISTS) {
+            if (fieldToSetName.contains(".")) {
+              putSugoiAttributeInEntityMapField(false, fieldToSetName, mappedEntity);
+            } else {
+              putSugoiAttributeInEntityField(false, fieldToSetName, mappedEntity);
             }
           }
         } catch (Exception e) {
@@ -109,13 +107,12 @@ public class GenericLdapMapper {
     if (objectClasses != null && !objectClasses.isEmpty()) {
       attributes.add(new Attribute("objectClass", objectClasses));
     }
-    // Exception where else is needed ? not needed if modification step
 
     for (Entry<String, String> mappingDefinition : mapping.entrySet()) {
       try {
         String[] splitedMappingDefinition = mappingDefinition.getValue().split(",");
         String attributeLdapName = splitedMappingDefinition[0];
-        String mappingType = splitedMappingDefinition[1];
+        ModelType mappingType = ModelType.valueOf(splitedMappingDefinition[1].toUpperCase());
         String readonlyStatus = splitedMappingDefinition[2];
         String fieldToSetName = mappingDefinition.getKey();
         if (!readonlyStatus.equalsIgnoreCase("ro")) {
@@ -157,22 +154,23 @@ public class GenericLdapMapper {
     return attributes;
   }
 
-  private static Object transformAttributeToSugoi(
-      String type, List<Attribute> attrs, Map<String, String> config) throws CertificateException {
-    switch (type.toUpperCase()) {
-      case "STRING":
+  private static Object transformLdapAttributeToSugoiAttribute(
+      ModelType type, List<Attribute> attrs, Map<String, String> config)
+      throws CertificateException {
+    switch (type) {
+      case STRING:
         return attrs.get(0).getValue();
-      case "BYTE_ARRAY":
+      case BYTE_ARRAY:
         return attrs.get(0).getValueByteArray();
-      case "ORGANIZATION":
+      case ORGANIZATION:
         Organization orga = new Organization();
         orga.setIdentifiant(LdapUtils.getNodeValueFromDN(attrs.get(0).getValue()));
         return orga;
-      case "ADDRESS":
+      case ADDRESS:
         Map<String, String> address = new HashMap<>();
         address.put("id", LdapUtils.getNodeValueFromDN(attrs.get(0).getValue()));
         return address;
-      case "LIST_HABILITATION":
+      case LIST_HABILITATION:
         List<String> values = new ArrayList<>();
         attrs.stream().forEach(attribute -> values.addAll(Arrays.asList(attribute.getValues())));
         return values.stream()
@@ -181,13 +179,13 @@ public class GenericLdapMapper {
                     attributeValue.split("_").length == 2 || attributeValue.split("_").length == 3)
             .map(attributeValue -> new Habilitation(attributeValue))
             .collect(Collectors.toList());
-      case "LIST_USER":
+      case LIST_USER:
         values = new ArrayList<>();
         attrs.stream().forEach(attribute -> values.addAll(Arrays.asList(attribute.getValues())));
         return values.stream()
             .map(attributeValue -> new User(LdapUtils.getNodeValueFromDN(attributeValue)))
             .collect(Collectors.toList());
-      case "LIST_GROUP":
+      case LIST_GROUP:
         values = new ArrayList<>();
         attrs.stream().forEach(attribute -> values.addAll(Arrays.asList(attribute.getValues())));
         return values.stream()
@@ -208,10 +206,12 @@ public class GenericLdapMapper {
                   }
                 })
             .collect(Collectors.toList());
-      case "LIST_STRING":
+      case LIST_STRING:
         values = new ArrayList<>();
         attrs.stream().forEach(attribute -> values.addAll(Arrays.asList(attribute.getValues())));
         return values.stream().collect(Collectors.toList());
+      case EXISTS:
+        return true;
       default:
         return null;
     }
@@ -219,15 +219,15 @@ public class GenericLdapMapper {
 
   @SuppressWarnings("unchecked")
   private static List<Attribute> transformSugoiToAttribute(
-      String type, String ldapAttributeName, Object sugoiValue, Map<String, String> config) {
-    switch (type.toUpperCase()) {
-      case "STRING":
+      ModelType type, String ldapAttributeName, Object sugoiValue, Map<String, String> config) {
+    switch (type) {
+      case STRING:
         if ((String) sugoiValue != "") {
           return List.of(new Attribute(ldapAttributeName, (String) sugoiValue));
         } else {
           return List.of();
         }
-      case "ORGANIZATION":
+      case ORGANIZATION:
         return List.of(
             new Attribute(
                 ldapAttributeName,
@@ -238,7 +238,7 @@ public class GenericLdapMapper {
                     //
                     ((Organization) sugoiValue).getIdentifiant(),
                     config.get(LdapConfigKeys.ORGANIZATION_SOURCE))));
-      case "ADDRESS":
+      case ADDRESS:
         if (((Map<String, String>) sugoiValue).containsKey("id")
             && config.get(LdapConfigKeys.ADDRESS_SOURCE) != null) {
           return List.of(
@@ -252,16 +252,16 @@ public class GenericLdapMapper {
                       ((Map<String, String>) sugoiValue).get("id"),
                       config.get(LdapConfigKeys.ADDRESS_SOURCE))));
         } else return List.of();
-      case "LIST_HABILITATION":
+      case LIST_HABILITATION:
         return ((List<Habilitation>) sugoiValue)
             .stream()
                 // Dont check contents (application nor role) for searching purpose
                 .filter(habilitation -> habilitation.getId() != null)
                 .map(habilitation -> new Attribute(ldapAttributeName, habilitation.getId()))
                 .collect(Collectors.toList());
-      case "LIST_USER":
+      case LIST_USER:
         return List.of();
-      case "LIST_GROUP":
+      case LIST_GROUP:
         return ((List<Group>) sugoiValue)
             .stream()
                 .map(
@@ -275,7 +275,7 @@ public class GenericLdapMapper {
                                 group.getName(),
                                 config.get(LdapConfigKeys.APP_SOURCE))))
                 .collect(Collectors.toList());
-      case "LIST_STRING":
+      case LIST_STRING:
         return ((List<String>) sugoiValue)
             .stream()
                 .map(value -> new Attribute(ldapAttributeName, value))
@@ -284,6 +284,30 @@ public class GenericLdapMapper {
         List.of();
     }
     return List.of();
+  }
+
+  private static <ReturnType> void putSugoiAttributeInEntityField(
+      Object sugoiAttribute, String fieldToSetName, ReturnType sugoiEntity)
+      throws NoSuchFieldException, IllegalAccessException {
+    Field modelField = sugoiEntity.getClass().getDeclaredField(fieldToSetName);
+    modelField.setAccessible(true);
+    modelField.set(sugoiEntity, sugoiAttribute);
+  }
+
+  private static <ReturnType> void putSugoiAttributeInEntityMapField(
+      Object sugoiAttribute, String fieldToSetName, ReturnType sugoiEntity)
+      throws NoSuchFieldException, IllegalAccessException {
+    String[] splitedFieldName = fieldToSetName.split("\\.");
+    String mapToModifyName = splitedFieldName[0];
+    String keyToModify = splitedFieldName[1];
+    Field modelField = sugoiEntity.getClass().getDeclaredField(mapToModifyName);
+    modelField.setAccessible(true);
+    Map<String, Object> map =
+        ((Map<?, ?>) modelField.get(sugoiEntity))
+            .entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getKey().toString(), e -> (Object) e.getValue()));
+    map.put(keyToModify, sugoiAttribute);
+    modelField.set(sugoiEntity, map);
   }
 
   public static <O> List<Modification> createMods(
