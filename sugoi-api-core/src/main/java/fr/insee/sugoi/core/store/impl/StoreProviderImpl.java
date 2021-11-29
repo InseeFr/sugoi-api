@@ -40,10 +40,7 @@ public class StoreProviderImpl implements StoreProvider {
   @Override
   public Store getStoreForUserStorage(String realmName, String userStorageName) {
     Realm r =
-        realmProvider
-            .load(realmName)
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + realmName + " doesn't exist "));
+        realmProvider.load(realmName).orElseThrow(() -> new RealmNotFoundException(realmName));
     UserStorage us = realmProvider.loadUserStorageByUserStorageName(realmName, userStorageName);
     return storeStorage.getStore(r, us);
   }
@@ -57,9 +54,7 @@ public class StoreProviderImpl implements StoreProvider {
                   ? storage
                   : realmProvider
                       .load(realm)
-                      .orElseThrow(
-                          () ->
-                              new RealmNotFoundException("The realm " + realm + " doesn't exist "))
+                      .orElseThrow(() -> new RealmNotFoundException(realm))
                       .getUserStorages()
                       .get(0)
                       .getName())
@@ -84,8 +79,7 @@ public class StoreProviderImpl implements StoreProvider {
             realm,
             realmProvider
                 .load(realm)
-                .orElseThrow(
-                    () -> new RealmNotFoundException("The realm " + realm + " doesn't exist "))
+                .orElseThrow(() -> new RealmNotFoundException(realm))
                 .getUserStorages()
                 .get(0)
                 .getName())
@@ -98,8 +92,7 @@ public class StoreProviderImpl implements StoreProvider {
             realm,
             realmProvider
                 .load(realm)
-                .orElseThrow(
-                    () -> new RealmNotFoundException("The realm " + realm + " doesn't exist "))
+                .orElseThrow(() -> new RealmNotFoundException(realm))
                 .getUserStorages()
                 .get(0)
                 .getName())

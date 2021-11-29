@@ -190,7 +190,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
           .collect(Collectors.toList());
     } catch (Exception e) {
       e.printStackTrace();
-      throw new RealmNotFoundException("Impossible de charger les realms");
+      throw new RealmNotFoundException("Impossible de charger les realms", e);
     }
   }
 
@@ -298,40 +298,34 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
       } catch (LDAPException e) {
         throw new RuntimeException("Failed to update realm " + realm.getName(), e);
       }
+    } else {
+      throw new RealmNotFoundException(realm.getName());
     }
-    throw new RealmNotFoundException(String.format("Realm %s not found", realm.getName()));
   }
 
   @Override
   public ProviderResponse deleteRealm(String realmName, ProviderRequest providerRequest) {
-    if (load(realmName) != null) {
-
-      try {
-        LDAPConnectionPool ldapConnectionPool = initLdapPoolConnection();
-        List<UserStorage> userStorages =
-            load(realmName)
-                .orElseThrow(
-                    () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "))
-                .getUserStorages();
-        if (userStorages.size() > 1) {
-          for (UserStorage userStorage :
-              load(realmName)
-                  .orElseThrow(
-                      () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "))
-                  .getUserStorages()) {
-            ldapConnectionPool.delete(getUserStorageDn(userStorage.getName(), realmName));
-          }
+    try {
+      LDAPConnectionPool ldapConnectionPool = initLdapPoolConnection();
+      List<UserStorage> userStorages =
+          load(realmName)
+              .orElseThrow(() -> new RealmNotFoundException(realmName))
+              .getUserStorages();
+      for (UserStorage userStorage : userStorages) {
+        if (ldapConnectionPool.getEntry(
+                getUserStorageDn(userStorage.getName(), realmName), "+", "*")
+            != null) {
+          ldapConnectionPool.delete(getUserStorageDn(userStorage.getName(), realmName));
         }
-        ldapConnectionPool.delete(getRealmDn(realmName));
-        ProviderResponse response = new ProviderResponse();
-        response.setStatus(ProviderResponseStatus.OK);
-        response.setEntityId(realmName);
-        return response;
-      } catch (LDAPException e) {
-        throw new RuntimeException("Failed to delete realm " + realmName, e);
       }
+      ldapConnectionPool.delete(getRealmDn(realmName));
+      ProviderResponse response = new ProviderResponse();
+      response.setStatus(ProviderResponseStatus.OK);
+      response.setEntityId(realmName);
+      return response;
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to delete realm " + realmName, e);
     }
-    throw new RealmNotFoundException(String.format("Realm %s not found", realmName));
   }
 
   private synchronized LDAPConnectionPool initLdapPoolConnection() {

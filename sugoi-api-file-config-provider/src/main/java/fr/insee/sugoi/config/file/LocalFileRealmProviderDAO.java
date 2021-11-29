@@ -15,6 +15,7 @@ package fr.insee.sugoi.config.file;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -103,7 +104,7 @@ public class LocalFileRealmProviderDAO implements RealmProvider {
         realms.stream()
             .filter(r -> r.getName().equalsIgnoreCase(realm.getName()))
             .findFirst()
-            .orElse(null);
+            .orElseThrow(() -> new RealmNotFoundException(realm.getName()));
     if (realmToModify != null) {
       realmToModify = realm;
     }

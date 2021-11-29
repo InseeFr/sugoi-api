@@ -238,10 +238,7 @@ public class UserServiceImpl implements UserService {
   public User findById(String realmName, String storage, String id) {
     try {
       Realm realm =
-          realmProvider
-              .load(realmName)
-              .orElseThrow(
-                  () -> new RealmNotFoundException("The realm " + realmName + " doesn't exist "));
+          realmProvider.load(realmName).orElseThrow(() -> new RealmNotFoundException(realmName));
       String nonNullStorage =
           storage != null
               ? storage
@@ -305,11 +302,7 @@ public class UserServiceImpl implements UserService {
                   user.addMetadatas(EventKeysConfig.USERSTORAGE, storage);
                 });
       } else {
-        Realm r =
-            realmProvider
-                .load(realm)
-                .orElseThrow(
-                    () -> new RealmNotFoundException("The realm " + realm + " doesn't exist "));
+        Realm r = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
         for (UserStorage us : r.getUserStorages()) {
           ReaderStore readerStore =
               storeProvider.getStoreForUserStorage(realm, us.getName()).getReader();
@@ -443,10 +436,7 @@ public class UserServiceImpl implements UserService {
   public User findByMail(String realmName, String storageName, String mail) {
     try {
       Realm realm =
-          realmProvider
-              .load(realmName)
-              .orElseThrow(
-                  () -> new RealmNotFoundException("The realm " + realmName + " doesn't exist "));
+          realmProvider.load(realmName).orElseThrow(() -> new RealmNotFoundException(realmName));
       String nonNullStorage =
           storageName != null
               ? storageName

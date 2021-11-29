@@ -16,7 +16,6 @@ package fr.insee.sugoi.config.file;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,20 +45,8 @@ public class LocalFileRealmProviderDAO_realmsTwoTest {
   @Test
   public void shouldFetchTestRealm() {
     assertThat(
-        "We should have a realm test",
-        localFileConfig
-            .load("test")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "))
-            .getName(),
-        is("test"));
+        "We should have a realm test", localFileConfig.load("test").get().getName(), is("test"));
     assertThat(
-        "We should have a realm TeSt",
-        localFileConfig
-            .load("TeSt")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "))
-            .getName(),
-        is("test"));
+        "We should have a realm TeSt", localFileConfig.load("TeSt").get().getName(), is("test"));
   }
 }

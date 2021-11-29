@@ -25,7 +25,6 @@ import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.model.Realm;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,19 +37,15 @@ public class ConfigServiceImpl implements ConfigService {
   @Autowired private SugoiEventPublisher sugoiEventPublisher;
 
   @Override
-  public Optional<Realm> getRealm(String name) {
+  public Realm getRealm(String name) {
     try {
-      Realm realm =
-          realmProvider
-              .load(name)
-              .orElseThrow(
-                  () -> new RealmNotFoundException("The realm " + name + " doesn't exist "));
+      Realm realm = realmProvider.load(name).orElseThrow(() -> new RealmNotFoundException(name));
       sugoiEventPublisher.publishCustomEvent(
           null,
           null,
           SugoiEventTypeEnum.FIND_REALM_BY_ID,
           Map.ofEntries(Map.entry(EventKeysConfig.REALM_NAME, name)));
-      return Optional.ofNullable(realm);
+      return realm;
     } catch (Exception e) {
       sugoiEventPublisher.publishCustomEvent(
           null,
@@ -59,7 +54,7 @@ public class ConfigServiceImpl implements ConfigService {
           Map.ofEntries(
               Map.entry(EventKeysConfig.REALM_NAME, name),
               Map.entry(EventKeysConfig.ERROR, e.toString())));
-      return Optional.empty();
+      throw e;
     }
   }
 
@@ -98,13 +93,11 @@ public class ConfigServiceImpl implements ConfigService {
   @Override
   public ProviderResponse updateRealm(Realm realm, ProviderRequest providerRequest) {
     try {
-      getRealm(realm.getName())
-          .orElseThrow(() -> new RealmNotFoundException("Realm " + realm.getName() + " not found"));
       ProviderResponse response = realmProvider.updateRealm(realm, providerRequest);
       sugoiEventPublisher.publishCustomEvent(null, null, SugoiEventTypeEnum.UPDATE_REALM, null);
       if (!providerRequest.isAsynchronousAllowed()
           && response.getStatus().equals(ProviderResponseStatus.OK)) {
-        response.setEntity(getRealm(realm.getName()).get());
+        response.setEntity(getRealm(realm.getName()));
       }
       return response;
     } catch (Exception e) {
@@ -124,7 +117,7 @@ public class ConfigServiceImpl implements ConfigService {
       sugoiEventPublisher.publishCustomEvent(null, null, SugoiEventTypeEnum.CREATE_REALM, null);
       if (!providerRequest.isAsynchronousAllowed()
           && response.getStatus().equals(ProviderResponseStatus.OK)) {
-        response.setEntity(getRealm(realm.getName()).get());
+        response.setEntity(getRealm(realm.getName()));
       }
       return response;
     } catch (Exception e) {

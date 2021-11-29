@@ -15,8 +15,10 @@ package fr.insee.sugoi.core.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
+import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -28,6 +30,7 @@ import fr.insee.sugoi.model.UserStorage;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,15 +58,16 @@ public class ConfigServiceTest {
     UserStorage us2 = new UserStorage();
     us2.setName("us2");
     realm.setUserStorages(List.of(us1, us2));
-  }
 
-  @Test
-  public void shouldUpdateExistingRealm() {
     Realm returnedRealm1 = new Realm();
     returnedRealm1.setName("realm");
 
     Mockito.when(realmProvider.load("realm")).thenReturn(Optional.of(returnedRealm1));
+    Mockito.when(realmProvider.load("idonotexist")).thenReturn(Optional.empty());
+  }
 
+  @Test
+  public void shouldUpdateExistingRealm() {
     ProviderRequest providerRequest =
         new ProviderRequest(new SugoiUser("toto", List.of("toto")), false, null, false);
     ProviderResponse mockedResponse =
@@ -75,5 +79,16 @@ public class ConfigServiceTest {
         "realm should have been updated",
         providerResponse.getStatus(),
         is(ProviderResponseStatus.OK));
+  }
+
+  @Test
+  public void shouldFindRealmWhenPresent() {
+    assertThat("Realm should be found", configService.getRealm("realm").getName(), is("realm"));
+  }
+
+  @Test
+  @DisplayName("When searching a realm that do not exist, should throw RealmNotFoundException")
+  public void shouldThrowNotFoundWhenNoRealmFound() {
+    assertThrows(RealmNotFoundException.class, () -> configService.getRealm("idonotexist"));
   }
 }

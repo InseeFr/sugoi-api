@@ -137,7 +137,7 @@ public class ExportController {
       storageToFind.add(storage);
     } else {
       storageToFind =
-          configService.getRealm(realm).get().getUserStorages().stream()
+          configService.getRealm(realm).getUserStorages().stream()
               .map(us -> us.getName())
               .collect(Collectors.toList());
     }

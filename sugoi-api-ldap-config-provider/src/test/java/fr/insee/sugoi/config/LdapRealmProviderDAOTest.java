@@ -18,7 +18,6 @@ import static org.hamcrest.Matchers.is;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.configuration.UiMappingService;
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.Realm;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -38,11 +37,7 @@ public class LdapRealmProviderDAOTest {
 
   @Test
   public void loadUniStorage() {
-    Realm realm =
-        ldapRealmProviderDAOImpl
-            .load("domaine1")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm realm = ldapRealmProviderDAOImpl.load("domaine1").get();
     assertThat("Should have appSource", realm.getAppSource(), is("applitest"));
     assertThat(
         "Default userstorage should have usersource",
@@ -52,11 +47,7 @@ public class LdapRealmProviderDAOTest {
 
   @Test
   public void loadMultiStorage() {
-    Realm realm =
-        ldapRealmProviderDAOImpl
-            .load("domaine2")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm realm = ldapRealmProviderDAOImpl.load("domaine2").get();
     assertThat("Should have two userstorages", realm.getUserStorages().size(), is(2));
     assertThat(
         "First userstorage is monUserStorage",
@@ -96,11 +87,7 @@ public class LdapRealmProviderDAOTest {
 
   @Test
   public void loadRealmWithConfig() {
-    Realm realm =
-        ldapRealmProviderDAOImpl
-            .load("domaine1")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm realm = ldapRealmProviderDAOImpl.load("domaine1").get();
     assertThat(
         "app_managed_attribute_key should be inseeGroupeDefaut",
         realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST),
@@ -113,11 +100,7 @@ public class LdapRealmProviderDAOTest {
 
   @Test
   public void shouldHaveRealmMapping() {
-    Realm realm =
-        ldapRealmProviderDAOImpl
-            .load("domaine1")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm realm = ldapRealmProviderDAOImpl.load("domaine1").get();
     assertThat(
         "Should have groupMapping",
         realm.getMappings().get("groupMapping").get("name"),
@@ -134,11 +117,7 @@ public class LdapRealmProviderDAOTest {
 
   @Test
   public void shouldHaveUsOneMapping() {
-    Realm realm =
-        ldapRealmProviderDAOImpl
-            .load("domaine1")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm realm = ldapRealmProviderDAOImpl.load("domaine1").get();
     assertThat(
         "Should have the userMapping",
         realm.getUserStorages().get(0).getMappings().get("userMapping").get("firstName"),

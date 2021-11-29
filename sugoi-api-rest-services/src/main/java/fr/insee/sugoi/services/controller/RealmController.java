@@ -13,7 +13,6 @@
 */
 package fr.insee.sugoi.services.controller;
 
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.SugoiUser;
@@ -91,13 +90,8 @@ public class RealmController {
     List<Realm> realmsFiltered = new ArrayList<>();
 
     if (id != null) {
-      Realm retrievedRealm =
-          configService
-              .getRealm(id)
-              .orElseThrow(() -> new RealmNotFoundException("Realm " + id + " not found"));
-      if (retrievedRealm != null) {
-        realms.add(retrievedRealm);
-      }
+      Realm retrievedRealm = configService.getRealm(id);
+      realms.add(retrievedRealm);
     } else {
       realms.addAll(configService.getRealms());
     }
