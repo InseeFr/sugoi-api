@@ -31,7 +31,6 @@ import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.paging.PageResult;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -138,8 +137,7 @@ public class ApplicationControllerTest {
   public void shouldGetApplicationByID() {
     try {
 
-      Mockito.when(applicationService.findById("domaine1", "SuperAppli"))
-          .thenReturn(Optional.of(application1));
+      Mockito.when(applicationService.findById("domaine1", "SuperAppli")).thenReturn(application1);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.get("/realms/domaine1/applications/SuperAppli")
@@ -187,7 +185,7 @@ public class ApplicationControllerTest {
     try {
 
       Mockito.when(applicationService.findById("domaine1", "SuperAppli"))
-          .thenReturn(Optional.of(application1Updated));
+          .thenReturn(application1Updated);
       Mockito.doReturn(
               new ProviderResponse(
                   "", "requestId", ProviderResponseStatus.OK, application1Updated, null))
@@ -406,7 +404,7 @@ public class ApplicationControllerTest {
     try {
 
       Mockito.when(applicationService.findById("domaine1", "dontexist"))
-          .thenReturn(Optional.empty());
+          .thenThrow(ApplicationNotFoundException.class);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.get("/realms/domaine1/applications/dontexist")
@@ -450,7 +448,7 @@ public class ApplicationControllerTest {
   @WithMockUser
   public void get404WhenNoApplicationIsFoundWhenUpdate() {
     try {
-      Mockito.doThrow(new ApplicationNotFoundException(""))
+      Mockito.doThrow(new ApplicationNotFoundException("domaine1", "SuperAppli"))
           .when(applicationService)
           .update(Mockito.anyString(), Mockito.any(), Mockito.any());
       RequestBuilder requestBuilder =
@@ -476,7 +474,7 @@ public class ApplicationControllerTest {
   public void get404WhenNoApplicationIsFoundWhenDelete() {
     try {
 
-      Mockito.doThrow(new ApplicationNotFoundException(""))
+      Mockito.doThrow(new ApplicationNotFoundException("domaine1", "dontexist"))
           .when(applicationService)
           .delete(Mockito.anyString(), Mockito.anyString(), Mockito.any());
 

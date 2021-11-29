@@ -17,11 +17,15 @@ public class ApplicationNotFoundException extends RuntimeException {
 
   private static final long serialVersionUID = -1735193744573498943L;
 
-  public ApplicationNotFoundException(String message, Throwable cause) {
-    super(message, cause);
+  public ApplicationNotFoundException(String realmName, String applicationId) {
+    super(String.format("Application %s does not exist in realm %s", applicationId, realmName));
   }
 
-  public ApplicationNotFoundException(String message) {
-    super(message);
+  public ApplicationNotFoundException(String applicationId) {
+    super(String.format("Application %s was not found", applicationId));
+  }
+
+  public ApplicationNotFoundException(String message, Throwable cause) {
+    super(message, cause);
   }
 }

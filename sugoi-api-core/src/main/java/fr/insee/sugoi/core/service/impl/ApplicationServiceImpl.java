@@ -27,7 +27,6 @@ import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;
 import java.util.Map;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +49,7 @@ public class ApplicationServiceImpl implements ApplicationService {
           Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION, application)));
       if (!providerRequest.isAsynchronousAllowed()
           && response.getStatus().equals(ProviderResponseStatus.OK)) {
-        response.setEntity(findById(realm, application.getName()).get());
+        response.setEntity(findById(realm, application.getName()));
       }
       return response;
     } catch (Exception e) {
@@ -84,11 +83,7 @@ public class ApplicationServiceImpl implements ApplicationService {
           Map.ofEntries(
               Map.entry(EventKeysConfig.APPLICATION_ID, id),
               Map.entry(EventKeysConfig.ERROR, e.toString())));
-      if (e instanceof ApplicationNotFoundException) {
-        throw (ApplicationNotFoundException) e;
-      } else {
-        throw e;
-      }
+      throw e;
     }
   }
 
@@ -105,7 +100,7 @@ public class ApplicationServiceImpl implements ApplicationService {
           Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION, application)));
       if (!providerRequest.isAsynchronousAllowed()
           && response.getStatus().equals(ProviderResponseStatus.OK)) {
-        response.setEntity(findById(realm, application.getName()).get());
+        response.setEntity(findById(realm, application.getName()));
       }
       return response;
     } catch (Exception e) {
@@ -121,16 +116,19 @@ public class ApplicationServiceImpl implements ApplicationService {
   }
 
   @Override
-  public Optional<Application> findById(String realm, String id) {
+  public Application findById(String realm, String id) {
     try {
-
-      Application app = storeProvider.getReaderStore(realm).getApplication(id);
+      Application app =
+          storeProvider
+              .getReaderStore(realm)
+              .getApplication(id)
+              .orElseThrow(() -> new ApplicationNotFoundException(realm, id));
       sugoiEventPublisher.publishCustomEvent(
           realm,
           null,
           SugoiEventTypeEnum.FIND_APPLICATION_BY_ID,
           Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION_ID, id)));
-      return Optional.ofNullable(app);
+      return app;
     } catch (Exception e) {
       sugoiEventPublisher.publishCustomEvent(
           realm,
@@ -139,7 +137,7 @@ public class ApplicationServiceImpl implements ApplicationService {
           Map.ofEntries(
               Map.entry(EventKeysConfig.APPLICATION_ID, id),
               Map.entry(EventKeysConfig.ERROR, e.toString())));
-      return Optional.empty();
+      throw e;
     }
   }
 

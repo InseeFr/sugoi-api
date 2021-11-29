@@ -234,7 +234,7 @@ public class LdapReaderStoreTest {
 
   @Test
   public void testGetApplication() {
-    Application application = ldapReaderStore.getApplication("Applitest");
+    Application application = ldapReaderStore.getApplication("Applitest").get();
     assertThat("Should get applitest", application.getName(), is("Applitest"));
     List<Group> groups = application.getGroups();
     assertThat(
@@ -255,7 +255,7 @@ public class LdapReaderStoreTest {
 
   @Test
   public void testGetNonexistentApplication() {
-    assertThat("Should get null", ldapReaderStore.getApplication("nottestc"), is(nullValue()));
+    assertThat("Should get null", ldapReaderStore.getApplication("nottestc").isEmpty());
   }
 
   @Test

@@ -14,6 +14,7 @@
 package fr.insee.sugoi.store.file;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
@@ -29,6 +30,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.logging.log4j.LogManager;
@@ -142,17 +144,14 @@ public class FileReaderStore implements ReaderStore {
 
   @Override
   public Group getGroup(String appName, String groupName) {
-    Application application = getApplication(appName);
-    if (application != null) {
-      return getApplication(appName).getGroups() != null
-          ? getApplication(appName).getGroups().stream()
-              .filter(group -> group.getName().equalsIgnoreCase(groupName))
-              .findFirst()
-              .orElse(null)
-          : null;
-    } else {
-      throw new RuntimeException("Application " + appName + " not found");
-    }
+    Application application =
+        getApplication(appName).orElseThrow(() -> new ApplicationNotFoundException(appName));
+    return application.getGroups() != null
+        ? application.getGroups().stream()
+            .filter(group -> group.getName().equalsIgnoreCase(groupName))
+            .findFirst()
+            .orElse(null)
+        : null;
   }
 
   @Override
@@ -179,14 +178,15 @@ public class FileReaderStore implements ReaderStore {
   }
 
   @Override
-  public Application getApplication(String applicationName) {
+  public Optional<Application> getApplication(String applicationName) {
     if (config.get(FileKeysConfig.APP_SOURCE) != null) {
       Resource realmsResource =
           resourceLoader.getResource(config.get(FileKeysConfig.APP_SOURCE) + applicationName);
       if (realmsResource.exists()) {
-        return loadResourceContent(realmsResource, Application.class);
+        return Optional.of(loadResourceContent(realmsResource, Application.class));
+      } else {
+        return Optional.empty();
       }
-      return null;
     } else {
       throw new UnsupportedOperationException("Applications feature not configured for this realm");
     }

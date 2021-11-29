@@ -319,7 +319,7 @@ public class LdapWriterStoreTest {
     groups.add(group2);
     application.setGroups(groups);
     ldapWriterStore.createApplication(application, null);
-    Application retrievedApp = ldapReaderStore.getApplication("MyApplication");
+    Application retrievedApp = ldapReaderStore.getApplication("MyApplication").get();
     assertThat("MyApplication should have been added", retrievedApp, not(nullValue()));
     assertThat(
         "My application should have groups",
@@ -329,12 +329,12 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testUpdateApplicationWithGroupAdding() {
-    Application application = ldapReaderStore.getApplication("Applitest");
+    Application application = ldapReaderStore.getApplication("Applitest").get();
     Group group1 = new Group();
     group1.setName("Group1_Applitest");
     application.getGroups().add(group1);
     ldapWriterStore.updateApplication(application, null);
-    Application retrievedApplication = ldapReaderStore.getApplication("Applitest");
+    Application retrievedApplication = ldapReaderStore.getApplication("Applitest").get();
     assertThat(
         "Applitest should have group1",
         retrievedApplication.getGroups().stream()
@@ -343,7 +343,7 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testUpdateApplicationWithGroupRemoving() {
-    Application application = ldapReaderStore.getApplication("Applitest");
+    Application application = ldapReaderStore.getApplication("Applitest").get();
     Group adminApplitestGroup =
         application.getGroups().stream()
             .filter(group -> group.getName().equalsIgnoreCase("ToDelete_Applitest"))
@@ -351,7 +351,7 @@ public class LdapWriterStoreTest {
             .get();
     application.getGroups().remove(adminApplitestGroup);
     ldapWriterStore.updateApplication(application, null);
-    Application retrievedApplication = ldapReaderStore.getApplication("Applitest");
+    Application retrievedApplication = ldapReaderStore.getApplication("Applitest").get();
     assertThat(
         "Applitest should not have todelete",
         !retrievedApplication.getGroups().stream()
@@ -360,7 +360,7 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testUpdateApplicationWithGroupModifying() {
-    Application application = ldapReaderStore.getApplication("Applitest");
+    Application application = ldapReaderStore.getApplication("Applitest").get();
     Group adminApplitestGroup =
         application.getGroups().stream()
             .filter(group -> group.getName().equalsIgnoreCase("ToUpdate_Applitest"))
@@ -368,7 +368,7 @@ public class LdapWriterStoreTest {
             .get();
     adminApplitestGroup.setDescription("new description");
     ldapWriterStore.updateApplication(application, null);
-    Application retrievedApplication = ldapReaderStore.getApplication("Applitest");
+    Application retrievedApplication = ldapReaderStore.getApplication("Applitest").get();
     assertThat(
         "ToUpdate should have description new description",
         retrievedApplication.getGroups().stream()
@@ -397,8 +397,7 @@ public class LdapWriterStoreTest {
     ldapWriterStore.deleteApplication("NotEmptyApplication", null);
     assertThat(
         "NotEmptyApplication should have been deleted",
-        ldapReaderStore.getApplication("NotEmptyApplication"),
-        is(nullValue()));
+        ldapReaderStore.getApplication("NotEmptyApplication").isEmpty());
     assertThat(
         "Group1 should not exist in NotEmptyApplication",
         ldapReaderStore.getGroup("NotEmptyApplication", "Group1_NotEmptyApplication"),

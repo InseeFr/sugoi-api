@@ -19,6 +19,7 @@ import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
+import java.util.Optional;
 
 /**
  * Reader store are responsible of all operations reading a store (to fetch informations) All method
@@ -88,10 +89,10 @@ public interface ReaderStore {
    * @param applicationName
    * @throws UnsupportedOperationException if the configuration for applications is not set on the
    *     Realm.
-   * @return the application with all its informations, groups and users in groups included. If no
-   *     application matches applicationName, null is returned.
+   * @return an optional of the application with all its informations, groups and users in groups
+   *     included. Is empty if application could not be found.
    */
-  public Application getApplication(String applicationName);
+  public Optional<Application> getApplication(String applicationName);
 
   /**
    * Search applications matching applicationFilter filled attributes.
