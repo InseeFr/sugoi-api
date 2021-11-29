@@ -16,7 +16,6 @@ package fr.insee.sugoi.services.controller;
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.exceptions.AppCannotManagedAttributeException;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
-import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.SugoiUser;
@@ -411,11 +410,7 @@ public class AppManagedUserAttributeController {
           String transactionId,
       Authentication authentication) {
 
-    User foundUser =
-        userService
-            .findById(realm, null, id)
-            .orElseThrow(
-                () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
+    User foundUser = userService.findById(realm, null, id);
     return addUserAttributesManagedByApp(
         realm,
         (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
@@ -479,11 +474,7 @@ public class AppManagedUserAttributeController {
           String transactionId,
       Authentication authentication) {
 
-    User foundUser =
-        userService
-            .findById(realm, null, id)
-            .orElseThrow(
-                () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
+    User foundUser = userService.findById(realm, null, id);
     return deleteUserAttributesManagedByApp(
         realm,
         (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),

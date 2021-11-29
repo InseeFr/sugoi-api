@@ -17,6 +17,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.core.exceptions.GroupAlreadyExistException;
+import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -52,7 +53,10 @@ public class FileWriterStore implements WriterStore {
   @Override
   public ProviderResponse deleteUser(String id, ProviderRequest providerRequest) {
     fileReaderStore.setResourceLoader(resourceLoader);
-    User user = fileReaderStore.getUser(id);
+    User user =
+        fileReaderStore
+            .getUser(id)
+            .orElseThrow(() -> new UserNotFoundException(config.get(FileKeysConfig.REALM), id));
     user.getGroups()
         .forEach(
             group -> deleteUserFromGroup(group.getAppName(), group.getName(), id, providerRequest));
@@ -242,7 +246,11 @@ public class FileWriterStore implements WriterStore {
                 .orElse(null)
             : null;
     if (group != null) {
-      User user = fileReaderStore.getUser(userId);
+      User user =
+          fileReaderStore
+              .getUser(userId)
+              .orElseThrow(
+                  () -> new UserNotFoundException(config.get(FileKeysConfig.REALM), userId));
       user.getGroups()
           .removeIf(
               groupFilter ->
@@ -292,7 +300,11 @@ public class FileWriterStore implements WriterStore {
                 .orElse(null)
             : null;
     if (group != null) {
-      User user = fileReaderStore.getUser(userId);
+      User user =
+          fileReaderStore
+              .getUser(userId)
+              .orElseThrow(
+                  () -> new UserNotFoundException(config.get(FileKeysConfig.REALM), userId));
       if (user != null) {
         try {
           if (user.getGroups() == null) {
@@ -477,14 +489,12 @@ public class FileWriterStore implements WriterStore {
   @Override
   public ProviderResponse addUserToGroupManager(
       String applicationName, String userId, ProviderRequest providerRequest) {
-    // TODO Auto-generated method stub
     throw new NotImplementedException();
   }
 
   @Override
   public ProviderResponse deleteUserFromManagerGroup(
       String applicationName, String userId, ProviderRequest providerRequest) {
-    // TODO Auto-generated method stub
     throw new NotImplementedException();
   }
 }

@@ -14,7 +14,6 @@
 package fr.insee.sugoi.old.services.controller;
 
 import fr.insee.sugoi.converter.ouganext.HabilitationsOuganext;
-import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.SugoiUser;
 import fr.insee.sugoi.core.service.UserService;
@@ -102,10 +101,6 @@ public class ContactHabilitationDomaineController {
                 userService
                     .findById(
                         realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
-                    .orElseThrow(
-                        () ->
-                            new UserNotFoundException(
-                                "Cannot find user " + identifiant + " in domaine " + domaine))
                     .getHabilitations()));
   }
 
@@ -163,12 +158,8 @@ public class ContactHabilitationDomaineController {
     RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
     User user =
-        userService
-            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
-            .orElseThrow(
-                () ->
-                    new UserNotFoundException(
-                        "Cannot find user " + identifiant + " in domaine " + domaine));
+        userService.findById(
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
     HabilitationsOuganext habilitations = new HabilitationsOuganext(user.getHabilitations());
     habilitations.addHabilitation(appName, nomRoles);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
@@ -238,12 +229,8 @@ public class ContactHabilitationDomaineController {
     RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
     User user =
-        userService
-            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
-            .orElseThrow(
-                () ->
-                    new UserNotFoundException(
-                        "Cannot find user " + identifiant + " in domaine " + domaine));
+        userService.findById(
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
     HabilitationsOuganext habilitations = new HabilitationsOuganext(user.getHabilitations());
     habilitations.addHabilitations(appName, role, proprietes);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
@@ -305,12 +292,8 @@ public class ContactHabilitationDomaineController {
     RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
     User user =
-        userService
-            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
-            .orElseThrow(
-                () ->
-                    new UserNotFoundException(
-                        "Cannot find user " + identifiant + " in domaine " + domaine));
+        userService.findById(
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
     HabilitationsOuganext habilitations = new HabilitationsOuganext(user.getHabilitations());
     habilitations.removeHabilitation(appName, nomRoles);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
@@ -379,12 +362,8 @@ public class ContactHabilitationDomaineController {
     RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
     User user =
-        userService
-            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
-            .orElseThrow(
-                () ->
-                    new UserNotFoundException(
-                        "Cannot find user " + identifiant + " in domaine " + domaine));
+        userService.findById(
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
     HabilitationsOuganext habilitations = new HabilitationsOuganext(user.getHabilitations());
     habilitations.removeHabilitation(appName, nomRole, proprietes);
     user.setHabilitations(habilitations.convertSugoiHabilitation());

@@ -15,6 +15,7 @@ package fr.insee.sugoi.store.file;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
+import fr.insee.sugoi.core.exceptions.MultipleUserWithSameMailException;
 import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.model.Application;
@@ -54,25 +55,20 @@ public class FileReaderStore implements ReaderStore {
   }
 
   @Override
-  public User getUser(String id) {
+  public Optional<User> getUser(String id) {
     Resource realmsResource =
         resourceLoader.getResource(config.get(FileKeysConfig.USER_SOURCE) + id);
     if (realmsResource.exists()) {
       User user = loadResourceContent(realmsResource, User.class);
       // suborganization is loaded as an independant resource
       if (user.getOrganization() != null && user.getOrganization().getIdentifiant() != null) {
-        try {
-          String nestedOrgaId = user.getOrganization().getIdentifiant();
-          user.setOrganization(
-              getOrganization(nestedOrgaId)
-                  .orElseThrow(() -> new OrganizationNotFoundException(nestedOrgaId)));
-        } catch (RuntimeException e) {
-          logger.error("Unable to retrieve user's organization", e);
-        }
+        String nestedOrgaId = user.getOrganization().getIdentifiant();
+        user.setOrganization(getOrganization(nestedOrgaId).orElse(null));
       }
-      return user;
+      return Optional.of(user);
+    } else {
+      return Optional.empty();
     }
-    return null;
   }
 
   @Override
@@ -123,8 +119,9 @@ public class FileReaderStore implements ReaderStore {
     if (group != null && group.getUsers() != null) {
       pageResult.setResults(
           group.getUsers().stream()
-              .map(user -> getUser(user.getUsername()))
-              .filter(user -> user != null)
+              .map(simplifiedUser -> getUser(simplifiedUser.getUsername()))
+              .filter(optionalUser -> optionalUser.isPresent())
+              .map(optionalUser -> optionalUser.get())
               .collect(Collectors.toList()));
     } else {
       pageResult.setResults(List.of());
@@ -271,19 +268,16 @@ public class FileReaderStore implements ReaderStore {
   }
 
   @Override
-  public User getUserByMail(String mail) {
+  public Optional<User> getUserByMail(String mail) {
     logger.debug("Searching user with mail {}", mail);
     User searchedUser = new User();
     searchedUser.setMail(mail);
     PageResult<User> users = searchUsers(searchedUser, null, null);
-    User user = null;
-    if (users.getResults().size() == 1) {
-      user = users.getResults().get(0);
-    } else if (users.getResults().size() > 1) {
-      throw new RuntimeException(
-          "multiple user found with this email where found cannot determine which one to choose");
+    if (users.getResults().size() > 1) {
+      throw new MultipleUserWithSameMailException(mail);
+    } else {
+      return users.getResults().stream().findFirst();
     }
-    return user;
   }
 
   @Override

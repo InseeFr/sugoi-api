@@ -14,7 +14,6 @@
 package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
-import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.SugoiUser;
@@ -157,11 +156,7 @@ public class CredentialsController {
           String transactionId,
       Authentication authentication) {
 
-    User user =
-        userService
-            .findById(realm, null, id)
-            .orElseThrow(
-                () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
+    User user = userService.findById(realm, null, id);
     return reinitPassword(
         pcr,
         realm,
@@ -271,11 +266,7 @@ public class CredentialsController {
           String transactionId,
       Authentication authentication) {
 
-    User user =
-        userService
-            .findById(realm, null, id)
-            .orElseThrow(
-                () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
+    User user = userService.findById(realm, null, id);
     return changePassword(
         pcr,
         realm,
@@ -386,11 +377,7 @@ public class CredentialsController {
           String transactionId,
       Authentication authentication) {
 
-    User user =
-        userService
-            .findById(realm, null, id)
-            .orElseThrow(
-                () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
+    User user = userService.findById(realm, null, id);
     return initPassword(
         realm,
         (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
@@ -468,11 +455,7 @@ public class CredentialsController {
           String id,
       @Parameter(description = "User password to test", required = true) @RequestBody
           PasswordView passwordView) {
-    User user =
-        userService
-            .findById(realm, null, id)
-            .orElseThrow(
-                () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
+    User user = userService.findById(realm, null, id);
     return validatePassword(
         realm, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id, passwordView);
   }
@@ -490,11 +473,7 @@ public class CredentialsController {
           @PathVariable("id")
           String id,
       @RequestBody Map<String, String> properties) {
-    User user =
-        userService
-            .findById(realm, null, id)
-            .orElseThrow(
-                () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
+    User user = userService.findById(realm, null, id);
     return sendLogin(
         realm, id, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), properties);
   }

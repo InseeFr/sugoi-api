@@ -18,7 +18,6 @@ import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
-import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -200,10 +199,7 @@ public class GroupServiceImpl implements GroupService {
       ProviderRequest providerRequest) {
     try {
       if (storage == null) {
-        User user =
-            userService
-                .findById(realm, null, userId)
-                .orElseThrow(() -> new UserNotFoundException("Cannot find user in realm " + realm));
+        User user = userService.findById(realm, null, userId);
         storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE);
       }
       ProviderResponse response =
@@ -233,8 +229,6 @@ public class GroupServiceImpl implements GroupService {
     }
   }
 
-  // TODO attention il manque le userStorage du userId a ajouter
-
   @Override
   public ProviderResponse deleteUserFromGroup(
       String realm,
@@ -245,10 +239,7 @@ public class GroupServiceImpl implements GroupService {
       ProviderRequest providerRequest) {
     try {
       if (storage == null) {
-        User user =
-            userService
-                .findById(realm, null, userId)
-                .orElseThrow(() -> new UserNotFoundException("Cannot find user in realm " + realm));
+        User user = userService.findById(realm, null, userId);
         storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE);
       }
       ProviderResponse response =
@@ -287,10 +278,7 @@ public class GroupServiceImpl implements GroupService {
       ProviderRequest providerRequest) {
     try {
       if (storage == null) {
-        User user =
-            userService
-                .findById(realm, null, userId)
-                .orElseThrow(() -> new UserNotFoundException("Cannot find user in realm " + realm));
+        User user = userService.findById(realm, null, userId);
         storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE);
       }
       ProviderResponse response =
@@ -327,10 +315,7 @@ public class GroupServiceImpl implements GroupService {
       ProviderRequest providerRequest) {
     try {
       if (storage == null) {
-        User user =
-            userService
-                .findById(realm, null, userId)
-                .orElseThrow(() -> new UserNotFoundException("Cannot find user in realm " + realm));
+        User user = userService.findById(realm, null, userId);
         storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE);
       }
       ProviderResponse response =

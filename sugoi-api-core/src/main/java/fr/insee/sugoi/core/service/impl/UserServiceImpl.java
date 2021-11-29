@@ -20,6 +20,7 @@ import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.exceptions.UnableToUpdateCertificateException;
 import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
+import fr.insee.sugoi.core.exceptions.UserNotFoundByMailException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
@@ -39,7 +40,6 @@ import fr.insee.sugoi.model.paging.SearchType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.passay.CharacterRule;
@@ -93,7 +93,7 @@ public class UserServiceImpl implements UserService {
             idGeneratedAndUnique =
                 !realmLoaded.getUserStorages().stream()
                     .map(us -> storeProvider.getReaderStore(realm, us.getName()).getUser(id))
-                    .anyMatch(u -> u != null);
+                    .anyMatch(u -> u.isPresent());
           } while (!idGeneratedAndUnique);
         } else {
           // check id unicity
@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
               .map(
                   us ->
                       storeProvider.getReaderStore(realm, us.getName()).getUser(user.getUsername()))
-              .anyMatch(u -> u != null)) {
+              .anyMatch(u -> u.isPresent())) {
             throw new UserAlreadyExistException(
                 "User " + user.getUsername() + " already exist in realm " + realm);
           }
@@ -119,7 +119,7 @@ public class UserServiceImpl implements UserService {
                         storeProvider
                             .getReaderStore(realm, us.getName())
                             .getUserByMail(user.getMail()))
-                .anyMatch(u -> u != null)) {
+                .anyMatch(u -> u.isPresent())) {
           throw new UserAlreadyExistException(
               "A user has the same mail " + user.getMail() + " in realm " + realm);
         }
@@ -138,7 +138,7 @@ public class UserServiceImpl implements UserService {
       if (!providerRequest.isAsynchronousAllowed()
           && response.getStatus().equals(ProviderResponseStatus.OK)) {
         user.setUsername(response.getEntityId());
-        response.setEntity(findById(realm, storage, user.getUsername()).get());
+        response.setEntity(findById(realm, storage, user.getUsername()));
       }
       return response;
     } catch (Exception e) {
@@ -168,17 +168,13 @@ public class UserServiceImpl implements UserService {
                   .getProperties()
                   .getOrDefault(GlobalKeysConfig.VERIFY_MAIL_UNICITY, "false"))
           && user.getMail() != null) {
-        User temp =
-            realmLoaded.getUserStorages().stream()
-                .map(
-                    us ->
-                        storeProvider
-                            .getReaderStore(realm, us.getName())
-                            .getUserByMail(user.getMail()))
-                .filter(u -> u != null)
-                .findAny()
-                .orElse(null);
-        if (temp != null && !temp.getUsername().equals(user.getUsername())) {
+        if (realmLoaded.getUserStorages().stream()
+            .map(
+                us ->
+                    storeProvider.getReaderStore(realm, us.getName()).getUserByMail(user.getMail()))
+            .anyMatch(
+                u ->
+                    u.isPresent() && !u.get().getUsername().equalsIgnoreCase(user.getUsername()))) {
           throw new UserAlreadyExistException(
               "A user has the same mail " + user.getMail() + " in realm " + realm);
         }
@@ -195,7 +191,7 @@ public class UserServiceImpl implements UserService {
           Map.ofEntries(Map.entry(EventKeysConfig.USER, user)));
       if (!providerRequest.isAsynchronousAllowed()
           && response.getStatus().equals(ProviderResponseStatus.OK)) {
-        response.setEntity(findById(realm, storage, user.getUsername()).get());
+        response.setEntity(findById(realm, storage, user.getUsername()));
       }
       return response;
     } catch (Exception e) {
@@ -239,77 +235,49 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public Optional<User> findById(String realmName, String storage, String id) {
-    User user = null;
+  public User findById(String realmName, String storage, String id) {
     try {
-      if (id != null) {
-        Realm realm =
-            realmProvider
-                .load(realmName)
-                .orElseThrow(
-                    () -> new RealmNotFoundException("The realm " + realmName + " doesn't exist "));
-        if (storage != null) {
-          user = storeProvider.getReaderStore(realmName, storage).getUser(id);
-          user.addMetadatas(GlobalKeysConfig.REALM, realmName.toLowerCase());
-          user.addMetadatas(GlobalKeysConfig.USERSTORAGE, storage.toLowerCase());
-        } else {
-          for (UserStorage us : realm.getUserStorages()) {
-            try {
-              user = storeProvider.getReaderStore(realmName, us.getName()).getUser(id);
-              user.addMetadatas(GlobalKeysConfig.REALM, realmName);
-              user.addMetadatas(GlobalKeysConfig.USERSTORAGE, us.getName());
-              break;
-            } catch (Exception e) {
-              logger.debug(
-                  "Error when trying to find user "
-                      + id
-                      + " on realm "
-                      + realmName
-                      + " and userstorage "
-                      + us
-                      + " error "
-                      + e.getMessage());
-            }
-          }
+      Realm realm =
+          realmProvider
+              .load(realmName)
+              .orElseThrow(
+                  () -> new RealmNotFoundException("The realm " + realmName + " doesn't exist "));
+      String nonNullStorage =
+          storage != null
+              ? storage
+              : realm.getUserStorages().stream()
+                  .filter(us -> exist(realmName, us.getName(), id))
+                  .findFirst()
+                  .orElseThrow(() -> new UserNotFoundException(realmName, id))
+                  .getName();
+      User user =
+          storeProvider
+              .getReaderStore(realmName, nonNullStorage)
+              .getUser(id)
+              .orElseThrow(() -> new UserNotFoundException(realmName, nonNullStorage, id));
+      user.addMetadatas(GlobalKeysConfig.REALM, realmName.toLowerCase());
+      user.addMetadatas(GlobalKeysConfig.USERSTORAGE, nonNullStorage.toLowerCase());
+      if (seeAlsoService != null
+          && realm.getProperties().containsKey(GlobalKeysConfig.SEEALSO_ATTRIBUTES)) {
+        for (String seeAlso : findUserSeeAlsos(realm, user)) {
+          seeAlsoService.decorateWithSeeAlso(user, seeAlso);
         }
-        if (seeAlsoService != null
-            && realm.getProperties().containsKey(GlobalKeysConfig.SEEALSO_ATTRIBUTES)) {
-          String[] seeAlsosAttributes =
-              realm
-                  .getProperties()
-                  .get(GlobalKeysConfig.SEEALSO_ATTRIBUTES)
-                  .replace(" ", "")
-                  .split(",");
-          List<String> seeAlsos = new ArrayList<>();
-          for (String seeAlsoAttribute : seeAlsosAttributes) {
-            Object seeAlsoAttributeValue = user.getAttributes().get(seeAlsoAttribute);
-            if (seeAlsoAttributeValue instanceof String) {
-              seeAlsos.add((String) seeAlsoAttributeValue);
-            } else if (seeAlsoAttributeValue instanceof List) {
-              ((List<?>) seeAlsoAttributeValue)
-                  .forEach(seeAlso -> seeAlsos.add(seeAlso.toString()));
-            }
-          }
-          for (String seeAlso : seeAlsos) {
-            seeAlsoService.decorateWithSeeAlso(user, seeAlso);
-          }
-        }
-        sugoiEventPublisher.publishCustomEvent(
-            realmName,
-            storage,
-            SugoiEventTypeEnum.FIND_USER_BY_ID,
-            Map.ofEntries(Map.entry(EventKeysConfig.USER_ID, id)));
       }
-      return Optional.ofNullable(user);
+      sugoiEventPublisher.publishCustomEvent(
+          realmName,
+          nonNullStorage,
+          SugoiEventTypeEnum.FIND_USER_BY_ID,
+          Map.ofEntries(Map.entry(EventKeysConfig.USER_ID, id != null ? id : "")));
+      return user;
     } catch (Exception e) {
       sugoiEventPublisher.publishCustomEvent(
           realmName,
           storage,
           SugoiEventTypeEnum.FIND_USER_BY_ID_ERROR,
           Map.ofEntries(
-              Map.entry(EventKeysConfig.USER_ID, id),
+              Map.entry(EventKeysConfig.USER_ID, id != null ? id : ""),
               Map.entry(EventKeysConfig.ERROR, e.toString())));
-      return Optional.ofNullable(user);
+      throw e;
     }
   }
 
@@ -386,7 +354,7 @@ public class UserServiceImpl implements UserService {
               Map.entry(EventKeysConfig.PAGEABLE, pageable),
               Map.entry(EventKeysConfig.TYPE_RECHERCHE, typeRecherche),
               Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw new RuntimeException("Erreur lors de la récupération des utilisateurs", e);
+      throw e;
     }
     sugoiEventPublisher.publishCustomEvent(
         realm,
@@ -472,89 +440,55 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public Optional<User> findByMail(String realmName, String storageName, String mail) {
-    User user = null;
+  public User findByMail(String realmName, String storageName, String mail) {
     try {
-      if (mail != null) {
-        Realm realm =
-            realmProvider
-                .load(realmName)
-                .orElseThrow(
-                    () -> new RealmNotFoundException("The realm " + realmName + " doesn't exist "));
-        if (storageName != null) {
-          user = storeProvider.getReaderStore(realmName, storageName).getUserByMail(mail);
-          user.addMetadatas(GlobalKeysConfig.REALM, realmName.toLowerCase());
-          user.addMetadatas(GlobalKeysConfig.USERSTORAGE, storageName.toLowerCase());
-        } else {
-          for (UserStorage us : realm.getUserStorages()) {
-            try {
-              user = storeProvider.getReaderStore(realmName, us.getName()).getUserByMail(mail);
-              user.addMetadatas(GlobalKeysConfig.REALM, realmName);
-              user.addMetadatas(GlobalKeysConfig.USERSTORAGE, us.getName());
-              break;
-            } catch (Exception e) {
-              logger.debug(
-                  "Error when trying to find user with mail"
-                      + mail
-                      + " on realm "
-                      + realmName
-                      + " and userstorage "
-                      + us
-                      + " error "
-                      + e.getMessage());
-            }
-          }
+      Realm realm =
+          realmProvider
+              .load(realmName)
+              .orElseThrow(
+                  () -> new RealmNotFoundException("The realm " + realmName + " doesn't exist "));
+      String nonNullStorage =
+          storageName != null
+              ? storageName
+              : realm.getUserStorages().stream()
+                  .filter(us -> existByMail(realmName, us.getName(), mail))
+                  .findFirst()
+                  .orElseThrow(() -> new UserNotFoundByMailException(realmName, mail))
+                  .getName();
+      User user =
+          storeProvider
+              .getReaderStore(realmName, storageName)
+              .getUserByMail(mail)
+              .orElseThrow(() -> new UserNotFoundByMailException(realmName, nonNullStorage, mail));
+      user.addMetadatas(GlobalKeysConfig.REALM, realmName.toLowerCase());
+      user.addMetadatas(GlobalKeysConfig.USERSTORAGE, storageName.toLowerCase());
+      if (seeAlsoService != null
+          && realm.getProperties().containsKey(GlobalKeysConfig.SEEALSO_ATTRIBUTES)) {
+        for (String seeAlso : findUserSeeAlsos(realm, user)) {
+          seeAlsoService.decorateWithSeeAlso(user, seeAlso);
         }
-        if (seeAlsoService != null
-            && realm.getProperties().containsKey(GlobalKeysConfig.SEEALSO_ATTRIBUTES)) {
-          String[] seeAlsosAttributes =
-              realm
-                  .getProperties()
-                  .get(GlobalKeysConfig.SEEALSO_ATTRIBUTES)
-                  .replace(" ", "")
-                  .split(",");
-          List<String> seeAlsos = new ArrayList<>();
-          for (String seeAlsoAttribute : seeAlsosAttributes) {
-            Object seeAlsoAttributeValue = user.getAttributes().get(seeAlsoAttribute);
-            if (seeAlsoAttributeValue instanceof String) {
-              seeAlsos.add((String) seeAlsoAttributeValue);
-            } else if (seeAlsoAttributeValue instanceof List) {
-              ((List<?>) seeAlsoAttributeValue)
-                  .forEach(seeAlso -> seeAlsos.add(seeAlso.toString()));
-            }
-          }
-          for (String seeAlso : seeAlsos) {
-            seeAlsoService.decorateWithSeeAlso(user, seeAlso);
-          }
-        }
-        sugoiEventPublisher.publishCustomEvent(
-            realmName,
-            storageName,
-            SugoiEventTypeEnum.FIND_USER_BY_MAIL,
-            Map.ofEntries(Map.entry(EventKeysConfig.USER_MAIL, mail)));
       }
-      return Optional.ofNullable(user);
+      sugoiEventPublisher.publishCustomEvent(
+          realmName,
+          storageName,
+          SugoiEventTypeEnum.FIND_USER_BY_MAIL,
+          Map.ofEntries(Map.entry(EventKeysConfig.USER_MAIL, mail != null ? mail : "")));
+      return user;
     } catch (Exception e) {
       sugoiEventPublisher.publishCustomEvent(
           realmName,
           storageName,
           SugoiEventTypeEnum.FIND_USER_BY_MAIL_ERROR,
           Map.ofEntries(
-              Map.entry(EventKeysConfig.USER_MAIL, mail),
+              Map.entry(EventKeysConfig.USER_MAIL, mail != null ? mail : ""),
               Map.entry(EventKeysConfig.ERROR, e.toString())));
-      return Optional.ofNullable(user);
+      throw e;
     }
   }
 
   @Override
   public byte[] getCertificate(String realm, String userStorage, String userId) {
-    User user =
-        findById(realm, userStorage, userId)
-            .orElseThrow(
-                () ->
-                    new UserNotFoundException(
-                        "Cannot find user with id " + userId + " in realm " + realm));
-    return user.getCertificate();
+    return findById(realm, userStorage, userId).getCertificate();
   }
 
   @Override
@@ -565,12 +499,7 @@ public class UserServiceImpl implements UserService {
       byte[] certificat,
       ProviderRequest providerRequest) {
     try {
-      User user =
-          findById(realm, userStorage, userId)
-              .orElseThrow(
-                  () ->
-                      new UserNotFoundException(
-                          "Cannot find user with id " + userId + " in realm " + realm));
+      User user = findById(realm, userStorage, userId);
       ProviderResponse response =
           storeProvider
               .getWriterStore(realm, userStorage)
@@ -585,17 +514,17 @@ public class UserServiceImpl implements UserService {
   @Override
   public ProviderResponse deleteCertificate(
       String realm, String userStorage, String id, ProviderRequest providerRequest) {
-    User user =
-        findById(realm, userStorage, id)
-            .orElseThrow(
-                () ->
-                    new UserNotFoundException(
-                        "Cannot find user with id " + id + " in realm " + realm));
+    User user = findById(realm, userStorage, id);
     ProviderResponse response =
         storeProvider
             .getWriterStore(realm, userStorage)
             .deleteUserCertificate(user, providerRequest);
     return response;
+  }
+
+  @Override
+  public boolean exist(String realm, String userStorage, String userId) {
+    return storeProvider.getReaderStore(realm, userStorage).getUser(userId).isPresent();
   }
 
   public String generateId(Boolean withUpperCase, Boolean withDigit, Integer size) {
@@ -632,5 +561,24 @@ public class UserServiceImpl implements UserService {
 
   public void setReaderStoreAsynchronous(boolean readerStoreAsynchronous) {
     this.readerStoreAsynchronous = readerStoreAsynchronous;
+  }
+
+  private List<String> findUserSeeAlsos(Realm realm, User user) {
+    String[] seeAlsosAttributes =
+        realm.getProperties().get(GlobalKeysConfig.SEEALSO_ATTRIBUTES).replace(" ", "").split(",");
+    List<String> seeAlsos = new ArrayList<>();
+    for (String seeAlsoAttribute : seeAlsosAttributes) {
+      Object seeAlsoAttributeValue = user.getAttributes().get(seeAlsoAttribute);
+      if (seeAlsoAttributeValue instanceof String) {
+        seeAlsos.add((String) seeAlsoAttributeValue);
+      } else if (seeAlsoAttributeValue instanceof List) {
+        ((List<?>) seeAlsoAttributeValue).forEach(seeAlso -> seeAlsos.add((String) seeAlso));
+      }
+    }
+    return seeAlsos;
+  }
+
+  private boolean existByMail(String realm, String userStorage, String mail) {
+    return storeProvider.getReaderStore(realm, userStorage).getUserByMail(mail).isPresent();
   }
 }

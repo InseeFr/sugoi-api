@@ -13,21 +13,13 @@
 */
 package fr.insee.sugoi.core.exceptions;
 
-public class UserNotFoundException extends RuntimeException {
+public class MultipleUserWithSameMailException extends RuntimeException {
 
-  private static final long serialVersionUID = 5107823250419750984L;
-
-  public UserNotFoundException(String message, Throwable cause) {
+  public MultipleUserWithSameMailException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public UserNotFoundException(String realm, String userid) {
-    super(String.format("User %s does not exist in realm %s", userid, realm));
-  }
-
-  public UserNotFoundException(String realm, String userstorage, String userid) {
-    super(
-        String.format(
-            "User %s does not exist in realm %s and userstorage %s", userid, realm, userstorage));
+  public MultipleUserWithSameMailException(String mail) {
+    super(String.format("Several users with mail %s were found", mail));
   }
 }

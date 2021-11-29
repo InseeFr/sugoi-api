@@ -125,7 +125,7 @@ public class FileReaderStoreTest {
 
   @Test
   public void testGetUser() {
-    User user = fileReaderStore.getUser("testc");
+    User user = fileReaderStore.getUser("testc").get();
     assertThat("Should get testc", user.getUsername(), is("testc"));
     assertThat("Should get address first line", user.getAddress().get("line1"), is("Insee"));
     assertThat(
@@ -142,7 +142,7 @@ public class FileReaderStoreTest {
 
   @Test
   public void testGetNonexistentUser() {
-    assertThat("Should get null", fileReaderStore.getUser("nottestc"), is(nullValue()));
+    assertThat("Should get null", fileReaderStore.getUser("nottestc").isEmpty());
   }
 
   @Test
@@ -262,7 +262,7 @@ public class FileReaderStoreTest {
   @Disabled
   @Test
   public void validateCredential() {
-    User user = fileReaderStore.getUser("testc");
+    User user = fileReaderStore.getUser("testc").get();
     assertThat(
         "Password should be validated",
         fileReaderStore.validateCredentials(user, "testc"),

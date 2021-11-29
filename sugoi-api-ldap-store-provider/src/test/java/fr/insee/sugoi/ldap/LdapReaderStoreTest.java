@@ -15,7 +15,6 @@ package fr.insee.sugoi.ldap;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
@@ -188,7 +187,7 @@ public class LdapReaderStoreTest {
 
   @Test
   public void testGetUser() {
-    User user = ldapReaderStore.getUser("testc");
+    User user = ldapReaderStore.getUser("testc").get();
     assertThat("Should get testc", user.getUsername(), is("testc"));
     assertThat("Should get address first line", user.getAddress().get("line1"), is("Insee"));
     assertThat(
@@ -209,7 +208,7 @@ public class LdapReaderStoreTest {
 
   @Test
   public void testGetNonexistentUser() {
-    assertThat("Should get null", ldapReaderStore.getUser("nottestc"), is(nullValue()));
+    assertThat("Should get null", ldapReaderStore.getUser("nottestc").isEmpty());
   }
 
   @Test
@@ -321,7 +320,7 @@ public class LdapReaderStoreTest {
 
   @Test
   public void validateCredential() {
-    User user = ldapReaderStore.getUser("testc");
+    User user = ldapReaderStore.getUser("testc").get();
     assertThat(
         "Password should be validated",
         ldapReaderStore.validateCredentials(user, "testc"),
@@ -338,7 +337,7 @@ public class LdapReaderStoreTest {
 
   @Test
   public void validateShaCredentialTest() {
-    User user = ldapReaderStore.getUser("shapassword2");
+    User user = ldapReaderStore.getUser("shapassword2").get();
     assertThat(
         "Hash password should be validated",
         ldapReaderStore.validateCredentials(user, "{SHA}c3q3RSeNwMY7E09Ve9oBHw+MVXg="));
@@ -346,7 +345,7 @@ public class LdapReaderStoreTest {
 
   @Test
   public void validateNoPasswordTest() {
-    User user = ldapReaderStore.getUser("nopassword");
+    User user = ldapReaderStore.getUser("nopassword").get();
     assertThat(
         "Not having a password should not lead to password validation",
         !ldapReaderStore.validateCredentials(user, null));
@@ -367,7 +366,7 @@ public class LdapReaderStoreTest {
   public void userWithPasswordShouldHaveValueHasPassword() {
     assertThat(
         "Should have hasPassword to true",
-        ldapReaderStore.getUser("testc").getAttributes().get("hasPassword"),
+        ldapReaderStore.getUser("testc").get().getAttributes().get("hasPassword"),
         is(true));
   }
 
@@ -378,7 +377,7 @@ public class LdapReaderStoreTest {
   public void userWithoutPasswordShouldHaveValueHasPassword() {
     assertThat(
         "Should have hasPassword to false",
-        ldapReaderStore.getUser("agarder").getAttributes().get("hasPassword"),
+        ldapReaderStore.getUser("agarder").get().getAttributes().get("hasPassword"),
         is(false));
   }
 }

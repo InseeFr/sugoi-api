@@ -33,7 +33,6 @@ import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.paging.PageResult;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -144,7 +143,7 @@ public class UserControllerTest {
   public void shouldGetUserByID() {
     try {
 
-      Mockito.when(userService.findById("domaine1", null, "Toto")).thenReturn(Optional.of(user1));
+      Mockito.when(userService.findById("domaine1", null, "Toto")).thenReturn(user1);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.get("/realms/domaine1/users/Toto")
@@ -176,8 +175,8 @@ public class UserControllerTest {
           .delete(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
 
       Mockito.when(userService.findById(Mockito.anyString(), Mockito.isNull(), Mockito.anyString()))
-          .thenReturn(Optional.of(user1))
-          .thenReturn(Optional.of(user1));
+          .thenReturn(user1)
+          .thenReturn(user1);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.delete("/realms/domaine1/storages/toto/users/supprimemoi")
@@ -199,8 +198,8 @@ public class UserControllerTest {
     try {
 
       Mockito.when(userService.findById(Mockito.anyString(), Mockito.any(), Mockito.any()))
-          .thenReturn(Optional.of(user1))
-          .thenReturn(Optional.of(user1Updated));
+          .thenReturn(user1)
+          .thenReturn(user1Updated);
 
       Mockito.doReturn(
               new ProviderResponse("", "requestId", ProviderResponseStatus.OK, user1Updated, null))
@@ -422,7 +421,7 @@ public class UserControllerTest {
     try {
 
       Mockito.when(userService.findById(Mockito.anyString(), Mockito.isNull(), Mockito.anyString()))
-          .thenReturn(Optional.empty());
+          .thenThrow(new UserNotFoundException("domaine1", "dontexist"));
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.get("/realms/domaine1/users/dontexist")
@@ -466,9 +465,10 @@ public class UserControllerTest {
   public void get404WhenNoUserIsFoundWhenUpdate() {
     try {
 
-      Mockito.doThrow(new UserNotFoundException(""))
+      Mockito.doThrow(new UserNotFoundException("domaine1", "Toto"))
           .when(userService)
-          .update(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any());
+          .findById("domaine1", null, "Toto");
+
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.put("/realms/domaine1/users/Toto")
               .contentType(MediaType.APPLICATION_JSON)
@@ -492,9 +492,9 @@ public class UserControllerTest {
   public void get404WhenNoUserIsFoundWhenDelete() {
     try {
 
-      Mockito.doThrow(new UserNotFoundException(""))
+      Mockito.doThrow(new UserNotFoundException("domaine1", "dontexist"))
           .when(userService)
-          .update(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any());
+          .findById("domaine1", null, "dontexist");
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.delete("/realms/domaine1/users/dontexist")

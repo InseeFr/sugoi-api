@@ -118,9 +118,8 @@ public class ContactsDomaineController {
 
     User sugoiUser = ouganextSugoiMapper.serializeToSugoi(contact, User.class);
     if (slug != null
-        && userService
-            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), slug)
-            .isEmpty()) {
+        && !userService.exist(
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), slug)) {
       sugoiUser.setUsername(slug);
     } else if (sugoiUser.getUsername() == null) {
       sugoiUser.setUsername(UUID.randomUUID().toString());

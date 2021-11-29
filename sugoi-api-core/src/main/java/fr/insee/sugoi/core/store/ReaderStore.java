@@ -34,18 +34,18 @@ public interface ReaderStore {
    * Retrieve the user with the given id in the store.
    *
    * @param id the id of the user
-   * @return the user with matching id, null if no user matches
+   * @return optional of the user with matching id, is empty if no match
    */
-  public User getUser(String id);
+  public Optional<User> getUser(String id);
 
   /**
    * Only on realms where `unique_emails` is enabled, retrieve the user with the given mail in the
    * store.
    *
    * @param mail
-   * @return the user with matching mail, null if no user matches
+   * @return optional of the user with matching mail, is empty if no match
    */
-  public User getUserByMail(String id);
+  public Optional<User> getUserByMail(String mail);
 
   /**
    * Search users matching userFilter filled attributes.

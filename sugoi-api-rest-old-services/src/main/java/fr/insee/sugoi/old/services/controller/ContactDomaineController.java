@@ -16,7 +16,6 @@ package fr.insee.sugoi.old.services.controller;
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
 import fr.insee.sugoi.converter.ouganext.ContactOuganext;
 import fr.insee.sugoi.converter.ouganext.InfoFormattageOuganext;
-import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.SugoiUser;
 import fr.insee.sugoi.core.service.UserService;
@@ -138,12 +137,8 @@ public class ContactDomaineController {
       return ResponseEntity.status(HttpStatus.OK)
           .body(
               ouganextSugoiMapper.serializeToOuganext(
-                  userService
-                      .findById(
-                          realmUserStorage.getRealm(),
-                          realmUserStorage.getUserStorage(),
-                          identifiant)
-                      .get(),
+                  userService.findById(
+                      realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant),
                   ContactOuganext.class));
     }
 
@@ -164,10 +159,8 @@ public class ContactDomaineController {
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             ouganextSugoiMapper.serializeToOuganext(
-                userService
-                    .findById(
-                        realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
-                    .get(),
+                userService.findById(
+                    realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant),
                 ContactOuganext.class));
   }
 
@@ -211,13 +204,8 @@ public class ContactDomaineController {
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             ouganextSugoiMapper.serializeToOuganext(
-                userService
-                    .findById(
-                        realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
-                    .orElseThrow(
-                        () ->
-                            new UserNotFoundException(
-                                "User " + identifiant + " not found in realm " + domaine)),
+                userService.findById(
+                    realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant),
                 ContactOuganext.class));
   }
 
