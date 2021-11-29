@@ -14,14 +14,13 @@
 package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.exceptions.UnableToUpdateCertificateException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.model.SugoiUser;
-import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.CertificateService;
+import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
@@ -77,7 +76,7 @@ public class UserController {
 
   @Autowired private UserService userService;
 
-  @Autowired private RealmProvider realmService;
+  @Autowired private ConfigService configService;
 
   @Autowired private CertificateService certificateService;
 
@@ -661,11 +660,7 @@ public class UserController {
       @Parameter(description = "User's mail to search", required = true) @PathVariable("mail")
           String mail) {
     if (Boolean.parseBoolean(
-        realmService
-            .load(realm)
-            .orElseThrow(() -> new RealmNotFoundException(realm))
-            .getProperties()
-            .get(GlobalKeysConfig.VERIFY_MAIL_UNICITY))) {
+        configService.getRealm(realm).getProperties().get(GlobalKeysConfig.VERIFY_MAIL_UNICITY))) {
 
       return ResponseEntity.status(HttpStatus.OK)
           .body(userService.findByMail(realm, storage, mail));
