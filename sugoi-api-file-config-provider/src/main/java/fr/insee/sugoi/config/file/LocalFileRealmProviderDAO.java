@@ -15,6 +15,7 @@ package fr.insee.sugoi.config.file;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.sugoi.core.exceptions.RealmAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
@@ -90,34 +91,42 @@ public class LocalFileRealmProviderDAO implements RealmProvider {
 
   @Override
   public ProviderResponse createRealm(Realm realm, ProviderRequest providerRequest) {
-    realms.add(realm);
-    overwriteConfig(realms);
-    ProviderResponse response = new ProviderResponse();
-    response.setStatus(ProviderResponseStatus.OK);
-    response.setEntityId(realm.getName());
-    return response;
+    if (load(realm.getName()).isEmpty()) {
+      findAll().add(realm);
+      overwriteConfig(realms);
+      ProviderResponse response = new ProviderResponse();
+      response.setStatus(ProviderResponseStatus.OK);
+      response.setEntityId(realm.getName());
+      return response;
+    } else {
+      throw new RealmAlreadyExistException(
+          String.format("Realm %s already exists", realm.getName()));
+    }
   }
 
   @Override
   public ProviderResponse updateRealm(Realm realm, ProviderRequest providerRequest) {
-    Realm realmToModify =
-        realms.stream()
-            .filter(r -> r.getName().equalsIgnoreCase(realm.getName()))
-            .findFirst()
-            .orElseThrow(() -> new RealmNotFoundException(realm.getName()));
-    if (realmToModify != null) {
-      realmToModify = realm;
+    if (load(realm.getName()).isPresent()) {
+      List<Realm> newRealms =
+          findAll().stream()
+              .filter(r -> !r.getName().equalsIgnoreCase(realm.getName()))
+              .collect(Collectors.toList());
+      newRealms.add(realm);
+      overwriteConfig(newRealms);
+      ProviderResponse response = new ProviderResponse();
+      response.setEntity(realm);
+      response.setStatus(ProviderResponseStatus.OK);
+      response.setEntityId(realm.getName());
+      return response;
+    } else {
+      throw new RealmNotFoundException(realm.getName());
     }
-    ProviderResponse response = new ProviderResponse();
-    response.setStatus(ProviderResponseStatus.OK);
-    response.setEntityId(realm.getName());
-    return response;
   }
 
   @Override
   public ProviderResponse deleteRealm(String realmName, ProviderRequest providerRequest) {
     overwriteConfig(
-        realms.stream()
+        findAll().stream()
             .filter(realm -> !realm.getName().equalsIgnoreCase(realmName))
             .collect(Collectors.toList()));
     ProviderResponse response = new ProviderResponse();
