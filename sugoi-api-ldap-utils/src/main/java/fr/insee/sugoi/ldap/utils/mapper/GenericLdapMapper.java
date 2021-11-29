@@ -222,11 +222,7 @@ public class GenericLdapMapper {
       ModelType type, String ldapAttributeName, Object sugoiValue, Map<String, String> config) {
     switch (type) {
       case STRING:
-        if ((String) sugoiValue != "") {
-          return List.of(new Attribute(ldapAttributeName, (String) sugoiValue));
-        } else {
-          return List.of();
-        }
+        return List.of(new Attribute(ldapAttributeName, (String) sugoiValue));
       case ORGANIZATION:
         return List.of(
             new Attribute(

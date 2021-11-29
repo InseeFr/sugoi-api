@@ -85,6 +85,31 @@ Feature: User scenario
         Then the client receives status code 200
         Then the client expect to receive an user
 
+        Scenario: Update user with no mail value
+        When the client perform PUT request with body on url /realms/domaine1/users/abcd body:
+            """
+            {
+                "username": "abcd"
+            }
+            """
+        And show body received
+        Then the client receives status code 200
+        Then the client expect to receive an user
+        Then the client expect the mail of user not to be null
+
+        Scenario: Update user with empty mail value
+        When the client perform PUT request with body on url /realms/domaine1/users/abcd body:
+            """
+            {
+                "username": "abcd",
+                "mail": ""
+            }
+            """
+        And show body received
+        Then the client receives status code 200
+        Then the client expect to receive an user
+        Then the client expect the mail of user to be null
+
 
     Scenario: Update user not exist
         When the client perform PUT request with body on url /realms/domaine1/users/abcde body:
