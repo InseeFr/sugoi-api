@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.converter.mapper;
 
+import fr.insee.sugoi.converter.exception.OuganextParsingException;
 import fr.insee.sugoi.converter.ouganext.AdresseOuganext;
 import fr.insee.sugoi.converter.ouganext.ApplicationOuganext;
 import fr.insee.sugoi.converter.ouganext.HabilitationsOuganext;
@@ -117,7 +118,11 @@ public class OuganextSugoiMapper {
       }
       return sugoiObject;
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new OuganextParsingException(
+          String.format(
+              "Parsing exception from ouganext %s to sugoi %s",
+              ouganextObject.getClass().getName(), clazz.getName()),
+          e);
     }
   }
 
@@ -197,7 +202,11 @@ public class OuganextSugoiMapper {
       }
       return ouganextObject;
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new OuganextParsingException(
+          String.format(
+              "Parsing exception from sugoi %s to ouganext %s",
+              sugoiObject.getClass().getName(), clazz.getName()),
+          e);
     }
   }
 
