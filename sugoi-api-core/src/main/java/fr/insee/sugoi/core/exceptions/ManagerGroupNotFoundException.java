@@ -13,17 +13,15 @@
 */
 package fr.insee.sugoi.core.exceptions;
 
-public class GroupNotFoundException extends RuntimeException {
+public class ManagerGroupNotFoundException extends RuntimeException {
 
-  private static final long serialVersionUID = -1230419093509057754L;
-
-  public GroupNotFoundException(String message, Throwable cause) {
+  public ManagerGroupNotFoundException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public GroupNotFoundException(String realm, String application, String group) {
+  public ManagerGroupNotFoundException(String realm, String applicationName) {
     super(
         String.format(
-            "Group %s of application %s does not exist in realm %s", group, application, realm));
+            "No manager group found for application %s on realm %s", applicationName, realm));
   }
 }

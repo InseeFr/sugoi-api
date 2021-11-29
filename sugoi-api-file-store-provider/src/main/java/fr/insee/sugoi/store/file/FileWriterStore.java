@@ -379,11 +379,9 @@ public class FileWriterStore implements WriterStore {
       try {
         fileReaderStore.setResourceLoader(resourceLoader);
         for (Group updatedGroup : updatedApplication.getGroups()) {
-          Group existingGroup =
-              fileReaderStore.getGroup(updatedApplication.getName(), updatedGroup.getName());
-          if (existingGroup != null) {
-            updatedGroup.setUsers(existingGroup.getUsers());
-          }
+          fileReaderStore
+              .getGroup(updatedApplication.getName(), updatedGroup.getName())
+              .ifPresent(existingGroup -> updatedGroup.setUsers(existingGroup.getUsers()));
         }
         updateResourceFile(
             config.get(FileKeysConfig.APP_SOURCE),

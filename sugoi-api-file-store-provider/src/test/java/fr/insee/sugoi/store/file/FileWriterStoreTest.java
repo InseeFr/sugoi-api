@@ -258,7 +258,7 @@ public class FileWriterStoreTest {
     fileWriterStore.addUserToGroup("Applitest", "Utilisateurs_Applitest", "byebye", null);
     assertThat(
         "byebye is in Utilisateurs_Applitest",
-        fileReaderStore.getGroup("Applitest", "Utilisateurs_Applitest").getUsers().stream()
+        fileReaderStore.getGroup("Applitest", "Utilisateurs_Applitest").get().getUsers().stream()
             .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
     assertThat(
         "byebye is in Utilisateurs_Applitest",
@@ -268,7 +268,7 @@ public class FileWriterStoreTest {
     assertThat("byebye should have been deleted", fileReaderStore.getUser("byebye").isEmpty());
     assertThat(
         "byebye should no more be in Utilisateurs_Applitest",
-        !fileReaderStore.getGroup("Applitest", "Utilisateurs_Applitest").getUsers().stream()
+        !fileReaderStore.getGroup("Applitest", "Utilisateurs_Applitest").get().getUsers().stream()
             .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
     assertThat(
         "byebye is in Utilisateurs_Applitest",
@@ -368,7 +368,7 @@ public class FileWriterStoreTest {
     fileWriterStore.createGroup("Applitest", group, null);
     assertThat(
         "Should retrieve Groupy",
-        fileReaderStore.getGroup("Applitest", "Groupy_Applitest").getName(),
+        fileReaderStore.getGroup("Applitest", "Groupy_Applitest").get().getName(),
         is("Groupy_Applitest"));
   }
 
@@ -381,8 +381,7 @@ public class FileWriterStoreTest {
     fileWriterStore.deleteGroup("WebServicesLdap", "Asupprimer_WebServicesLdap", null);
     assertThat(
         "Should have been deleted",
-        fileReaderStore.getGroup("WebServicesLdap", "Asupprimer_WebServicesLdap"),
-        is(nullValue()));
+        fileReaderStore.getGroup("WebServicesLdap", "Asupprimer_WebServicesLdap").isEmpty());
   }
 
   @Test
@@ -435,12 +434,12 @@ public class FileWriterStoreTest {
 
   @Test
   public void testUpdateGroup() {
-    Group group = fileReaderStore.getGroup("Applitest", "Administrateurs_Applitest");
+    Group group = fileReaderStore.getGroup("Applitest", "Administrateurs_Applitest").get();
     group.setDescription("new description");
     fileWriterStore.updateGroup("Applitest", group, null);
     assertThat(
         "SuperGroup description should be new description",
-        fileReaderStore.getGroup("Applitest", "Administrateurs_Applitest").getDescription(),
+        fileReaderStore.getGroup("Applitest", "Administrateurs_Applitest").get().getDescription(),
         is("new description"));
   }
 

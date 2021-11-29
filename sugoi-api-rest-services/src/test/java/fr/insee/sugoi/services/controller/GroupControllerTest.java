@@ -31,7 +31,6 @@ import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.paging.PageResult;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -127,7 +126,7 @@ public class GroupControllerTest {
     try {
 
       Mockito.when(groupService.findById("domaine1", "monApplication", "Group1"))
-          .thenReturn(Optional.of(group1));
+          .thenReturn(group1);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.get("/realms/domaine1/applications/monApplication/groups/Group1")
@@ -178,7 +177,7 @@ public class GroupControllerTest {
     try {
 
       Mockito.when(groupService.findById("domaine1", "monApplication", "Group2"))
-          .thenReturn(Optional.of(group2Updated));
+          .thenReturn(group2Updated);
       Mockito.doReturn(
               new ProviderResponse(
                   "Group2", "requestId", ProviderResponseStatus.OK, group2Updated, null))
@@ -398,7 +397,7 @@ public class GroupControllerTest {
     try {
 
       Mockito.when(groupService.findById("domaine1", "monApplication", "dontexist"))
-          .thenReturn(Optional.empty());
+          .thenThrow(new GroupNotFoundException("domaine1", "monApplication", "dontexist"));
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.get("/realms/domaine1/application/monApplication/groups/dontexist")
@@ -444,7 +443,7 @@ public class GroupControllerTest {
   public void get404WhenNoGroupIsFoundWhenUpdate() {
     try {
 
-      Mockito.doThrow(new GroupNotFoundException(""))
+      Mockito.doThrow(new GroupNotFoundException("domaine1", "monApplication", "Group1"))
           .when(groupService)
           .update(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any());
       RequestBuilder requestBuilder =
@@ -470,7 +469,7 @@ public class GroupControllerTest {
   public void get404WhenNoGroupIsFoundWhenDelete() {
     try {
 
-      Mockito.doThrow(new GroupNotFoundException(""))
+      Mockito.doThrow(new GroupNotFoundException("domaine1", "monApplication", "dontexist"))
           .when(groupService)
           .delete(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any());
 

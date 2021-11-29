@@ -18,6 +18,7 @@ import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
+import fr.insee.sugoi.core.exceptions.ManagerGroupNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -30,7 +31,6 @@ import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;
 import java.util.Map;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +58,7 @@ public class GroupServiceImpl implements GroupService {
               Map.entry(EventKeysConfig.APPLICATION_NAME, appName)));
       if (!providerRequest.isAsynchronousAllowed()
           && response.getStatus().equals(ProviderResponseStatus.OK)) {
-        response.setEntity(findById(realm, appName, group.getName()).get());
+        response.setEntity(findById(realm, appName, group.getName()));
       }
       return response;
     } catch (Exception e) {
@@ -94,37 +94,37 @@ public class GroupServiceImpl implements GroupService {
           Map.ofEntries(
               Map.entry(EventKeysConfig.GROUP_ID, id),
               Map.entry(EventKeysConfig.ERROR, e.toString())));
-      if (e instanceof GroupNotFoundException) {
-        throw (GroupNotFoundException) e;
-      } else {
-        throw e;
-      }
+      throw e;
     }
   }
 
   @Override
-  public Optional<Group> findById(String realm, String appName, String id) {
+  public Group findById(String realm, String appName, String id) {
     try {
 
-      Group group = storeProvider.getReaderStore(realm).getGroup(appName, id);
+      Group group =
+          storeProvider
+              .getReaderStore(realm)
+              .getGroup(appName, id)
+              .orElseThrow(() -> new GroupNotFoundException(realm, appName, id));
       sugoiEventPublisher.publishCustomEvent(
           realm,
           null,
           SugoiEventTypeEnum.FIND_GROUP_BY_ID,
           Map.ofEntries(
-              Map.entry(EventKeysConfig.GROUP_ID, id),
-              Map.entry(EventKeysConfig.APPLICATION_NAME, appName)));
-      return Optional.ofNullable(group);
+              Map.entry(EventKeysConfig.GROUP_ID, id != null ? id : ""),
+              Map.entry(EventKeysConfig.APPLICATION_NAME, appName != null ? appName : "")));
+      return group;
     } catch (Exception e) {
       sugoiEventPublisher.publishCustomEvent(
           realm,
           null,
           SugoiEventTypeEnum.FIND_GROUP_BY_ID_ERROR,
           Map.ofEntries(
-              Map.entry(EventKeysConfig.GROUP_ID, id),
-              Map.entry(EventKeysConfig.APPLICATION_NAME, appName),
+              Map.entry(EventKeysConfig.GROUP_ID, id != null ? id : ""),
+              Map.entry(EventKeysConfig.APPLICATION_NAME, appName != null ? appName : ""),
               Map.entry(EventKeysConfig.ERROR, e.toString())));
-      return Optional.empty();
+      throw e;
     }
   }
 
@@ -173,7 +173,7 @@ public class GroupServiceImpl implements GroupService {
               Map.entry(EventKeysConfig.APPLICATION_NAME, appName)));
       if (!providerRequest.isAsynchronousAllowed()
           && response.getStatus().equals(ProviderResponseStatus.OK)) {
-        response.setEntity(findById(realm, appName, group.getName()).get());
+        response.setEntity(findById(realm, appName, group.getName()));
       }
       return response;
     } catch (Exception e) {
@@ -346,11 +346,11 @@ public class GroupServiceImpl implements GroupService {
   @Override
   public Group getManagerGroup(String realm, String applicationName) {
     try {
-      Group group = storeProvider.getReaderStore(realm).getManagerGroup(applicationName);
-      if (group == null) {
-        throw new GroupNotFoundException(
-            "Cannot find group of manager in application " + applicationName);
-      }
+      Group group =
+          storeProvider
+              .getReaderStore(realm)
+              .getManagerGroup(applicationName)
+              .orElseThrow(() -> new ManagerGroupNotFoundException(realm, applicationName));
       sugoiEventPublisher.publishCustomEvent(
           realm,
           null,

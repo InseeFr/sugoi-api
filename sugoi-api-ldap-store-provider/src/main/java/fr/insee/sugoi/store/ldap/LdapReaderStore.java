@@ -178,13 +178,13 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
    * the retrieve object is a group as defined in the group_filter_pattern
    */
   @Override
-  public Group getGroup(String appName, String groupName) {
+  public Optional<Group> getGroup(String appName, String groupName) {
     try {
       SearchResultEntry entry = getEntryByDn(getGroupDN(appName, groupName));
       return ((entry != null)
               && (Filter.create(getGroupWildcardFilter(appName)).matchesEntry(entry)))
-          ? groupLdapMapper.mapFromAttributes(entry.getAttributes())
-          : null;
+          ? Optional.of(groupLdapMapper.mapFromAttributes(entry.getAttributes()))
+          : Optional.empty();
     } catch (LDAPException e) {
       throw new RuntimeException("Fail to get group in ldap", e);
     }
@@ -394,10 +394,12 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
   }
 
   @Override
-  public Group getManagerGroup(String applicationName) {
+  public Optional<Group> getManagerGroup(String applicationName) {
     try {
       SearchResultEntry entry = getEntryByDn(getGroupManagerSource(applicationName));
-      return (entry != null) ? groupLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
+      return (entry != null)
+          ? Optional.of(groupLdapMapper.mapFromAttributes(entry.getAttributes()))
+          : Optional.empty();
     } catch (Exception e) {
       throw new RuntimeException("Fail to get group in ldap", e);
     }

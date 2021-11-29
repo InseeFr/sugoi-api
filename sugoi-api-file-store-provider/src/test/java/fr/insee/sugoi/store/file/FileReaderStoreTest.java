@@ -221,7 +221,7 @@ public class FileReaderStoreTest {
 
   @Test
   public void testGetGroup() {
-    Group group = fileReaderStore.getGroup("Applitest", "Utilisateurs_Applitest");
+    Group group = fileReaderStore.getGroup("Applitest", "Utilisateurs_Applitest").get();
     assertThat(
         "Should be Utilisateurs_Applitest group", group.getName(), is("Utilisateurs_Applitest"));
     assertThat(
