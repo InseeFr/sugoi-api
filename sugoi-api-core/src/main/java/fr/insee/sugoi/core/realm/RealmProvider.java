@@ -14,6 +14,7 @@
 package fr.insee.sugoi.core.realm;
 
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
+import fr.insee.sugoi.core.exceptions.UserStorageNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.model.Realm;
@@ -55,50 +56,16 @@ public interface RealmProvider {
    * @param realmName : the realm to search into (case insensitive)
    * @param userStorageName : the name of the user storage wanted (case insensitive)
    * @return the user storage found
+   * @throws UserStorageNotFoundException
    * @throws RealmNotFoundException
    */
   public default UserStorage loadUserStorageByUserStorageName(
       String realmName, String userStorageName) throws RealmNotFoundException {
-    Realm r =
-        load(realmName)
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + realmName + "doesn't exist"));
-    if (r != null) {
-
-      for (UserStorage us : r.getUserStorages()) {
-        if (us.getName().equalsIgnoreCase(userStorageName)) {
-          return us;
-        }
-      }
-    }
-
-    throw new RealmNotFoundException(String.format("No user Storage %s found", userStorageName));
-  }
-
-  /**
-   * Find an user storage by his name. As we have no guarantee that each user storage accross all
-   * realms have an unique name, the returned user storage is the first found with this name.
-   *
-   * <p>Default implementation is to browse through realms and user storages and teturn the first
-   * found with this name (case insensitive)
-   *
-   * <p>There is no guarantee that the same user storage is returned everytime with the same call
-   *
-   * @param userStorageName to find
-   * @return the first user storage found.
-   * @throws RealmNotFoundException
-   */
-  public default Realm loadRealmByUserStorageName(String userStorageName)
-      throws RealmNotFoundException {
-    for (Realm r : findAll()) {
-      for (UserStorage us : r.getUserStorages()) {
-        if (us.getName().equalsIgnoreCase(userStorageName)) {
-          return r;
-        }
-      }
-    }
-    throw new RealmNotFoundException(
-        String.format("No Realm found for user Storage %s", userStorageName));
+    Realm r = load(realmName).orElseThrow(() -> new RealmNotFoundException(realmName));
+    return r.getUserStorages().stream()
+        .filter(us -> us.getName().equalsIgnoreCase(userStorageName))
+        .findFirst()
+        .orElseThrow(() -> new UserStorageNotFoundException(realmName, userStorageName));
   }
 
   /**
@@ -115,6 +82,14 @@ public interface RealmProvider {
       allEntries = true)
   public ProviderResponse createRealm(Realm realm, ProviderRequest providerRequest);
 
+  /**
+   * Update the properties of a realm
+   *
+   * @param realm that will override the realm with same name
+   * @param providerRequest
+   * @throws RealmNotFoundException if realm does not exist
+   * @return a response containing the updated realm and the status of the action
+   */
   @CacheEvict(
       value = {"Realms", "Realm"},
       allEntries = true)

@@ -13,7 +13,7 @@
 */
 package fr.insee.sugoi.old.services.model;
 
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
+import fr.insee.sugoi.core.exceptions.NoDomaineMappingException;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -36,7 +36,7 @@ public class ConverterDomainRealm {
     if (domainMapRealm.get(domain) != null) {
       return domainMapRealm.get(domain);
     }
-    throw new RealmNotFoundException("Cannot map domain " + domain + " to realm and userstorage");
+    throw new NoDomaineMappingException(domain);
   }
 
   public Map<String, RealmStorage> getDomainMapRealm() {

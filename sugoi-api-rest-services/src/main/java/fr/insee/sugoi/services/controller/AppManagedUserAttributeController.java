@@ -273,11 +273,7 @@ public class AppManagedUserAttributeController {
             .map(String::toUpperCase)
             .collect(Collectors.toList());
     SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
-    Realm _realm =
-        realmProvider
-            .load(realm)
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm _realm = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
     List<String> attributes_allowed =
         Arrays.asList(
             _realm

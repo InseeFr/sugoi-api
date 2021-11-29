@@ -26,6 +26,7 @@ import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
 import fr.insee.sugoi.core.exceptions.InvalidTransactionIdException;
 import fr.insee.sugoi.core.exceptions.InvalidUserStorageException;
 import fr.insee.sugoi.core.exceptions.ManagerGroupNotFoundException;
+import fr.insee.sugoi.core.exceptions.NoDomaineMappingException;
 import fr.insee.sugoi.core.exceptions.OrganizationAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.OrganizationNotCreatedException;
 import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
@@ -38,6 +39,7 @@ import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.UserNotCreatedException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundByMailException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
+import fr.insee.sugoi.core.exceptions.UserStorageNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -68,6 +70,26 @@ public class SugoiAdviceController {
   @ExceptionHandler(UserNotFoundException.class)
   @ResponseBody
   public ResponseEntity<ErrorView> exception(UserNotFoundException e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    final ResponseEntity<ErrorView> response =
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
+    return response;
+  }
+
+  @ExceptionHandler(UserStorageNotFoundException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(UserStorageNotFoundException e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    final ResponseEntity<ErrorView> response =
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
+    return response;
+  }
+
+  @ExceptionHandler(NoDomaineMappingException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(NoDomaineMappingException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
     final ResponseEntity<ErrorView> response =

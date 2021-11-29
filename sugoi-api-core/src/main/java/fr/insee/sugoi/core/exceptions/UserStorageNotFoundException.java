@@ -13,15 +13,13 @@
 */
 package fr.insee.sugoi.core.exceptions;
 
-public class RealmNotFoundException extends RuntimeException {
+public class UserStorageNotFoundException extends RuntimeException {
 
-  private static final long serialVersionUID = -6450377806626107202L;
-
-  public RealmNotFoundException(String message, Throwable cause) {
+  public UserStorageNotFoundException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public RealmNotFoundException(String realmName) {
-    super(String.format("Realm %s was not found", realmName));
+  public UserStorageNotFoundException(String realm, String userstorage) {
+    super(String.format("Userstorage %s was not found in realm %s", userstorage, realm));
   }
 }

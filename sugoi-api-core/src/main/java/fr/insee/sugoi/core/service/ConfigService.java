@@ -20,7 +20,6 @@ import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.model.Realm;
 import java.util.List;
-import java.util.Optional;
 
 /** Managing realm configuration */
 public interface ConfigService {
@@ -29,9 +28,10 @@ public interface ConfigService {
    * Finds a realm by its name by using the RealmProvider Bean The result is cached.
    *
    * @param name
-   * @return an optional of the Realm
+   * @throws RealmNotFoundException if realm does not exist
+   * @return the requested realm
    */
-  Optional<Realm> getRealm(String name);
+  Realm getRealm(String name);
 
   /**
    * Finds all realms using the RealmProvider bean. The resulting list is cached.

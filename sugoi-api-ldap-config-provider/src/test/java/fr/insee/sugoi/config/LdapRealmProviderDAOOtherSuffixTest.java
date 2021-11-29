@@ -17,7 +17,6 @@ import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
 import fr.insee.sugoi.core.configuration.UiMappingService;
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.Realm;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +35,7 @@ public class LdapRealmProviderDAOOtherSuffixTest {
 
   @Test
   public void ldapRealmDifferentNamePattern() {
-    Realm realm =
-        ldapRealmProviderDAOImpl
-            .load("domainesugoi")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm realm = ldapRealmProviderDAOImpl.load("domainesugoi").get();
     assertThat(
         "Default userstorage should have usersource",
         realm.getUserStorages().get(0).getUserSource(),

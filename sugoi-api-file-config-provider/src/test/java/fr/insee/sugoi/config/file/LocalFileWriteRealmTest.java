@@ -15,10 +15,8 @@ package fr.insee.sugoi.config.file;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import java.io.File;
@@ -84,20 +82,9 @@ public class LocalFileWriteRealmTest {
     uniqueUserStorage.setOrganizationSource("ou=organisations,ou=clients_domaine2,o=insee,c=fr");
     uniqueUserStorage.addProperty("group_filter_pattern", "toto");
     realmToAdd.setUserStorages(List.of(uniqueUserStorage));
-    assertThrows(
-        RealmNotFoundException.class,
-        () ->
-            localFileConfig
-                .load("toadd")
-                .orElseThrow(
-                    () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist ")),
-        "Realm should not exist");
+    assertThat("Realm should not exist", localFileConfig.load("toadd").isEmpty());
     localFileConfig.createRealm(realmToAdd, null);
-    Realm retrievedRealm =
-        localFileConfig
-            .load("toadd")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm retrievedRealm = localFileConfig.load("toadd").get();
     assertThat("Realm should be present", retrievedRealm.getName(), is("toadd"));
     assertThat("Realm should have an url", retrievedRealm.getUrl(), is("localhost"));
     assertThat(
@@ -133,20 +120,9 @@ public class LocalFileWriteRealmTest {
     userStorages.add(userStorage1);
     userStorages.add(userStorage2);
     realmToAdd.setUserStorages(userStorages);
-    assertThrows(
-        RealmNotFoundException.class,
-        () ->
-            localFileConfig
-                .load("toadd")
-                .orElseThrow(
-                    () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist ")),
-        "Realm should not exist");
+    assertThat("Realm should not exist", localFileConfig.load("toadd").isEmpty());
     localFileConfig.createRealm(realmToAdd, null);
-    Realm retrievedRealm =
-        localFileConfig
-            .load("multistorage")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm retrievedRealm = localFileConfig.load("multistorage").get();
     assertThat("Realm should be present", retrievedRealm.getName(), is("multistorage"));
     assertThat(
         "Realm should have two userstorages", retrievedRealm.getUserStorages().size(), is(2));
@@ -162,25 +138,14 @@ public class LocalFileWriteRealmTest {
 
   @Test
   public void deleteRealmWithOneStorageTest() {
-    assertThat("Realm should be present", localFileConfig.load("todelete"), is(not(nullValue())));
+    assertThat("Realm should be present", localFileConfig.load("todelete").isPresent());
     localFileConfig.deleteRealm("todelete", null);
-    assertThrows(
-        RealmNotFoundException.class,
-        () ->
-            localFileConfig
-                .load("toadd")
-                .orElseThrow(
-                    () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist ")),
-        "Realm should not exist");
+    assertThat("Realm should not exist", localFileConfig.load("toadd").isEmpty());
   }
 
   @Test
   public void changeRealmUserSourceTest() {
-    Realm realmToModify =
-        localFileConfig
-            .load("tomodify")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm realmToModify = localFileConfig.load("tomodify").get();
     UserStorage userStorage = realmToModify.getUserStorages().get(0);
     userStorage.setUserSource("ou=contacts,ou=clients_domaine2,o=insee,c=fr");
     localFileConfig.updateRealm(realmToModify, null);
@@ -192,11 +157,7 @@ public class LocalFileWriteRealmTest {
 
   @Test
   public void changeRealmUrlTest() {
-    Realm realmToModify =
-        localFileConfig
-            .load("tomodify")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm realmToModify = localFileConfig.load("tomodify").get();
     realmToModify.setUrl("new_url");
     localFileConfig.updateRealm(realmToModify, null);
     assertThat(
@@ -205,11 +166,7 @@ public class LocalFileWriteRealmTest {
 
   @Test
   public void addApplicationMappingTest() {
-    Realm realmToModify =
-        localFileConfig
-            .load("tomodify")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm realmToModify = localFileConfig.load("tomodify").get();
     if (!realmToModify.getMappings().containsKey("applicationMapping")) {
       realmToModify.getMappings().put("applicationMapping", new HashMap<>());
     }
@@ -217,23 +174,13 @@ public class LocalFileWriteRealmTest {
     localFileConfig.updateRealm(realmToModify, null);
     assertThat(
         "Application mapping should have a name",
-        localFileConfig
-            .load("tomodify")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "))
-            .getMappings()
-            .get("applicationMapping")
-            .get("name"),
+        localFileConfig.load("tomodify").get().getMappings().get("applicationMapping").get("name"),
         is("ou,String,rw"));
   }
 
   @Test
   public void addOrganizationMappingTest() {
-    Realm realmToModify =
-        localFileConfig
-            .load("tomodify")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm realmToModify = localFileConfig.load("tomodify").get();
     if (!realmToModify.getUserStorages().get(0).getMappings().containsKey("organizationMapping")) {
       realmToModify
           .getUserStorages()
@@ -252,8 +199,7 @@ public class LocalFileWriteRealmTest {
         "Organization mapping should have an address",
         localFileConfig
             .load("tomodify")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "))
+            .get()
             .getUserStorages()
             .get(0)
             .getMappings()

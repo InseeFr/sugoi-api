@@ -15,12 +15,8 @@ package fr.insee.sugoi.config;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import fr.insee.sugoi.core.configuration.UiMappingService;
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.ArrayList;
@@ -51,21 +47,10 @@ public class LdapRealmProviderWriteTest {
     uniqueUserStorage.setOrganizationSource("ou=organisations,ou=clients_domaine2,o=insee,c=fr");
     uniqueUserStorage.addProperty("group_filter_pattern", "toto");
     realmToAdd.setUserStorages(List.of(uniqueUserStorage));
-    assertThrows(
-        RealmNotFoundException.class,
-        () ->
-            ldapRealmProviderDAOImpl
-                .load("toadd")
-                .orElseThrow(
-                    () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist ")),
-        "Realm should not exist");
+    assertThat("Realm should not exist", ldapRealmProviderDAOImpl.load("toadd").isEmpty());
 
     ldapRealmProviderDAOImpl.createRealm(realmToAdd, null);
-    Realm retrievedRealm =
-        ldapRealmProviderDAOImpl
-            .load("toadd")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm retrievedRealm = ldapRealmProviderDAOImpl.load("toadd").get();
     assertThat("Realm should be present", retrievedRealm.getName(), is("toadd"));
     assertThat("Realm should have an url", retrievedRealm.getUrl(), is("localhost"));
     assertThat(
@@ -101,20 +86,9 @@ public class LdapRealmProviderWriteTest {
     userStorages.add(userStorage1);
     userStorages.add(userStorage2);
     realmToAdd.setUserStorages(userStorages);
-    assertThrows(
-        RealmNotFoundException.class,
-        () ->
-            ldapRealmProviderDAOImpl
-                .load("multistorage")
-                .orElseThrow(
-                    () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist ")),
-        "Realm should not exist");
+    assertThat("Realm should not exist", ldapRealmProviderDAOImpl.load("multistorage").isEmpty());
     ldapRealmProviderDAOImpl.createRealm(realmToAdd, null);
-    Realm retrievedRealm =
-        ldapRealmProviderDAOImpl
-            .load("multistorage")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm retrievedRealm = ldapRealmProviderDAOImpl.load("multistorage").get();
     assertThat("Realm should be present", retrievedRealm.getName(), is("multistorage"));
     assertThat(
         "Realm should have two userstorages", retrievedRealm.getUserStorages().size(), is(2));
@@ -130,87 +104,47 @@ public class LdapRealmProviderWriteTest {
 
   @Test
   public void deleteRealmWithOneStorageTest() {
-    assertThat(
-        "Realm should be present",
-        ldapRealmProviderDAOImpl.load("todelete").get(),
-        is(not(nullValue())));
+    assertThat("Realm should be present", ldapRealmProviderDAOImpl.load("todelete").isPresent());
     ldapRealmProviderDAOImpl.deleteRealm("todelete", null);
-    assertThrows(
-        RealmNotFoundException.class,
-        () ->
-            ldapRealmProviderDAOImpl
-                .load("todelete")
-                .orElseThrow(
-                    () ->
-                        new RealmNotFoundException("The realm " + "todelete" + " doesn't exist ")),
-        "todelete should be deleted");
+    assertThat("todelete should be deleted", ldapRealmProviderDAOImpl.load("todelete").isEmpty());
   }
 
   @Test
   public void deleteRealmWithMultipleStoragesTest() {
     assertThat(
-        "Realm should be present",
-        ldapRealmProviderDAOImpl.load("todeletemulti").get(),
-        is(not(nullValue())));
+        "Realm should be present", ldapRealmProviderDAOImpl.load("todeletemulti").isPresent());
     ldapRealmProviderDAOImpl.deleteRealm("todeletemulti", null);
-    assertThrows(
-        RealmNotFoundException.class,
-        () ->
-            ldapRealmProviderDAOImpl
-                .load("todeletemulti")
-                .orElseThrow(
-                    () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist ")),
-        "todeletemulti should be deleted");
+    assertThat(
+        "todeletemulti should be deleted",
+        ldapRealmProviderDAOImpl.load("todeletemulti").isEmpty());
   }
 
   @Test
   public void changeRealmUserSourceTest() {
-    Realm realmToModify =
-        ldapRealmProviderDAOImpl
-            .load("tomodify")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm realmToModify = ldapRealmProviderDAOImpl.load("tomodify").get();
     UserStorage userStorage = realmToModify.getUserStorages().get(0);
     userStorage.setUserSource("ou=contacts,ou=clients_domaine2,o=insee,c=fr");
     ldapRealmProviderDAOImpl.updateRealm(realmToModify, null);
     assertThat(
         "User source should change to domaine2",
-        ldapRealmProviderDAOImpl
-            .load("tomodify")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "))
-            .getUserStorages()
-            .get(0)
-            .getUserSource(),
+        ldapRealmProviderDAOImpl.load("tomodify").get().getUserStorages().get(0).getUserSource(),
         is("ou=contacts,ou=clients_domaine2,o=insee,c=fr"));
   }
 
   @Test
   public void changeRealmUrlTest() {
-    Realm realmToModify =
-        ldapRealmProviderDAOImpl
-            .load("tomodify")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm realmToModify = ldapRealmProviderDAOImpl.load("tomodify").get();
     realmToModify.setUrl("new_url");
     ldapRealmProviderDAOImpl.updateRealm(realmToModify, null);
     assertThat(
         "Url should have changed",
-        ldapRealmProviderDAOImpl
-            .load("tomodify")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "))
-            .getUrl(),
+        ldapRealmProviderDAOImpl.load("tomodify").get().getUrl(),
         is("new_url"));
   }
 
   @Test
   public void addApplicationMappingTest() {
-    Realm realmToModify =
-        ldapRealmProviderDAOImpl
-            .load("tomodify")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm realmToModify = ldapRealmProviderDAOImpl.load("tomodify").get();
     if (!realmToModify.getMappings().containsKey("applicationMapping")) {
       realmToModify.getMappings().put("applicationMapping", new HashMap<>());
     }
@@ -220,8 +154,7 @@ public class LdapRealmProviderWriteTest {
         "Application mapping should have a name",
         ldapRealmProviderDAOImpl
             .load("tomodify")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "))
+            .get()
             .getMappings()
             .get("applicationMapping")
             .get("name"),
@@ -230,11 +163,7 @@ public class LdapRealmProviderWriteTest {
 
   @Test
   public void addOrganizationMappingTest() {
-    Realm realmToModify =
-        ldapRealmProviderDAOImpl
-            .load("tomodify")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "));
+    Realm realmToModify = ldapRealmProviderDAOImpl.load("tomodify").get();
     if (!realmToModify.getUserStorages().get(0).getMappings().containsKey("organizationMapping")) {
       realmToModify
           .getUserStorages()
@@ -253,8 +182,7 @@ public class LdapRealmProviderWriteTest {
         "Organization mapping should have an address",
         ldapRealmProviderDAOImpl
             .load("tomodify")
-            .orElseThrow(
-                () -> new RealmNotFoundException("The realm " + "test" + " doesn't exist "))
+            .get()
             .getUserStorages()
             .get(0)
             .getMappings()

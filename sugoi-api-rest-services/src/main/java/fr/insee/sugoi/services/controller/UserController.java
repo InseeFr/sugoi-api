@@ -663,7 +663,7 @@ public class UserController {
     if (Boolean.parseBoolean(
         realmService
             .load(realm)
-            .orElseThrow(() -> new RealmNotFoundException("Realm " + realm + " doesn't exist"))
+            .orElseThrow(() -> new RealmNotFoundException(realm))
             .getProperties()
             .get(GlobalKeysConfig.VERIFY_MAIL_UNICITY))) {
 

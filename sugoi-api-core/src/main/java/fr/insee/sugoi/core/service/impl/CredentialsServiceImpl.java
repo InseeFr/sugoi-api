@@ -17,7 +17,6 @@ import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.PasswordPolicyNotMetException;
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
@@ -56,12 +55,7 @@ public class CredentialsServiceImpl implements CredentialsService {
     try {
       User user = userService.findById(realm, userStorage, userId);
 
-      Map<String, String> realmProperties =
-          configService
-              .getRealm(realm)
-              .orElseThrow(
-                  () -> new RealmNotFoundException("Cannot load properties for realm " + realm))
-              .getProperties();
+      Map<String, String> realmProperties = configService.getRealm(realm).getProperties();
 
       String password =
           passwordService.generatePassword(
@@ -121,12 +115,7 @@ public class CredentialsServiceImpl implements CredentialsService {
       ProviderRequest providerRequest) {
     try {
 
-      Map<String, String> realmProperties =
-          configService
-              .getRealm(realm)
-              .orElseThrow(
-                  () -> new RealmNotFoundException("Cannot load properties for realm " + realm))
-              .getProperties();
+      Map<String, String> realmProperties = configService.getRealm(realm).getProperties();
 
       boolean newPasswordIsValid = validatePassword(newPassword, realmProperties);
 
@@ -168,12 +157,7 @@ public class CredentialsServiceImpl implements CredentialsService {
       ProviderRequest providerRequest) {
     try {
 
-      Map<String, String> realmProperties =
-          configService
-              .getRealm(realm)
-              .orElseThrow(
-                  () -> new RealmNotFoundException("Cannot load properties for realm " + realm))
-              .getProperties();
+      Map<String, String> realmProperties = configService.getRealm(realm).getProperties();
 
       boolean newPasswordIsValid = validatePassword(pcr.getNewPassword(), realmProperties);
       if (newPasswordIsValid) {
