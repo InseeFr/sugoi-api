@@ -19,11 +19,11 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
+import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.service.CredentialsService;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.services.view.PasswordView;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -143,7 +143,7 @@ public class CredentialsControllerTest {
     user.getMetadatas().put("userStorage", "foundUserstorage");
 
     Mockito.when(userService.findById(Mockito.eq("domaine1"), Mockito.isNull(), Mockito.eq("user")))
-        .thenReturn(Optional.of(user));
+        .thenReturn(user);
 
     PasswordView passwordView = new PasswordView();
     passwordView.setPassword("myPassword");
@@ -174,7 +174,7 @@ public class CredentialsControllerTest {
     user.getMetadatas().put("userStorage", "foundUserstorage");
 
     Mockito.when(userService.findById(Mockito.eq("domaine1"), Mockito.isNull(), Mockito.eq("user")))
-        .thenReturn(Optional.of(user));
+        .thenReturn(user);
 
     PasswordView passwordView = new PasswordView();
     passwordView.setPassword("badPassword");
@@ -203,7 +203,7 @@ public class CredentialsControllerTest {
         .thenReturn(true);
 
     Mockito.when(userService.findById(Mockito.eq("domaine1"), Mockito.isNull(), Mockito.eq("user")))
-        .thenReturn(Optional.empty());
+        .thenThrow(new UserNotFoundException("domaine1", "user"));
 
     PasswordView passwordView = new PasswordView();
     passwordView.setPassword("myPassword");

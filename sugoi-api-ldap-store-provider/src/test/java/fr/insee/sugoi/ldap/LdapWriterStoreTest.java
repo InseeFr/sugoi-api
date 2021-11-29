@@ -224,7 +224,7 @@ public class LdapWriterStoreTest {
     user.addAttributes("additionalMail", "other@insee.fr");
     user.addHabilitation(new Habilitation("application", "role", "property"));
     ldapWriterStore.createUser(user, null);
-    User retrievedUser = ldapReaderStore.getUser("Titi");
+    User retrievedUser = ldapReaderStore.getUser("Titi").get();
     assertThat("Titi should have been added", retrievedUser, not(nullValue()));
     assertThat("Titi should have an address", retrievedUser.getAddress().get("line1"), is("Toto"));
     assertThat(
@@ -251,31 +251,31 @@ public class LdapWriterStoreTest {
     user.setMail("petittest@titi.fr");
     user.getAttributes().put("common_name", "Petit Test");
     ldapWriterStore.createUser(user, null);
-    User retrievedUser = ldapReaderStore.getUser("TitiNoAddress");
+    User retrievedUser = ldapReaderStore.getUser("TitiNoAddress").get();
     assertThat("TitiNoAddress should have been added", retrievedUser, not(nullValue()));
     assertThat("TitiNoAddress shouldn't have an address", retrievedUser.getAddress().size(), is(0));
   }
 
   @Test
   public void testUpdateUser() {
-    User user = ldapReaderStore.getUser("testo");
+    User user = ldapReaderStore.getUser("testo").get();
     user.setMail("nvtest@insee.fr");
     Map<String, String> address = new HashMap<>();
     address.put("line1", "Toto");
     address.put("line2", "Chez Toto");
     user.setAddress(address);
     ldapWriterStore.updateUser(user, new ProviderRequest(null, false, null));
-    User modifiedUser = ldapReaderStore.getUser("testo");
+    User modifiedUser = ldapReaderStore.getUser("testo").get();
     assertThat("testo should have a new mail", modifiedUser.getMail(), is("nvtest@insee.fr"));
     assertThat("testo should have an address", modifiedUser.getAddress().get("line1"), is("Toto"));
   }
 
   @Test
   public void testUpdateUserWithSameMailWithoutUnicityNeeded() {
-    User user = ldapReaderStore.getUser("testo");
+    User user = ldapReaderStore.getUser("testo").get();
     user.setMail("test1@test.fr");
     ldapWriterStore.updateUser(user, new ProviderRequest(null, false, null));
-    User modifiedUser = ldapReaderStore.getUser("testo");
+    User modifiedUser = ldapReaderStore.getUser("testo").get();
     assertThat("testo should have a new mail", modifiedUser.getMail(), is("test1@test.fr"));
   }
 
@@ -290,8 +290,7 @@ public class LdapWriterStoreTest {
         ldapReaderStore.getUsersInGroup("Applitest", "Utilisateurs_Applitest").getResults().stream()
             .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
     ldapWriterStore.deleteUser("byebye", null);
-    assertThat(
-        "byebye should have been deleted", ldapReaderStore.getUser("byebye"), is(nullValue()));
+    assertThat("byebye should have been deleted", ldapReaderStore.getUser("byebye").isEmpty());
     assertThat(
         "byebye should no more be in Utilisateurs_Applitest",
         !ldapReaderStore.getGroup("Applitest", "Utilisateurs_Applitest").getUsers().stream()
@@ -517,31 +516,31 @@ public class LdapWriterStoreTest {
     ldapWriterStore.initPassword("testo", "toto", null, null);
     assertThat(
         "Password toto should be validated",
-        ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo"), "toto"));
+        ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo").get(), "toto"));
     assertThat(
         "Password testc should not be validated",
-        !ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo"), "testc"));
+        !ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo").get(), "testc"));
   }
 
   @Test
   public void testReinitPassword() {
     assertThat(
         "Password should not be reinit",
-        !ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo"), "reinit"));
+        !ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo").get(), "reinit"));
     ldapWriterStore.reinitPassword("testo", "reinit", new PasswordChangeRequest(), null);
     assertThat(
         "Password should be reinit",
-        ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo"), "reinit"));
+        ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo").get(), "reinit"));
     assertThat(
         "Password should not be testo",
-        !ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo"), "testo"));
+        !ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo").get(), "testo"));
     ldapWriterStore.reinitPassword("testo", "reinit2", new PasswordChangeRequest(), null);
     assertThat(
         "Password should be reinit2",
-        ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo"), "reinit2"));
+        ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo").get(), "reinit2"));
     assertThat(
         "Password should not be reinit",
-        !ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo"), "reinit"));
+        !ldapReaderStore.validateCredentials(ldapReaderStore.getUser("testo").get(), "reinit"));
   }
 
   @Test
@@ -552,7 +551,7 @@ public class LdapWriterStoreTest {
     assertThat(
         "Password should not be newpassword",
         !ldapReaderStore.validateCredentials(
-            ldapReaderStore.getUser("rawpassword"), "newpassword"));
+            ldapReaderStore.getUser("rawpassword").get(), "newpassword"));
   }
 
   @Test
@@ -563,11 +562,12 @@ public class LdapWriterStoreTest {
         "Response should have status OK", response.getStatus(), is(ProviderResponseStatus.OK));
     assertThat(
         "Should have a new password",
-        ldapReaderStore.validateCredentials(ldapReaderStore.getUser("rawpassword"), "newpassword"));
+        ldapReaderStore.validateCredentials(
+            ldapReaderStore.getUser("rawpassword").get(), "newpassword"));
     assertThat(
         "Password should no more be truepassword",
         !ldapReaderStore.validateCredentials(
-            ldapReaderStore.getUser("rawpassword"), "truepassword"));
+            ldapReaderStore.getUser("rawpassword").get(), "truepassword"));
   }
 
   @Test
@@ -581,7 +581,8 @@ public class LdapWriterStoreTest {
         "Response should have status 204", response.getStatus(), is(ProviderResponseStatus.OK));
     assertThat(
         "Should have a new password",
-        ldapReaderStore.validateCredentials(ldapReaderStore.getUser("nopassword"), "newpassword"));
+        ldapReaderStore.validateCredentials(
+            ldapReaderStore.getUser("nopassword").get(), "newpassword"));
   }
 
   @Test
@@ -590,7 +591,8 @@ public class LdapWriterStoreTest {
         "shapassword", "{SHA}c3q3RSeNwMY7E09Ve9oBHw+MVXg=", "newpassword", null);
     assertThat(
         "Should have a new password",
-        ldapReaderStore.validateCredentials(ldapReaderStore.getUser("shapassword"), "newpassword"));
+        ldapReaderStore.validateCredentials(
+            ldapReaderStore.getUser("shapassword").get(), "newpassword"));
   }
 
   @Test
@@ -604,7 +606,7 @@ public class LdapWriterStoreTest {
     ldapWriterStore.createUser(user, null);
     ldapWriterStore.addAppManagedAttribute(
         "testAppManagedAdd", "inseeGroupeDefaut", "prop_role_appli", null);
-    User retrievedUser = ldapReaderStore.getUser("testAppManagedAdd");
+    User retrievedUser = ldapReaderStore.getUser("testAppManagedAdd").get();
     assertThat(
         "Should have a new habilitation",
         retrievedUser.getHabilitations().get(0).getId(),
@@ -623,7 +625,7 @@ public class LdapWriterStoreTest {
     ldapWriterStore.createUser(user, null);
     ldapWriterStore.deleteAppManagedAttribute(
         "testAppManagedDelete", "inseeGroupeDefaut", "property_role_application", null);
-    User retrievedUser = ldapReaderStore.getUser("testAppManagedDelete");
+    User retrievedUser = ldapReaderStore.getUser("testAppManagedDelete").get();
     assertThat(
         "Should have a delete one habilitation", retrievedUser.getHabilitations().size(), is(0));
   }

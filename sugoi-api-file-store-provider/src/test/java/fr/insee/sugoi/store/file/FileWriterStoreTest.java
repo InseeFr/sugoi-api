@@ -217,7 +217,7 @@ public class FileWriterStoreTest {
     address.put("line2", "Chez Toto");
     user.setAddress(address);
     fileWriterStore.createUser(user, null);
-    User retrievedUser = fileReaderStore.getUser("Titi");
+    User retrievedUser = fileReaderStore.getUser("Titi").get();
     assertThat("Titi should have been added", retrievedUser, not(nullValue()));
     assertThat("Titi should have an address", retrievedUser.getAddress().get("line1"), is("Toto"));
   }
@@ -230,14 +230,13 @@ public class FileWriterStoreTest {
     user.setFirstName("Petit");
     user.setMail("petittest@titi.fr");
     fileWriterStore.createUser(user, null);
-    User retrievedUser = fileReaderStore.getUser("TitiNoAddress");
-    assertThat("TitiNoAddress should have been added", retrievedUser, not(nullValue()));
+    User retrievedUser = fileReaderStore.getUser("TitiNoAddress").get();
     assertThat("TitiNoAddress shouldn't have an address", retrievedUser.getAddress().size(), is(0));
   }
 
   @Test
   public void testUpdateUser() {
-    User user = fileReaderStore.getUser("testo");
+    User user = fileReaderStore.getUser("testo").get();
     user.setMail("nvtest@insee.fr");
     Map<String, String> address = new HashMap<>();
     address.put("line1", "Toto");
@@ -245,7 +244,7 @@ public class FileWriterStoreTest {
     user.setAddress(address);
     fileWriterStore.updateUser(user, null);
 
-    User modifiedUser = fileReaderStore.getUser("testo");
+    User modifiedUser = fileReaderStore.getUser("testo").get();
     assertThat("testo should have a new mail", modifiedUser.getMail(), is("nvtest@insee.fr"));
     assertThat("testo should have an address", modifiedUser.getAddress().get("line1"), is("Toto"));
   }
@@ -266,8 +265,7 @@ public class FileWriterStoreTest {
         fileReaderStore.getUsersInGroup("Applitest", "Utilisateurs_Applitest").getResults().stream()
             .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
     fileWriterStore.deleteUser("byebye", null);
-    assertThat(
-        "byebye should have been deleted", fileReaderStore.getUser("byebye"), is(nullValue()));
+    assertThat("byebye should have been deleted", fileReaderStore.getUser("byebye").isEmpty());
     assertThat(
         "byebye should no more be in Utilisateurs_Applitest",
         !fileReaderStore.getGroup("Applitest", "Utilisateurs_Applitest").getUsers().stream()

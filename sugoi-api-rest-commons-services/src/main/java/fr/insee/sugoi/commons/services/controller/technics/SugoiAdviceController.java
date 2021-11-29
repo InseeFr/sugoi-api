@@ -35,6 +35,7 @@ import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.exceptions.StoragePolicyNotMetException;
 import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.UserNotCreatedException;
+import fr.insee.sugoi.core.exceptions.UserNotFoundByMailException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +67,16 @@ public class SugoiAdviceController {
   @ExceptionHandler(UserNotFoundException.class)
   @ResponseBody
   public ResponseEntity<ErrorView> exception(UserNotFoundException e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    final ResponseEntity<ErrorView> response =
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
+    return response;
+  }
+
+  @ExceptionHandler(UserNotFoundByMailException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(UserNotFoundByMailException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
     final ResponseEntity<ErrorView> response =

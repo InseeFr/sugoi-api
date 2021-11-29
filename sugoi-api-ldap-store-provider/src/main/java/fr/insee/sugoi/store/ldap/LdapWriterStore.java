@@ -95,34 +95,33 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   /** Delete a user and its address */
   @Override
   public ProviderResponse deleteUser(String id, ProviderRequest providerRequest) {
-    User currentUser = ldapReaderStore.getUser(id);
-    if (currentUser != null) {
-      try {
-        currentUser
-            .getGroups()
-            .forEach(
-                group ->
-                    deleteUserFromGroup(group.getAppName(), group.getName(), id, providerRequest));
-        if (currentUser.getAddress().get("id") != null) {
-          deleteAddress(currentUser.getAddress().get("id"));
-        }
-        DeleteRequest dr = new DeleteRequest(getUserDN(id));
-        ldapPoolConnection.delete(dr);
-        ProviderResponse response = new ProviderResponse();
-        response.setStatus(ProviderResponseStatus.OK);
-        response.setEntityId(id);
-        return response;
-      } catch (LDAPException e) {
-        throw new RuntimeException("Failed to delete user " + id, e);
+    try {
+      User currentUser =
+          ldapReaderStore
+              .getUser(id)
+              .orElseThrow(
+                  () ->
+                      new UserNotFoundException(
+                          config.get(LdapConfigKeys.REALM_NAME),
+                          config.get(LdapConfigKeys.USERSTORAGE_NAME),
+                          id));
+      currentUser
+          .getGroups()
+          .forEach(
+              group ->
+                  deleteUserFromGroup(group.getAppName(), group.getName(), id, providerRequest));
+      if (currentUser.getAddress().get("id") != null) {
+        deleteAddress(currentUser.getAddress().get("id"));
       }
+      DeleteRequest dr = new DeleteRequest(getUserDN(id));
+      ldapPoolConnection.delete(dr);
+      ProviderResponse response = new ProviderResponse();
+      response.setStatus(ProviderResponseStatus.OK);
+      response.setEntityId(id);
+      return response;
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to delete user " + id, e);
     }
-    throw new UserNotFoundException(
-        "Cannot find user "
-            + id
-            + " in realm "
-            + config.get(LdapConfigKeys.REALM_NAME)
-            + " and userstorage "
-            + config.get(LdapConfigKeys.USERSTORAGE_NAME));
   }
 
   /**
@@ -151,43 +150,37 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   /** Update the ldap properties of a user. Current user is read to retrieve user address link */
   @Override
   public ProviderResponse updateUser(User updatedUser, ProviderRequest providerRequest) {
-    if (ldapReaderStore.getUser(updatedUser.getUsername()) != null) {
-      try {
-        if (updatedUser != null) {
-          User currentUser = ldapReaderStore.getUser(updatedUser.getUsername());
-          if (currentUser == null) {
-            throw new UserNotFoundException("User is not found on this user storage");
-          }
-          if (updatedUser.getAddress() != null && updatedUser.getAddress().size() > 0) {
-            if (currentUser.getAddress() != null && currentUser.getAddress().containsKey("id")) {
-              updateAddress(currentUser.getAddress().get("id"), updatedUser.getAddress());
-            } else {
-              Map<String, String> newAddress = new HashMap<>();
-              newAddress.put("id", createAddress(updatedUser.getAddress()).toString());
-              updatedUser.setAddress(newAddress);
-              createAddress(updatedUser.getAddress());
-            }
-          }
-          ModifyRequest mr =
-              new ModifyRequest(
-                  getUserDN(updatedUser.getUsername()), userLdapMapper.createMods(updatedUser));
-          ldapPoolConnection.modify(mr);
+    try {
+      User currentUser =
+          ldapReaderStore
+              .getUser(updatedUser.getUsername())
+              .orElseThrow(
+                  () ->
+                      new UserNotFoundException(
+                          config.get(LdapConfigKeys.REALM_NAME),
+                          config.get(LdapConfigKeys.USERSTORAGE_NAME),
+                          updatedUser.getUsername()));
+      if (updatedUser.getAddress() != null && updatedUser.getAddress().size() > 0) {
+        if (currentUser.getAddress() != null && currentUser.getAddress().containsKey("id")) {
+          updateAddress(currentUser.getAddress().get("id"), updatedUser.getAddress());
+        } else {
+          Map<String, String> newAddress = new HashMap<>();
+          newAddress.put("id", createAddress(updatedUser.getAddress()).toString());
+          updatedUser.setAddress(newAddress);
+          createAddress(updatedUser.getAddress());
         }
-      } catch (LDAPException e) {
-        throw new RuntimeException("Failed to update user while writing to LDAP", e);
       }
-      ProviderResponse response = new ProviderResponse();
-      response.setStatus(ProviderResponseStatus.OK);
-      response.setEntityId(updatedUser.getUsername());
-      return response;
+      ModifyRequest mr =
+          new ModifyRequest(
+              getUserDN(updatedUser.getUsername()), userLdapMapper.createMods(updatedUser));
+      ldapPoolConnection.modify(mr);
+    } catch (LDAPException e) {
+      throw new RuntimeException("Failed to update user while writing to LDAP", e);
     }
-    throw new UserNotFoundException(
-        "User "
-            + updatedUser.getUsername()
-            + " doesn't exist in realm "
-            + config.get(LdapConfigKeys.REALM_NAME)
-            + "and userstorage "
-            + config.get(LdapConfigKeys.USERSTORAGE_NAME));
+    ProviderResponse response = new ProviderResponse();
+    response.setStatus(ProviderResponseStatus.OK);
+    response.setEntityId(updatedUser.getUsername());
+    return response;
   }
 
   @Override
@@ -395,13 +388,10 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
               + " in realm "
               + config.get(LdapConfigKeys.REALM_NAME));
     }
-    if (ldapReaderStore.getUser(userId) == null) {
-      throw new UserNotFoundException(
-          "Cannot find user with id "
-              + userId
-              + " in realm "
-              + config.get(LdapConfigKeys.REALM_NAME));
-    }
+    ldapReaderStore
+        .getUser(userId)
+        .orElseThrow(
+            () -> new UserNotFoundException(config.get(LdapConfigKeys.REALM_NAME), userId));
     try {
       ModifyRequest mr =
           new ModifyRequest(
@@ -435,13 +425,10 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
               + " in realm "
               + config.get(LdapConfigKeys.REALM_NAME));
     }
-    if (ldapReaderStore.getUser(userId) == null) {
-      throw new UserNotFoundException(
-          "Cannot find user with id "
-              + userId
-              + " in realm "
-              + config.get(LdapConfigKeys.REALM_NAME));
-    }
+    ldapReaderStore
+        .getUser(userId)
+        .orElseThrow(
+            () -> new UserNotFoundException(config.get(LdapConfigKeys.REALM_NAME), userId));
     try {
       ModifyRequest mr =
           new ModifyRequest(
@@ -472,13 +459,11 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
 
     Modification mod =
         new Modification(ModificationType.REPLACE, "userPassword", generatedPassword);
-    User user = ldapReaderStore.getUser(userId);
-
-    if (user == null) {
-      throw new UserNotFoundException(
-          "User " + userId + " not found in realm" + config.get(LdapConfigKeys.REALM_NAME));
-    }
-
+    User user =
+        ldapReaderStore
+            .getUser(userId)
+            .orElseThrow(
+                () -> new UserNotFoundException(config.get(LdapConfigKeys.REALM_NAME), userId));
     try {
       ldapPoolConnection.modify(
           "uid=" + user.getUsername() + "," + config.get(LdapConfigKeys.USER_SOURCE), mod);
@@ -502,12 +487,11 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   public ProviderResponse initPassword(
       String userId, String password, PasswordChangeRequest pcr, ProviderRequest providerRequest) {
     Modification mod = new Modification(ModificationType.REPLACE, "userPassword", password);
-    User user = ldapReaderStore.getUser(userId);
-    if (user == null) {
-      throw new UserNotFoundException(
-          "User " + userId + " not found in realm" + config.get(LdapConfigKeys.REALM_NAME));
-    }
-
+    User user =
+        ldapReaderStore
+            .getUser(userId)
+            .orElseThrow(
+                () -> new UserNotFoundException(config.get(LdapConfigKeys.REALM_NAME), userId));
     try {
 
       ldapPoolConnection.modify(
@@ -524,12 +508,11 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public ProviderResponse changePassword(
       String userId, String oldPassword, String newPassword, ProviderRequest providerRequest) {
-    User user = ldapReaderStore.getUser(userId);
-
-    if (user == null) {
-      throw new UserNotFoundException(
-          "User " + userId + " not found in realm" + config.get(LdapConfigKeys.REALM_NAME));
-    }
+    User user =
+        ldapReaderStore
+            .getUser(userId)
+            .orElseThrow(
+                () -> new UserNotFoundException(config.get(LdapConfigKeys.REALM_NAME), userId));
     try {
       PasswordModifyExtendedRequest pmer =
           new PasswordModifyExtendedRequest(
@@ -557,13 +540,11 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     Modification mod =
         new Modification(
             ModificationType.REPLACE, "pwdReset", Boolean.toString(isReset).toUpperCase());
-    User user = ldapReaderStore.getUser(userId);
-
-    if (user == null) {
-      throw new UserNotFoundException(
-          "User " + userId + " not found in realm" + config.get(LdapConfigKeys.REALM_NAME));
-    }
-
+    User user =
+        ldapReaderStore
+            .getUser(userId)
+            .orElseThrow(
+                () -> new UserNotFoundException(config.get(LdapConfigKeys.REALM_NAME), userId));
     try {
       ldapPoolConnection.modify(
           "uid=" + user.getUsername() + "," + config.get(LdapConfigKeys.USER_SOURCE), mod);
@@ -690,71 +671,61 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public ProviderResponse addAppManagedAttribute(
       String userId, String attributeKey, String attributeValue, ProviderRequest providerRequest) {
-    if (ldapReaderStore.getUser(userId) != null) {
-      try {
-        ModifyRequest modifyAttributeRequest =
-            new ModifyRequest(
-                getUserDN(userId),
-                new Modification(ModificationType.ADD, attributeKey, attributeValue));
-        ldapPoolConnection.modify(modifyAttributeRequest);
-        ProviderResponse response = new ProviderResponse();
-        response.setStatus(ProviderResponseStatus.OK);
-        response.setEntityId(userId);
-        return response;
-      } catch (LDAPException e) {
-        throw new RuntimeException(
-            "Failed to update user attribute "
-                + attributeKey
-                + " with value "
-                + attributeValue
-                + " while writing to LDAP",
-            e);
-      }
+    ldapReaderStore
+        .getUser(userId)
+        .orElseThrow(
+            () -> new UserNotFoundException(config.get(LdapConfigKeys.REALM_NAME), userId));
+    try {
+      ModifyRequest modifyAttributeRequest =
+          new ModifyRequest(
+              getUserDN(userId),
+              new Modification(ModificationType.ADD, attributeKey, attributeValue));
+      ldapPoolConnection.modify(modifyAttributeRequest);
+      ProviderResponse response = new ProviderResponse();
+      response.setStatus(ProviderResponseStatus.OK);
+      response.setEntityId(userId);
+      return response;
+    } catch (LDAPException e) {
+      throw new RuntimeException(
+          "Failed to update user attribute "
+              + attributeKey
+              + " with value "
+              + attributeValue
+              + " while writing to LDAP",
+          e);
     }
-    throw new UserNotFoundException(
-        "Cannot find user "
-            + userId
-            + " in realm "
-            + config.get(LdapConfigKeys.REALM_NAME)
-            + " and userstorage "
-            + config.get(LdapConfigKeys.USERSTORAGE_NAME));
   }
 
   @Override
   public ProviderResponse deleteAppManagedAttribute(
       String userId, String attributeKey, String attributeValue, ProviderRequest providerRequest) {
-    if (ldapReaderStore.getUser(userId) != null) {
+    ldapReaderStore
+        .getUser(userId)
+        .orElseThrow(
+            () -> new UserNotFoundException(config.get(LdapConfigKeys.REALM_NAME), userId));
 
-      try {
-        ModifyRequest modifyAttributeRequest =
-            new ModifyRequest(
-                getUserDN(userId),
-                new Modification(ModificationType.DELETE, attributeKey, attributeValue));
-        ldapPoolConnection.modify(modifyAttributeRequest);
-        ProviderResponse response = new ProviderResponse();
-        response.setStatus(ProviderResponseStatus.OK);
-        response.setEntityId(userId);
-        return response;
-      } catch (LDAPException e) {
-        if (e.getResultCode().equals(ResultCode.NO_SUCH_ATTRIBUTE)) {
-          throw new AppManagedAttributeException("Cannot delete, attribute not found", e);
-        }
-        throw new RuntimeException(
-            "Failed to update user attribute "
-                + attributeKey
-                + " with value "
-                + attributeValue
-                + " while writing to LDAP",
-            e);
+    try {
+      ModifyRequest modifyAttributeRequest =
+          new ModifyRequest(
+              getUserDN(userId),
+              new Modification(ModificationType.DELETE, attributeKey, attributeValue));
+      ldapPoolConnection.modify(modifyAttributeRequest);
+      ProviderResponse response = new ProviderResponse();
+      response.setStatus(ProviderResponseStatus.OK);
+      response.setEntityId(userId);
+      return response;
+    } catch (LDAPException e) {
+      if (e.getResultCode().equals(ResultCode.NO_SUCH_ATTRIBUTE)) {
+        throw new AppManagedAttributeException("Cannot delete, attribute not found", e);
       }
+      throw new RuntimeException(
+          "Failed to update user attribute "
+              + attributeKey
+              + " with value "
+              + attributeValue
+              + " while writing to LDAP",
+          e);
     }
-    throw new UserNotFoundException(
-        "Cannot find user "
-            + userId
-            + " in realm "
-            + config.get(LdapConfigKeys.REALM_NAME)
-            + " and userstorage "
-            + config.get(LdapConfigKeys.USERSTORAGE_NAME));
   }
 
   /**
@@ -908,13 +879,10 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   public ProviderResponse addUserToGroupManager(
       String applicationName, String userId, ProviderRequest providerRequest) {
 
-    if (ldapReaderStore.getUser(userId) == null) {
-      throw new UserNotFoundException(
-          "Cannot find user with id "
-              + userId
-              + " in realm "
-              + config.get(LdapConfigKeys.REALM_NAME));
-    }
+    ldapReaderStore
+        .getUser(userId)
+        .orElseThrow(
+            () -> new UserNotFoundException(config.get(LdapConfigKeys.REALM_NAME), userId));
     try {
       ModifyRequest mr =
           new ModifyRequest(
@@ -939,13 +907,10 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public ProviderResponse deleteUserFromManagerGroup(
       String applicationName, String userId, ProviderRequest providerRequest) {
-    if (ldapReaderStore.getUser(userId) == null) {
-      throw new UserNotFoundException(
-          "Cannot find user with id "
-              + userId
-              + " in realm "
-              + config.get(LdapConfigKeys.REALM_NAME));
-    }
+    ldapReaderStore
+        .getUser(userId)
+        .orElseThrow(
+            () -> new UserNotFoundException(config.get(LdapConfigKeys.REALM_NAME), userId));
     try {
       ModifyRequest mr =
           new ModifyRequest(

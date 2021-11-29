@@ -54,12 +54,7 @@ public class CredentialsServiceImpl implements CredentialsService {
       PasswordChangeRequest pcr,
       ProviderRequest providerRequest) {
     try {
-      User user =
-          userService
-              .findById(realm, userStorage, userId)
-              .orElseThrow(
-                  () ->
-                      new UserNotFoundException("User " + userId + " not found in realm" + realm));
+      User user = userService.findById(realm, userStorage, userId);
 
       Map<String, String> realmProperties =
           configService
@@ -216,13 +211,7 @@ public class CredentialsServiceImpl implements CredentialsService {
   public boolean validateCredential(
       String realm, String userStorage, String userName, String password) {
     try {
-      User user =
-          userService
-              .findById(realm, userStorage, userName)
-              .orElseThrow(
-                  () ->
-                      new UserNotFoundException(
-                          "User " + userName + " not found in realm" + realm));
+      User user = userService.findById(realm, userStorage, userName);
       boolean valid =
           storeProvider.getReaderStore(realm, userStorage).validateCredentials(user, password);
       sugoiEventPublisher.publishCustomEvent(
@@ -276,11 +265,7 @@ public class CredentialsServiceImpl implements CredentialsService {
   public boolean sendLogin(
       String realm, String userStorage, String id, Map<String, String> properties) {
     try {
-      User user =
-          userService
-              .findById(realm, userStorage, id)
-              .orElseThrow(
-                  () -> new UserNotFoundException("User " + id + " not found in realm" + realm));
+      User user = userService.findById(realm, userStorage, id);
       sugoiEventPublisher.publishCustomEvent(
           realm,
           userStorage,

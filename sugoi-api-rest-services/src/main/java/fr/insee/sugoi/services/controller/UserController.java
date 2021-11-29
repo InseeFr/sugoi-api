@@ -16,7 +16,6 @@ package fr.insee.sugoi.services.controller;
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.exceptions.UnableToUpdateCertificateException;
-import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -446,11 +445,7 @@ public class UserController {
     if (!user.getUsername().equals(id)) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
-    User foundUser =
-        userService
-            .findById(realm, null, id)
-            .orElseThrow(
-                () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
+    User foundUser = userService.findById(realm, null, id);
     return updateUsers(
         realm,
         (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
@@ -566,11 +561,7 @@ public class UserController {
           String transactionId,
       Authentication authentication) {
 
-    User foundUser =
-        userService
-            .findById(realm, null, id)
-            .orElseThrow(
-                () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
+    User foundUser = userService.findById(realm, null, id);
     return deleteUsers(
         realm,
         (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
@@ -610,12 +601,7 @@ public class UserController {
           String storage,
       @Parameter(description = "Username to search", required = true) @PathVariable("username")
           String id) {
-    User user =
-        userService
-            .findById(realm, storage, id)
-            .orElseThrow(
-                () -> new UserNotFoundException("Cannot find user " + id + " in realm " + realm));
-    return ResponseEntity.status(HttpStatus.OK).body(user);
+    return ResponseEntity.status(HttpStatus.OK).body(userService.findById(realm, storage, id));
   }
 
   @GetMapping(
@@ -681,14 +667,8 @@ public class UserController {
             .getProperties()
             .get(GlobalKeysConfig.VERIFY_MAIL_UNICITY))) {
 
-      User user =
-          userService
-              .findByMail(realm, storage, mail)
-              .orElseThrow(
-                  () ->
-                      new UserNotFoundException(
-                          "Cannot find user with mail " + mail + " in realm " + realm));
-      return ResponseEntity.status(HttpStatus.OK).body(user);
+      return ResponseEntity.status(HttpStatus.OK)
+          .body(userService.findByMail(realm, storage, mail));
     }
     return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
   }
@@ -770,13 +750,7 @@ public class UserController {
           String realm,
       @Parameter(description = "Username to search", required = true) @PathVariable("id") String id)
       throws CertificateException {
-    User user =
-        userService
-            .findById(realm, null, id)
-            .orElseThrow(
-                () ->
-                    new UserNotFoundException(
-                        "Cannot find user with id " + id + " in realm " + realm));
+    User user = userService.findById(realm, null, id);
     return getUserCertificate(
         realm, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id);
   }
@@ -874,13 +848,7 @@ public class UserController {
       Authentication authentication)
       throws IOException {
 
-    User user =
-        userService
-            .findById(realm, null, id)
-            .orElseThrow(
-                () ->
-                    new UserNotFoundException(
-                        "Cannot find user with id " + id + " in realm " + realm));
+    User user = userService.findById(realm, null, id);
     return updateUserCertificate(
         realm,
         (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
@@ -981,13 +949,7 @@ public class UserController {
           String transactionId,
       Authentication authentication) {
 
-    User user =
-        userService
-            .findById(realm, null, id)
-            .orElseThrow(
-                () ->
-                    new UserNotFoundException(
-                        "Cannot find user with id " + id + " in realm " + realm));
+    User user = userService.findById(realm, null, id);
     return deleteUserCertificate(
         realm,
         (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),

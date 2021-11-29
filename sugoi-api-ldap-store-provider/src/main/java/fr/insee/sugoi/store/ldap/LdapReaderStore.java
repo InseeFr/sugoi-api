@@ -21,6 +21,7 @@ import com.unboundid.ldap.sdk.SearchRequest;
 import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
+import fr.insee.sugoi.core.exceptions.MultipleUserWithSameMailException;
 import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.LdapFilter;
@@ -75,7 +76,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
    * the organization ldap resource
    */
   @Override
-  public User getUser(String id) {
+  public Optional<User> getUser(String id) {
     logger.debug("Searching user {}", id);
     SearchResultEntry entry = getEntryByDn(getUserDN(id));
     User user = (entry != null) ? userLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
@@ -89,7 +90,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     if (user != null && user.getOrganization() != null) {
       user.setOrganization(getOrganization(user.getOrganization().getIdentifiant()).orElse(null));
     }
-    return user;
+    return Optional.ofNullable(user);
   }
 
   /**
@@ -143,7 +144,8 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       page.setResults(
           Arrays.stream(entry.getAttribute("uniqueMember").getValues())
               .map(uniqueMember -> getUser(LdapUtils.getNodeValueFromDN(uniqueMember)))
-              .filter(user -> user != null)
+              .filter(optionalUser -> optionalUser.isPresent())
+              .map(optionalUser -> optionalUser.get())
               .collect(Collectors.toList()));
     } else {
       page.setResults(new ArrayList<>());
@@ -366,7 +368,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
   }
 
   @Override
-  public User getUserByMail(String mail) {
+  public Optional<User> getUserByMail(String mail) {
     logger.debug("Searching user with mail {}", mail);
     User searchedUser = new User();
     searchedUser.setMail(mail);
@@ -386,10 +388,9 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
         user.setOrganization(getOrganization(user.getOrganization().getIdentifiant()).orElse(null));
       }
     } else if (users.getResults().size() > 1) {
-      throw new RuntimeException(
-          "multiple user found with this email where found cannot determine which one to choose");
+      throw new MultipleUserWithSameMailException(mail);
     }
-    return user;
+    return Optional.ofNullable(user);
   }
 
   @Override

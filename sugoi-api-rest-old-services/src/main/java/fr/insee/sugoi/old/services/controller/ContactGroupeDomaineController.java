@@ -16,7 +16,6 @@ package fr.insee.sugoi.old.services.controller;
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
 import fr.insee.sugoi.converter.ouganext.GroupeOuganext;
 import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
-import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.SugoiUser;
 import fr.insee.sugoi.core.service.GroupService;
@@ -98,12 +97,8 @@ public class ContactGroupeDomaineController {
     RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
     User user =
-        userService
-            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
-            .orElseThrow(
-                () ->
-                    new UserNotFoundException(
-                        "Cannot find user " + identifiant + " in domaine " + domaine));
+        userService.findById(
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             user.getGroups().stream()
@@ -179,12 +174,8 @@ public class ContactGroupeDomaineController {
                         + "in domaine "
                         + domaine));
     User user =
-        userService
-            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
-            .orElseThrow(
-                () ->
-                    new UserNotFoundException(
-                        "Cannot find user " + identifiant + " in domaine " + domaine));
+        userService.findById(
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
     if (user.getGroups() != null
         && user.getGroups().stream()
             .anyMatch(g -> g.getName().equals(nomGroupe) && g.getAppName().equals(nomAppli))) {
@@ -267,12 +258,8 @@ public class ContactGroupeDomaineController {
     RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
     User user =
-        userService
-            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
-            .orElseThrow(
-                () ->
-                    new UserNotFoundException(
-                        "Cannot find user " + identifiant + " in domaine " + domaine));
+        userService.findById(
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
     if (user.getGroups() != null
         && user.getGroups().stream()
             .anyMatch(

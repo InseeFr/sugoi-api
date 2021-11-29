@@ -22,7 +22,6 @@ import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;
-import java.util.Optional;
 
 public interface UserService {
 
@@ -64,19 +63,21 @@ public interface UserService {
    * @param realm
    * @param storageName
    * @param idep
-   * @return an optional of user
+   * @throws UserNotFoundException if no match
+   * @return user with matching idep
    */
-  Optional<User> findById(String realm, String storageName, String idep);
+  User findById(String realm, String storageName, String idep);
 
   /**
-   * Find a user by its username in a realm
+   * Find a user by its mail in a realm
    *
    * @param realm
    * @param storageName
-   * @param idep
-   * @return an optional of user
+   * @param mail
+   * @throws UserNotFoundException if no match
+   * @return user with matching mail
    */
-  Optional<User> findByMail(String realm, String storageName, String mail);
+  User findByMail(String realm, String storageName, String mail);
 
   /**
    * Find users by criterias in a realm
@@ -142,4 +143,14 @@ public interface UserService {
 
   ProviderResponse deleteCertificate(
       String realm, String userStorage, String userid, ProviderRequest providerRequest);
+
+  /**
+   * Check if a user exists on realm and userstorage
+   *
+   * @param realm
+   * @param userStorage
+   * @param userId
+   * @return true if userId exists on realm/userstorage, else false
+   */
+  boolean exist(String realm, String userStorage, String userId);
 }

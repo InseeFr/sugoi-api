@@ -16,7 +16,6 @@ package fr.insee.sugoi.old.services.controller;
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
 import fr.insee.sugoi.converter.ouganext.ContactOuganext;
 import fr.insee.sugoi.converter.ouganext.OrganisationOuganext;
-import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.core.service.OrganizationService;
 import fr.insee.sugoi.core.service.UserService;
@@ -92,10 +91,7 @@ public class IdController {
 
   private ContactOuganext findContact(Realm realm, String id) {
     return ouganextSugoiMapper.serializeToOuganext(
-        userService
-            .findById(realm.getName(), null, id)
-            .orElseThrow(() -> new UserNotFoundException("User" + id + " not found in " + realm)),
-        ContactOuganext.class);
+        userService.findById(realm.getName(), null, id), ContactOuganext.class);
   }
 
   private OrganisationOuganext findOrganisation(Realm realm, String id) {

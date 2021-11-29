@@ -13,7 +13,6 @@
 */
 package fr.insee.sugoi.old.services.controller;
 
-import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.SugoiUser;
 import fr.insee.sugoi.core.service.UserService;
@@ -100,10 +99,6 @@ public class ContactInseeRoleApplicatifDomaineController {
             userService
                 .findById(
                     realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
-                .orElseThrow(
-                    () ->
-                        new UserNotFoundException(
-                            "Cannot find user " + identifiant + " in domaine " + domaine))
                 .getAttributes()
                 .get("insee_roles_applicatifs"));
   }
@@ -154,12 +149,8 @@ public class ContactInseeRoleApplicatifDomaineController {
     RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
     User user =
-        userService
-            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
-            .orElseThrow(
-                () ->
-                    new UserNotFoundException(
-                        "Cannot find user " + identifiant + " in domaine " + domaine));
+        userService.findById(
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
     if (user.getAttributes().containsKey("insee_roles_applicatifs")) {
       @SuppressWarnings("unchecked")
       List<String> userRoles = (List<String>) user.getAttributes().get("insee_roles_applicatifs");
@@ -224,12 +215,8 @@ public class ContactInseeRoleApplicatifDomaineController {
     RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
     User user =
-        userService
-            .findById(realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
-            .orElseThrow(
-                () ->
-                    new UserNotFoundException(
-                        "Cannot find user " + identifiant + " in domaine " + domaine));
+        userService.findById(
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
     if (user.getAttributes().containsKey("insee_roles_applicatifs")) {
       user.getAttributes()
           .put(
