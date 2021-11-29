@@ -162,12 +162,15 @@ public class UserServiceImpl implements UserService {
     if (!readerStoreAsynchronous) {
       Realm realmLoaded = realmProvider.load(realm).get();
 
-      // check mail unicity if needed
+      // check mail unicity if needed (don't check is new mail is blank or empty as
+      // this indicate
+      // delete mail)
       if (Boolean.parseBoolean(
               realmLoaded
                   .getProperties()
                   .getOrDefault(GlobalKeysConfig.VERIFY_MAIL_UNICITY, "false"))
-          && user.getMail() != null) {
+          && user.getMail() != null
+          && !user.getMail().isBlank()) {
         if (realmLoaded.getUserStorages().stream()
             .map(
                 us ->

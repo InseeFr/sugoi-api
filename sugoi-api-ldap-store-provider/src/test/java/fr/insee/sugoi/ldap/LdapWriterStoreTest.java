@@ -280,6 +280,15 @@ public class LdapWriterStoreTest {
   }
 
   @Test
+  public void testUpdateUserWithEmptyValue() {
+    User user = ldapReaderStore.getUser("testo").get();
+    user.setMail("");
+    ldapWriterStore.updateUser(user, new ProviderRequest(null, false, null));
+    User modifiedUser = ldapReaderStore.getUser("testo").get();
+    assertThat("testo should not have a mail anymore", modifiedUser.getMail(), is(nullValue()));
+  }
+
+  @Test
   public void testDeleteUser() {
     assertThat(
         "byebye is in Utilisateurs_Applitest",

@@ -17,6 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -95,6 +96,16 @@ public class UserGlue {
   @Then("the client expect the username of user to be {}")
   public void expect_username_of_user_to_be(String username) {
     assertThat(stepData.getUser().getUsername(), is(username));
+  }
+
+  @Then("the client expect the mail of user not to be null")
+  public void expect_mail_of_user_not_to_be_null() {
+    assertThat(stepData.getUser().getMail(), is(notNullValue()));
+  }
+
+  @Then("the client expect the mail of user to be null")
+  public void expect_mail_of_user_to_be_null() {
+    assertThat(stepData.getUser().getMail(), is(nullValue()));
   }
 
   @Then("the client expect the username of user not to be null")

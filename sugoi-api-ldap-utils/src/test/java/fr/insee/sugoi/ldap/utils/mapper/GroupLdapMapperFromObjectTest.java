@@ -96,14 +96,14 @@ public class GroupLdapMapperFromObjectTest {
                         && attribute.getValue().equals("uid=user2,ou=contacts,o=insee,c=fr"))));
   }
 
+  // Necessary for the change mod construction (for deleting empty value attributes)
   @Test
-  public void emptyStringShouldBeRemoved() {
+  public void emptyStringShouldNotBeRemoved() {
     group.setName("group");
     group.setDescription("");
     List<Attribute> mappedAttributes = groupLdapMapper.mapToAttributes(group);
     assertThat(
-        "Should not have a description attribute",
-        mappedAttributes.stream()
-            .allMatch(attribute -> !(attribute.getName().equals("description"))));
+        "Should have a empty description attribute",
+        mappedAttributes.stream().anyMatch(attribute -> attribute.getName().equals("description")));
   }
 }

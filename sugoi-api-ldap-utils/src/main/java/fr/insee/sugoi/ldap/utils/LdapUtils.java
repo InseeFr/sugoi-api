@@ -114,23 +114,43 @@ public class LdapUtils {
     }
   }
 
+  /**
+   * @param attributes : with all values not null
+   * @throws NullpointerException if any value in attributes is null
+   * @return
+   */
   public static List<Modification> convertAttributesToModifications(List<Attribute> attributes) {
     return attributes.stream()
         .map(attribute -> attribute.getName())
         .filter(attributeName -> !attributeName.equalsIgnoreCase("objectClass"))
         .distinct()
-        .map(
-            attributeName ->
-                new Modification(
-                    ModificationType.REPLACE,
-                    attributeName,
-                    attributes.stream()
-                        .filter(
-                            filterAttribute ->
-                                filterAttribute.getName().equalsIgnoreCase(attributeName))
-                        .map(filterAttribute -> filterAttribute.getValues())
-                        .flatMap(values -> Arrays.stream(values))
-                        .toArray(String[]::new)))
+        .map(attributeName -> computeMotificationFromNewvalue(attributeName, attributes))
         .collect(Collectors.toList());
+  }
+
+  /**
+   * @param attributeName
+   * @param attributes : all values must not be null
+   * @throws NullpointerException if any value in atributes is null
+   * @return
+   */
+  private static Modification computeMotificationFromNewvalue(
+      String attributeName, List<Attribute> attributes) {
+    String[] newValues =
+        attributes.stream()
+            .filter(filterAttribute -> filterAttribute.getName().equalsIgnoreCase(attributeName))
+            .map(filterAttribute -> filterAttribute.getValues())
+            .flatMap(values -> Arrays.stream(values))
+            .filter(value -> !value.isBlank())
+            .toArray(String[]::new);
+
+    if (newValues.length == 0) {
+      // If there are only blank or empty vales, this should be considered as
+      // delete attribute (no value to set)
+      return new Modification(ModificationType.DELETE, attributeName);
+    } else {
+      // Set new value(s)
+      return new Modification(ModificationType.REPLACE, attributeName, newValues);
+    }
   }
 }
