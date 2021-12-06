@@ -138,7 +138,7 @@ public class UserServiceImpl implements UserService {
       if (!providerRequest.isAsynchronousAllowed()
           && response.getStatus().equals(ProviderResponseStatus.OK)) {
         user.setUsername(response.getEntityId());
-        response.setEntity(findById(realm, storage, user.getUsername()));
+        response.setEntity(user);
       }
       return response;
     } catch (Exception e) {
