@@ -13,66 +13,41 @@
 */
 package fr.insee.sugoi.core.configuration;
 
-import net.sf.ehcache.config.CacheConfiguration;
+import java.util.HashMap;
+import java.util.Map;
+import javax.cache.Caching;
+import org.ehcache.config.CacheConfiguration;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
+import org.ehcache.core.config.DefaultConfiguration;
+import org.ehcache.jsr107.EhcacheCachingProvider;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.CachingConfigurer;
+import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.ehcache.EhCacheCacheManager;
-import org.springframework.cache.interceptor.CacheErrorHandler;
-import org.springframework.cache.interceptor.CacheResolver;
-import org.springframework.cache.interceptor.KeyGenerator;
-import org.springframework.cache.interceptor.SimpleCacheErrorHandler;
-import org.springframework.cache.interceptor.SimpleCacheResolver;
-import org.springframework.cache.interceptor.SimpleKeyGenerator;
+import org.springframework.cache.jcache.JCacheCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableCaching
-public class EhCacheConfig implements CachingConfigurer {
-
-  @Bean(destroyMethod = "shutdown")
-  public net.sf.ehcache.CacheManager ehCacheManager() {
-
-    CacheConfiguration cacheConfiguration = new CacheConfiguration();
-    cacheConfiguration.setName("Realms");
-    cacheConfiguration.setMemoryStoreEvictionPolicy("LRU");
-    cacheConfiguration.setMaxEntriesLocalHeap(1000);
-
-    CacheConfiguration cacheConfiguration1 = new CacheConfiguration();
-    cacheConfiguration1.setName("Realm");
-    cacheConfiguration1.setMemoryStoreEvictionPolicy("LRU");
-    cacheConfiguration1.setMaxEntriesLocalHeap(1000);
-
-    net.sf.ehcache.config.Configuration config = new net.sf.ehcache.config.Configuration();
-
-    config.addCache(cacheConfiguration);
-    config.addCache(cacheConfiguration1);
-
-    return net.sf.ehcache.CacheManager.newInstance(config);
-  }
+public class EhCacheConfig extends CachingConfigurerSupport {
 
   @Bean
   @Override
   public CacheManager cacheManager() {
-    return new EhCacheCacheManager(ehCacheManager());
-  }
 
-  @Bean
-  @Override
-  public KeyGenerator keyGenerator() {
-    return new SimpleKeyGenerator();
-  }
+    org.ehcache.config.CacheConfiguration<Object, Object> cacheConfiguration =
+        CacheConfigurationBuilder.newCacheConfigurationBuilder(
+                Object.class, Object.class, ResourcePoolsBuilder.heap(1000))
+            .build();
+    Map<String, CacheConfiguration<?, ?>> caches = new HashMap<>();
+    caches.put("Realm", cacheConfiguration);
+    caches.put("Realms", cacheConfiguration);
 
-  @Bean
-  @Override
-  public CacheResolver cacheResolver() {
-    return new SimpleCacheResolver(cacheManager());
-  }
-
-  @Bean
-  @Override
-  public CacheErrorHandler errorHandler() {
-    return new SimpleCacheErrorHandler();
+    EhcacheCachingProvider provider = (EhcacheCachingProvider) Caching.getCachingProvider();
+    DefaultConfiguration configuration =
+        new DefaultConfiguration(caches, this.getClass().getClassLoader());
+    return new JCacheCacheManager(
+        provider.getCacheManager(provider.getDefaultURI(), configuration));
   }
 }

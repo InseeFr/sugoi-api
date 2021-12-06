@@ -43,6 +43,8 @@
 		<freemarker.version>2.3.31</freemarker.version>
 		<git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
 		<commons-io.version>2.11.0</commons-io.version>
+		<org.ehcache.version>3.9.7</org.ehcache.version>
+		<javax.cache.version>1.1.1</javax.cache.version>
 	</properties>
 
 	<dependencies></dependencies>
@@ -242,6 +244,18 @@
 				<artifactId>unboundid-ldapsdk</artifactId>
 				<version>${com.unboundid.version}</version>
 			</dependency>
+
+			<dependency>
+				<groupId>org.ehcache</groupId>
+				<artifactId>ehcache</artifactId>
+				<version>${org.ehcache.version}</version>
+			</dependency>
+
+    		<dependency>
+      			<groupId>javax.cache</groupId>
+      			<artifactId>cache-api</artifactId>
+      			<version>${javax.cache.version}</version>
+    		</dependency>
 
 			<dependency>
 				<groupId>org.fusesource.jansi</groupId>
