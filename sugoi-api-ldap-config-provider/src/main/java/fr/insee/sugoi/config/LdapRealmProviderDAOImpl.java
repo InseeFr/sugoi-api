@@ -16,7 +16,6 @@ package fr.insee.sugoi.config;
 import com.unboundid.ldap.sdk.AddRequest;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Filter;
-import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
 import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldap.sdk.ModifyRequest;
@@ -26,6 +25,7 @@ import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.configuration.UiMappingService;
+import fr.insee.sugoi.core.exceptions.LdapStoreConnectionFailedException;
 import fr.insee.sugoi.core.exceptions.RealmAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
@@ -33,6 +33,7 @@ import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.model.UiField;
 import fr.insee.sugoi.core.realm.RealmProvider;
+import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.LdapFilter;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
@@ -41,7 +42,9 @@ import fr.insee.sugoi.ldap.utils.mapper.UserStorageLdapMapper;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
@@ -60,6 +63,18 @@ import org.springframework.stereotype.Component;
     havingValue = "ldap",
     matchIfMissing = false)
 public class LdapRealmProviderDAOImpl implements RealmProvider {
+
+  @Value("${fr.insee.sugoi.ldap.default.username:}")
+  private String defaultUsername;
+
+  @Value("${fr.insee.sugoi.ldap.default.password:}")
+  private String defaultPassword;
+
+  @Value("${fr.insee.sugoi.ldap.default.pool:}")
+  private String defaultPoolSize;
+
+  @Value("${fr.insee.sugoi.ldap.default.use-authenticated-connection-for-reading:true}")
+  private boolean useAuthenticatedConnectionForReading;
 
   @Value("${fr.insee.sugoi.config.ldap.profils.url:}")
   private String url;
@@ -92,15 +107,17 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
 
   private static final Logger logger = LogManager.getLogger(LdapRealmProviderDAOImpl.class);
 
-  private static LDAPConnectionPool ldapConnectionPool;
+  private LDAPConnectionPool ldapConnectionPoolAuthenticated;
+
+  private LDAPConnectionPool ldapConnectionPool;
 
   @Override
   public Optional<Realm> load(String realmName) {
     logger.info("Loading configuration from ldap://{}:{}/{}", url, port, baseDn);
     try {
-      LDAPConnectionPool ldapConnection = initLdapPoolConnection();
       SearchResultEntry realmEntry =
-          ldapConnection.getEntry(realmEntryPattern.replace("{realm}", realmName) + "," + baseDn);
+          ldapPoolConnection()
+              .getEntry(realmEntryPattern.replace("{realm}", realmName) + "," + baseDn);
       if (realmEntry != null) {
         logger.debug("Found entry {}", realmEntry.getDN());
         Realm realm = RealmLdapMapper.mapFromSearchEntry(realmEntry);
@@ -111,7 +128,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
           realm.setWriterType(defaultWriter);
         }
         logger.debug("Parsing as realm {}", realm);
-        realm.setUserStorages(loadUserStorages(realmEntry, ldapConnection));
+        realm.setUserStorages(loadUserStorages(realmEntry));
         if (realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST) == null) {
           realm.addProperty(
               GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, defaultAppManagedAttributeKeyList);
@@ -146,11 +163,10 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   public List<Realm> findAll() {
     logger.info("Loading realms configurations from ldap://{}:{}/{}", url, port, baseDn);
     try {
-      LDAPConnectionPool ldapConnection = initLdapPoolConnection();
       SearchRequest searchRequest =
           new SearchRequest(
               baseDn, SearchScope.ONE, LdapFilter.create("(objectClass=*)"), "*", "+");
-      SearchResult searchResult = ldapConnection.search(searchRequest);
+      SearchResult searchResult = ldapPoolConnection().search(searchRequest);
       return searchResult.getSearchEntries().stream()
           .map(
               e -> {
@@ -173,7 +189,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
                       GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST,
                       defaultAppManagedAttributePatternList);
                 }
-                realm.setUserStorages(loadUserStorages(e, ldapConnection));
+                realm.setUserStorages(loadUserStorages(e));
                 realm
                     .getUiMapping()
                     .putIfAbsent(
@@ -204,15 +220,15 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
     }
   }
 
-  private List<UserStorage> loadUserStorages(
-      SearchResultEntry realmEntry, LDAPConnectionPool ldapConnection) {
+  private List<UserStorage> loadUserStorages(SearchResultEntry realmEntry) {
     try {
       String baseName = realmEntry.getAttribute("cn").getValue();
       SearchResult userStoragesResult =
-          ldapConnection.search(
-              "cn=" + baseName + "," + baseDn,
-              SearchScope.SUBORDINATE_SUBTREE,
-              Filter.create("objectClass=*"));
+          ldapPoolConnection()
+              .search(
+                  "cn=" + baseName + "," + baseDn,
+                  SearchScope.SUBORDINATE_SUBTREE,
+                  Filter.create("objectClass=*"));
       if (userStoragesResult.getEntryCount() > 0) {
         return userStoragesResult.getSearchEntries().stream()
             .map(
@@ -230,7 +246,6 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   public ProviderResponse createRealm(Realm realm, ProviderRequest providerRequest) {
     if (load(realm.getName()).isEmpty()) {
       try {
-        LDAPConnectionPool ldapConnectionPool = initLdapPoolConnection();
         AddRequest addRequest =
             new AddRequest(
                 getRealmDn(realm.getName()),
@@ -238,15 +253,15 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
         if (realm.getUserStorages().size() == 1) {
           UserStorageLdapMapper.mapToAttributes(realm.getUserStorages().get(0)).stream()
               .forEach(attribute -> addRequest.addAttribute(attribute));
-          ldapConnectionPool.add(addRequest);
+          ldapConnectionPoolAuthenticated().add(addRequest);
         } else {
-          ldapConnectionPool.add(addRequest);
+          ldapConnectionPoolAuthenticated().add(addRequest);
           for (UserStorage userStorage : realm.getUserStorages()) {
             AddRequest userStorageAddRequest =
                 new AddRequest(
                     String.format("cn=%s,%s", userStorage.getName(), getRealmDn(realm.getName())),
                     UserStorageLdapMapper.mapToAttributes(userStorage));
-            ldapConnectionPool.add(userStorageAddRequest);
+            ldapConnectionPoolAuthenticated().add(userStorageAddRequest);
           }
         }
         ProviderResponse response = new ProviderResponse();
@@ -264,7 +279,6 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   public ProviderResponse updateRealm(Realm realm, ProviderRequest providerRequest) {
     if (load(realm.getName()).isPresent()) {
       try {
-        LDAPConnectionPool ldapConnectionPool = initLdapPoolConnection();
         ModifyRequest modifyRequest;
         if (realm.getUserStorages().size() == 1) {
           List<Attribute> realmAttributes =
@@ -276,21 +290,21 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
               new ModifyRequest(
                   getRealmDn(realm.getName()),
                   LdapUtils.convertAttributesToModifications(realmAttributes));
-          ldapConnectionPool.modify(modifyRequest);
+          ldapConnectionPoolAuthenticated().modify(modifyRequest);
         } else {
           for (UserStorage userStorage : realm.getUserStorages()) {
             ModifyRequest userStorageModifyRequest =
                 new ModifyRequest(
                     getUserStorageDn(userStorage.getName(), realm.getName()),
                     UserStorageLdapMapper.createMods(userStorage));
-            ldapConnectionPool.modify(userStorageModifyRequest);
+            ldapConnectionPoolAuthenticated().modify(userStorageModifyRequest);
           }
           modifyRequest =
               new ModifyRequest(
                   getRealmDn(realm.getName()),
                   RealmLdapMapper.createMods(realm, realmEntryPattern, baseDn));
         }
-        ldapConnectionPool.modify(modifyRequest);
+        ldapConnectionPoolAuthenticated().modify(modifyRequest);
         ProviderResponse response = new ProviderResponse();
         response.setStatus(ProviderResponseStatus.OK);
         response.setEntityId(realm.getName());
@@ -306,19 +320,19 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   @Override
   public ProviderResponse deleteRealm(String realmName, ProviderRequest providerRequest) {
     try {
-      LDAPConnectionPool ldapConnectionPool = initLdapPoolConnection();
       List<UserStorage> userStorages =
           load(realmName)
               .orElseThrow(() -> new RealmNotFoundException(realmName))
               .getUserStorages();
       for (UserStorage userStorage : userStorages) {
-        if (ldapConnectionPool.getEntry(
-                getUserStorageDn(userStorage.getName(), realmName), "+", "*")
+        if (ldapConnectionPoolAuthenticated()
+                .getEntry(getUserStorageDn(userStorage.getName(), realmName), "+", "*")
             != null) {
-          ldapConnectionPool.delete(getUserStorageDn(userStorage.getName(), realmName));
+          ldapConnectionPoolAuthenticated()
+              .delete(getUserStorageDn(userStorage.getName(), realmName));
         }
       }
-      ldapConnectionPool.delete(getRealmDn(realmName));
+      ldapConnectionPoolAuthenticated().delete(getRealmDn(realmName));
       ProviderResponse response = new ProviderResponse();
       response.setStatus(ProviderResponseStatus.OK);
       response.setEntityId(realmName);
@@ -328,18 +342,41 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
     }
   }
 
-  private synchronized LDAPConnectionPool initLdapPoolConnection() {
+  private LDAPConnectionPool ldapPoolConnection() {
     try {
-      if (ldapConnectionPool == null
-          || !ldapConnectionPool.getConnectionPoolName().equals(url + "-" + port)) {
-        ldapConnectionPool = new LDAPConnectionPool(new LDAPConnection(url, port), 10);
-        ldapConnectionPool.setConnectionPoolName(url + "-" + port);
-        ldapConnectionPool.setCreateIfNecessary(true);
+      if (ldapConnectionPool == null) {
+        if (useAuthenticatedConnectionForReading) {
+          ldapConnectionPool = ldapConnectionPoolAuthenticated();
+        } else {
+          Map<String, String> config = new HashMap<>();
+          config.put(LdapConfigKeys.URL, url);
+          config.put(LdapConfigKeys.PORT, String.valueOf(port));
+          config.put(LdapConfigKeys.POOL_SIZE, defaultPoolSize);
+          ldapConnectionPool = LdapFactory.getConnectionPool(config);
+        }
       }
-
       return ldapConnectionPool;
     } catch (LDAPException e) {
-      throw new RuntimeException("Failed to init ldap connection", e);
+      throw new LdapStoreConnectionFailedException(
+          String.format("Failed connection to ldap realm store %s:%d", url, port), e);
+    }
+  }
+
+  private LDAPConnectionPool ldapConnectionPoolAuthenticated() {
+    try {
+      if (ldapConnectionPoolAuthenticated == null) {
+        Map<String, String> config = new HashMap<>();
+        config.put(LdapConfigKeys.URL, url);
+        config.put(LdapConfigKeys.PORT, String.valueOf(port));
+        config.put(LdapConfigKeys.POOL_SIZE, defaultPoolSize);
+        config.put(LdapConfigKeys.USERNAME, defaultUsername);
+        config.put(LdapConfigKeys.PASSWORD, defaultPassword);
+        ldapConnectionPool = LdapFactory.getConnectionPoolAuthenticated(config);
+      }
+      return ldapConnectionPool;
+    } catch (LDAPException e) {
+      throw new LdapStoreConnectionFailedException(
+          String.format("Failed authenticated connection to ldap realm store %s:%d", url, port), e);
     }
   }
 
