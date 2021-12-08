@@ -2,6 +2,7 @@
 
 - [Realm and userstorage configuration](#realm-and-userstorage-configuration)
   - [Realm configuration](#realm-configuration)
+    - [Ui mapping](#ui-mapping)
     - [Realm configuration properties](#realm-configuration-properties)
   - [UserStorage configuration](#userstorage-configuration)
     - [Generic UserStorage properties](#generic-userstorage-properties)
@@ -45,10 +46,32 @@ These configurations are used for all type of Store Provider.
 | url          |               "example.org", "localhost"               |                                                 no |                                                                                                                   | Url of the resource server.                                                                                            |
 | appSource    | "ou=Applications,o=insee,c=fr", "/realm1/applications" |                                                yes |                                                                                                                   | The location of the applications to read on the server. If appSource is not set then applications cannot be managed.   |
 | userStorages |                See UserStorage section                 | no, the realm should have at least one userstorage |                                                                                                                   | A list of all userstorages the realm is made of.                                                                       |
-| properties   |                    See next section                    |                                                yes |                                                                                                               {}  | A list of other options which can be specific to the type of Store Provider.                                           |
+| properties   |                    See [Properties section](#realm-configuration-properties)                    |                                                yes |                                                                                                               {}  | A list of other options which can be specific to the type of Store Provider.                                           |
 | readerType   |          "LdapReaderStore", "FileReaderStore"          |                                                 no |   the default can be set via the instance property : fr.insee.sugoi.store.readerType, if not set app cannot work  | Indicates wich type of store is used for reading. This attribute is read-only for now and should be set via default.   |
 | writeType    | "JMSWriterStore", "LdapWriterStore", "FileWriterStore" |                                                 no |  the default can be set via the instance property : fr.insee.sugoi.store.writerType?, if not set app cannot work  | Indicates wich type of store is used for writing. This attribute is read-only for now and should be set via default.   |
-| mappings     |                  see mappings section                  |                                                yes |                                                                                              see mappings section | Description of how to map Sugoi application and group attributes with ldap attributes when using a ldap store provider |
+| mappings     |                  See [mappings section](#realm-and-userstorage-mappings-with-a-ldap-store-provider)                  |                                                yes |                                                                                              see [mappings section](#realm-and-userstorage-mappings-with-a-ldap-store-provider) | Description of how to map Sugoi application and group attributes with ldap attributes when using a ldap store provider |
+| uiMapping | See [ui mapping section](#ui-mappings) | yes | | Declarative descriptions of fields constiuting a user and an organization |
+
+### UI Mappings
+
+UI mappings are the descriptions of what constitute a user and an organization in Sugoi. These mapping are used to provide metadatas to Sugoi users.
+
+Realm ui mappings is a map containing two list of ui mapping : a uiUserMapping list and a uiOrganizationMapping list.
+
+A UI mapping is defined as follow :
+
+name;helpTextTitle;helpText;path;type;modifiable;tag[;order;option:value...]
+
+with :
+
+- name : a short name for the field
+- helpTextTitle : the human readable name of the field
+- helpText : an extensive explanation of the field
+- path : an informative value indicating where the field comes from
+- type : string, list_string...
+- modifiable : true or false depending of the field modification status
+- tag : a tag defining a category for the field
+- order : an int to order the different fields
 
 ### Realm configuration properties
 
@@ -74,7 +97,7 @@ These configuration should be set for each UserStorage contained in a Realm :
 | properties                   |                                                                               |                         might be needed depending on the type of store (see next sections) |                                                                                      | A list of other options which can be specific to the type of Store Provider.                                                                            |
 | readerType                   |                     "LdapReaderStore", "FileReaderStore"                      |                                                                                         no |  the default can be set via the instance property : fr.insee.sugoi.store.readerType  | Indicates wich type of store is used for reading. This attribute is read-only for now and should be set via default.                                    |
 | writeType                    |            "JMSWriterStore", "LdapWriterStore", "FileWriterStore"             |                                                                                         no |  the default can be set via the instance property : fr.insee.sugoi.store.writerType  | Indicates wich type of store is used for writing. This attribute is read-only for now and should be set via default.                                    |
-| mappings                     |                             see mappings section                              |                                             should be set when using a ldap store provider |                                                                 see mappings section | Description of how to map Sugoi user and organization attributes with ldap attributes when using a ldap store provider                                  |
+| mappings                     |                             see [mappings section](#realm-and-userstorage-mappings-with-a-ldap-store-provider)                              |                                             should be set when using a ldap store provider |                                                                 see [mappings section](#realm-and-userstorage-mappings-with-a-ldap-store-provider) | Description of how to map Sugoi user and organization attributes with ldap attributes when using a ldap store provider                                  |
 | group_manager_source_pattern |                "uid=ASI\_$(app),ou=Applications,o=insee,c=fr"                 |                 should be set when wanted to have a kind of group of group manager for app |                                                                                      | Description of where to put user who can manage apps groups                                                                                             |
 
 ### Generic UserStorage properties

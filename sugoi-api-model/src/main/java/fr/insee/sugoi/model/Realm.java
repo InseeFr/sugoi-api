@@ -13,21 +13,41 @@
 */
 package fr.insee.sugoi.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+import fr.insee.sugoi.model.technics.UiField;
 import java.io.Serializable;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Realm implements Serializable {
+
   private String name;
   private String url;
   private String appSource;
   private List<UserStorage> userStorages;
   private Map<String, String> properties = new HashMap<>();
   private Map<String, Map<String, String>> mappings = new HashMap<>();
-  private Map<String, List<Object>> uiMapping = new HashMap<>();
+  private Map<UIMappingType, List<UiField>> uiMapping = new EnumMap<>(UIMappingType.class);
   private String readerType;
   private String writerType;
+
+  public enum UIMappingType {
+    UI_ORGANIZATION_MAPPING("uiOrganizationMapping"),
+    UI_USER_MAPPING("uiUserMapping");
+
+    private String type;
+
+    private UIMappingType(String type) {
+      this.type = type;
+    }
+
+    @JsonValue
+    public String getType() {
+      return type;
+    }
+  }
 
   public String getName() {
     return this.name;
@@ -110,11 +130,11 @@ public class Realm implements Serializable {
     return mappings;
   }
 
-  public Map<String, List<Object>> getUiMapping() {
+  public Map<UIMappingType, List<UiField>> getUiMapping() {
     return uiMapping;
   }
 
-  public void setUiMapping(Map<String, List<Object>> uiMapping) {
+  public void setUiMapping(Map<UIMappingType, List<UiField>> uiMapping) {
     this.uiMapping = uiMapping;
   }
 }

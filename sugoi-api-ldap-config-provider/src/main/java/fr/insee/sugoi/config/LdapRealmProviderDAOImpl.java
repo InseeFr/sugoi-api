@@ -31,7 +31,6 @@ import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
-import fr.insee.sugoi.core.model.UiField;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.LdapFilter;
@@ -40,6 +39,7 @@ import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.ldap.utils.mapper.RealmLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserStorageLdapMapper;
 import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.Realm.UIMappingType;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.Collections;
 import java.util.HashMap;
@@ -141,13 +141,12 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
         }
         realm
             .getUiMapping()
-            .putIfAbsent(
-                "uiUserMapping", (List<Object>) (Object) uiMappingService.getUserUiDefaultField());
+            .putIfAbsent(UIMappingType.UI_USER_MAPPING, uiMappingService.getUserUiDefaultField());
         realm
             .getUiMapping()
             .putIfAbsent(
-                "uiOrganizationMapping",
-                (List<Object>) (Object) uiMappingService.getOrganizationUiDefaultField());
+                UIMappingType.UI_ORGANIZATION_MAPPING,
+                uiMappingService.getOrganizationUiDefaultField());
         sortUiLists(realm);
         realm.getProperties().putIfAbsent(LdapConfigKeys.SORT_KEY, defaultSortKey);
         return Optional.of(realm);
@@ -193,13 +192,12 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
                 realm
                     .getUiMapping()
                     .putIfAbsent(
-                        "uiUserMapping",
-                        (List<Object>) (Object) uiMappingService.getUserUiDefaultField());
+                        UIMappingType.UI_USER_MAPPING, uiMappingService.getUserUiDefaultField());
                 realm
                     .getUiMapping()
                     .putIfAbsent(
-                        "uiOrganizationMapping",
-                        (List<Object>) (Object) uiMappingService.getOrganizationUiDefaultField());
+                        UIMappingType.UI_ORGANIZATION_MAPPING,
+                        uiMappingService.getOrganizationUiDefaultField());
                 sortUiLists(realm);
                 return realm;
               })
@@ -213,8 +211,8 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   private void sortUiLists(Realm realm) {
     try {
       // sort ui list of field by order
-      Collections.sort((List<UiField>) (Object) realm.getUiMapping().get("uiUserMapping"));
-      Collections.sort((List<UiField>) (Object) realm.getUiMapping().get("uiOrganizationMapping"));
+      Collections.sort(realm.getUiMapping().get(UIMappingType.UI_USER_MAPPING));
+      Collections.sort(realm.getUiMapping().get(UIMappingType.UI_ORGANIZATION_MAPPING));
     } catch (Exception e) {
       logger.debug("ui fields are not sorted");
     }

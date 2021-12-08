@@ -13,7 +13,7 @@
 */
 package fr.insee.sugoi.core.configuration;
 
-import fr.insee.sugoi.core.model.UiField;
+import fr.insee.sugoi.model.technics.UiField;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,6 +81,36 @@ public class UiMappingService {
     return organizationUiFields;
   }
 
+  /**
+   * Convert a string of form :
+   *
+   * <p>name;helpTextTitle;helpText;path;type;modifiable;tag[;order;option:value...]
+   *
+   * <p>to the adequate UiField
+   *
+   * <p>with :
+   *
+   * <p>- name : a short name for the field
+   *
+   * <p>- helpTextTitle : the human readable name of the field
+   *
+   * <p>- helpText : an extensive explanation of the field
+   *
+   * <p>- path : an informative value indicating where the field comes from
+   *
+   * <p>- type : string, list_string...
+   *
+   * <p>- modifiable : true or false depending of the field modification status
+   *
+   * <p>- tag : a tag defining a category for the field
+   *
+   * <p>- order : an int to order the different fields
+   *
+   * <p>The next parameters constitute a map of option/value
+   *
+   * @param entry a string with appropriate format
+   * @return the converted UiField, null if format is invalid
+   */
   public UiField convertStringToUIField(String entry) {
     try {
       String[] fieldProperties = entry.split(";", 9);
@@ -97,7 +127,7 @@ public class UiMappingService {
       }
       if (fieldProperties.length >= 9 && !fieldProperties[8].isEmpty()) {
         String[] optionsProperties = fieldProperties[8].split(";");
-        Map<String, Object> options = new HashMap<>();
+        Map<String, String> options = new HashMap<>();
         for (String optionProperty : optionsProperties) {
           options.put(optionProperty.split("=")[0], optionProperty.split("=")[1]);
         }
