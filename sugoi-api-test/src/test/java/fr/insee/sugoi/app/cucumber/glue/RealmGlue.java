@@ -17,6 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.app.cucumber.utils.StepData;
 import fr.insee.sugoi.model.Realm;
@@ -30,6 +31,8 @@ import java.util.List;
 public class RealmGlue {
 
   private Scenario scenario;
+
+  private ObjectMapper mapper = new ObjectMapper();
 
   @Before
   public void before(Scenario scenario) {
@@ -45,7 +48,6 @@ public class RealmGlue {
   @Then("the client expect to have realms access")
   public void haveRealmAccess() {
     Boolean haveRealmAccess = false;
-    ObjectMapper mapper = new ObjectMapper();
     try {
       List<Realm> realms =
           Arrays.asList(mapper.readValue(stepData.getLatestResponse().getBody(), Realm[].class));
@@ -57,5 +59,12 @@ public class RealmGlue {
       e.printStackTrace();
     }
     assertThat(haveRealmAccess, is(true));
+  }
+
+  @Then("the client expect description to be {}")
+  public void expect_description_of_realm_to_be(String description)
+      throws JsonMappingException, JsonProcessingException {
+    Realm realm = mapper.readValue(stepData.getLatestResponse().getBody(), Realm.class);
+    assertThat(realm.getProperties().get("description"), is(description));
   }
 }
