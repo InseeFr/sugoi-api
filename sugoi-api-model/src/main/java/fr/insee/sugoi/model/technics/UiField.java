@@ -11,17 +11,16 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.core.model;
+package fr.insee.sugoi.model.technics;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UiField implements Serializable, Comparable {
-  // userUiMapping$name;helpTextTitle;helpText;path;type;modifiable;tag;order;options1:value,options2:value;
+public class UiField implements Serializable, Comparable<UiField> {
 
   private String name;
-  private String HelpTextTitle;
+  private String helpTextTitle;
   private String helpText;
   private String path;
   private String type;
@@ -29,18 +28,11 @@ public class UiField implements Serializable, Comparable {
   private String tag;
   private int order;
 
-  private Map<String, Object> options = new HashMap<>();
-
-  public UiField() {}
+  private Map<String, String> options = new HashMap<>();
 
   @Override
-  public int compareTo(Object o) {
-    if (o instanceof UiField) {
-      UiField oUiField = (UiField) o;
-      return Integer.compare(this.getOrder(), oUiField.getOrder());
-    } else {
-      return 0;
-    }
+  public int compareTo(UiField uiField) {
+    return Integer.compare(this.getOrder(), uiField.getOrder());
   }
 
   public String getName() {
@@ -52,11 +44,11 @@ public class UiField implements Serializable, Comparable {
   }
 
   public String getHelpTextTitle() {
-    return this.HelpTextTitle;
+    return this.helpTextTitle;
   }
 
-  public void setHelpTextTitle(String HelpTextTitle) {
-    this.HelpTextTitle = HelpTextTitle;
+  public void setHelpTextTitle(String helpTextTitle) {
+    this.helpTextTitle = helpTextTitle;
   }
 
   public String getHelpText() {
@@ -99,11 +91,11 @@ public class UiField implements Serializable, Comparable {
     this.tag = tag;
   }
 
-  public Map<String, Object> getOptions() {
+  public Map<String, String> getOptions() {
     return options;
   }
 
-  public void setOptions(Map<String, Object> options) {
+  public void setOptions(Map<String, String> options) {
     this.options = options;
   }
 

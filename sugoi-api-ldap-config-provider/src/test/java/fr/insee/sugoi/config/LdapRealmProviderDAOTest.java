@@ -19,6 +19,8 @@ import static org.hamcrest.Matchers.is;
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.configuration.UiMappingService;
 import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.Realm.UIMappingType;
+import fr.insee.sugoi.model.technics.UiField;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,5 +147,22 @@ public class LdapRealmProviderDAOTest {
         "Should have organizationMapping",
         realm.getUserStorages().get(0).getMappings().get("organizationMapping").get("address"),
         is("inseeAdressePostaleDN,address,rw"));
+  }
+
+  @Test
+  public void uiMappingShouldBeOrdered() {
+    List<UiField> uiUserMapping =
+        ldapRealmProviderDAOImpl
+            .load("domaine1")
+            .get()
+            .getUiMapping()
+            .get(UIMappingType.UI_USER_MAPPING);
+    assertThat("Should be 25 found uiUserMapping", 25, is(uiUserMapping.size()));
+    assertThat("First one should be the id", "Identifiant", is(uiUserMapping.get(0).getName()));
+    assertThat(
+        "Second one should be the password last modification date",
+        "PasswordLastChange",
+        is(uiUserMapping.get(1).getName()));
+    assertThat("Third one should be the realm field", "Realm", is(uiUserMapping.get(2).getName()));
   }
 }

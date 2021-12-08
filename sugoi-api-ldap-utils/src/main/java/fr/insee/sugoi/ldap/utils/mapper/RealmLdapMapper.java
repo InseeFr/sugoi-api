@@ -21,6 +21,7 @@ import fr.insee.sugoi.core.configuration.UiMappingService;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.Realm.UIMappingType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,15 +73,16 @@ public class RealmLdapMapper {
           String attributeName = attributeSplits[0];
           String attributeMappingValues = attributeSplits[1];
           realm.getMappings().get(property[0]).put(attributeName, attributeMappingValues);
-        } else if (property[0].equalsIgnoreCase("uiUserMapping")
-            || property[0].equalsIgnoreCase("uiOrganizationMapping")) {
+        } else if (property[0].equalsIgnoreCase("uiOrganizationMapping")) {
 
-          if (!realm.getUiMapping().containsKey(property[0])) {
-            realm.getUiMapping().put(property[0], new ArrayList<>());
-          }
           realm
               .getUiMapping()
-              .get(property[0])
+              .computeIfAbsent(UIMappingType.UI_ORGANIZATION_MAPPING, l -> new ArrayList<>())
+              .add(uiMappingService.convertStringToUIField(property[1]));
+        } else if (property[0].equalsIgnoreCase("uiUserMapping")) {
+          realm
+              .getUiMapping()
+              .computeIfAbsent(UIMappingType.UI_USER_MAPPING, l -> new ArrayList<>())
               .add(uiMappingService.convertStringToUIField(property[1]));
         }
       }
