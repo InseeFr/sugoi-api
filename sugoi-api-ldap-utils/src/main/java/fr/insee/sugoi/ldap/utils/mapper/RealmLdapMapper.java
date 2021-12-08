@@ -98,6 +98,11 @@ public class RealmLdapMapper {
     if (realm.getUrl() != null) {
       attributes.add(new Attribute("inseepropriete", String.format("ldapUrl$%s", realm.getUrl())));
     }
+    if (realm.getProperties().containsKey(GlobalKeysConfig.REALM_DESCRIPTION)) {
+      attributes.add(
+          new Attribute(
+              "description", realm.getProperties().get(GlobalKeysConfig.REALM_DESCRIPTION)));
+    }
     if (realm.getAppSource() != null) {
       attributes.add(
           new Attribute(
