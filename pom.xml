@@ -44,6 +44,7 @@
 		<git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
 		<commons-io.version>2.11.0</commons-io.version>
 		<log4j2.version>2.15.0</log4j2.version>
+		<net.sf.ehcache.version>2.10.9.2</net.sf.ehcache.version>
 	</properties>
 
 	<dependencies></dependencies>
@@ -342,6 +343,12 @@
 				<artifactId>commons-io</artifactId>
 				<version>{commons-io.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>net.sf.ehcache</groupId>
+				<artifactId>ehcache</artifactId>
+				<version>${net.sf.ehcache.version}</version>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 

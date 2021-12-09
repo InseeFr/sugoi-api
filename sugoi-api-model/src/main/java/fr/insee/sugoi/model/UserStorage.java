@@ -16,14 +16,15 @@ package fr.insee.sugoi.model;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
 
 public class UserStorage implements Serializable {
   private String name;
   private String userSource;
   private String organizationSource;
   private String addressSource;
-  private Map<String, String> properties = new HashMap<>();
-  private Map<String, Map<String, String>> mappings = new HashMap<>();
+  @IgnoreSizeOf private Map<String, String> properties = new HashMap<>();
+  @IgnoreSizeOf private Map<String, Map<String, String>> mappings = new HashMap<>();
 
   public String getName() {
     return this.name;
