@@ -20,6 +20,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
 
 public class Realm implements Serializable {
 
@@ -27,9 +28,12 @@ public class Realm implements Serializable {
   private String url;
   private String appSource;
   private List<UserStorage> userStorages;
-  private Map<String, String> properties = new HashMap<>();
-  private Map<String, Map<String, String>> mappings = new HashMap<>();
+  @IgnoreSizeOf private Map<String, String> properties = new HashMap<>();
+  @IgnoreSizeOf private Map<String, Map<String, String>> mappings = new HashMap<>();
+
+  @IgnoreSizeOf
   private Map<UIMappingType, List<UiField>> uiMapping = new EnumMap<>(UIMappingType.class);
+
   private String readerType;
   private String writerType;
 
