@@ -50,7 +50,9 @@ public class CredentialsServiceImpl implements CredentialsService {
       String realm,
       String userStorage,
       String userId,
-      PasswordChangeRequest pcr,
+      Map<String, String> templateProperties,
+      String webserviceTag,
+      boolean changePasswordResetStatus,
       ProviderRequest providerRequest) {
     try {
       User user = userService.findById(realm, userStorage, userId);
@@ -82,14 +84,23 @@ public class CredentialsServiceImpl implements CredentialsService {
       ProviderResponse response =
           storeProvider
               .getWriterStore(realm, userStorage)
-              .reinitPassword(userId, password, pcr, providerRequest);
+              .reinitPassword(
+                  userId,
+                  password,
+                  changePasswordResetStatus,
+                  templateProperties,
+                  webserviceTag,
+                  providerRequest);
       sugoiEventPublisher.publishCustomEvent(
           realm,
           userStorage,
           SugoiEventTypeEnum.RESET_PASSWORD,
           Map.ofEntries(
-              Map.entry(EventKeysConfig.PASSWORD_CHANGE_REQUEST, pcr),
+              Map.entry(EventKeysConfig.PROPERTIES, templateProperties),
+              Map.entry(
+                  EventKeysConfig.MAIL, computeReceiverMail(templateProperties, user.getMail())),
               Map.entry(EventKeysConfig.USER, user),
+              Map.entry(EventKeysConfig.WEBSERVICE_TAG, webserviceTag != null ? webserviceTag : ""),
               Map.entry(EventKeysConfig.PASSWORD, password)));
       return response;
     } catch (Exception e) {
@@ -98,7 +109,6 @@ public class CredentialsServiceImpl implements CredentialsService {
           userStorage,
           SugoiEventTypeEnum.RESET_PASSWORD_ERROR,
           Map.ofEntries(
-              Map.entry(EventKeysConfig.PASSWORD_CHANGE_REQUEST, pcr),
               Map.entry(EventKeysConfig.USER_ID, userId),
               Map.entry(EventKeysConfig.ERROR, e.toString())));
       throw e;
@@ -220,6 +230,43 @@ public class CredentialsServiceImpl implements CredentialsService {
     }
   }
 
+  @Override
+  public boolean sendLogin(
+      String realm,
+      String userStorage,
+      String id,
+      Map<String, String> templateProperties,
+      String webhookTag) {
+    try {
+      User user = userService.findById(realm, userStorage, id);
+      sugoiEventPublisher.publishCustomEvent(
+          realm,
+          userStorage,
+          SugoiEventTypeEnum.SEND_LOGIN,
+          Map.ofEntries(
+              Map.entry(
+                  EventKeysConfig.MAIL, computeReceiverMail(templateProperties, user.getMail())),
+              Map.entry(EventKeysConfig.WEBSERVICE_TAG, webhookTag != null ? webhookTag : ""),
+              Map.entry(EventKeysConfig.USER, user),
+              Map.entry(EventKeysConfig.PROPERTIES, templateProperties)));
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  private String computeReceiverMail(Map<String, String> templateProperties, String userMail) {
+    if (templateProperties.containsKey("mail")
+        && templateProperties.get("mail") != null
+        && !templateProperties.get("mail").isBlank()) {
+      return templateProperties.get("mail");
+    } else if (userMail != null) {
+      return userMail;
+    } else {
+      return "";
+    }
+  }
+
   private Boolean validatePassword(String password, Map<String, String> realmProperties) {
     return passwordService.validatePassword(
         password,
@@ -243,23 +290,5 @@ public class CredentialsServiceImpl implements CredentialsService {
             ? Integer.parseInt(
                 realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_MIN_SIZE))
             : null);
-  }
-
-  @Override
-  public boolean sendLogin(
-      String realm, String userStorage, String id, Map<String, String> properties) {
-    try {
-      User user = userService.findById(realm, userStorage, id);
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          userStorage,
-          SugoiEventTypeEnum.SEND_LOGIN,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.USER, user),
-              Map.entry(EventKeysConfig.PROPERTIES, properties)));
-      return true;
-    } catch (Exception e) {
-      return false;
-    }
   }
 }

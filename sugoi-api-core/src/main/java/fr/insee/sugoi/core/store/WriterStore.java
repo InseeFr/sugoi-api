@@ -21,6 +21,7 @@ import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.User;
+import java.util.Map;
 
 /** Writer stores are responsible for all operations modifying the underlying store. */
 public interface WriterStore {
@@ -185,13 +186,16 @@ public interface WriterStore {
    *
    * @param user
    * @param generatedPassword password to set to the user, cannot be null
-   * @param pcr not used
-   * @param sendModes not used
+   * @param changePasswordResetStatus
+   * @param templateProperties properties that are injected in template for use of webhook
+   * @param webhookTag define the webhook that will be call
    */
   ProviderResponse reinitPassword(
       String userId,
       String generatedPassword,
-      PasswordChangeRequest pcr,
+      boolean changePasswordResetStatus,
+      Map<String, String> templateProperties,
+      String webhookTag,
       ProviderRequest providerRequest);
 
   /**

@@ -27,7 +27,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -110,11 +112,22 @@ public class ContactPasswordDomaineController {
       Authentication authentication) {
     RealmStorage realmUserStorage = converterDomainRealm.getRealmForDomain(domaine);
 
+    Map<String, String> templateProperties =
+        pcr.getInfoFormattageEnvoi() != null
+            ? ouganextSugoiMapper.serializeOuganextToMap(pcr.getInfoFormattageEnvoi())
+            : new HashMap<>();
+
+    if (pcr.getAdresseMessagerie() != null) {
+      templateProperties.put("mail", pcr.getAdresseMessagerie());
+    }
+
     credentialsService.reinitPassword(
         realmUserStorage.getRealm(),
         realmUserStorage.getUserStorage(),
         identifiant,
-        ouganextSugoiMapper.serializeToSugoi(pcr, fr.insee.sugoi.model.PasswordChangeRequest.class),
+        templateProperties,
+        modeEnvoisString != null && modeEnvoisString.size() > 0 ? modeEnvoisString.get(0) : "MAIL",
+        true,
         new ProviderRequest(
             new SugoiUser(
                 authentication.getName(),

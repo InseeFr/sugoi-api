@@ -76,7 +76,11 @@ Feature: Credential scenario
         Given the client authentified with username appli_sugoi and password sugoi
         When the client perform POST request with body on url /realms/domaine1/users/test_password/reinitPassword body:
             """
-            {}
+            {
+                "templateProperties": {
+                    "application": "myapp"
+                }
+            }
             """
         And show body received
         Then the client receives status code 204

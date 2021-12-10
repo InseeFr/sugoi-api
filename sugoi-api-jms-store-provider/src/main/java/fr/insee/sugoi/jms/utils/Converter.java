@@ -159,6 +159,11 @@ public class Converter {
     return null;
   }
 
+  public Map<String, String> toMapStringString(Object object) {
+    LinkedHashMap<String, String> linkedHashMap = (LinkedHashMap) object;
+    return (Map<String, String>) linkedHashMap;
+  }
+
   public byte[] convertToBytes(Object object) throws IOException {
     try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream out = new ObjectOutputStream(bos)) {

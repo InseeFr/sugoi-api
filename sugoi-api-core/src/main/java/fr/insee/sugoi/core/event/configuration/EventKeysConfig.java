@@ -65,4 +65,5 @@ public class EventKeysConfig extends GlobalKeysConfig {
 
   public static final String NEW_PASSWORD = "new-password";
   public static final String OLD_PASSWORD = "old-password";
+  public static final String WEBSERVICE_TAG = "webserviceTag";
 }

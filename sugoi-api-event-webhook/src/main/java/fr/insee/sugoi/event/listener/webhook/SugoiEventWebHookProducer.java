@@ -13,11 +13,11 @@
 */
 package fr.insee.sugoi.event.listener.webhook;
 
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEvent;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.event.listener.webhook.service.WebHookService;
-import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.User;
 import java.util.HashMap;
 import java.util.List;
@@ -47,57 +47,49 @@ public class SugoiEventWebHookProducer {
   @EventListener
   public void handleContextStart(SugoiEvent cse) {
     SugoiEventTypeEnum eventType = cse.getEventType();
+    String webHookTag = (String) cse.getProperties().get(EventKeysConfig.WEBSERVICE_TAG);
+    Map<String, Object> values = getValuesForTemplateFromEvent(cse);
     switch (eventType) {
       case RESET_PASSWORD:
-        User user = (User) cse.getProperties().get(EventKeysConfig.USER);
-        String password = (String) cse.getProperties().get(EventKeysConfig.PASSWORD);
-        PasswordChangeRequest pcr =
-            (PasswordChangeRequest)
-                cse.getProperties().get(EventKeysConfig.PASSWORD_CHANGE_REQUEST);
-        String realm = cse.getRealm();
-        String userStorage = cse.getUserStorage() != null ? cse.getUserStorage() : "default";
-        String webHookTag =
-            pcr.getProperties().get("tag") != null ? pcr.getProperties().get("tag") : "MAIL";
-        Map<String, Object> values = new HashMap<>();
-        values.put(EventKeysConfig.REALM, realm);
-        values.put(EventKeysConfig.USERSTORAGE, userStorage);
-        values.put(EventKeysConfig.USER, user);
-        values.put(EventKeysConfig.MAIL, pcr.getEmail() != null ? pcr.getEmail() : user.getMail());
-        values.put(EventKeysConfig.PASSWORD, password);
-        values.put(
-            EventKeysConfig.PROPERTIES,
-            pcr.getProperties() != null ? pcr.getProperties() : new HashMap<String, String>());
         webHookNames.stream()
             .filter(
                 webHookName ->
-                    (((String) env.getProperty("sugoi.api.event.webhook." + webHookName + ".tag"))
+                    ((env.getProperty("sugoi.api.event.webhook." + webHookName + ".tag"))
                         .equalsIgnoreCase(webHookTag)))
             .forEach(webHookName -> webHookService.resetPassword(webHookName, values));
         break;
       case SEND_LOGIN:
-        user = (User) cse.getProperties().get(EventKeysConfig.USER);
-        Map<String, String> properties =
-            (Map<String, String>) cse.getProperties().get(EventKeysConfig.PROPERTIES);
-        realm = cse.getRealm();
-        userStorage = cse.getUserStorage() != null ? cse.getUserStorage() : "default";
-        webHookTag = properties.get("tag") != null ? properties.get("tag") : "MAIL";
-        values = new HashMap<>();
-        values.put(EventKeysConfig.REALM, realm);
-        values.put(EventKeysConfig.USERSTORAGE, userStorage);
-        values.put(EventKeysConfig.USER_ID, user.getUsername());
-        values.put(
-            EventKeysConfig.MAIL,
-            properties.get("mail") != null ? properties.get("mail") : user.getMail());
-        values.put(EventKeysConfig.PROPERTIES, properties);
         webHookNames.stream()
             .filter(
                 webHookName ->
-                    (((String) env.getProperty("sugoi.api.event.webhook." + webHookName + ".tag"))
+                    ((env.getProperty("sugoi.api.event.webhook." + webHookName + ".tag"))
                         .equalsIgnoreCase(webHookTag)))
             .forEach(webHookName -> webHookService.sendLogin(webHookName, values));
         break;
       default:
         break;
     }
+  }
+
+  private Map<String, Object> getValuesForTemplateFromEvent(SugoiEvent event) {
+    Map<String, Object> values = new HashMap<>();
+
+    User user = (User) event.getProperties().get(EventKeysConfig.USER);
+    String password = (String) event.getProperties().get(EventKeysConfig.PASSWORD);
+    String realm = event.getRealm();
+    String userStorage = event.getUserStorage() != null ? event.getUserStorage() : "default";
+
+    values.put(GlobalKeysConfig.REALM, realm);
+    values.put(GlobalKeysConfig.USERSTORAGE, userStorage);
+    values.put(EventKeysConfig.USER, user);
+    values.put(EventKeysConfig.MAIL, event.getProperties().get(EventKeysConfig.MAIL));
+    values.put(EventKeysConfig.PASSWORD, password);
+    values.put(EventKeysConfig.USER_ID, user.getUsername());
+    values.put(EventKeysConfig.PROPERTIES, event.getProperties().get(EventKeysConfig.PROPERTIES));
+    return values;
+  }
+
+  private String getTagWithDefaultMail(String maybeNullTag) {
+    return maybeNullTag != null && !maybeNullTag.isBlank() ? maybeNullTag : "MAIL";
   }
 }
