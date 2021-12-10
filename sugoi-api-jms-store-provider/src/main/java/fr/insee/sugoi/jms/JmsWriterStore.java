@@ -179,16 +179,22 @@ public class JmsWriterStore implements WriterStore {
 
   @Override
   public ProviderResponse reinitPassword(
-      String userId, String password, PasswordChangeRequest pcr, ProviderRequest providerRequest) {
+      String userId,
+      String password,
+      boolean changePasswordResetStatus,
+      Map<String, String> templateProperties,
+      String webhookTag,
+      ProviderRequest providerRequest) {
     // Use init password to avoid a second generation of a random generation
-    pcr.setNewPassword(password);
     Map<String, Object> params = new HashMap<>();
     params.put(JmsAtttributes.USER_ID, userId);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
     params.put(JmsAtttributes.PASSWORD, password);
-    params.put(JmsAtttributes.PASSWORD_CHANGE_REQUEST, pcr);
-    return checkAndSend(Method.INIT_PASSWORD, params, userId, providerRequest);
+    params.put(JmsAtttributes.SHOULD_RESET_PASSWORD, changePasswordResetStatus);
+    params.put(JmsAtttributes.TEMPLATE_PROPERTIES, templateProperties);
+    params.put(JmsAtttributes.WEBHOOK_TAG, webhookTag);
+    return checkAndSend(Method.REINIT_PASSWORD, params, userId, providerRequest);
   }
 
   @Override

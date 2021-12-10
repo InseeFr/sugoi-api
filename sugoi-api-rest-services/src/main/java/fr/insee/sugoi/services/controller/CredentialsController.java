@@ -23,6 +23,7 @@ import fr.insee.sugoi.model.PasswordChangeRequest;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.services.Utils;
 import fr.insee.sugoi.services.view.PasswordView;
+import fr.insee.sugoi.services.view.TemplatePropertiesView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -45,6 +46,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -60,7 +62,10 @@ public class CredentialsController {
   @Autowired private UserService userService;
 
   @PostMapping(path = {"/realms/{realm}/storages/{storage}/users/{id}/reinitPassword"})
-  @Operation(summary = "Reinitialize the password of the user")
+  @Operation(
+      summary =
+          "Reinitialize the user password with a new random password. A webhook can be called at the same time. "
+              + "To complete the webhook body template, fill the templateProperties body.")
   @ApiResponses(
       value = {
         @ApiResponse(
@@ -74,8 +79,7 @@ public class CredentialsController {
       })
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
   public ResponseEntity<ProviderResponse> reinitPassword(
-      @Parameter(description = "Password change request&", required = true) @RequestBody
-          PasswordChangeRequest pcr,
+      @RequestBody(required = false) TemplatePropertiesView templatePropertiesView,
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -88,6 +92,14 @@ public class CredentialsController {
           String userStorage,
       @Parameter(description = "User's id to change password", required = true) @PathVariable("id")
           String id,
+      @Parameter(
+              description =
+                  "Tag to define which webhook to call. If not provided, the MAIL service will be used.")
+          @RequestParam(name = "webhook-tag", required = false)
+          String webserviceTag,
+      @Parameter(description = "")
+          @RequestParam(name = "change-password-reset-status", defaultValue = "false")
+          boolean changePasswordResetStatus,
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
@@ -104,7 +116,11 @@ public class CredentialsController {
             realm,
             userStorage,
             id,
-            pcr,
+            templatePropertiesView != null && templatePropertiesView.getTemplateProperties() != null
+                ? templatePropertiesView.getTemplateProperties()
+                : Map.of(),
+            webserviceTag,
+            changePasswordResetStatus,
             new ProviderRequest(
                 new SugoiUser(
                     authentication.getName(),
@@ -122,7 +138,10 @@ public class CredentialsController {
   }
 
   @PostMapping(path = {"/realms/{realm}/users/{id}/reinitPassword"})
-  @Operation(summary = "Reinitialize the password of the user")
+  @Operation(
+      summary =
+          "Reinitialize the user password with a new random password. A webhook can be called at the same time. "
+              + "To complete the webhook body template, fill the templateProperties body.")
   @ApiResponses(
       value = {
         @ApiResponse(
@@ -136,8 +155,7 @@ public class CredentialsController {
       })
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
   public ResponseEntity<ProviderResponse> reinitPassword(
-      @Parameter(description = "Password change request&", required = true) @RequestBody
-          PasswordChangeRequest pcr,
+      @RequestBody(required = false) TemplatePropertiesView templatePropertiesView,
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -145,6 +163,14 @@ public class CredentialsController {
           String realm,
       @Parameter(description = "User's id to change password", required = true) @PathVariable("id")
           String id,
+      @Parameter(
+              description =
+                  "Tag to define which webservice to call. If not provided, the MAIL service will be used.")
+          @RequestParam(name = "webhook-tag", required = false)
+          String webserviceTag,
+      @Parameter(description = "")
+          @RequestParam(name = "change-password-reset-status", defaultValue = "false")
+          boolean changePasswordResetStatus,
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
@@ -158,10 +184,12 @@ public class CredentialsController {
 
     User user = userService.findById(realm, null, id);
     return reinitPassword(
-        pcr,
+        templatePropertiesView,
         realm,
         (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
         id,
+        webserviceTag,
+        changePasswordResetStatus,
         isAsynchronous,
         isUrgent,
         transactionId,
@@ -462,41 +490,56 @@ public class CredentialsController {
 
   @PostMapping(value = "/realms/{realm}/users/{id}/send-login")
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
-  @Operation(summary = "Send login to user")
+  @Operation(summary = "Call an external webservice with the predefined template send-login")
   public ResponseEntity<Void> sendLogin(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
           @PathVariable("realm")
           String realm,
-      @Parameter(description = "User's id to validate password", required = true)
-          @PathVariable("id")
+      @Parameter(description = "User whose login will be send", required = true) @PathVariable("id")
           String id,
-      @RequestBody Map<String, String> properties) {
+      @RequestParam(name = "webhook-tag", required = false) String webserviceTag,
+      @RequestBody(required = false) TemplatePropertiesView templatePropertiesView) {
     User user = userService.findById(realm, null, id);
     return sendLogin(
-        realm, id, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), properties);
+        realm,
+        id,
+        (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
+        webserviceTag,
+        templatePropertiesView);
   }
 
   @PostMapping(value = "/realms/{realm}/storages/{storage}/users/{id}/send-login")
   @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
-  @Operation(summary = "Send login to user")
+  @Operation(summary = "Call an external webservice with the predifined template send-login")
   public ResponseEntity<Void> sendLogin(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
           @PathVariable("realm")
           String realm,
-      @Parameter(description = "User's id to validate password", required = true)
-          @PathVariable("id")
+      @Parameter(description = "User whose login will be send", required = true) @PathVariable("id")
           String id,
       @Parameter(
               description = "Name of the userStorage where the operation will be made",
               required = false)
-          @PathVariable(value = "storage", required = false)
+          @PathVariable(value = "storage")
           String userStorage,
-      @RequestBody Map<String, String> properties) {
-    credentialsService.sendLogin(realm, userStorage, id, properties);
+      @Parameter(
+              description =
+                  "Tag to define which webhook to call. If not provided, the MAIL service will be used.")
+          @RequestParam(name = "webhook-tag", required = false)
+          String webserviceTag,
+      @RequestBody(required = false) TemplatePropertiesView templatePropertiesView) {
+    credentialsService.sendLogin(
+        realm,
+        userStorage,
+        id,
+        templatePropertiesView != null && templatePropertiesView.getTemplateProperties() != null
+            ? templatePropertiesView.getTemplateProperties()
+            : Map.of(),
+        webserviceTag);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 }

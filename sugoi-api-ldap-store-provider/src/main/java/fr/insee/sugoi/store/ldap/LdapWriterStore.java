@@ -25,7 +25,6 @@ import com.unboundid.ldap.sdk.ModifyRequest;
 import com.unboundid.ldap.sdk.ResultCode;
 import com.unboundid.ldap.sdk.extensions.PasswordModifyExtendedRequest;
 import com.unboundid.util.SubtreeDeleter;
-import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.exceptions.AppManagedAttributeException;
 import fr.insee.sugoi.core.exceptions.ApplicationAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
@@ -446,7 +445,9 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   public ProviderResponse reinitPassword(
       String userId,
       String generatedPassword,
-      PasswordChangeRequest pcr,
+      boolean changePasswordResetStatus,
+      Map<String, String> templateProperties,
+      String webhookTag,
       ProviderRequest providerRequest) {
 
     Modification mod =
@@ -459,13 +460,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     try {
       ldapPoolConnection.modify(
           "uid=" + user.getUsername() + "," + config.get(LdapConfigKeys.USER_SOURCE), mod);
-      changePasswordResetStatus(
-          userId,
-          (pcr.getProperties() != null
-                  && pcr.getProperties().get(EventKeysConfig.MUST_CHANGE_PASSWORD) != null)
-              ? Boolean.parseBoolean(pcr.getProperties().get(EventKeysConfig.MUST_CHANGE_PASSWORD))
-              : false,
-          providerRequest);
+      changePasswordResetStatus(userId, changePasswordResetStatus);
       ProviderResponse response = new ProviderResponse();
       response.setStatus(ProviderResponseStatus.OK);
       response.setEntityId(user.getUsername());
@@ -527,8 +522,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     return response;
   }
 
-  private ProviderResponse changePasswordResetStatus(
-      String userId, boolean isReset, ProviderRequest providerRequest) {
+  private ProviderResponse changePasswordResetStatus(String userId, boolean isReset) {
     Modification mod =
         new Modification(
             ModificationType.REPLACE, "pwdReset", Boolean.toString(isReset).toUpperCase());

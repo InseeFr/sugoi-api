@@ -24,6 +24,7 @@
     - [SeeAlso http+json](#seealso-httpjson)
     - [SeeAlso ldap](#seealso-ldap)
   - [Notify external webservices](#notify-external-webservices)
+    - [Reserved keywords](#reserved-keywords)
 
 ## Use cases
 
@@ -213,3 +214,10 @@ See [Webhook configuration](configuration.md#webhooks-configuration) to define t
 Several webservices can be configured. The webservice is chosen by the user by specifying a TAG in their request. If no tag is specified the webservice configured for the tag MAIL will be used by default.
 
 A possible usecase of these notifications is to call a webservice that send email when a password is changed.
+
+### Reserved keywords
+
+Reserved keywords are template keywords that the user won't be able to set or that will have a default value if not set. Those are :
+
+- **mail** : can be set as a template property but if not, the mail of the user on which the request is made will be taken as default.
+- **userId** : is the name of the user on which the request is done, cannot be changed
