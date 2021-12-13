@@ -43,6 +43,7 @@
 		<freemarker.version>2.3.31</freemarker.version>
 		<git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
 		<commons-io.version>2.11.0</commons-io.version>
+		<log4j2.version>2.15.0</log4j2.version>
 	</properties>
 
 	<dependencies></dependencies>
@@ -58,6 +59,30 @@
 				<scope>import</scope>
 			</dependency>
 
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-api</artifactId>
+				<version>${log4j2.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-core</artifactId>
+				<version>${log4j2.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-jul</artifactId>
+				<version>${log4j2.version}</version>
+			</dependency>
+
+
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-slf4j-impl</artifactId>
+				<version>${log4j2.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>fr.insee.sugoi</groupId>
@@ -226,7 +251,7 @@
 			</dependency>
 
 			<dependency>
-            	<groupId>me.jvt.cucumber</groupId>
+				<groupId>me.jvt.cucumber</groupId>
 				<artifactId>reporting-plugin</artifactId>
 				<version>${cucumber-reporting-plugin.version}</version>
 			</dependency>
