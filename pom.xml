@@ -29,7 +29,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<tomcat.version>9.0.54</tomcat.version>
 		<commons-io.version>2.11.0</commons-io.version>
-		<com.unboundid.version>6.0.2</com.unboundid.version>
+		<com.unboundid.version>6.0.3</com.unboundid.version>
 		<org.xmlunit.version>2.8.3</org.xmlunit.version>
 		<org.fusesource.jansi.version>2.3.4</org.fusesource.jansi.version>
 		<commons-lang.version>2.6</commons-lang.version>
