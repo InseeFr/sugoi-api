@@ -1,3 +1,131 @@
+# 0.9.2
+
+
+- [BUG] :mute: Add IgnoreSizeOf for realm cache sizing
+- [ENH] :sparkles: /change-password can call an external webservice
+- [ENH] :sparkles: /init-password can change reset password status
+- [ENH] :boom: /init-password takes a PasswordView
+- [ENH] :boom: Remove camel case from /init-password /change-password and /reinit-password
+- [ENH] :boom: /reinitPassword takes optional TemplatePropertiesView
+- [ENH] :rotating_light: Fix warnings on UiFields
+- [BUG] :bug: Fix modify request on ldap config store should be authenticated
+- [BUG] :bug: Description should be writable on ldap config store
+- [UP] :arrow_up: Bump maven-surefire-plugin from 3.0.0-M4 to 3.0.0-M5
+- [UP] :arrow_up: Bump spotless-maven-plugin from 2.17.4 to 2.17.6
+- [UP] :arrow_up: Bump org.springdoc.version from 1.5.12 to 1.6.0
+- [UP] :arrow_up: Bump unboundid-ldapsdk from 6.0.2 to 6.0.3
+- [FIX] :ambulance: fix cve log4j2, avoid injection code
+- [UP] :arrow_up: Bump spring-boot.version from 2.5.5 to 2.6.1
+- [UP] :arrow_up: Bump spotless-maven-plugin from 2.17.3 to 2.17.4
+- [UP] :arrow_up: Bump cucumber.version from 7.0.0 to 7.1.0
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 0.9.0
+- [ENH] :sparkle: delete attribute if it has only a blank or empty value
+- [ENH] :recycle: Remove RealmProvider from controllers
+- [ENH] :recycle: Move management of realm not found to service level
+- [ENH] :recycle: Move management of group not found to service level
+- [ENH] :recycle: Move management of user not found to service level
+- [ENH] :recycle: Move management of organization not found at service level
+- [ENH] :recycle: Move management of application not found at service level
+- [ENH] :sparkles: Ouganext controller can throw OuganextParsingException
+- [ENH] :sparkles: Add a ldap mapping type exists (#519)
+- [ENH] :recycle: Pass passwords to CredentialsService instead of PCR
+- [UP] :arrow_up: Bump xmlunit-core from 2.8.2 to 2.8.3
+- [BUG] :bug: Fix swagger ui display ouganext request body instead of sugoi (#500)
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 0.8.8
+- [ENH] :memo: Add documentation on webhooks
+- [UP] :arrow_up: Bump spotless-maven-plugin from 2.17.0 to 2.17.3
+- [UP] :arrow_up: Bump org.springdoc.version from 1.5.11 to 1.5.12
+- [BUG] :bug: Fix synchronous request behind JMS doesn't return a body
+- [ENH] :sparkles: password in a PasswordView instead of a Map on /validate-password (#501)
+- [ENH] :sparkles: manage asi group from sugoi
+- [UP] :arrow_up: Bump spring-boot.version from 2.5.4 to 2.5.5
+- [UP] :arrow_up: Bump maven-war-plugin from 3.3.1 to 3.3.2
+- [UP] :arrow_up: Bump org.springdoc.version from 1.5.10 to 1.5.11
+- [UP] :arrow_up: Bump tomcat.version from 9.0.52 to 9.0.54
+- [UP] :arrow_up: Bump cucumber.version from 6.10.2 to 7.0.0
+- [UP] :arrow_up: Bump unboundid-ldapsdk from 6.0.0 to 6.0.2
+- [BUG] fix errors around monoconnection reopening
+- [UP] :arrow_up: Bump spotless-maven-plugin from 2.12.3 to 2.17.0
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 0.8.7
+- [BUG] :bug: Get application get 200 groups instead of 20 (#468)
+- [BUG] :bug: Fail in event doesn't stop request-process
+- [ENH] generate id if missing and better id and mail unicity check
+- [BUG] :bug: Fix unfounded mail check on user update
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 0.8.5
+- [BUG] bad duplicate email check
+- [BUG] unable to add app managed attribute from jms writer
+- [BUG] restore old xml mapping for retro endpoints
+- [ENH] only generate friendly password (#459)
+- [BUG] :bug: Fix event without realm name (#449)
+- [ENH] adjust typo line address
+- [BUG] Default ui mapping passwordlastchange not modifiable (#456)
+- [UP] :arrow_up: Bump tomcat.version from 9.0.50 to 9.0.52
+- [UP] :arrow_up: Bump spring-boot.version from 2.5.3 to 2.5.4
+- [UP] :arrow_up: Bump spotless-maven-plugin from 2.12.2 to 2.12.3
+- [FIX] adjust mapping of search parameters
+- [FIX] accept generic strings for searching habilitations
+- [FIX] :bug: update and delete certificate
+- [ENH] :sparkles: manage certificate
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 0.8.4
+- [FIX] adjust habilitation endpoints
+- [ENH] Sort ui items
+- [FIX] adjust default values
+- [FIX] adjust default values
+- [FIX] adjust default values
+- [BUG] :bug: repair ui mapping
+- [BUG] :bug: retrieve good exception type after provider response post in broker
+- [ENH] :sparkles: add send login
+- [BUG] :bug: avoid null pointer exception when reset password
+- [ENH] :sparkles: add ui field configuration in realm
+- [ENH] role claim more generic
+- [ENH] Add authenticated connections for ldapReader
+- [FIX] Avoid null Ldap Connection
+- [REL] :rocket: release version 0.8.1
+- [FIX] Delete member group dont work when multi storage (#412)
+- [ENH] :sparkles: Allow to configure mail unicity by realm
+- [ENH] :sparkles: allow to add realm description on ui-side
+- [UP] :arrow_up: Bump git-commit-id-plugin from 4.0.5 to 4.9.10
+- [UP] :arrow_up: Bump org.springdoc.version from 1.5.9 to 1.5.10
+- [UP] :arrow_up: Bump commons-csv from 1.8 to 1.9.0
+- [ENH] :sparkles: Appmanager need to have reader and appmanager roles to update application groups (#331)
+- [UP] :arrow_up: Bump jansi from 2.3.3 to 2.3.4
+- [UP] :arrow_up: Bump passay from 1.6.0 to 1.6.1
+- [UP] :arrow_up: Bump spring-boot.version from 2.5.2 to 2.5.3
+- [UP] :arrow_up: Bump spotless-maven-plugin from 2.12.1 to 2.12.2
+- [ENH] :sparkles: make broker working synchrone asynchrone
+- [ENH] :rocket: manage exchange between front and a back
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 0.7.0
+- [BUG] 🐛 fix some sonar/compilation warnings
+- [BUG] :bug: renew connection with ldap if server is down (#391)
+- [UP] :arrow_up: Bump commons-io from 2.10.0 to 2.11.0
+- [UP] :arrow_up: Bump tomcat.version from 9.0.48 to 9.0.50
+- [ENH] :sparkles: Mapping Sugoi object with Ldap must be customisable (#191)
+- [ENH] :sparkles: Realm and UserStorage mapping attributes for Ldap Store Provider
+- [ENH] global export feature
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 0.6.0
+- [BUG] :bug: Signoff commit when preparing release
+- [META] :card_index: change commit message when releasing
+- [BUG] 🐛 Fix ldap connexion leak (#379)
+- [ENH] objectClass can be set by userStorage
+- [ENH] implement paging on ldap store
+- [UP] :arrow_up: Bump spring-boot.version from 2.5.1 to 2.5.2
+- [ENH] :sparkles: sort key must be customizable
+- [UP] :arrow_up: Bump spotless-maven-plugin from 2.12.0 to 2.12.1
+- [UP] :arrow_up: Bump tomcat.version from 9.0.46 to 9.0.48
+- [META] 📇 Fix changelog format and url
+- [REL] :rocket: prepare next version
+- [REL] :rocket: prepare new version 0.5.0
+- [REL] :rocket: Release 0.4.0
+- Resolve [250] Add paging properties on userstorage of type ldap + Resolve [247] Having a generic interface for paged requests  + Resolve [248] Refactor findByProperties services for multi-userstorage paging + Resolve [251] Implement paging on Ldap store
+
+
 # 0.9.0
 
 
