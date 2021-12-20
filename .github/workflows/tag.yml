@@ -23,6 +23,7 @@ jobs:
           git config --global user.email "dg75-dsi-domaine-outils-transverses@insee.fr"  
           git clone https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{github.repository}}.git
           cd sugoi-api/
+          git checkout ${{ github.ref_name }}
           git fetch --tags
           git checkout -b release-${{ github.event.inputs.version }}
           mvn -B versions:set -DnewVersion=${{ github.event.inputs.version }}  -DgenerateBackupPoms=false
