@@ -1,3 +1,11 @@
+# 0.9.1.1
+
+
+- [UP] :arrow_up: Bump log4j to 2.17.0
+- [ENH] :construction_worker: Tag action can be triggered on other branch than master
+- [REL] :rocket: prepare next version
+
+
 # 0.9.1
 
 
