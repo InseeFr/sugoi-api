@@ -20,93 +20,185 @@ Feature: Realms scenario synchrone
         When the client perform POST request with body on url /realms body:
             """
             {
-                "name": "newrealm",
-                "url": "localhost",
-                "appSource": "ou=Applications,o=insee,c=fr",
-                "userStorages": [
+              "name": "newrealm",
+              "url": "localhost",
+              "appSource": "ou=Applications,o=insee,c=fr",
+              "properties": {
+                "app-managed-attribute-keys-list": "inseegroupedefaut,inseeroleapplicatif",
+                "app-managed-attribute-patterns-list": "(.*)_$(application),$(application)\\$\\$(.*)",
+                "description": "Le profil domaine2<br/>Test <b>html</b> in description"
+              },
+              "userStorages": [
                 {
-                    "name": "Profil_domaine1_WebServiceLdap",
-                    "userSource": "ou=contacts,ou=clients_domaine1,o=insee,c=fr",
-                    "organizationSource": "ou=organisations,ou=clients_domaine1,o=insee,c=fr",
-                    "addressSource": "ou=adresses,ou=clients_domaine1,o=insee,c=fr",
-                    "properties": {
+                  "name": "Profil_domaine1_WebServiceLdap",
+                  "userSource": "ou=contacts,ou=clients_domaine1,o=insee,c=fr",
+                  "organizationSource": "ou=organisations,ou=clients_domaine1,o=insee,c=fr",
+                  "addressSource": "ou=adresses,ou=clients_domaine1,o=insee,c=fr",
+                  "properties": {
                     "group_filter_pattern": "(cn={group}_{appliname})",
                     "organization_object_classes": "top,inseeOrganisation",
                     "user_object_classes": "top,inseeCompte,inseeContact,inseeAttributsAuthentification,inseeAttributsHabilitation,inseeAttributsCommunication",
                     "group_source_pattern": "ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr"
+                  },
+                  "userMappings": [
+                    {
+                      "sugoiName": "username",
+                      "storeName": "uid",
+                      "modelType": "STRING",
+                      "writable": true
                     },
-                    "mappings": {
-                    "organizationMapping": {
-                        "address": "inseeAdressePostaleDN,address,rw",
-                        "attributes.description": "description,String,rw",
-                        "identifiant": "uid,String,rw",
-                        "organization": "inseeOrganisationDN,organization,rw",
-                        "attributes.mail": "mail,String,rw",
-                        "gpgkey": "inseeClefChiffrement,byte_array,ro"
+                    {
+                      "sugoiName": "lastName",
+                      "storeName": "sn",
+                      "modelType": "STRING",
+                      "writable": true
                     },
-                    "userMapping": {
-                        "attributes.identifiant_metier": "inseeIdentifiantMetier,String,rw",
-                        "lastName": "sn,String,rw",
-                        "address": "inseeAdressePostaleDN,address,rw",
-                        "mail": "mail,String,rw",
-                        "attributes.description": "description,String,rw",
-                        "attributes.common_name": "cn,String,rw",
-                        "attributes.phone_number": "telephoneNumber,String,rw",
-                        "attributes.telephone_portable": "inseenumerotelephoneportable,String,rw",
-                        "certificate": "userCertificate;binary,byte_array,ro",
-                        "habilitations": "inseeGroupeDefaut,list_habilitation,rw",
-                        "groups": "memberOf,list_group,ro",
-                        "attributes.properties": "inseePropriete,list_string,rw",
-                        "metadatas.modifyTimestamp": "modifyTimestamp,string,ro",
-                        "attributes.additionalMail": "inseeMailCorrespondant,String,rw",
-                        "attributes.seeAlsos": "seeAlso,list_string,ro,singl",
-                        "attributes.personal_title": "personalTitle,String,rw",
-                        "attributes.insee_timbre": "inseeTimbre,String,rw",
-                        "attributes.repertoire_distribution": "inseerepertoirededistribution,String,rw",
-                        "firstName": "givenname,String,rw",
-                        "attributes.insee_organisme": "inseeOrganisme,String,rw",
-                        "organization": "inseeOrganisationDN,organization,rw",
-                        "attributes.hasPassword": "userPassword,exists,ro",
-                        "attributes.insee_roles_applicatifs": "inseeRoleApplicatif,list_string,rw",
-                        "username": "uid,String,rw"
+                    {
+                      "sugoiName": "mail",
+                      "storeName": "mail",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "firstName",
+                      "storeName": "givenname",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "attributes.common_name",
+                      "storeName": "cn",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "attributes.personal_title",
+                      "storeName": "personalTitle",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "attributes.description",
+                      "storeName": "description",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "attributes.phone_number",
+                      "storeName": "telephoneNumber",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "habilitations",
+                      "storeName": "inseeGroupeDefaut",
+                      "modelType": "LIST_HABILITATION",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "organization",
+                      "storeName": "inseeOrganisationDN",
+                      "modelType": "ORGANIZATION",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "address",
+                      "storeName": "inseeAdressePostaleDN",
+                      "modelType": "ADDRESS",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "groups",
+                      "storeName": "memberOf",
+                      "modelType": "LIST_GROUP",
+                      "writable": false
+                    },
+                    {
+                      "sugoiName": "attributes.insee_roles_applicatifs",
+                      "storeName": "inseeRoleApplicatif",
+                      "modelType": "LIST_STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "attributes.hasPassword",
+                      "storeName": "userPassword",
+                      "modelType": "EXISTS",
+                      "writable": false
+                    },
+                    {
+                      "sugoiName": "metadatas.modifyTimestamp",
+                      "storeName": "modifyTimestamp",
+                      "modelType": "STRING",
+                      "writable": false
+                    },
+                    {
+                      "sugoiName": "attributes.additionalMail",
+                      "storeName": "inseeMailCorrespondant",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "attributes.passwordShouldBeReset",
+                      "storeName": "pwdReset",
+                      "modelType": "STRING",
+                      "writable": false
                     }
+                  ],
+                  "organizationMappings": [
+                    {
+                      "sugoiName": "identifiant",
+                      "storeName": "uid",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "attributes.description",
+                      "storeName": "description",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "attributes.mail",
+                      "storeName": "mail",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "address",
+                      "storeName": "inseeAdressePostaleDN",
+                      "modelType": "ADDRESS",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "organization",
+                      "storeName": "inseeOrganisationDN",
+                      "modelType": "ORGANIZATION",
+                      "writable": true
                     }
+                  ]
                 }
-                ],
-                "properties": {
-                    "app-managed-attribute-keys-list": "inseegroupedefaut,inseeroleapplicatif",
-                    "app-managed-attribute-patterns-list": "(.*)_$(application),$(application)\\$\\$(.*)",
-                    "description": "Le profil domaine2<br/>Test <b>html</b> in description"
-                },
-                "mappings": {
-                "applicationMapping": {
-                    "name": "ou,String,rw"
-                },
-                "groupMapping": {
-                    "name": "cn,String,rw",
-                    "description": "description,String,rw",
-                    "users": "uniquemember,list_user,rw"
-                }
-                },
-                "uiMapping": {
+              ],
+              "applicationMappings": [],
+              "groupMappings": [],
+              "uiMapping": {
                 "uiOrganizationMapping": [],
                 "uiUserMapping": [
-                    {
-                        "name": "Identifiant",
-                        "helpTextTitle": "Identifiant de l'utilisateur",
-                        "helpText": "Il servira pour le rechercher a travers l'annuaire. Caracteres autorises alphabetiques chiffres apostrophes espaces tirets",
-                        "path": "username",
-                        "type": "string",
-                        "required": true,
-                        "modifiable": true,
-                        "tag": "main",
-                        "order": 2147483647,
-                        "options": {}
-                    }
+                  {
+                    "name": "Identifiant",
+                    "helpTextTitle": "Identifiant de l'utilisateur",
+                    "helpText": "Il servira pour le rechercher a travers l'annuaire. Caracteres autorises alphabetiques chiffres apostrophes espaces tirets",
+                    "path": "username",
+                    "type": "string",
+                    "required": true,
+                    "modifiable": true,
+                    "tag": "main",
+                    "order": 2147483647,
+                    "options": {}
+                  }
                 ]
-                },
-                "readerType": "LdapReaderStore",
-                "writerType": "LdapWriterStore"
+              },
+              "readerType": "LdapReaderStore",
+              "writerType": "LdapWriterStore"
             }
             """
         And show body received
@@ -117,117 +209,209 @@ Feature: Realms scenario synchrone
         When the client perform PUT request with body on url /realms/newrealm body:
             """
             {
-                "name": "newrealm",
-                "url": "localhost",
-                "appSource": "ou=Applications,o=insee,c=fr",
-                "userStorages": [
+              "name": "newrealm",
+              "url": "localhost",
+              "appSource": "ou=Applications,o=insee,c=fr",
+              "properties": {
+                "app-managed-attribute-keys-list": "inseegroupedefaut,inseeroleapplicatif",
+                "app-managed-attribute-patterns-list": "(.*)_$(application),$(application)\\$\\$(.*)",
+                "description": "I'm updated"
+              },
+              "userStorages": [
                 {
-                    "name": "Profil_domaine1_WebServiceLdap",
-                    "userSource": "ou=contacts,ou=clients_domaine1,o=insee,c=fr",
-                    "organizationSource": "ou=organisations,ou=clients_domaine1,o=insee,c=fr",
-                    "addressSource": "ou=adresses,ou=clients_domaine1,o=insee,c=fr",
-                    "properties": {
+                  "name": "Profil_domaine1_WebServiceLdap",
+                  "userSource": "ou=contacts,ou=clients_domaine1,o=insee,c=fr",
+                  "organizationSource": "ou=organisations,ou=clients_domaine1,o=insee,c=fr",
+                  "addressSource": "ou=adresses,ou=clients_domaine1,o=insee,c=fr",
+                  "properties": {
                     "group_filter_pattern": "(cn={group}_{appliname})",
                     "organization_object_classes": "top,inseeOrganisation",
                     "user_object_classes": "top,inseeCompte,inseeContact,inseeAttributsAuthentification,inseeAttributsHabilitation,inseeAttributsCommunication",
                     "group_source_pattern": "ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr"
+                  },
+                  "userMappings": [
+                    {
+                      "sugoiName": "username",
+                      "storeName": "uid",
+                      "modelType": "STRING",
+                      "writable": true
                     },
-                    "mappings": {
-                    "organizationMapping": {
-                        "address": "inseeAdressePostaleDN,address,rw",
-                        "attributes.description": "description,String,rw",
-                        "identifiant": "uid,String,rw",
-                        "organization": "inseeOrganisationDN,organization,rw",
-                        "attributes.mail": "mail,String,rw",
-                        "gpgkey": "inseeClefChiffrement,byte_array,ro"
+                    {
+                      "sugoiName": "lastName",
+                      "storeName": "sn",
+                      "modelType": "STRING",
+                      "writable": true
                     },
-                    "userMapping": {
-                        "attributes.identifiant_metier": "inseeIdentifiantMetier,String,rw",
-                        "lastName": "sn,String,rw",
-                        "address": "inseeAdressePostaleDN,address,rw",
-                        "mail": "mail,String,rw",
-                        "attributes.description": "description,String,rw",
-                        "attributes.common_name": "cn,String,rw",
-                        "attributes.phone_number": "telephoneNumber,String,rw",
-                        "attributes.telephone_portable": "inseenumerotelephoneportable,String,rw",
-                        "certificate": "userCertificate;binary,byte_array,ro",
-                        "habilitations": "inseeGroupeDefaut,list_habilitation,rw",
-                        "groups": "memberOf,list_group,ro",
-                        "attributes.properties": "inseePropriete,list_string,rw",
-                        "metadatas.modifyTimestamp": "modifyTimestamp,string,ro",
-                        "attributes.additionalMail": "inseeMailCorrespondant,String,rw",
-                        "attributes.seeAlsos": "seeAlso,list_string,ro,singl",
-                        "attributes.personal_title": "personalTitle,String,rw",
-                        "attributes.insee_timbre": "inseeTimbre,String,rw",
-                        "attributes.repertoire_distribution": "inseerepertoirededistribution,String,rw",
-                        "firstName": "givenname,String,rw",
-                        "attributes.insee_organisme": "inseeOrganisme,String,rw",
-                        "organization": "inseeOrganisationDN,organization,rw",
-                        "attributes.hasPassword": "userPassword,exists,ro",
-                        "attributes.insee_roles_applicatifs": "inseeRoleApplicatif,list_string,rw",
-                        "username": "uid,String,rw"
+                    {
+                      "sugoiName": "mail",
+                      "storeName": "mail",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "firstName",
+                      "storeName": "givenname",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "attributes.common_name",
+                      "storeName": "cn",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "attributes.personal_title",
+                      "storeName": "personalTitle",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "attributes.description",
+                      "storeName": "description",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "attributes.phone_number",
+                      "storeName": "telephoneNumber",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "habilitations",
+                      "storeName": "inseeGroupeDefaut",
+                      "modelType": "LIST_HABILITATION",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "organization",
+                      "storeName": "inseeOrganisationDN",
+                      "modelType": "ORGANIZATION",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "address",
+                      "storeName": "inseeAdressePostaleDN",
+                      "modelType": "ADDRESS",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "groups",
+                      "storeName": "memberOf",
+                      "modelType": "LIST_GROUP",
+                      "writable": false
+                    },
+                    {
+                      "sugoiName": "attributes.insee_roles_applicatifs",
+                      "storeName": "inseeRoleApplicatif",
+                      "modelType": "LIST_STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "attributes.hasPassword",
+                      "storeName": "userPassword",
+                      "modelType": "EXISTS",
+                      "writable": false
+                    },
+                    {
+                      "sugoiName": "metadatas.modifyTimestamp",
+                      "storeName": "modifyTimestamp",
+                      "modelType": "STRING",
+                      "writable": false
+                    },
+                    {
+                      "sugoiName": "attributes.additionalMail",
+                      "storeName": "inseeMailCorrespondant",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "attributes.passwordShouldBeReset",
+                      "storeName": "pwdReset",
+                      "modelType": "STRING",
+                      "writable": false
                     }
+                  ],
+                  "organizationMappings": [
+                    {
+                      "sugoiName": "identifiant",
+                      "storeName": "uid",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "attributes.description",
+                      "storeName": "description",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "attributes.mail",
+                      "storeName": "mail",
+                      "modelType": "STRING",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "address",
+                      "storeName": "inseeAdressePostaleDN",
+                      "modelType": "ADDRESS",
+                      "writable": true
+                    },
+                    {
+                      "sugoiName": "organization",
+                      "storeName": "inseeOrganisationDN",
+                      "modelType": "ORGANIZATION",
+                      "writable": true
                     }
+                  ]
                 }
-                ],
-                "properties": {
-                    "app-managed-attribute-keys-list": "inseegroupedefaut,inseeroleapplicatif",
-                    "app-managed-attribute-patterns-list": "(.*)_$(application),$(application)\\$\\$(.*)",
-                    "description": "I'm updated"
-                },
-                "mappings": {
-                "applicationMapping": {
-                    "name": "ou,String,rw"
-                },
-                "groupMapping": {
-                    "name": "cn,String,rw",
-                    "description": "description,String,rw",
-                    "users": "uniquemember,list_user,rw"
-                }
-                },
-                "uiMapping": {
+              ],
+              "applicationMappings": [],
+              "groupMappings": [],
+              "uiMapping": {
                 "uiOrganizationMapping": [],
                 "uiUserMapping": [
-                    {
-                        "name": "Identifiant",
-                        "helpTextTitle": "Identifiant de l'utilisateur",
-                        "helpText": "Il servira pour le rechercher a travers l'annuaire. Caracteres autorises alphabetiques chiffres apostrophes espaces tirets",
-                        "path": "username",
-                        "type": "string",
-                        "required": true,
-                        "modifiable": true,
-                        "tag": "main",
-                        "order": 2147483647,
-                        "options": {}
-                    },
-                    {
-                        "name": "Nom commun",
-                        "helpTextTitle": "Nom commun de l'utilisateur",
-                        "helpText": "Caracteres autorises alphabetiques chiffres apostrophes espaces tirets",
-                        "path": "attributes.common_name",
-                        "type": "string",
-                        "required": false,
-                        "modifiable": true,
-                        "tag": "main",
-                        "order": 2147483647,
-                        "options": {}
-                    },
-                    {
-                        "name": "Nom",
-                        "helpTextTitle": "Nom de l'utilisateur",
-                        "helpText": "Caracteres autorises alphabetiques chiffres apostrophes espaces tirets",
-                        "path": "lastName",
-                        "type": "string",
-                        "required": false,
-                        "modifiable": true,
-                        "tag": "main",
-                        "order": 2147483647,
-                        "options": {}
-                    }
+                  {
+                    "name": "Identifiant",
+                    "helpTextTitle": "Identifiant de l'utilisateur",
+                    "helpText": "Il servira pour le rechercher a travers l'annuaire. Caracteres autorises alphabetiques chiffres apostrophes espaces tirets",
+                    "path": "username",
+                    "type": "string",
+                    "required": true,
+                    "modifiable": true,
+                    "tag": "main",
+                    "order": 2147483647,
+                    "options": {}
+                  },
+                  {
+                    "name": "Nom commun",
+                    "helpTextTitle": "Nom commun de l'utilisateur",
+                    "helpText": "Caracteres autorises alphabetiques chiffres apostrophes espaces tirets",
+                    "path": "attributes.common_name",
+                    "type": "string",
+                    "required": false,
+                    "modifiable": true,
+                    "tag": "main",
+                    "order": 2147483647,
+                    "options": {}
+                  },
+                  {
+                    "name": "Nom",
+                    "helpTextTitle": "Nom de l'utilisateur",
+                    "helpText": "Caracteres autorises alphabetiques chiffres apostrophes espaces tirets",
+                    "path": "lastName",
+                    "type": "string",
+                    "required": false,
+                    "modifiable": true,
+                    "tag": "main",
+                    "order": 2147483647,
+                    "options": {}
+                  }
                 ]
-                },
-                "readerType": "LdapReaderStore",
-                "writerType": "LdapWriterStore"
+              },
+              "readerType": "LdapReaderStore",
+              "writerType": "LdapWriterStore"
             }
             """
         And show body received

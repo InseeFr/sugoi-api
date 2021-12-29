@@ -13,11 +13,12 @@
 */
 package fr.insee.sugoi.ldap.utils.mapper;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 import com.unboundid.ldap.sdk.Attribute;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -37,14 +38,9 @@ public class OrganizationLdapMapperFromAttributesTest {
     Map<String, String> config = new HashMap<>();
     config.put("address_source", "ou=address,o=insee,c=fr");
     config.put("organization_source", "ou=organisations,ou=clients_domaine1,o=insee,c=fr");
-    Map<String, String> mapping = new HashMap<>();
-    mapping.put("identifiant", "uid,String,rw");
-    mapping.put("attributes.description", "description,String,rw");
-    mapping.put("attributes.mail", "mail,String,rw");
-    mapping.put("address", "inseeAdressePostaleDN,address,rw");
-    mapping.put("inseeClefChiffrement", "gpgkey,address,rw");
-    mapping.put("organization", "inseeOrganisationDN,organization,rw");
-    organizationLdapMapper = new OrganizationLdapMapper(config, mapping);
+
+    organizationLdapMapper =
+        new OrganizationLdapMapper(config, StoreMappingFixture.getOrganizationStoreMappings());
   }
 
   @Test

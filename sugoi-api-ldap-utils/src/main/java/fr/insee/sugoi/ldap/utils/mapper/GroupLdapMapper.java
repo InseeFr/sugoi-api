@@ -17,6 +17,7 @@ import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.technics.StoreMapping;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -26,35 +27,35 @@ public class GroupLdapMapper implements LdapMapper<Group> {
 
   Map<String, String> config;
   List<String> objectClasses;
-  Map<String, String> mapping;
+  List<StoreMapping> mappings;
 
-  public GroupLdapMapper(Map<String, String> config, Map<String, String> mapping) {
+  public GroupLdapMapper(Map<String, String> config, List<StoreMapping> mappings) {
     this.config = config;
     if (config.get(LdapConfigKeys.GROUP_OBJECT_CLASSES) != null) {
       objectClasses = Arrays.asList(config.get(LdapConfigKeys.GROUP_OBJECT_CLASSES).split(","));
     }
-    this.mapping = mapping;
+    this.mappings = mappings;
   }
 
   @Override
   public Group mapFromAttributes(Collection<Attribute> attributes) {
-    return GenericLdapMapper.mapLdapAttributesToObject(attributes, Group.class, config, mapping);
+    return GenericLdapMapper.mapLdapAttributesToObject(attributes, Group.class, config, mappings);
   }
 
   @Override
   public List<Attribute> mapToAttributes(Group group) {
     return GenericLdapMapper.mapObjectToLdapAttributes(
-        group, Group.class, config, mapping, objectClasses, true);
+        group, Group.class, config, mappings, objectClasses, true);
   }
 
   @Override
   public List<Attribute> createAttributesForFilter(Group group) {
     return GenericLdapMapper.mapObjectToLdapAttributes(
-        group, Group.class, config, mapping, objectClasses, false);
+        group, Group.class, config, mappings, objectClasses, false);
   }
 
   @Override
   public List<Modification> createMods(Group updatedGroup) {
-    return GenericLdapMapper.createMods(updatedGroup, Group.class, config, mapping);
+    return GenericLdapMapper.createMods(updatedGroup, Group.class, config, mappings);
   }
 }

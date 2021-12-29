@@ -14,6 +14,7 @@
 package fr.insee.sugoi.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import fr.insee.sugoi.model.technics.StoreMapping;
 import fr.insee.sugoi.model.technics.UiField;
 import java.io.Serializable;
 import java.util.EnumMap;
@@ -30,28 +31,30 @@ public class Realm implements Serializable {
   private String appSource;
   private List<UserStorage> userStorages;
   @IgnoreSizeOf private Map<String, String> properties = new HashMap<>();
-  @IgnoreSizeOf private Map<String, Map<String, String>> mappings = new HashMap<>();
 
   @IgnoreSizeOf
   private Map<UIMappingType, List<UiField>> uiMapping = new EnumMap<>(UIMappingType.class);
 
+  @IgnoreSizeOf private List<StoreMapping> groupMappings;
+  @IgnoreSizeOf private List<StoreMapping> applicationMappings;
+
   private String readerType;
   private String writerType;
 
-  public enum UIMappingType {
-    UI_ORGANIZATION_MAPPING("uiOrganizationMapping"),
-    UI_USER_MAPPING("uiUserMapping");
+  public List<StoreMapping> getGroupMappings() {
+    return groupMappings;
+  }
 
-    private String type;
+  public void setGroupMappings(List<StoreMapping> groupMappings) {
+    this.groupMappings = groupMappings;
+  }
 
-    private UIMappingType(String type) {
-      this.type = type;
-    }
+  public List<StoreMapping> getApplicationMappings() {
+    return applicationMappings;
+  }
 
-    @JsonValue
-    public String getType() {
-      return type;
-    }
+  public void setApplicationMappings(List<StoreMapping> applicationMappings) {
+    this.applicationMappings = applicationMappings;
   }
 
   public String getName() {
@@ -64,6 +67,22 @@ public class Realm implements Serializable {
 
   public List<UserStorage> getUserStorages() {
     return this.userStorages;
+  }
+
+  public enum UIMappingType {
+    UI_ORGANIZATION_MAPPING("uiOrganizationMapping"),
+    UI_USER_MAPPING("uiUserMapping");
+
+    private final String type;
+
+    UIMappingType(String type) {
+      this.type = type;
+    }
+
+    @JsonValue
+    public String getType() {
+      return type;
+    }
   }
 
   public void setUserStorages(List<UserStorage> userStorages) {
@@ -133,14 +152,6 @@ public class Realm implements Serializable {
 
   public void setWriterType(String writerType) {
     this.writerType = writerType;
-  }
-
-  public void setMappings(Map<String, Map<String, String>> mappings) {
-    this.mappings = mappings;
-  }
-
-  public Map<String, Map<String, String>> getMappings() {
-    return mappings;
   }
 
   public Map<UIMappingType, List<UiField>> getUiMapping() {

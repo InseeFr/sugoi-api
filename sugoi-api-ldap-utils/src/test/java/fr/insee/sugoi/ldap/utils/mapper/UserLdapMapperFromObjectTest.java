@@ -13,18 +13,15 @@
 */
 package fr.insee.sugoi.ldap.utils.mapper;
 
-import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.unboundid.ldap.sdk.Attribute;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,23 +41,8 @@ public class UserLdapMapperFromObjectTest {
     config.put("organization_source", "ou=organisations,o=insee,c=fr");
     config.put("address_source", "ou=address,o=insee,c=fr");
     config.put(LdapConfigKeys.USER_OBJECT_CLASSES, "top,person");
-    Map<String, String> mapping = new HashMap<>();
-    mapping.put("username", "uid,String,rw");
-    mapping.put("lastName", "sn,String,rw");
-    mapping.put("mail", "mail,String,rw");
-    mapping.put("firstName", "givenname,String,rw");
-    mapping.put("attributes.common_name", "cn,String,rw");
-    mapping.put("attributes.personal_title", "personalTitle,String,rw");
-    mapping.put("attributes.description", "description,String,rw");
-    mapping.put("attributes.phone_number", "telephoneNumber,String,rw");
-    mapping.put("habilitations", "inseeGroupeDefaut,list_habilitation,rw");
-    mapping.put("organization", "inseeOrganisationDN,organization,rw");
-    mapping.put("address", "inseeAdressePostaleDN,address,rw");
-    mapping.put("groups", "memberOf,list_group,ro");
-    mapping.put("attributes.insee_roles_applicatifs", "inseeRoleApplicatif,list_string,rw");
-    mapping.put("attributes.common_name", "cn,String,rw");
-    mapping.put("metadatas.modifyTimestamp", "modifyTimestamp,String,ro");
-    userLdapMapper = new UserLdapMapper(config, mapping);
+
+    userLdapMapper = new UserLdapMapper(config, StoreMappingFixture.getUserStoreMappings());
 
     user = new User();
   }

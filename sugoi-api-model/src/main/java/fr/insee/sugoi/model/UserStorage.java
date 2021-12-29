@@ -13,8 +13,10 @@
 */
 package fr.insee.sugoi.model;
 
+import fr.insee.sugoi.model.technics.StoreMapping;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
 
@@ -23,8 +25,28 @@ public class UserStorage implements Serializable {
   private String userSource;
   private String organizationSource;
   private String addressSource;
+
   @IgnoreSizeOf private Map<String, String> properties = new HashMap<>();
-  @IgnoreSizeOf private Map<String, Map<String, String>> mappings = new HashMap<>();
+
+  @IgnoreSizeOf private List<StoreMapping> userMappings;
+
+  @IgnoreSizeOf private List<StoreMapping> organizationMappings;
+
+  public List<StoreMapping> getUserMappings() {
+    return userMappings;
+  }
+
+  public void setUserMappings(List<StoreMapping> userMappings) {
+    this.userMappings = userMappings;
+  }
+
+  public List<StoreMapping> getOrganizationMappings() {
+    return organizationMappings;
+  }
+
+  public void setOrganizationMappings(List<StoreMapping> organizationMappings) {
+    this.organizationMappings = organizationMappings;
+  }
 
   public String getName() {
     return this.name;
@@ -68,26 +90,5 @@ public class UserStorage implements Serializable {
 
   public void addProperty(String key, String value) {
     this.properties.put(key, value);
-  }
-
-  @Override
-  public String toString() {
-    return "UserStorage [name="
-        + name
-        + ", organizationSource="
-        + organizationSource
-        + ", properties="
-        + properties
-        + ", userSource="
-        + userSource
-        + "]";
-  }
-
-  public void setMappings(Map<String, Map<String, String>> mappings) {
-    this.mappings = mappings;
-  }
-
-  public Map<String, Map<String, String>> getMappings() {
-    return mappings;
   }
 }
