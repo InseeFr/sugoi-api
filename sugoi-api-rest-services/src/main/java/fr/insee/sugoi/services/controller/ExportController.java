@@ -16,6 +16,8 @@ package fr.insee.sugoi.services.controller;
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.*;
+import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;

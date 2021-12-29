@@ -54,7 +54,7 @@ public class LocalFileRealmProviderDAO implements RealmProvider {
   @Autowired ResourceLoader resourceLoader;
 
   private List<Realm> realms;
-  private ObjectMapper mapper = new ObjectMapper();
+  private final ObjectMapper mapper = new ObjectMapper();
 
   @Override
   public Optional<Realm> load(String realmName) {

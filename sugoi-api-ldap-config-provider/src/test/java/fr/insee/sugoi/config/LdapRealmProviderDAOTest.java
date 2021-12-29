@@ -20,6 +20,8 @@ import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.configuration.UiMappingService;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.Realm.UIMappingType;
+import fr.insee.sugoi.model.technics.ModelType;
+import fr.insee.sugoi.model.technics.StoreMapping;
 import fr.insee.sugoi.model.technics.UiField;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -104,17 +106,22 @@ public class LdapRealmProviderDAOTest {
   public void shouldHaveRealmMapping() {
     Realm realm = ldapRealmProviderDAOImpl.load("domaine1").get();
     assertThat(
-        "Should have groupMapping",
-        realm.getMappings().get("groupMapping").get("name"),
-        is("cn,String,rw"));
+        "Should have a name mapping",
+        realm.getGroupMappings().stream()
+            .anyMatch(v -> v.equals(new StoreMapping("name", "cn", ModelType.STRING, true))));
+
     assertThat(
-        "Should have groupMapping",
-        realm.getMappings().get("groupMapping").get("users"),
-        is("uniquemember,list_user,rw"));
+        "should have a groups mapping",
+        realm.getGroupMappings().stream()
+            .anyMatch(
+                v ->
+                    v.equals(
+                        new StoreMapping("users", "uniquemember", ModelType.LIST_USER, true))));
+
     assertThat(
-        "Should have applicationMapping",
-        realm.getMappings().get("applicationMapping").get("name"),
-        is("ou,String,rw"));
+        "Should have an application mapping",
+        realm.getApplicationMappings().stream()
+            .anyMatch(v -> v.equals(new StoreMapping("name", "ou", ModelType.STRING, true))));
   }
 
   @Test
@@ -122,31 +129,44 @@ public class LdapRealmProviderDAOTest {
     Realm realm = ldapRealmProviderDAOImpl.load("domaine1").get();
     assertThat(
         "Should have the userMapping",
-        realm.getUserStorages().get(0).getMappings().get("userMapping").get("firstName"),
-        is("givenname,String,rw"));
+        realm.getUserStorages().get(0).getUserMappings().stream()
+            .anyMatch(
+                v -> v.equals(new StoreMapping("firstName", "givenname", ModelType.STRING, true))));
+
     assertThat(
-        "Should have userMapping",
-        realm
-            .getUserStorages()
-            .get(0)
-            .getMappings()
-            .get("userMapping")
-            .get("attributes.insee_roles_applicatifs"),
-        is("inseeRoleApplicatif,list_string,rw"));
+        "Should have the userMapping",
+        realm.getUserStorages().get(0).getUserMappings().stream()
+            .anyMatch(
+                v ->
+                    v.equals(
+                        new StoreMapping(
+                            "attributes.insee_roles_applicatifs",
+                            "inseeRoleApplicatif",
+                            ModelType.LIST_STRING,
+                            true))));
 
     assertThat(
         "Should have the organizationMapping",
-        realm
-            .getUserStorages()
-            .get(0)
-            .getMappings()
-            .get("organizationMapping")
-            .get("attributes.mail"),
-        is("mail,String,rw"));
+        realm.getUserStorages().get(0).getOrganizationMappings().stream()
+            .anyMatch(
+                v ->
+                    v.equals(new StoreMapping("attributes.mail", "mail", ModelType.STRING, true))));
+
     assertThat(
-        "Should have organizationMapping",
-        realm.getUserStorages().get(0).getMappings().get("organizationMapping").get("address"),
-        is("inseeAdressePostaleDN,address,rw"));
+        "Should have the organizationMapping",
+        realm.getUserStorages().get(0).getOrganizationMappings().stream()
+            .anyMatch(
+                v ->
+                    v.equals(
+                        new StoreMapping(
+                            "address", "inseeAdressePostaleDN", ModelType.ADDRESS, true))));
+
+    assertThat(
+        "Should have the userMapping",
+        realm.getUserStorages().get(0).getUserMappings().stream()
+            .anyMatch(
+                v ->
+                    v.equals(new StoreMapping("groups", "memberOf", ModelType.LIST_GROUP, false))));
   }
 
   @Test

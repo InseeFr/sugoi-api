@@ -13,17 +13,18 @@
 */
 package fr.insee.sugoi.config.file;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
+import fr.insee.sugoi.model.technics.ModelType;
+import fr.insee.sugoi.model.technics.StoreMapping;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ public class LocalFileWriteRealmTest {
   @Autowired ResourceLoader resourceLoader;
   @Autowired LocalFileRealmProviderDAO localFileConfig;
 
-  private ObjectMapper mapper = new ObjectMapper();
+  private final ObjectMapper mapper = new ObjectMapper();
 
   @BeforeEach
   public void setup() {
@@ -167,31 +168,26 @@ public class LocalFileWriteRealmTest {
   @Test
   public void addApplicationMappingTest() {
     Realm realmToModify = localFileConfig.load("tomodify").get();
-    if (!realmToModify.getMappings().containsKey("applicationMapping")) {
-      realmToModify.getMappings().put("applicationMapping", new HashMap<>());
-    }
-    realmToModify.getMappings().get("applicationMapping").put("name", "ou,String,rw");
+    realmToModify.setApplicationMappings(new ArrayList<>());
+    realmToModify
+        .getApplicationMappings()
+        .add(new StoreMapping("name", "ou", ModelType.STRING, true));
     localFileConfig.updateRealm(realmToModify, null);
     assertThat(
         "Application mapping should have a name",
-        localFileConfig.load("tomodify").get().getMappings().get("applicationMapping").get("name"),
-        is("ou,String,rw"));
+        localFileConfig.load("tomodify").get().getApplicationMappings().stream()
+            .anyMatch(v -> v.equals(new StoreMapping("name", "ou", ModelType.STRING, true))));
   }
 
   @Test
   public void addOrganizationMappingTest() {
     Realm realmToModify = localFileConfig.load("tomodify").get();
+    realmToModify.getUserStorages().get(0).setOrganizationMappings(new ArrayList<>());
     realmToModify
         .getUserStorages()
         .get(0)
-        .getMappings()
-        .put("organizationMapping", new HashMap<>());
-    realmToModify
-        .getUserStorages()
-        .get(0)
-        .getMappings()
-        .get("organizationMapping")
-        .put("address", "inseeAdressePostaleDN,address,rw");
+        .getOrganizationMappings()
+        .add(new StoreMapping("address", "inseeAdressePostaleDN", ModelType.ADDRESS, true));
     localFileConfig.updateRealm(realmToModify, null);
     assertThat(
         "Organization mapping should have an address",
@@ -200,9 +196,12 @@ public class LocalFileWriteRealmTest {
             .get()
             .getUserStorages()
             .get(0)
-            .getMappings()
-            .get("organizationMapping")
-            .get("address"),
-        is("inseeAdressePostaleDN,address,rw"));
+            .getOrganizationMappings()
+            .stream()
+            .anyMatch(
+                v ->
+                    v.equals(
+                        new StoreMapping(
+                            "address", "inseeAdressePostaleDN", ModelType.ADDRESS, true))));
   }
 }

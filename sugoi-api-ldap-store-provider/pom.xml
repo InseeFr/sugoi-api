@@ -29,5 +29,12 @@
          <groupId>fr.insee.sugoi</groupId>
          <artifactId>sugoi-api-ldap-utils</artifactId>
       </dependency>
+      <dependency>
+         <groupId>fr.insee.sugoi</groupId>
+         <artifactId>sugoi-api-model</artifactId>
+		   <version>${project.version}</version>
+         <type>test-jar</type>
+         <scope>test</scope>
+      </dependency>
    </dependencies>
 </project>

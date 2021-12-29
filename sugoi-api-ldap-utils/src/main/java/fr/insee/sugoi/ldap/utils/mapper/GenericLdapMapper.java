@@ -22,16 +22,12 @@ import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.technics.ModelType;
+import fr.insee.sugoi.model.technics.StoreMapping;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -42,44 +38,42 @@ public class GenericLdapMapper {
       Collection<Attribute> attributes,
       Class<ReturnType> returnClazz,
       Map<String, String> config,
-      Map<String, String> mapping) {
+      List<StoreMapping> mappings) {
+
     try {
       ReturnType mappedEntity = returnClazz.getDeclaredConstructor().newInstance();
-      for (Entry<String, String> mappingDefinition : mapping.entrySet()) {
+      for (StoreMapping mappingDefinition : mappings) {
         try {
-          String[] splitedMappingDefinition = mappingDefinition.getValue().split(",");
-          String attributeLdapName = splitedMappingDefinition[0];
-          ModelType mappingType = ModelType.valueOf(splitedMappingDefinition[1].toUpperCase());
-          String fieldToSetName = mappingDefinition.getKey();
+
           List<Attribute> correspondingAttributes =
               attributes.stream()
-                  .filter(attribute -> attributeLdapName.equalsIgnoreCase(attribute.getName()))
+                  .filter(
+                      attribute ->
+                          mappingDefinition.getStoreName().equalsIgnoreCase(attribute.getName()))
                   .collect(Collectors.toList());
-          if (correspondingAttributes.size() > 0) {
-            if (fieldToSetName.contains(".")) {
-              Object sugoiAttribute =
-                  transformLdapAttributeToSugoiAttribute(
-                      mappingType, correspondingAttributes, config);
-              putSugoiAttributeInEntityMapField(sugoiAttribute, fieldToSetName, mappedEntity);
+          if (!correspondingAttributes.isEmpty()) {
+            Object sugoiAttribute =
+                transformLdapAttributeToSugoiAttribute(
+                    mappingDefinition.getModelType(), correspondingAttributes, config);
+            if (mappingDefinition.getSugoiName().contains(".")) {
+              putSugoiAttributeInEntityMapField(
+                  sugoiAttribute, mappingDefinition.getSugoiName(), mappedEntity);
             } else {
-              Object sugoiAttribute =
-                  transformLdapAttributeToSugoiAttribute(
-                      mappingType, correspondingAttributes, config);
-              putSugoiAttributeInEntityField(sugoiAttribute, fieldToSetName, mappedEntity);
+              putSugoiAttributeInEntityField(
+                  sugoiAttribute, mappingDefinition.getSugoiName(), mappedEntity);
             }
-          } else if (mappingType == ModelType.EXISTS) {
-            if (fieldToSetName.contains(".")) {
-              putSugoiAttributeInEntityMapField(false, fieldToSetName, mappedEntity);
+          } else if (mappingDefinition.getModelType() == ModelType.EXISTS) {
+            if (mappingDefinition.getSugoiName().contains(".")) {
+              putSugoiAttributeInEntityMapField(
+                  false, mappingDefinition.getSugoiName(), mappedEntity);
             } else {
-              putSugoiAttributeInEntityField(false, fieldToSetName, mappedEntity);
+              putSugoiAttributeInEntityField(false, mappingDefinition.getSugoiName(), mappedEntity);
             }
           }
         } catch (Exception e) {
           throw new LdapMappingConfigurationException(
               "Error occured while mapping attribute to Ldap. Must be caused by the configuration "
-                  + mappingDefinition.getKey()
-                  + ":"
-                  + mappingDefinition.getValue()
+                  + mappingDefinition
                   + " for entity "
                   + returnClazz.getName(),
               e);
@@ -101,7 +95,7 @@ public class GenericLdapMapper {
       SugoiType entity,
       Class<SugoiType> entityClazz,
       Map<String, String> config,
-      Map<String, String> mapping,
+      List<StoreMapping> mappings,
       List<String> objectClasses,
       boolean isToWrite) {
     List<Attribute> attributes = new ArrayList<>();
@@ -109,44 +103,46 @@ public class GenericLdapMapper {
       attributes.add(new Attribute("objectClass", objectClasses));
     }
 
-    for (Entry<String, String> mappingDefinition : mapping.entrySet()) {
+    for (StoreMapping mappingDefinition : mappings) {
       try {
-        String[] splitedMappingDefinition = mappingDefinition.getValue().split(",");
-        String attributeLdapName = splitedMappingDefinition[0];
-        ModelType mappingType = ModelType.valueOf(splitedMappingDefinition[1].toUpperCase());
-        String readonlyStatus = splitedMappingDefinition[2];
-        String fieldToSetName = mappingDefinition.getKey();
-        if (!readonlyStatus.equalsIgnoreCase("ro") || !isToWrite) {
-          if (fieldToSetName.contains(".")) {
-            String[] splitedFieldName = fieldToSetName.split("\\.");
+
+        if (mappingDefinition.isWritable() || !isToWrite) {
+          if (mappingDefinition.getSugoiName().contains(".")) {
+            String[] splitedFieldName = mappingDefinition.getSugoiName().split("\\.");
             String mapToModifyName = splitedFieldName[0];
             String keyToModify = splitedFieldName[1];
             Field modelField = entity.getClass().getDeclaredField(mapToModifyName);
             modelField.setAccessible(true);
-            Map<String, Object> map = (Map<String, Object>) modelField.get(entity);
-            if (map != null && map.containsKey(keyToModify)) {
-              Object sugoiValue = map.get(keyToModify);
+            Map<String, Object> mapToModify = (Map<String, Object>) modelField.get(entity);
+            if (mapToModify != null && mapToModify.containsKey(keyToModify)) {
+              Object sugoiValue = mapToModify.get(keyToModify);
               if (sugoiValue != null) {
                 attributes.addAll(
-                    transformSugoiToAttribute(mappingType, attributeLdapName, sugoiValue, config));
+                    transformSugoiToAttribute(
+                        mappingDefinition.getModelType(),
+                        mappingDefinition.getStoreName(),
+                        sugoiValue,
+                        config));
               }
             }
           } else {
-            Field sugoiField = entity.getClass().getDeclaredField(fieldToSetName);
+            Field sugoiField = entity.getClass().getDeclaredField(mappingDefinition.getSugoiName());
             sugoiField.setAccessible(true);
             Object sugoiValue = sugoiField.get(entity);
             if (sugoiValue != null) {
               attributes.addAll(
-                  transformSugoiToAttribute(mappingType, attributeLdapName, sugoiValue, config));
+                  transformSugoiToAttribute(
+                      mappingDefinition.getModelType(),
+                      mappingDefinition.getStoreName(),
+                      sugoiValue,
+                      config));
             }
           }
         }
       } catch (Exception e) {
         throw new LdapMappingConfigurationException(
             "Error occured while mapping attribute to Ldap. Must be caused by the configuration "
-                + mappingDefinition.getKey()
-                + ":"
-                + mappingDefinition.getValue()
+                + mappingDefinition
                 + " for entity "
                 + entityClazz.getName(),
             e);
@@ -307,9 +303,9 @@ public class GenericLdapMapper {
   }
 
   public static <O> List<Modification> createMods(
-      O entity, Class<O> propertiesClazz, Map<String, String> config, Map<String, String> mapping) {
+      O entity, Class<O> propertiesClazz, Map<String, String> config, List<StoreMapping> mappings) {
     return LdapUtils.convertAttributesToModifications(
         // Modification => no need to specify object classes
-        mapObjectToLdapAttributes(entity, propertiesClazz, config, mapping, null, true));
+        mapObjectToLdapAttributes(entity, propertiesClazz, config, mappings, null, true));
   }
 }

@@ -44,12 +44,12 @@ public class GenericGlue {
   }
 
   private Scenario scenario;
-  private StepData stepData;
+  private final StepData stepData;
 
   private String basicUsername = null;
   private String basicPassword = null;
 
-  private Map<String, String> headers = new HashMap<>();
+  private final Map<String, String> headers = new HashMap<>();
 
   public GenericGlue(StepData stepData) {
     this.stepData = stepData;
@@ -267,6 +267,7 @@ public class GenericGlue {
       } catch (Exception e) {
         System.out.println("App is not ready sleeping...");
         System.out.println(e.getMessage());
+        e.printStackTrace();
         Thread.sleep(20000);
         System.out.println("continue...");
       }

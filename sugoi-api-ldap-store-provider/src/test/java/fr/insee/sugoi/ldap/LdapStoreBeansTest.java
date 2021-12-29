@@ -13,20 +13,22 @@
 */
 package fr.insee.sugoi.ldap;
 
-import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+import fr.insee.sugoi.model.MappingType;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
+import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
+import fr.insee.sugoi.model.technics.ModelType;
+import fr.insee.sugoi.model.technics.StoreMapping;
 import fr.insee.sugoi.store.ldap.LdapStoreBeans;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootTest(classes = LdapStoreBeans.class)
@@ -71,28 +73,8 @@ public class LdapStoreBeansTest {
     us.setName("default");
     us.addProperty("group_filter_pattern", groupFilterPattern);
     us.addProperty("group_source_pattern", groupSourcePattern);
-    Map<String, Map<String, String>> mappings = new HashMap<>();
 
-    Map<String, String> userMapping = new HashMap<>();
-    userMapping.put("username", "uid,String,rw");
-    userMapping.put("lastName", "sn,String,rw");
-    userMapping.put("mail", "mail,String,rw");
-    userMapping.put("firstName", "givenname,String,rw");
-    userMapping.put("attributes.common_name", "cn,String,rw");
-    userMapping.put("attributes.personal_title", "personalTitle,String,rw");
-    userMapping.put("attributes.description", "description,String,rw");
-    userMapping.put("attributes.phone_number", "telephoneNumber,String,rw");
-    userMapping.put("habilitations", "inseeGroupeDefaut,list_habilitation,rw");
-    userMapping.put("organization", "inseeOrganisationDN,organization,rw");
-    userMapping.put("address", "inseeAdressePostaleDN,address,rw");
-    userMapping.put("groups", "memberOf,list_group,ro");
-    userMapping.put("attributes.insee_roles_applicatifs", "inseeRoleApplicatif,list_string,rw");
-    userMapping.put("attributes.common_name", "cn,String,rw");
-    userMapping.put("attributes.additionalMail", "inseeMailCorrespondant,String,rw");
-
-    mappings.put("userMapping", userMapping);
-
-    us.setMappings(mappings);
+    us.setUserMappings(StoreMappingFixture.getUserStoreMappings());
     return us;
   }
 
@@ -104,58 +86,70 @@ public class LdapStoreBeansTest {
     realm.setPort("390");
     realm.setAppSource(appSource);
 
-    Map<String, Map<String, String>> mappings = new HashMap<>();
-    Map<String, String> groupMapping = new HashMap<>();
-    groupMapping.put("name", "cn,String,rw");
-    groupMapping.put("description", "description,String,rw");
-    groupMapping.put("users", "uniquemember,list_user,rw");
-    mappings.put("groupMapping", groupMapping);
-    realm.setMappings(mappings);
+    realm.setGroupMappings(StoreMappingFixture.getGroupStoreMappings());
 
     return realm;
   }
 
-  @Autowired ApplicationContext context;
   @Autowired LdapStoreBeans ldapStoreBeans;
 
   @Test
   public void beanShouldHaveItsOwnMappingTest() {
-    Map<String, Map<String, String>> mappings =
+    Map<MappingType, List<StoreMapping>> mappings =
         ldapStoreBeans.getCompleteMapping(realm(), userStorage());
     assertThat(
         "Should have the mappings that have been explicitly set in the realm",
-        mappings.get("groupMapping").get("name"),
-        is("cn,String,rw"));
+        mappings.get(MappingType.GROUPMAPPING).stream()
+            .anyMatch(v -> v.equals(new StoreMapping("name", "cn", ModelType.STRING, true))));
     assertThat(
         "Should have the mappings that have been explicitly set in the realm",
-        mappings.get("groupMapping").get("users"),
-        is("uniquemember,list_user,rw"));
+        mappings.get(MappingType.GROUPMAPPING).stream()
+            .anyMatch(
+                v ->
+                    v.equals(
+                        new StoreMapping("users", "uniquemember", ModelType.LIST_USER, true))));
     assertThat(
         "Should have the mappings that have been explicitly set in the us",
-        mappings.get("userMapping").get("firstName"),
-        is("givenname,String,rw"));
+        mappings.get(MappingType.USERMAPPING).stream()
+            .anyMatch(
+                v -> v.equals(new StoreMapping("firstName", "givenname", ModelType.STRING, true))));
     assertThat(
         "Should have the mappings that have been explicitly set in the us",
-        mappings.get("userMapping").get("attributes.insee_roles_applicatifs"),
-        is("inseeRoleApplicatif,list_string,rw"));
+        mappings.get(MappingType.USERMAPPING).stream()
+            .anyMatch(
+                v ->
+                    v.equals(
+                        new StoreMapping(
+                            "attributes.insee_roles_applicatifs",
+                            "inseeRoleApplicatif",
+                            ModelType.LIST_STRING,
+                            true))));
   }
 
   @Test
   public void beanShouldHaveDefaultMappingTest() {
-    Map<String, Map<String, String>> mappings =
+    Map<MappingType, List<StoreMapping>> mappings =
         ldapStoreBeans.getCompleteMapping(realm(), userStorage());
     assertThat(
         "Should have the default mappings in the us when not set",
-        mappings.get("organizationMapping").get("attributes.mail"),
-        is("mail,String,rw"));
+        mappings.get(MappingType.ORGANIZATIONMAPPING).stream()
+            .anyMatch(
+                v ->
+                    v.equals(new StoreMapping("attributes.mail", "mail", ModelType.STRING, true))));
+
     assertThat(
         "Should have the default mappings in the us when not set",
-        mappings.get("organizationMapping").get("address"),
-        is("inseeAdressePostaleDN,address,rw"));
+        mappings.get(MappingType.ORGANIZATIONMAPPING).stream()
+            .anyMatch(
+                v ->
+                    v.equals(
+                        new StoreMapping(
+                            "address", "inseeAdressePostaleDN", ModelType.ADDRESS, true))));
+
     assertThat(
         "Should have the default mappings in the realm when not set",
-        mappings.get("applicationMapping").get("name"),
-        is("ou,String,rw"));
+        mappings.get(MappingType.APPLICATIONMAPPING).stream()
+            .anyMatch(v -> v.equals(new StoreMapping("name", "ou", ModelType.STRING, true))));
   }
 
   @Test

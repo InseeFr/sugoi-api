@@ -17,6 +17,7 @@ import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.technics.StoreMapping;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -26,22 +27,22 @@ public class OrganizationLdapMapper implements LdapMapper<Organization> {
 
   Map<String, String> config;
   List<String> objectClasses;
-  Map<String, String> mapping;
+  List<StoreMapping> mappings;
 
-  public OrganizationLdapMapper(Map<String, String> config, Map<String, String> mapping) {
+  public OrganizationLdapMapper(Map<String, String> config, List<StoreMapping> mappings) {
     this.config = config;
     if (config.get(LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES) != null) {
       objectClasses =
           Arrays.asList(config.get(LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES).split(","));
     }
-    this.mapping = mapping;
+    this.mappings = mappings;
   }
 
   @Override
   public Organization mapFromAttributes(Collection<Attribute> attributes) {
     Organization org =
         GenericLdapMapper.mapLdapAttributesToObject(
-            attributes, Organization.class, config, mapping);
+            attributes, Organization.class, config, mappings);
     // org.setGpgkey(searchResultEntry.getAttribute("inseeClefChiffrement").getValueByteArray());
     return org;
   }
@@ -49,17 +50,17 @@ public class OrganizationLdapMapper implements LdapMapper<Organization> {
   @Override
   public List<Attribute> mapToAttributes(Organization organization) {
     return GenericLdapMapper.mapObjectToLdapAttributes(
-        organization, Organization.class, config, mapping, objectClasses, true);
+        organization, Organization.class, config, mappings, objectClasses, true);
   }
 
   @Override
   public List<Attribute> createAttributesForFilter(Organization organization) {
     return GenericLdapMapper.mapObjectToLdapAttributes(
-        organization, Organization.class, config, mapping, objectClasses, false);
+        organization, Organization.class, config, mappings, objectClasses, false);
   }
 
   @Override
   public List<Modification> createMods(Organization updatedOrganization) {
-    return GenericLdapMapper.createMods(updatedOrganization, Organization.class, config, mapping);
+    return GenericLdapMapper.createMods(updatedOrganization, Organization.class, config, mappings);
   }
 }
