@@ -17,6 +17,8 @@ import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.technics.StoreMapping;
+
 import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
@@ -33,20 +35,20 @@ public class UserLdapMapper implements LdapMapper<User> {
 
   Map<String, String> config;
   List<String> objectClasses;
-  Map<String, String> mapping;
+  List<StoreMapping> mappings;
 
-  public UserLdapMapper(Map<String, String> config, Map<String, String> mapping) {
+  public UserLdapMapper(Map<String, String> config, List<StoreMapping> mappings) {
     this.config = config;
     if (config.get(LdapConfigKeys.USER_OBJECT_CLASSES) != null) {
       objectClasses = Arrays.asList(config.get(LdapConfigKeys.USER_OBJECT_CLASSES).split(","));
     }
-    this.mapping = mapping;
+    this.mappings = mappings;
   }
 
   @Override
   public User mapFromAttributes(Collection<Attribute> attributes) {
     User user =
-        GenericLdapMapper.mapLdapAttributesToObject(attributes, User.class, config, mapping);
+        GenericLdapMapper.mapLdapAttributesToObject(attributes, User.class, config, mappings);
     if (user.getCertificate() != null) {
       CertificateFactory cf;
       try {
@@ -80,11 +82,11 @@ public class UserLdapMapper implements LdapMapper<User> {
   @Override
   public List<Attribute> mapToAttributes(User u) {
     return GenericLdapMapper.mapObjectToLdapAttributes(
-        u, User.class, config, mapping, objectClasses);
+        u, User.class, config, mappings, objectClasses);
   }
 
   @Override
   public List<Modification> createMods(User updatedUser) {
-    return GenericLdapMapper.createMods(updatedUser, User.class, config, mapping);
+    return GenericLdapMapper.createMods(updatedUser, User.class, config, mappings);
   }
 }

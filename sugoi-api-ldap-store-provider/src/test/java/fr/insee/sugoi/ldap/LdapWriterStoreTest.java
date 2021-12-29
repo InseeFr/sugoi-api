@@ -13,33 +13,18 @@
 */
 package fr.insee.sugoi.ldap;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
 import fr.insee.sugoi.core.exceptions.StoragePolicyNotMetException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
+import fr.insee.sugoi.ldap.fixtures.StoreMappingFixture;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
-import fr.insee.sugoi.model.Application;
-import fr.insee.sugoi.model.Group;
-import fr.insee.sugoi.model.Habilitation;
-import fr.insee.sugoi.model.Organization;
-import fr.insee.sugoi.model.Realm;
-import fr.insee.sugoi.model.User;
-import fr.insee.sugoi.model.UserStorage;
+import fr.insee.sugoi.model.*;
 import fr.insee.sugoi.store.ldap.LdapReaderStore;
 import fr.insee.sugoi.store.ldap.LdapStoreBeans;
 import fr.insee.sugoi.store.ldap.LdapWriterStore;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,6 +35,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.TestPropertySource;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(classes = {EmbeddedLdapAutoConfiguration.class, LdapStoreBeans.class})
 @TestPropertySource(locations = "classpath:/application.properties")
@@ -89,47 +83,13 @@ public class LdapWriterStoreTest {
     us.addProperty("group_filter_pattern", groupFilterPattern);
     us.addProperty("group_source_pattern", groupSourcePattern);
     us.addProperty(
-        LdapConfigKeys.USER_OBJECT_CLASSES,
-        "top,inseeContact,inseeAttributsHabilitation,inseeAttributsCommunication");
+            LdapConfigKeys.USER_OBJECT_CLASSES,
+            "top,inseeContact,inseeAttributsHabilitation,inseeAttributsCommunication");
     us.addProperty(LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES, "top,inseeOrganisation");
-    Map<String, Map<String, String>> mappings = new HashMap<>();
 
-    Map<String, String> userMapping = new HashMap<>();
-    userMapping.put("username", "uid,String,rw");
-    userMapping.put("lastName", "sn,String,rw");
-    userMapping.put("mail", "mail,String,rw");
-    userMapping.put("firstName", "givenname,String,rw");
-    userMapping.put("attributes.common_name", "cn,String,rw");
-    userMapping.put("attributes.personal_title", "personalTitle,String,rw");
-    userMapping.put("attributes.description", "description,String,rw");
-    userMapping.put("attributes.phone_number", "telephoneNumber,String,rw");
-    userMapping.put("habilitations", "inseeGroupeDefaut,list_habilitation,rw");
-    userMapping.put("organization", "inseeOrganisationDN,organization,rw");
-    userMapping.put("address", "inseeAdressePostaleDN,address,rw");
-    userMapping.put("groups", "memberOf,list_group,ro");
-    userMapping.put("attributes.insee_roles_applicatifs", "inseeRoleApplicatif,list_string,rw");
-    userMapping.put("attributes.common_name", "cn,String,rw");
-    userMapping.put("attributes.additionalMail", "inseeMailCorrespondant,String,rw");
-    userMapping.put("attributes.passwordShouldBeReset", "pwdReset,String,ro");
-    Map<String, String> organizationMapping = new HashMap<>();
-    organizationMapping.put("identifiant", "uid,String,rw");
-    organizationMapping.put("attributes.description", "description,String,rw");
-    organizationMapping.put("attributes.mail", "mail,String,rw");
-    organizationMapping.put("address", "inseeAdressePostaleDN,address,rw");
-    organizationMapping.put("organization", "inseeOrganisationDN,organization,rw");
-    Map<String, String> applicationMapping = new HashMap<>();
-    applicationMapping.put("name", "ou,String,rw");
-    Map<String, String> groupMapping = new HashMap<>();
-    groupMapping.put("name", "cn,String,rw");
-    groupMapping.put("description", "description,String,rw");
-    groupMapping.put("users", "uniquemember,list_user,rw");
 
-    mappings.put("userMapping", userMapping);
-    mappings.put("organizationMapping", organizationMapping);
-    mappings.put("applicationMapping", applicationMapping);
-    mappings.put("groupMapping", groupMapping);
-
-    us.setMappings(mappings);
+    us.setUserMappings(StoreMappingFixture.getUserStoreMappings());
+    us.setOrganizationMappings(StoreMappingFixture.getOrganizationStoreMappings());
     return us;
   }
 
@@ -141,19 +101,11 @@ public class LdapWriterStoreTest {
     realm.setAppSource(appSource);
     realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, appManagedAttributeKey);
     realm.addProperty(
-        GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, appManagedAttributePattern);
+            GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, appManagedAttributePattern);
     realm.addProperty(LdapConfigKeys.UNIQUE_EMAILS, "false");
 
-    Map<String, Map<String, String>> mappings = new HashMap<>();
-    Map<String, String> applicationMapping = new HashMap<>();
-    applicationMapping.put("name", "ou,String,rw");
-    Map<String, String> groupMapping = new HashMap<>();
-    groupMapping.put("name", "cn,String,rw");
-    groupMapping.put("description", "description,String,rw");
-    groupMapping.put("users", "uniquemember,list_user,rw");
-    mappings.put("applicationMapping", applicationMapping);
-    mappings.put("groupMapping", groupMapping);
-    realm.setMappings(mappings);
+    realm.setApplicationMappings(StoreMappingFixture.getApplicationStoreMappings());
+    realm.setGroupMappings(StoreMappingFixture.getGroupStoreMappings());
 
     return realm;
   }

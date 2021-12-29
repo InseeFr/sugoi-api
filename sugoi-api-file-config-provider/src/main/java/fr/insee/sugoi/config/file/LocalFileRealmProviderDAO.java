@@ -21,12 +21,6 @@ import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.model.Realm;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -34,11 +28,18 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Component
 @ConditionalOnProperty(
-    value = "fr.insee.sugoi.realm.config.type",
-    havingValue = "local",
-    matchIfMissing = true)
+        value = "fr.insee.sugoi.realm.config.type",
+        havingValue = "local",
+        matchIfMissing = true)
 public class LocalFileRealmProviderDAO implements RealmProvider {
 
   @Value("${fr.insee.sugoi.realm.config.local.path:classpath:/realms.json}")
@@ -53,7 +54,7 @@ public class LocalFileRealmProviderDAO implements RealmProvider {
   @Autowired ResourceLoader resourceLoader;
 
   private List<Realm> realms;
-  private ObjectMapper mapper = new ObjectMapper();
+  private final ObjectMapper mapper = new ObjectMapper();
 
   @Override
   public Optional<Realm> load(String realmName) {

@@ -13,16 +13,18 @@
 */
 package fr.insee.sugoi.ldap.utils.mapper;
 
-import static org.hamcrest.MatcherAssert.*;
-
 import com.unboundid.ldap.sdk.Attribute;
+import fixtures.StoreMappingFixture;
 import fr.insee.sugoi.model.Application;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @SpringBootTest(classes = ApplicationLdapMapper.class)
 public class ApplicationLdapMapperFromObjectTest {
@@ -37,9 +39,7 @@ public class ApplicationLdapMapperFromObjectTest {
     Map<String, String> config = new HashMap<>();
     config.put("app_source", "ou=monappli,ou=Applications,o=insee,c=fr");
     config.put("address_source", "ou=address,o=insee,c=fr");
-    Map<String, String> mapping = new HashMap<>();
-    applicationLdapMapper = new ApplicationLdapMapper(config, mapping);
-    mapping.put("name", "ou,String,rw");
+    applicationLdapMapper = new ApplicationLdapMapper(config, StoreMappingFixture.getApplicationStoreMappings());
     application = new Application();
   }
 

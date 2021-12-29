@@ -11,7 +11,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.ldap.utils.mapper;
+package fr.insee.sugoi.model.technics;
 
 public enum ModelType {
   STRING,

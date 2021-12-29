@@ -13,22 +13,26 @@
 */
 package fr.insee.sugoi.config.file;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
-
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.technics.ModelType;
+import fr.insee.sugoi.model.technics.StoreMapping;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
+
 @SpringBootTest(classes = LocalFileRealmProviderDAO.class)
 @TestPropertySource(
-    properties = "fr.insee.sugoi.realm.config.local.path=classpath:/realms-one.json")
+        properties = "fr.insee.sugoi.realm.config.local.path=classpath:/realms-one.json")
 public class LocalFileRealmProviderDAO_realmsOneTest {
 
-  @Autowired RealmProvider localFileConfig;
+  @Autowired
+  RealmProvider localFileConfig;
 
   @Test
   public void shouldBeLocalFileRealmProvider() {
@@ -68,48 +72,35 @@ public class LocalFileRealmProviderDAO_realmsOneTest {
   public void shouldHaveRealmMapping() {
     Realm realm = localFileConfig.load("test").get();
     assertThat(
-        "Should have groupMapping",
-        realm.getMappings().get("groupMapping").get("name"),
-        is("cn,String,rw"));
+            "Should have groupMapping",
+            realm.getGroupMappings().stream().anyMatch(v -> v.equals(new StoreMapping("name", "cn", ModelType.STRING, true))));
+
     assertThat(
-        "Should have groupMapping",
-        realm.getMappings().get("groupMapping").get("users"),
-        is("uniquemember,list_user,rw"));
+            "Should have groupMapping",
+            realm.getGroupMappings().stream().anyMatch(v -> v.equals(new StoreMapping("users", "uniquemember", ModelType.LIST_USER, true))));
+
     assertThat(
-        "Should have applicationMapping",
-        realm.getMappings().get("applicationMapping").get("name"),
-        is("ou,String,rw"));
+            "Should have applicationMapping",
+            realm.getApplicationMappings().stream().anyMatch(v -> v.equals(new StoreMapping("name", "ou", ModelType.STRING, true))));
+
   }
 
   @Test
   public void shouldHaveUsOneMapping() {
     Realm realm = localFileConfig.load("test").get();
     assertThat(
-        "Should have the userMapping",
-        realm.getUserStorages().get(0).getMappings().get("userMapping").get("firstName"),
-        is("givenname,String,rw"));
-    assertThat(
-        "Should have userMapping",
-        realm
-            .getUserStorages()
-            .get(0)
-            .getMappings()
-            .get("userMapping")
-            .get("attributes.insee_roles_applicatifs"),
-        is("inseeRoleApplicatif,list_string,rw"));
+            "Should have the userMapping",
+            realm.getUserStorages().get(0).getUserMappings().stream().anyMatch(v -> v.equals(new StoreMapping("firstName", "givenname", ModelType.STRING, true))));
 
     assertThat(
-        "Should have the organizationMapping",
-        realm
-            .getUserStorages()
-            .get(0)
-            .getMappings()
-            .get("organizationMapping")
-            .get("attributes.mail"),
-        is("mail,String,rw"));
+            "Should have userMapping",
+            realm.getUserStorages().get(0).getUserMappings().stream().anyMatch(v -> v.equals(new StoreMapping("attributes.insee_roles_applicatifs", "inseeRoleApplicatif", ModelType.LIST_STRING, true))));
+
     assertThat(
-        "Should have organizationMapping",
-        realm.getUserStorages().get(0).getMappings().get("organizationMapping").get("address"),
-        is("inseeAdressePostaleDN,address,rw"));
+            "Should have the organizationMapping",
+            realm.getUserStorages().get(0).getOrganizationMappings().stream().anyMatch(v -> v.equals(new StoreMapping("attributes.mail", "mail", ModelType.STRING, true))));
+    assertThat(
+            "Should have organizationMapping",
+            realm.getUserStorages().get(0).getOrganizationMappings().stream().anyMatch(v -> v.equals(new StoreMapping("address", "inseeAdressePostaleDN", ModelType.ADDRESS, true))));
   }
 }

@@ -13,15 +13,13 @@
 */
 package fr.insee.sugoi.config;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.configuration.UiMappingService;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.Realm.UIMappingType;
+import fr.insee.sugoi.model.technics.ModelType;
+import fr.insee.sugoi.model.technics.StoreMapping;
 import fr.insee.sugoi.model.technics.UiField;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ldap.embedded.EmbeddedLdapAutoConfiguration;
@@ -29,13 +27,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 @SpringBootTest(classes = {EmbeddedLdapAutoConfiguration.class, LdapRealmProviderDAOImpl.class})
 @TestPropertySource(locations = "classpath:/application.properties")
 public class LdapRealmProviderDAOTest {
 
-  @Autowired LdapRealmProviderDAOImpl ldapRealmProviderDAOImpl;
+  @Autowired
+  LdapRealmProviderDAOImpl ldapRealmProviderDAOImpl;
 
-  @MockBean private UiMappingService uiMappingService;
+  @MockBean
+  private UiMappingService uiMappingService;
 
   @Test
   public void loadUniStorage() {
@@ -103,50 +108,31 @@ public class LdapRealmProviderDAOTest {
   @Test
   public void shouldHaveRealmMapping() {
     Realm realm = ldapRealmProviderDAOImpl.load("domaine1").get();
-    assertThat(
-        "Should have groupMapping",
-        realm.getMappings().get("groupMapping").get("name"),
-        is("cn,String,rw"));
-    assertThat(
-        "Should have groupMapping",
-        realm.getMappings().get("groupMapping").get("users"),
-        is("uniquemember,list_user,rw"));
-    assertThat(
-        "Should have applicationMapping",
-        realm.getMappings().get("applicationMapping").get("name"),
-        is("ou,String,rw"));
+    assertThat("Should have a name mapping", realm.getGroupMappings().stream().anyMatch(v -> v.equals(new StoreMapping("name", "cn", ModelType.STRING, true))));
+
+
+    assertThat("should have a groups mapping", realm.getGroupMappings().stream().anyMatch(v -> v.equals(new StoreMapping("users", "uniquemember", ModelType.LIST_USER, true))));
+
+
+    assertThat("Should have an application mapping", realm.getApplicationMappings().stream().anyMatch(v -> v.equals(new StoreMapping("name", "ou", ModelType.STRING, true))));
+
   }
 
   @Test
   public void shouldHaveUsOneMapping() {
     Realm realm = ldapRealmProviderDAOImpl.load("domaine1").get();
-    assertThat(
-        "Should have the userMapping",
-        realm.getUserStorages().get(0).getMappings().get("userMapping").get("firstName"),
-        is("givenname,String,rw"));
-    assertThat(
-        "Should have userMapping",
-        realm
-            .getUserStorages()
-            .get(0)
-            .getMappings()
-            .get("userMapping")
-            .get("attributes.insee_roles_applicatifs"),
-        is("inseeRoleApplicatif,list_string,rw"));
+    assertThat("Should have the userMapping", realm.getUserStorages().get(0).getUserMappings().stream().anyMatch(v -> v.equals(new StoreMapping("firstName", "givenname", ModelType.STRING, true))));
 
-    assertThat(
-        "Should have the organizationMapping",
-        realm
-            .getUserStorages()
-            .get(0)
-            .getMappings()
-            .get("organizationMapping")
-            .get("attributes.mail"),
-        is("mail,String,rw"));
-    assertThat(
-        "Should have organizationMapping",
-        realm.getUserStorages().get(0).getMappings().get("organizationMapping").get("address"),
-        is("inseeAdressePostaleDN,address,rw"));
+
+    assertThat("Should have the userMapping", realm.getUserStorages().get(0).getUserMappings().stream().anyMatch(v -> v.equals(new StoreMapping("attributes.insee_roles_applicatifs", "inseeRoleApplicatif", ModelType.LIST_STRING, true))));
+
+
+    assertThat("Should have the organizationMapping", realm.getUserStorages().get(0).getOrganizationMappings().stream().anyMatch(v -> v.equals(new StoreMapping("attributes.mail", "mail", ModelType.STRING, true))));
+
+    assertThat("Should have the organizationMapping", realm.getUserStorages().get(0).getOrganizationMappings().stream().anyMatch(v -> v.equals(new StoreMapping("address", "inseeAdressePostaleDN", ModelType.ADDRESS, true))));
+
+    assertThat("Should have the userMapping", realm.getUserStorages().get(0).getUserMappings().stream().anyMatch(v -> v.equals(new StoreMapping("groups", "memberOf", ModelType.LIST_GROUP, false))));
+
   }
 
   @Test
@@ -155,14 +141,15 @@ public class LdapRealmProviderDAOTest {
         ldapRealmProviderDAOImpl
             .load("domaine1")
             .get()
-            .getUiMapping()
-            .get(UIMappingType.UI_USER_MAPPING);
+                .getUiMapping()
+                .get(UIMappingType.UI_USER_MAPPING);
     assertThat("Should be 25 found uiUserMapping", 25, is(uiUserMapping.size()));
     assertThat("First one should be the id", "Identifiant", is(uiUserMapping.get(0).getName()));
     assertThat(
-        "Second one should be the password last modification date",
-        "PasswordLastChange",
-        is(uiUserMapping.get(1).getName()));
+            "Second one should be the password last modification date",
+            "PasswordLastChange",
+            is(uiUserMapping.get(1).getName()));
     assertThat("Third one should be the realm field", "Realm", is(uiUserMapping.get(2).getName()));
   }
+
 }

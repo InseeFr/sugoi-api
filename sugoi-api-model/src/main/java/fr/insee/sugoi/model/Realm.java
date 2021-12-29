@@ -14,54 +14,78 @@
 package fr.insee.sugoi.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import fr.insee.sugoi.model.technics.StoreMapping;
 import fr.insee.sugoi.model.technics.UiField;
+import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
+
 import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
 
 public class Realm implements Serializable {
 
   private String name;
-  private String url;
-  private String appSource;
-  private List<UserStorage> userStorages;
-  @IgnoreSizeOf private Map<String, String> properties = new HashMap<>();
-  @IgnoreSizeOf private Map<String, Map<String, String>> mappings = new HashMap<>();
+    private String url;
+    private String appSource;
+    private List<UserStorage> userStorages;
+    @IgnoreSizeOf
+    private Map<String, String> properties = new HashMap<>();
 
-  @IgnoreSizeOf
-  private Map<UIMappingType, List<UiField>> uiMapping = new EnumMap<>(UIMappingType.class);
+    @IgnoreSizeOf
+    private Map<UIMappingType, List<UiField>> uiMapping = new EnumMap<>(UIMappingType.class);
 
-  private String readerType;
-  private String writerType;
+    @IgnoreSizeOf
+    private List<StoreMapping> groupMappings;
+    @IgnoreSizeOf
+    private List<StoreMapping> applicationMappings;
 
-  public enum UIMappingType {
-    UI_ORGANIZATION_MAPPING("uiOrganizationMapping"),
-    UI_USER_MAPPING("uiUserMapping");
+    private String readerType;
+    private String writerType;
 
-    private String type;
 
-    private UIMappingType(String type) {
-      this.type = type;
+    public enum UIMappingType {
+        UI_ORGANIZATION_MAPPING("uiOrganizationMapping"),
+        UI_USER_MAPPING("uiUserMapping");
+
+        private final String type;
+
+        UIMappingType(String type) {
+            this.type = type;
+        }
+
+        @JsonValue
+        public String getType() {
+            return type;
+        }
     }
 
-    @JsonValue
-    public String getType() {
-      return type;
+    public List<StoreMapping> getGroupMappings() {
+        return groupMappings;
     }
-  }
 
-  public String getName() {
-    return this.name;
-  }
+    public void setGroupMappings(List<StoreMapping> groupMappings) {
+        this.groupMappings = groupMappings;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public List<StoreMapping> getApplicationMappings() {
+        return applicationMappings;
+    }
 
-  public List<UserStorage> getUserStorages() {
+    public void setApplicationMappings(List<StoreMapping> applicationMappings) {
+        this.applicationMappings = applicationMappings;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<UserStorage> getUserStorages() {
     return this.userStorages;
   }
 
@@ -126,13 +150,6 @@ public class Realm implements Serializable {
     this.writerType = writerType;
   }
 
-  public void setMappings(Map<String, Map<String, String>> mappings) {
-    this.mappings = mappings;
-  }
-
-  public Map<String, Map<String, String>> getMappings() {
-    return mappings;
-  }
 
   public Map<UIMappingType, List<UiField>> getUiMapping() {
     return uiMapping;

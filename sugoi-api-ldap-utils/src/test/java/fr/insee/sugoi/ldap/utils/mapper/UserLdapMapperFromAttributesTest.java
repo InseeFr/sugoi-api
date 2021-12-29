@@ -13,19 +13,17 @@
 */
 package fr.insee.sugoi.ldap.utils.mapper;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
-
 import com.unboundid.ldap.sdk.Attribute;
+import fixtures.StoreMappingFixture;
 import fr.insee.sugoi.model.User;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.*;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 @SpringBootTest(classes = UserLdapMapper.class)
 public class UserLdapMapperFromAttributesTest {
@@ -40,22 +38,9 @@ public class UserLdapMapperFromAttributesTest {
     config.put(
         "group_source_pattern",
         "ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr");
-    Map<String, String> mapping = new HashMap<>();
-    mapping.put("username", "uid,String,rw");
-    mapping.put("lastName", "sn,String,rw");
-    mapping.put("mail", "mail,String,rw");
-    mapping.put("firstName", "givenname,String,rw");
-    mapping.put("attributes.common_name", "cn,String,rw");
-    mapping.put("attributes.personal_title", "personalTitle,String,rw");
-    mapping.put("attributes.description", "description,String,rw");
-    mapping.put("attributes.phone_number", "telephoneNumber,String,rw");
-    mapping.put("habilitations", "inseeGroupeDefaut,list_habilitation,rw");
-    mapping.put("organization", "inseeOrganisationDN,organization,rw");
-    mapping.put("address", "inseeAdressePostaleDN,address,rw");
-    mapping.put("groups", "memberOf,list_group,ro");
-    mapping.put("attributes.insee_roles_applicatifs", "inseeRoleApplicatif,list_string,rw");
-    mapping.put("attributes.hasPassword", "userPassword,exists,ro");
-    userLdapMapper = new UserLdapMapper(config, mapping);
+
+
+    userLdapMapper = new UserLdapMapper(config, StoreMappingFixture.getUserStoreMappings());
   }
 
   @Test
@@ -90,6 +75,7 @@ public class UserLdapMapperFromAttributesTest {
     attributes.add(personalTitleAttribute);
     attributes.add(descriptionAttribute);
     attributes.add(telAttribute);
+
     User mappedUser = userLdapMapper.mapFromAttributes(attributes);
 
     assertThat("Should hava a cn", mappedUser.getAttributes().get("common_name"), is("Toto Tata"));

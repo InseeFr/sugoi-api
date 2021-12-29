@@ -13,18 +13,20 @@
 */
 package fr.insee.sugoi.ldap.utils.mapper;
 
-import static org.hamcrest.MatcherAssert.*;
-
 import com.unboundid.ldap.sdk.Attribute;
+import fixtures.StoreMappingFixture;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.User;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @SpringBootTest(classes = GroupLdapMapper.class)
 public class GroupLdapMapperFromObjectTest {
@@ -39,11 +41,7 @@ public class GroupLdapMapperFromObjectTest {
     Map<String, String> config = new HashMap<>();
     config.put("address_source", "ou=address,o=insee,c=fr");
     config.put("user_source", "ou=contacts,o=insee,c=fr");
-    Map<String, String> mapping = new HashMap<>();
-    groupLdapMapper = new GroupLdapMapper(config, mapping);
-    mapping.put("name", "cn,String,rw");
-    mapping.put("description", "description,String,rw");
-    mapping.put("users", "uniquemember,list_user,rw");
+    groupLdapMapper = new GroupLdapMapper(config, StoreMappingFixture.getGroupStoreMappings());
     group = new Group();
   }
 

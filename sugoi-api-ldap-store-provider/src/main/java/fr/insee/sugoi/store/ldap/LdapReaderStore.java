@@ -13,43 +13,26 @@
 */
 package fr.insee.sugoi.store.ldap;
 
-import com.unboundid.ldap.sdk.Filter;
-import com.unboundid.ldap.sdk.LDAPException;
-import com.unboundid.ldap.sdk.LDAPSearchException;
-import com.unboundid.ldap.sdk.ResultCode;
-import com.unboundid.ldap.sdk.SearchRequest;
-import com.unboundid.ldap.sdk.SearchResult;
-import com.unboundid.ldap.sdk.SearchResultEntry;
-import com.unboundid.ldap.sdk.SearchScope;
+import com.unboundid.ldap.sdk.*;
 import fr.insee.sugoi.core.exceptions.MultipleUserWithSameMailException;
 import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.LdapFilter;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
-import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;
-import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
-import fr.insee.sugoi.ldap.utils.mapper.GroupLdapMapper;
-import fr.insee.sugoi.ldap.utils.mapper.LdapMapper;
-import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
-import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
-import fr.insee.sugoi.model.Application;
-import fr.insee.sugoi.model.Group;
-import fr.insee.sugoi.model.Organization;
-import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.ldap.utils.mapper.*;
+import fr.insee.sugoi.model.*;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import fr.insee.sugoi.model.technics.StoreMapping;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class LdapReaderStore extends LdapStore implements ReaderStore {
 
-  public LdapReaderStore(Map<String, String> config, Map<String, Map<String, String>> mappings) {
+  public LdapReaderStore(Map<String, String> config, Map<MappingType, List<StoreMapping>> mappings) {
     logger.debug("Configuring LdapReaderStore with config : {}", config);
     try {
       if (Boolean.valueOf(config.get(LdapConfigKeys.READ_CONNECTION_AUTHENTICATED))) {
@@ -60,11 +43,11 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
         this.ldapMonoConnection = LdapFactory.getSingleConnection(config);
       }
       this.config = config;
-      userLdapMapper = new UserLdapMapper(config, mappings.get("userMapping"));
+      userLdapMapper = new UserLdapMapper(config, mappings.get(MappingType.USERMAPPING));
       organizationLdapMapper =
-          new OrganizationLdapMapper(config, mappings.get("organizationMapping"));
-      groupLdapMapper = new GroupLdapMapper(config, mappings.get("groupMapping"));
-      applicationLdapMapper = new ApplicationLdapMapper(config, mappings.get("applicationMapping"));
+              new OrganizationLdapMapper(config, mappings.get(MappingType.ORGANIZATIONMAPPING));
+      groupLdapMapper = new GroupLdapMapper(config, mappings.get(MappingType.GROUPMAPPING));
+      applicationLdapMapper = new ApplicationLdapMapper(config, mappings.get(MappingType.APPLICATIONMAPPING));
       addressLdapMapper = new AddressLdapMapper(config);
     } catch (LDAPException e) {
       throw new RuntimeException(e);

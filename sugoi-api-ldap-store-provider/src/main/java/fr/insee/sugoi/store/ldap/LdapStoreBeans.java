@@ -15,17 +15,22 @@ package fr.insee.sugoi.store.ldap;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
+import fr.insee.sugoi.model.MappingType;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import fr.insee.sugoi.model.technics.StoreMapping;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
+
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Configuration
 @ConfigurationProperties("fr.insee.sugoi.ldap.default")
@@ -164,58 +169,37 @@ public class LdapStoreBeans {
         LdapConfigKeys.APPLICATION_OBJECT_CLASSES,
         userStorage.getProperties().get(LdapConfigKeys.APPLICATION_OBJECT_CLASSES) != null
             ? userStorage.getProperties().get(LdapConfigKeys.APPLICATION_OBJECT_CLASSES)
-            : defaultApplicationObjectClasses);
+                : defaultApplicationObjectClasses);
     config.put(
-        LdapConfigKeys.ADDRESS_OBJECT_CLASSES,
-        userStorage.getProperties().get(LdapConfigKeys.ADDRESS_OBJECT_CLASSES) != null
-            ? userStorage.getProperties().get(LdapConfigKeys.ADDRESS_OBJECT_CLASSES)
-            : defaultAddressObjectClasses);
+            LdapConfigKeys.ADDRESS_OBJECT_CLASSES,
+            userStorage.getProperties().get(LdapConfigKeys.ADDRESS_OBJECT_CLASSES) != null
+                    ? userStorage.getProperties().get(LdapConfigKeys.ADDRESS_OBJECT_CLASSES)
+                    : defaultAddressObjectClasses);
 
     return config;
   }
 
-  public Map<String, Map<String, String>> getCompleteMapping(Realm realm, UserStorage userStorage) {
-    Map<String, Map<String, String>> resultMappings = new HashMap<>();
-    if (!userStorage.getMappings().containsKey("userMapping")) {
-      Map<String, String> mapping = new HashMap<>();
-      for (String mappingInstruction : defaultUserMapping) {
-        String[] mappingInstructionSplit = mappingInstruction.split(":");
-        mapping.put(mappingInstructionSplit[0], mappingInstructionSplit[1]);
-      }
-      resultMappings.put("userMapping", mapping);
+  public Map<MappingType, List<StoreMapping>> getCompleteMapping(Realm realm, UserStorage userStorage) {
+    Map<MappingType, List<StoreMapping>> resultMappings = new EnumMap<>(MappingType.class);
+    if (userStorage.getUserMappings() == null || userStorage.getUserMappings().isEmpty()) {
+      resultMappings.put(MappingType.USERMAPPING, defaultUserMapping.stream().map(StoreMapping::new).collect(Collectors.toList()));
     } else {
-      resultMappings.put("userMapping", userStorage.getMappings().get("userMapping"));
+      resultMappings.put(MappingType.USERMAPPING, userStorage.getUserMappings());
     }
-    if (!userStorage.getMappings().containsKey("organizationMapping")) {
-      Map<String, String> mapping = new HashMap<>();
-      for (String mappingInstruction : defaultOrganizationMapping) {
-        String[] mappingInstructionSplit = mappingInstruction.split(":");
-        mapping.put(mappingInstructionSplit[0], mappingInstructionSplit[1]);
-      }
-      resultMappings.put("organizationMapping", mapping);
+    if (realm.getApplicationMappings() == null || realm.getApplicationMappings().isEmpty()) {
+      resultMappings.put(MappingType.APPLICATIONMAPPING, defaultApplicationMapping.stream().map(StoreMapping::new).collect(Collectors.toList()));
     } else {
-      resultMappings.put(
-          "organizationMapping", userStorage.getMappings().get("organizationMapping"));
+      resultMappings.put(MappingType.APPLICATIONMAPPING, realm.getApplicationMappings());
     }
-    if (!realm.getMappings().containsKey("applicationMapping")) {
-      Map<String, String> mapping = new HashMap<>();
-      for (String mappingInstruction : defaultApplicationMapping) {
-        String[] mappingInstructionSplit = mappingInstruction.split(":");
-        mapping.put(mappingInstructionSplit[0], mappingInstructionSplit[1]);
-      }
-      resultMappings.put("applicationMapping", mapping);
+    if (userStorage.getOrganizationMappings() == null || userStorage.getOrganizationMappings().isEmpty()) {
+      resultMappings.put(MappingType.ORGANIZATIONMAPPING, defaultOrganizationMapping.stream().map(StoreMapping::new).collect(Collectors.toList()));
     } else {
-      resultMappings.put("applicationMapping", realm.getMappings().get("applicationMapping"));
+      resultMappings.put(MappingType.ORGANIZATIONMAPPING, userStorage.getOrganizationMappings());
     }
-    if (!realm.getMappings().containsKey("groupMapping")) {
-      Map<String, String> mapping = new HashMap<>();
-      for (String mappingInstruction : defaultGroupMapping) {
-        String[] mappingInstructionSplit = mappingInstruction.split(":");
-        mapping.put(mappingInstructionSplit[0], mappingInstructionSplit[1]);
-      }
-      resultMappings.put("groupMapping", mapping);
+    if (realm.getGroupMappings() == null || realm.getGroupMappings().isEmpty()) {
+      resultMappings.put(MappingType.GROUPMAPPING, defaultGroupMapping.stream().map(StoreMapping::new).collect(Collectors.toList()));
     } else {
-      resultMappings.put("groupMapping", realm.getMappings().get("groupMapping"));
+      resultMappings.put(MappingType.GROUPMAPPING, realm.getGroupMappings());
     }
     return resultMappings;
   }
@@ -225,7 +209,7 @@ public class LdapStoreBeans {
   }
 
   public void setUseAuthenticatedConnectionForReading(
-      boolean useAuthenticatedConnectionForReading) {
+          boolean useAuthenticatedConnectionForReading) {
     this.useAuthenticatedConnectionForReading = useAuthenticatedConnectionForReading;
   }
 }

@@ -13,30 +13,10 @@
 */
 package fr.insee.sugoi.store.ldap;
 
-import com.unboundid.ldap.sdk.AddRequest;
-import com.unboundid.ldap.sdk.Attribute;
-import com.unboundid.ldap.sdk.DeleteRequest;
-import com.unboundid.ldap.sdk.ExtendedResult;
-import com.unboundid.ldap.sdk.LDAPConnectionPool;
-import com.unboundid.ldap.sdk.LDAPException;
-import com.unboundid.ldap.sdk.Modification;
-import com.unboundid.ldap.sdk.ModificationType;
-import com.unboundid.ldap.sdk.ModifyRequest;
-import com.unboundid.ldap.sdk.ResultCode;
+import com.unboundid.ldap.sdk.*;
 import com.unboundid.ldap.sdk.extensions.PasswordModifyExtendedRequest;
 import com.unboundid.util.SubtreeDeleter;
-import fr.insee.sugoi.core.exceptions.AppManagedAttributeException;
-import fr.insee.sugoi.core.exceptions.ApplicationAlreadyExistException;
-import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
-import fr.insee.sugoi.core.exceptions.GroupAlreadyExistException;
-import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
-import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
-import fr.insee.sugoi.core.exceptions.OrganizationAlreadyExistException;
-import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
-import fr.insee.sugoi.core.exceptions.StoragePolicyNotMetException;
-import fr.insee.sugoi.core.exceptions.UnableToUpdateCertificateException;
-import fr.insee.sugoi.core.exceptions.UnabletoUpdateGPGKeyException;
-import fr.insee.sugoi.core.exceptions.UserNotFoundException;
+import fr.insee.sugoi.core.exceptions.*;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -45,44 +25,35 @@ import fr.insee.sugoi.core.service.impl.CertificateServiceImpl;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
-import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;
-import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
-import fr.insee.sugoi.ldap.utils.mapper.GroupLdapMapper;
-import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
-import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
-import fr.insee.sugoi.model.Application;
-import fr.insee.sugoi.model.Group;
-import fr.insee.sugoi.model.Organization;
-import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.ldap.utils.mapper.*;
+import fr.insee.sugoi.model.*;
+import fr.insee.sugoi.model.technics.StoreMapping;
+
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class LdapWriterStore extends LdapStore implements WriterStore {
 
-  private LDAPConnectionPool ldapPoolConnection;
+  private final LDAPConnectionPool ldapPoolConnection;
 
-  private UserLdapMapper userLdapMapper;
-  private OrganizationLdapMapper organizationLdapMapper;
-  private GroupLdapMapper groupLdapMapper;
-  private ApplicationLdapMapper applicationLdapMapper;
-  private AddressLdapMapper addressLdapMapper;
+  private final UserLdapMapper userLdapMapper;
+  private final OrganizationLdapMapper organizationLdapMapper;
+  private final GroupLdapMapper groupLdapMapper;
+  private final ApplicationLdapMapper applicationLdapMapper;
+  private final AddressLdapMapper addressLdapMapper;
 
-  private LdapReaderStore ldapReaderStore;
+  private final LdapReaderStore ldapReaderStore;
 
-  public LdapWriterStore(Map<String, String> config, Map<String, Map<String, String>> mappings) {
+  public LdapWriterStore(Map<String, String> config, Map<MappingType, List<StoreMapping>> mappings) {
     try {
       this.ldapPoolConnection = LdapFactory.getConnectionPoolAuthenticated(config);
       this.config = config;
-      userLdapMapper = new UserLdapMapper(config, mappings.get("userMapping"));
+      userLdapMapper = new UserLdapMapper(config, mappings.get(MappingType.USERMAPPING));
       organizationLdapMapper =
-          new OrganizationLdapMapper(config, mappings.get("organizationMapping"));
-      groupLdapMapper = new GroupLdapMapper(config, mappings.get("groupMapping"));
-      applicationLdapMapper = new ApplicationLdapMapper(config, mappings.get("applicationMapping"));
+              new OrganizationLdapMapper(config, mappings.get(MappingType.ORGANIZATIONMAPPING));
+      groupLdapMapper = new GroupLdapMapper(config, mappings.get(MappingType.GROUPMAPPING));
+      applicationLdapMapper = new ApplicationLdapMapper(config, mappings.get(MappingType.APPLICATIONMAPPING));
       addressLdapMapper = new AddressLdapMapper(config);
       ldapReaderStore = new LdapReaderStore(config, mappings);
     } catch (LDAPException e) {

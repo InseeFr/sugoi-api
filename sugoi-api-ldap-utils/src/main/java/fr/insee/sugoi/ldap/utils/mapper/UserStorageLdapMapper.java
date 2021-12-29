@@ -18,9 +18,10 @@ import com.unboundid.ldap.sdk.Modification;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.UserStorage;
+import fr.insee.sugoi.model.technics.StoreMapping;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,21 +54,19 @@ public class UserStorageLdapMapper {
                   if (property[0].equalsIgnoreCase("groupFilterPattern")) {
                     userStorage.addProperty("group_filter_pattern", property[1]);
                   }
-                  if (property[0].equalsIgnoreCase("userMapping")
-                      || property[0].equalsIgnoreCase("organizationMapping")) {
-                    // ex with userMapping$username:uid,string,rw
-                    if (!userStorage.getMappings().containsKey(property[0])) {
-                      userStorage
-                          .getMappings()
-                          .put(property[0], new HashMap<>()); // add a map userMapping
+                  // ex with userMapping$username:uid,string,rw
+                  else if (property[0].equalsIgnoreCase("userMapping")) {
+
+                    if (userStorage.getUserMappings() == null) {
+                      userStorage.setUserMappings(new ArrayList<>());
                     }
-                    String[] attributeSplits = property[1].split(":");
-                    String attributeName = attributeSplits[0]; // username
-                    String attributeMappingValues = attributeSplits[1]; // uid,string,rw
-                    userStorage
-                        .getMappings()
-                        .get(property[0])
-                        .put(attributeName, attributeMappingValues);
+                    userStorage.getUserMappings().add(new StoreMapping(property[1]));
+
+                  } else if (property[0].equalsIgnoreCase("organizationMapping")) {
+                    if (userStorage.getOrganizationMappings() == null) {
+                      userStorage.setOrganizationMappings(new ArrayList<>());
+                    }
+                    userStorage.getOrganizationMappings().add(new StoreMapping(property[1]));
                   }
                   if (property[0].equalsIgnoreCase(LdapConfigKeys.USER_OBJECT_CLASSES)) {
                     userStorage.addProperty(LdapConfigKeys.USER_OBJECT_CLASSES, property[1]);
@@ -129,26 +128,28 @@ public class UserStorageLdapMapper {
               "inseepropriete",
               String.format(
                   "groupSourcePattern$%s",
-                  userStorage.getProperties().get("group_source_pattern"))));
+                      userStorage.getProperties().get("group_source_pattern"))));
     }
     if (userStorage.getProperties().containsKey("group_filter_pattern")) {
       attributes.add(
-          new Attribute(
-              "inseepropriete",
-              String.format(
-                  "groupFilterPattern$%s",
-                  userStorage.getProperties().get("group_filter_pattern"))));
+              new Attribute(
+                      "inseepropriete",
+                      String.format(
+                              "groupFilterPattern$%s",
+                              userStorage.getProperties().get("group_filter_pattern"))));
     }
-    for (String entityKey : userStorage.getMappings().keySet()) {
-      for (String attributeName : userStorage.getMappings().get(entityKey).keySet()) {
+    if (userStorage.getUserMappings() != null) {
+      for (StoreMapping storeMapping : userStorage.getUserMappings()) {
         attributes.add(
-            new Attribute(
-                "inseepropriete",
-                String.format(
-                    "%s$%s:%s",
-                    entityKey,
-                    attributeName,
-                    userStorage.getMappings().get(entityKey).get(attributeName))));
+                new Attribute(
+                        "inseepropriete", String.format("%s$%s", "userMapping", storeMapping.toStoreString())));
+      }
+    }
+    if (userStorage.getOrganizationMappings() != null) {
+      for (StoreMapping storeMapping : userStorage.getOrganizationMappings()) {
+        attributes.add(
+                new Attribute(
+                        "inseepropriete", String.format("%s$%s", "organizationMapping", storeMapping.toStoreString())));
       }
     }
     return attributes;
