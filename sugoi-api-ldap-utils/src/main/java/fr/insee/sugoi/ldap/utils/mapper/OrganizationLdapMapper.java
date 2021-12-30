@@ -48,7 +48,7 @@ public class OrganizationLdapMapper implements LdapMapper<Organization> {
 
   @Override
   public List<Attribute> mapToAttributes(Organization organization) {
-    return GenericLdapMapper.mapObjectToLdapAttributes(
+    return GenericLdapMapper.createAttributes(
         organization, Organization.class, config, mapping, objectClasses);
   }
 

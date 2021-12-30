@@ -312,6 +312,25 @@ inseegroupedefaut: prop1_TestIgnoreCase_applitest
 inseegroupedefaut: Prop2_TestIgnoreCase_applitest
 inseeAdressePostaleDN: l=testu,ou=adresses,ou=clients_domaine1,o=insee,c=fr
 
+dn: uid=userwithlist,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+uid: userwithlist
+telephoneNumber: 1209883940
+cn: User With Group Default
+inseeRoleApplicatif: prop_role_applitest
+inseeRoleApplicatif: role2_applitest
+inseeRoleApplicatif: prop1_TestIgnoreCase_applitest
+inseeRoleApplicatif: Prop2_TestIgnoreCase_applitest
+inseegroupedefaut: prop_role_applitest
+inseegroupedefaut: role2_applitest
+inseegroupedefaut: prop1_TestIgnoreCase_applitest
+inseegroupedefaut: Prop2_TestIgnoreCase_applitest
+
 dn: uid=rawpassword,ou=contacts,ou=clients_domaine1,o=insee,c=fr
 objectClass: top
 objectClass: inseeCompte

@@ -97,7 +97,7 @@ public class GenericLdapMapper {
   }
 
   @SuppressWarnings("unchecked")
-  public static <SugoiType> List<Attribute> mapObjectToLdapAttributes(
+  private static <SugoiType> List<Attribute> mapObjectToLdapAttributes(
       SugoiType entity,
       Class<SugoiType> entityClazz,
       Map<String, String> config,
@@ -220,6 +220,9 @@ public class GenericLdapMapper {
   @SuppressWarnings("unchecked")
   private static List<Attribute> transformSugoiToAttribute(
       ModelType type, String ldapAttributeName, Object sugoiValue, Map<String, String> config) {
+    if (sugoiValue instanceof List && ((List<?>) sugoiValue).isEmpty()) {
+      return List.of(new Attribute(ldapAttributeName, ""));
+    }
     switch (type) {
       case STRING:
         return List.of(new Attribute(ldapAttributeName, (String) sugoiValue));
@@ -304,6 +307,17 @@ public class GenericLdapMapper {
                 .collect(Collectors.toMap(e -> e.getKey().toString(), e -> (Object) e.getValue()));
     map.put(keyToModify, sugoiAttribute);
     modelField.set(sugoiEntity, map);
+  }
+
+  public static <S> List<Attribute> createAttributes(
+      S entity,
+      Class<S> entityClazz,
+      Map<String, String> config,
+      Map<String, String> mapping,
+      List<String> objectClasses) {
+    return mapObjectToLdapAttributes(entity, entityClazz, config, mapping, objectClasses).stream()
+        .filter(attribute -> attribute.hasValue() && !attribute.getValue().isBlank())
+        .collect(Collectors.toList());
   }
 
   public static <O> List<Modification> createMods(

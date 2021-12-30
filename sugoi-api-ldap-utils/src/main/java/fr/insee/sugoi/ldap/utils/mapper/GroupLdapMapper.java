@@ -43,8 +43,7 @@ public class GroupLdapMapper implements LdapMapper<Group> {
 
   @Override
   public List<Attribute> mapToAttributes(Group group) {
-    return GenericLdapMapper.mapObjectToLdapAttributes(
-        group, Group.class, config, mapping, objectClasses);
+    return GenericLdapMapper.createAttributes(group, Group.class, config, mapping, objectClasses);
   }
 
   @Override

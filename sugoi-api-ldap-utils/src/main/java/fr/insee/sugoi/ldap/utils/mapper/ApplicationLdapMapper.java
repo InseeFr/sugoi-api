@@ -43,7 +43,7 @@ public class ApplicationLdapMapper implements LdapMapper<Application> {
   }
 
   public List<Attribute> mapToAttributes(Application application) {
-    return GenericLdapMapper.mapObjectToLdapAttributes(
+    return GenericLdapMapper.createAttributes(
         application, Application.class, config, mapping, objectClasses);
   }
 

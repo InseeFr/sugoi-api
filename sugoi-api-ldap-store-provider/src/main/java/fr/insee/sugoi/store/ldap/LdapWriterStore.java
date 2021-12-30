@@ -23,6 +23,7 @@ import com.unboundid.ldap.sdk.Modification;
 import com.unboundid.ldap.sdk.ModificationType;
 import com.unboundid.ldap.sdk.ModifyRequest;
 import com.unboundid.ldap.sdk.ResultCode;
+import com.unboundid.ldap.sdk.controls.PermissiveModifyRequestControl;
 import com.unboundid.ldap.sdk.extensions.PasswordModifyExtendedRequest;
 import com.unboundid.util.SubtreeDeleter;
 import fr.insee.sugoi.core.exceptions.AppManagedAttributeException;
@@ -171,6 +172,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       ModifyRequest mr =
           new ModifyRequest(
               getUserDN(updatedUser.getUsername()), userLdapMapper.createMods(updatedUser));
+      mr.addControl(new PermissiveModifyRequestControl());
       ldapPoolConnection.modify(mr);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to update user while writing to LDAP", e);
@@ -252,6 +254,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
           new ModifyRequest(
               getGroupDN(appName, updatedGroup.getName()),
               groupLdapMapper.createMods(updatedGroup));
+      mr.addControl(new PermissiveModifyRequestControl());
       ldapPoolConnection.modify(mr);
     } catch (LDAPException e) {
       throw new RuntimeException(
@@ -358,6 +361,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
           new ModifyRequest(
               getOrganizationDN(updatedOrganization.getIdentifiant()),
               organizationLdapMapper.createMods(updatedOrganization));
+      mr.addControl(new PermissiveModifyRequestControl());
       ldapPoolConnection.modify(mr);
     } catch (LDAPException e) {
       throw new RuntimeException(
@@ -603,6 +607,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
           new ModifyRequest(
               getApplicationDN(updatedApplication.getName()),
               applicationLdapMapper.createMods(updatedApplication));
+      mr.addControl(new PermissiveModifyRequestControl());
       ldapPoolConnection.modify(mr);
       List<Group> alreadyExistingGroups =
           ldapReaderStore
@@ -702,6 +707,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
           new ModifyRequest(
               getUserDN(userId),
               new Modification(ModificationType.DELETE, attributeKey, attributeValue));
+      modifyAttributeRequest.addControl(new PermissiveModifyRequestControl());
       ldapPoolConnection.modify(modifyAttributeRequest);
       ProviderResponse response = new ProviderResponse();
       response.setStatus(ProviderResponseStatus.OK);
@@ -740,6 +746,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   private void updateAddress(String id, Map<String, String> newAddress) throws LDAPException {
     ModifyRequest modifyRequest =
         new ModifyRequest(getAddressDN(id), addressLdapMapper.createMods(newAddress));
+    modifyRequest.addControl(new PermissiveModifyRequestControl());
     ldapPoolConnection.modify(modifyRequest);
   }
 
@@ -801,7 +808,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       try {
         X509Certificate certificate = cfs.getCertificateFromByte(user.getCertificate());
         String certificateId = cfs.encodeCertificate(certificate);
-        ldapPoolConnection.modify(
+        ModifyRequest mr =
             new ModifyRequest(
                 getUserDN(user.getUsername()),
                 List.of(
@@ -812,7 +819,9 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
                     new Modification(
                         ModificationType.DELETE,
                         "inseePropriete",
-                        "certificateId$" + certificateId))));
+                        "certificateId$" + certificateId)));
+        mr.addControl(new PermissiveModifyRequestControl());
+        ldapPoolConnection.modify(mr);
         ProviderResponse response = new ProviderResponse();
         response.setStatus(ProviderResponseStatus.OK);
         response.setEntityId(user.getUsername());

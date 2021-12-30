@@ -14,6 +14,7 @@
 package fr.insee.sugoi.ldap;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -287,6 +288,40 @@ public class LdapWriterStoreTest {
     ldapWriterStore.updateUser(user, new ProviderRequest(null, false, null));
     User modifiedUser = ldapReaderStore.getUser("testo").get();
     assertThat("testo should not have a mail anymore", modifiedUser.getMail(), is(nullValue()));
+    // updating the same way a second time should lead to the same result
+    ldapWriterStore.updateUser(user, new ProviderRequest(null, false, null));
+    assertThat("testo should not have a mail anymore", modifiedUser.getMail(), is(nullValue()));
+  }
+
+  @DisplayName(
+      "Given a user that has an attribute of type list which contains element,"
+          + " updating this list with an empty list should delete the former values")
+  @Test
+  public void testUpdateUserWithEmptyList() {
+    User user = ldapReaderStore.getUser("userwithlist").get();
+    assertThat(
+        "The user has attributes roles applicatifs",
+        ((List<?>) user.getAttributes().get("insee_roles_applicatifs")).size(),
+        greaterThan(0));
+    user.getAttributes().put("insee_roles_applicatifs", List.of());
+    ldapWriterStore.updateUser(user, new ProviderRequest(null, false, null));
+    User modifiedUser = ldapReaderStore.getUser("userwithlist").get();
+    assertThat(
+        "The user has no more roles applicatifs",
+        !modifiedUser.getAttributes().containsKey("insee_roles_applicatifs"));
+  }
+
+  @DisplayName(
+      "Given a user that has habilitations,"
+          + " updating these habilitations with an empty list should delete the former values")
+  @Test
+  public void testUpdateUserWithoutHabilitations() {
+    User user = ldapReaderStore.getUser("userwithlist").get();
+    assertThat("The user has habilitations", user.getHabilitations().size(), greaterThan(0));
+    user.getHabilitations().clear();
+    ldapWriterStore.updateUser(user, new ProviderRequest(null, false, null));
+    User modifiedUser = ldapReaderStore.getUser("userwithlist").get();
+    assertThat("The user has no more habilitations", modifiedUser.getHabilitations().size(), is(0));
   }
 
   @Test

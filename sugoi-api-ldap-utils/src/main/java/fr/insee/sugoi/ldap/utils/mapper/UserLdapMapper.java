@@ -79,8 +79,7 @@ public class UserLdapMapper implements LdapMapper<User> {
 
   @Override
   public List<Attribute> mapToAttributes(User u) {
-    return GenericLdapMapper.mapObjectToLdapAttributes(
-        u, User.class, config, mapping, objectClasses);
+    return GenericLdapMapper.createAttributes(u, User.class, config, mapping, objectClasses);
   }
 
   @Override
