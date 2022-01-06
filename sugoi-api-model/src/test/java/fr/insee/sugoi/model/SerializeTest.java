@@ -9,8 +9,8 @@
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* limitations under the License.
+*/
 package fr.insee.sugoi.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,40 +27,40 @@ public class SerializeTest {
   ObjectMapper objectMapper = new ObjectMapper();
 
   String realmToTest =
-          "{"
-                  + "    \"name\": \"newrealm\","
-                  + "    \"url\": \"localhost\","
-                  + "    \"appSource\": \"ou=Applications,o=insee,c=fr\","
-                  + "    \"userStorages\": ["
-                  + "    {"
-                  + "        \"name\": \"Profil_domaine5_WebServiceLdap\","
-                  + "        \"userSource\": \"ou=contacts,ou=clients_domaine5,o=insee,c=fr\","
-                  + "        \"organizationSource\": \"ou=organisations,ou=clients_domaine5,o=insee,c=fr\","
-                  + "        \"addressSource\": \"ou=adresses,ou=clients_domaine5,o=insee,c=fr\","
-                  + "        \"properties\": {"
-                  + "        \"group_filter_pattern\": \"(cn={group}_{appliname})\","
-                  + "        \"organization_object_classes\": \"top,inseeOrganisation\","
-                  + "        \"user_object_classes\": \"top,inseeCompte,inseeContact,inseeAttributsAuthentification,inseeAttributsHabilitation,inseeAttributsCommunication\","
-                  + "        \"group_source_pattern\": \"ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr\""
-                  + "        },"
-                  + "        \"mappings\": {"
-                  + "        \"organizationMapping\": [],"
-                  + "        \"userMapping\": []"
-                  + "        }"
-                  + "    }"
-                  + "    ],"
-                  + "    \"properties\": {"
-                  + "        \"app-managed-attribute-keys-list\": \"inseegroupedefaut,inseeroleapplicatif\","
-                  + "        \"description\": \"Le profil domaine6<br/>Test <b>html</b> in description\""
-                  + "    },"
-                  + "    \"uiMapping\": {"
-                  + "    \"uiOrganizationMapping\": [],"
-                  + "    \"uiUserMapping\": ["
-                  + "    ]"
-                  + "    },"
-                  + "    \"readerType\": \"LdapReaderStore\","
-                  + "    \"writerType\": \"LdapWriterStore\""
-                  + "}";
+      "{"
+          + "    \"name\": \"newrealm\","
+          + "    \"url\": \"localhost\","
+          + "    \"appSource\": \"ou=Applications,o=insee,c=fr\","
+          + "    \"userStorages\": ["
+          + "    {"
+          + "        \"name\": \"Profil_domaine5_WebServiceLdap\","
+          + "        \"userSource\": \"ou=contacts,ou=clients_domaine5,o=insee,c=fr\","
+          + "        \"organizationSource\": \"ou=organisations,ou=clients_domaine5,o=insee,c=fr\","
+          + "        \"addressSource\": \"ou=adresses,ou=clients_domaine5,o=insee,c=fr\","
+          + "        \"properties\": {"
+          + "        \"group_filter_pattern\": \"(cn={group}_{appliname})\","
+          + "        \"organization_object_classes\": \"top,inseeOrganisation\","
+          + "        \"user_object_classes\": \"top,inseeCompte,inseeContact,inseeAttributsAuthentification,inseeAttributsHabilitation,inseeAttributsCommunication\","
+          + "        \"group_source_pattern\": \"ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr\""
+          + "        },"
+          + "        \"mappings\": {"
+          + "        \"organizationMapping\": [],"
+          + "        \"userMapping\": []"
+          + "        }"
+          + "    }"
+          + "    ],"
+          + "    \"properties\": {"
+          + "        \"app-managed-attribute-keys-list\": \"inseegroupedefaut,inseeroleapplicatif\","
+          + "        \"description\": \"Le profil domaine6<br/>Test <b>html</b> in description\""
+          + "    },"
+          + "    \"uiMapping\": {"
+          + "    \"uiOrganizationMapping\": [],"
+          + "    \"uiUserMapping\": ["
+          + "    ]"
+          + "    },"
+          + "    \"readerType\": \"LdapReaderStore\","
+          + "    \"writerType\": \"LdapWriterStore\""
+          + "}";
 
   @Test
   public void serializeRealmTest() throws JsonProcessingException {

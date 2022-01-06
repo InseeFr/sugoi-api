@@ -40,8 +40,8 @@ public class ApplicationLdapMapperFromAttributesTest {
     config.put("address_source", "ou=address,o=insee,c=fr");
     config.put("app_source", "ou=organisations,ou=clients_domaine1,o=inese,c=fr");
 
-    applicationLdapMapper = new ApplicationLdapMapper(config, StoreMappingFixture.getApplicationStoreMappings());
-
+    applicationLdapMapper =
+        new ApplicationLdapMapper(config, StoreMappingFixture.getApplicationStoreMappings());
   }
 
   @Test

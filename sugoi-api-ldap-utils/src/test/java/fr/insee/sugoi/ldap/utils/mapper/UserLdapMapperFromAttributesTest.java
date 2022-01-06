@@ -39,7 +39,6 @@ public class UserLdapMapperFromAttributesTest {
         "group_source_pattern",
         "ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr");
 
-
     userLdapMapper = new UserLdapMapper(config, StoreMappingFixture.getUserStoreMappings());
   }
 

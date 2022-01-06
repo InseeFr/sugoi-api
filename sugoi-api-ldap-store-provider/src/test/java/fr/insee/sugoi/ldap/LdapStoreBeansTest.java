@@ -95,35 +95,59 @@ public class LdapStoreBeansTest {
   @Test
   public void beanShouldHaveItsOwnMappingTest() {
     Map<MappingType, List<StoreMapping>> mappings =
-            ldapStoreBeans.getCompleteMapping(realm(), userStorage());
+        ldapStoreBeans.getCompleteMapping(realm(), userStorage());
     assertThat(
-            "Should have the mappings that have been explicitly set in the realm",
-            mappings.get(MappingType.GROUPMAPPING).stream().anyMatch(v -> v.equals(new StoreMapping("name", "cn", ModelType.STRING, true))));
+        "Should have the mappings that have been explicitly set in the realm",
+        mappings.get(MappingType.GROUPMAPPING).stream()
+            .anyMatch(v -> v.equals(new StoreMapping("name", "cn", ModelType.STRING, true))));
     assertThat(
-            "Should have the mappings that have been explicitly set in the realm",
-            mappings.get(MappingType.GROUPMAPPING).stream().anyMatch(v -> v.equals(new StoreMapping("users", "uniquemember", ModelType.LIST_USER, true))));
+        "Should have the mappings that have been explicitly set in the realm",
+        mappings.get(MappingType.GROUPMAPPING).stream()
+            .anyMatch(
+                v ->
+                    v.equals(
+                        new StoreMapping("users", "uniquemember", ModelType.LIST_USER, true))));
     assertThat(
-            "Should have the mappings that have been explicitly set in the us",
-            mappings.get(MappingType.USERMAPPING).stream().anyMatch(v -> v.equals(new StoreMapping("firstName", "givenname", ModelType.STRING, true))));
+        "Should have the mappings that have been explicitly set in the us",
+        mappings.get(MappingType.USERMAPPING).stream()
+            .anyMatch(
+                v -> v.equals(new StoreMapping("firstName", "givenname", ModelType.STRING, true))));
     assertThat(
-            "Should have the mappings that have been explicitly set in the us",
-            mappings.get(MappingType.USERMAPPING).stream().anyMatch(v -> v.equals(new StoreMapping("attributes.insee_roles_applicatifs", "inseeRoleApplicatif", ModelType.LIST_STRING, true))));
+        "Should have the mappings that have been explicitly set in the us",
+        mappings.get(MappingType.USERMAPPING).stream()
+            .anyMatch(
+                v ->
+                    v.equals(
+                        new StoreMapping(
+                            "attributes.insee_roles_applicatifs",
+                            "inseeRoleApplicatif",
+                            ModelType.LIST_STRING,
+                            true))));
   }
 
   @Test
   public void beanShouldHaveDefaultMappingTest() {
     Map<MappingType, List<StoreMapping>> mappings =
-            ldapStoreBeans.getCompleteMapping(realm(), userStorage());
+        ldapStoreBeans.getCompleteMapping(realm(), userStorage());
     assertThat(
-            "Should have the default mappings in the us when not set",
-            mappings.get(MappingType.ORGANIZATIONMAPPING).stream().anyMatch(v -> v.equals(new StoreMapping("attributes.mail", "mail", ModelType.STRING, true))));
+        "Should have the default mappings in the us when not set",
+        mappings.get(MappingType.ORGANIZATIONMAPPING).stream()
+            .anyMatch(
+                v ->
+                    v.equals(new StoreMapping("attributes.mail", "mail", ModelType.STRING, true))));
 
     assertThat(
-            "Should have the default mappings in the us when not set",
-            mappings.get(MappingType.ORGANIZATIONMAPPING).stream().anyMatch(v -> v.equals(new StoreMapping("address", "inseeAdressePostaleDN", ModelType.ADDRESS, true))));
+        "Should have the default mappings in the us when not set",
+        mappings.get(MappingType.ORGANIZATIONMAPPING).stream()
+            .anyMatch(
+                v ->
+                    v.equals(
+                        new StoreMapping(
+                            "address", "inseeAdressePostaleDN", ModelType.ADDRESS, true))));
 
     assertThat(
-            "Should have the default mappings in the realm when not set",
-            mappings.get(MappingType.APPLICATIONMAPPING).stream().anyMatch(v -> v.equals(new StoreMapping("name", "ou", ModelType.STRING, true))));
+        "Should have the default mappings in the realm when not set",
+        mappings.get(MappingType.APPLICATIONMAPPING).stream()
+            .anyMatch(v -> v.equals(new StoreMapping("name", "ou", ModelType.STRING, true))));
   }
 }

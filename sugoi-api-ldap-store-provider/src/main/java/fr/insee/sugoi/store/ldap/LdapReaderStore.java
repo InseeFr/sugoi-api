@@ -32,7 +32,8 @@ import java.util.stream.Collectors;
 
 public class LdapReaderStore extends LdapStore implements ReaderStore {
 
-  public LdapReaderStore(Map<String, String> config, Map<MappingType, List<StoreMapping>> mappings) {
+  public LdapReaderStore(
+      Map<String, String> config, Map<MappingType, List<StoreMapping>> mappings) {
     logger.debug("Configuring LdapReaderStore with config : {}", config);
     try {
       if (Boolean.valueOf(config.get(LdapConfigKeys.READ_CONNECTION_AUTHENTICATED))) {
@@ -45,9 +46,10 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       this.config = config;
       userLdapMapper = new UserLdapMapper(config, mappings.get(MappingType.USERMAPPING));
       organizationLdapMapper =
-              new OrganizationLdapMapper(config, mappings.get(MappingType.ORGANIZATIONMAPPING));
+          new OrganizationLdapMapper(config, mappings.get(MappingType.ORGANIZATIONMAPPING));
       groupLdapMapper = new GroupLdapMapper(config, mappings.get(MappingType.GROUPMAPPING));
-      applicationLdapMapper = new ApplicationLdapMapper(config, mappings.get(MappingType.APPLICATIONMAPPING));
+      applicationLdapMapper =
+          new ApplicationLdapMapper(config, mappings.get(MappingType.APPLICATIONMAPPING));
       addressLdapMapper = new AddressLdapMapper(config);
     } catch (LDAPException e) {
       throw new RuntimeException(e);

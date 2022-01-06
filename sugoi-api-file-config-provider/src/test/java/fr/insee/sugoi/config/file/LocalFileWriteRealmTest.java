@@ -37,13 +37,11 @@ import static org.hamcrest.Matchers.is;
 
 @SpringBootTest(classes = LocalFileRealmProviderDAO.class)
 @TestPropertySource(
-        properties = "fr.insee.sugoi.realm.config.local.path=classpath:/realms-write.json")
+    properties = "fr.insee.sugoi.realm.config.local.path=classpath:/realms-write.json")
 public class LocalFileWriteRealmTest {
 
-  @Autowired
-  ResourceLoader resourceLoader;
-  @Autowired
-  LocalFileRealmProviderDAO localFileConfig;
+  @Autowired ResourceLoader resourceLoader;
+  @Autowired LocalFileRealmProviderDAO localFileConfig;
 
   private final ObjectMapper mapper = new ObjectMapper();
 
@@ -172,11 +170,14 @@ public class LocalFileWriteRealmTest {
   public void addApplicationMappingTest() {
     Realm realmToModify = localFileConfig.load("tomodify").get();
     realmToModify.setApplicationMappings(new ArrayList<>());
-    realmToModify.getApplicationMappings().add(new StoreMapping("name", "ou", ModelType.STRING, true));
+    realmToModify
+        .getApplicationMappings()
+        .add(new StoreMapping("name", "ou", ModelType.STRING, true));
     localFileConfig.updateRealm(realmToModify, null);
     assertThat(
-            "Application mapping should have a name",
-            localFileConfig.load("tomodify").get().getApplicationMappings().stream().anyMatch(v -> v.equals(new StoreMapping("name", "ou", ModelType.STRING, true))));
+        "Application mapping should have a name",
+        localFileConfig.load("tomodify").get().getApplicationMappings().stream()
+            .anyMatch(v -> v.equals(new StoreMapping("name", "ou", ModelType.STRING, true))));
   }
 
   @Test
@@ -184,17 +185,24 @@ public class LocalFileWriteRealmTest {
     Realm realmToModify = localFileConfig.load("tomodify").get();
     realmToModify.getUserStorages().get(0).setOrganizationMappings(new ArrayList<>());
     realmToModify
-            .getUserStorages()
-            .get(0)
-            .getOrganizationMappings().add(new StoreMapping("address", "inseeAdressePostaleDN", ModelType.ADDRESS, true));
+        .getUserStorages()
+        .get(0)
+        .getOrganizationMappings()
+        .add(new StoreMapping("address", "inseeAdressePostaleDN", ModelType.ADDRESS, true));
     localFileConfig.updateRealm(realmToModify, null);
     assertThat(
-            "Organization mapping should have an address",
-            localFileConfig
-                    .load("tomodify")
-                    .get()
-                    .getUserStorages()
-                    .get(0)
-                    .getOrganizationMappings().stream().anyMatch(v -> v.equals(new StoreMapping("address", "inseeAdressePostaleDN", ModelType.ADDRESS, true))));
+        "Organization mapping should have an address",
+        localFileConfig
+            .load("tomodify")
+            .get()
+            .getUserStorages()
+            .get(0)
+            .getOrganizationMappings()
+            .stream()
+            .anyMatch(
+                v ->
+                    v.equals(
+                        new StoreMapping(
+                            "address", "inseeAdressePostaleDN", ModelType.ADDRESS, true))));
   }
 }

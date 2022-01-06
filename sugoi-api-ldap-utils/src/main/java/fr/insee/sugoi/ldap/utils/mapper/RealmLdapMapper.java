@@ -79,13 +79,13 @@ public class RealmLdapMapper {
         } else if (property[0].equalsIgnoreCase("uiOrganizationMapping")) {
 
           realm
-                  .getUiMapping()
-                  .computeIfAbsent(UIMappingType.UI_ORGANIZATION_MAPPING, l -> new ArrayList<>())
-                  .add(uiMappingService.convertStringToUIField(property[1]));
+              .getUiMapping()
+              .computeIfAbsent(UIMappingType.UI_ORGANIZATION_MAPPING, l -> new ArrayList<>())
+              .add(uiMappingService.convertStringToUIField(property[1]));
         } else if (property[0].equalsIgnoreCase("uiUserMapping")) {
           realm
-                  .getUiMapping()
-                  .computeIfAbsent(UIMappingType.UI_USER_MAPPING, l -> new ArrayList<>())
+              .getUiMapping()
+              .computeIfAbsent(UIMappingType.UI_USER_MAPPING, l -> new ArrayList<>())
               .add(uiMappingService.convertStringToUIField(property[1]));
         }
       }
@@ -105,34 +105,36 @@ public class RealmLdapMapper {
     }
     if (realm.getProperties().containsKey(GlobalKeysConfig.REALM_DESCRIPTION)) {
       attributes.add(
-              new Attribute(
-                      "description", realm.getProperties().get(GlobalKeysConfig.REALM_DESCRIPTION)));
+          new Attribute(
+              "description", realm.getProperties().get(GlobalKeysConfig.REALM_DESCRIPTION)));
     }
     if (realm.getAppSource() != null) {
       attributes.add(
-              new Attribute(
-                      "inseepropriete",
-                      String.format("branchesApplicativesPossibles$%s", realm.getAppSource())));
+          new Attribute(
+              "inseepropriete",
+              String.format("branchesApplicativesPossibles$%s", realm.getAppSource())));
     }
     realm
-            .getProperties()
-            .forEach(
-                    (propertyName, propertyValue) ->
-                            attributes.add(
-                                    new Attribute(
-                                            "inseepropriete", String.format("%s$%s", propertyName, propertyValue))));
+        .getProperties()
+        .forEach(
+            (propertyName, propertyValue) ->
+                attributes.add(
+                    new Attribute(
+                        "inseepropriete", String.format("%s$%s", propertyName, propertyValue))));
     if (realm.getApplicationMappings() != null) {
       for (StoreMapping storeMapping : realm.getApplicationMappings()) {
         attributes.add(
-                new Attribute(
-                        "inseepropriete", String.format("%s$%s", "applicationMapping", storeMapping.toStoreString())));
+            new Attribute(
+                "inseepropriete",
+                String.format("%s$%s", "applicationMapping", storeMapping.toStoreString())));
       }
     }
     if (realm.getGroupMappings() != null) {
       for (StoreMapping storeMapping : realm.getGroupMappings()) {
         attributes.add(
-                new Attribute(
-                        "inseepropriete", String.format("%s$%s", "groupMapping", storeMapping.toStoreString())));
+            new Attribute(
+                "inseepropriete",
+                String.format("%s$%s", "groupMapping", storeMapping.toStoreString())));
       }
     }
 

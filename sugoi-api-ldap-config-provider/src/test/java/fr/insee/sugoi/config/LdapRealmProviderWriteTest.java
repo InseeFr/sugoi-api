@@ -13,7 +13,6 @@
 */
 package fr.insee.sugoi.config;
 
-
 import fr.insee.sugoi.config.fixtures.StoreMappingFixture;
 import fr.insee.sugoi.core.configuration.UiMappingService;
 import fr.insee.sugoi.model.Realm;
@@ -37,11 +36,9 @@ import static org.hamcrest.Matchers.is;
 @TestPropertySource(locations = "classpath:/application-write.properties")
 public class LdapRealmProviderWriteTest {
 
-  @Autowired
-  LdapRealmProviderDAOImpl ldapRealmProviderDAOImpl;
+  @Autowired LdapRealmProviderDAOImpl ldapRealmProviderDAOImpl;
 
-  @MockBean
-  private UiMappingService uiMappingService;
+  @MockBean private UiMappingService uiMappingService;
 
   @Test
   public void addNewRealmWithOneUserStorageTest() {
@@ -155,10 +152,9 @@ public class LdapRealmProviderWriteTest {
 
     ldapRealmProviderDAOImpl.updateRealm(realmToModify, null);
     assertThat(
-            "Application mapping should have a name",
-            ldapRealmProviderDAOImpl
-                    .load("tomodify")
-                    .get().getApplicationMappings().stream().anyMatch(v -> v.equals(new StoreMapping("name", "ou", ModelType.STRING, true))));
+        "Application mapping should have a name",
+        ldapRealmProviderDAOImpl.load("tomodify").get().getApplicationMappings().stream()
+            .anyMatch(v -> v.equals(new StoreMapping("name", "ou", ModelType.STRING, true))));
   }
 
   @Test
@@ -166,19 +162,24 @@ public class LdapRealmProviderWriteTest {
     Realm realmToModify = ldapRealmProviderDAOImpl.load("tomodify").get();
 
     realmToModify
-            .getUserStorages()
-            .get(0)
-            .setOrganizationMappings(StoreMappingFixture.getOrganizationStoreMappings());
-
+        .getUserStorages()
+        .get(0)
+        .setOrganizationMappings(StoreMappingFixture.getOrganizationStoreMappings());
 
     ldapRealmProviderDAOImpl.updateRealm(realmToModify, null);
     assertThat(
-            "Organization mapping should have an address",
-            ldapRealmProviderDAOImpl
-                    .load("tomodify")
-                    .get()
-                    .getUserStorages()
-                    .get(0)
-                    .getOrganizationMappings().stream().anyMatch(v -> v.equals(new StoreMapping("address", "inseeAdressePostaleDN", ModelType.ADDRESS, true))));
+        "Organization mapping should have an address",
+        ldapRealmProviderDAOImpl
+            .load("tomodify")
+            .get()
+            .getUserStorages()
+            .get(0)
+            .getOrganizationMappings()
+            .stream()
+            .anyMatch(
+                v ->
+                    v.equals(
+                        new StoreMapping(
+                            "address", "inseeAdressePostaleDN", ModelType.ADDRESS, true))));
   }
 }

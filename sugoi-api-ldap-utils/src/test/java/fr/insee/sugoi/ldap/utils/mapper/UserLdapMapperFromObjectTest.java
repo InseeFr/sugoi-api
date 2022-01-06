@@ -43,7 +43,6 @@ public class UserLdapMapperFromObjectTest {
     config.put("address_source", "ou=address,o=insee,c=fr");
     config.put(LdapConfigKeys.USER_OBJECT_CLASSES, "top,person");
 
-
     userLdapMapper = new UserLdapMapper(config, StoreMappingFixture.getUserStoreMappings());
 
     user = new User();

@@ -39,7 +39,8 @@ public class ApplicationLdapMapperFromObjectTest {
     Map<String, String> config = new HashMap<>();
     config.put("app_source", "ou=monappli,ou=Applications,o=insee,c=fr");
     config.put("address_source", "ou=address,o=insee,c=fr");
-    applicationLdapMapper = new ApplicationLdapMapper(config, StoreMappingFixture.getApplicationStoreMappings());
+    applicationLdapMapper =
+        new ApplicationLdapMapper(config, StoreMappingFixture.getApplicationStoreMappings());
     application = new Application();
   }
 

@@ -20,16 +20,8 @@ import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.technics.StoreMapping;
 
 import java.io.ByteArrayInputStream;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.security.cert.*;
+import java.util.*;
 
 public class UserLdapMapper implements LdapMapper<User> {
 

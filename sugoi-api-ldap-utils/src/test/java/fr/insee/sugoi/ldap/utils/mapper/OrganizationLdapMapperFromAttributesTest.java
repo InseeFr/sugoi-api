@@ -40,7 +40,8 @@ public class OrganizationLdapMapperFromAttributesTest {
     config.put("address_source", "ou=address,o=insee,c=fr");
     config.put("organization_source", "ou=organisations,ou=clients_domaine1,o=insee,c=fr");
 
-    organizationLdapMapper = new OrganizationLdapMapper(config, StoreMappingFixture.getOrganizationStoreMappings());
+    organizationLdapMapper =
+        new OrganizationLdapMapper(config, StoreMappingFixture.getOrganizationStoreMappings());
   }
 
   @Test

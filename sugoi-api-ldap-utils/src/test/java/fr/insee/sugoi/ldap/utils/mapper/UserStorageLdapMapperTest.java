@@ -35,8 +35,7 @@ public class UserStorageLdapMapperTest {
   UserStorageLdapMapper userStorageLdapMapper = new UserStorageLdapMapper();
 
   @BeforeEach
-  public void setup() {
-  }
+  public void setup() {}
 
   @Test
   public void getUserStorageObjectFromAttributes() {
@@ -87,14 +86,17 @@ public class UserStorageLdapMapperTest {
     UserStorage userStorage =
         UserStorageLdapMapper.mapFromAttributes(List.of(inseeProprieteAttributes, cnAttribute));
     assertThat(
-            "userMapping should have a username mapping",
-            userStorage.getUserMappings().stream().anyMatch(v -> v.equals(new StoreMapping("username", "uid", ModelType.STRING, true))));
+        "userMapping should have a username mapping",
+        userStorage.getUserMappings().stream()
+            .anyMatch(v -> v.equals(new StoreMapping("username", "uid", ModelType.STRING, true))));
     assertThat(
-            "userMapping should have a mail mapping",
-            userStorage.getUserMappings().stream().anyMatch(v -> v.equals(new StoreMapping("mail", "mail", ModelType.STRING, true))));
+        "userMapping should have a mail mapping",
+        userStorage.getUserMappings().stream()
+            .anyMatch(v -> v.equals(new StoreMapping("mail", "mail", ModelType.STRING, true))));
     assertThat(
-            "organizationMapping should have a mail mapping",
-            userStorage.getOrganizationMappings().stream().anyMatch(v -> v.equals(new StoreMapping("mail", "mail", ModelType.STRING, true))));
+        "organizationMapping should have a mail mapping",
+        userStorage.getOrganizationMappings().stream()
+            .anyMatch(v -> v.equals(new StoreMapping("mail", "mail", ModelType.STRING, true))));
   }
 
   @Test
@@ -105,14 +107,14 @@ public class UserStorageLdapMapperTest {
     userStorage.setOrganizationMappings(StoreMappingFixture.getOrganizationStoreMappings());
     List<Attribute> attributes = UserStorageLdapMapper.mapToAttributes(userStorage);
     assertThat(
-            "Should have inseePropriete with username",
-            attributes.stream()
-                    .anyMatch(
-                            attribute ->
-                                    attribute.getName().equalsIgnoreCase("inseepropriete")
-                                            && attribute
-                                            .getValue()
-                                            .equalsIgnoreCase("userMapping$username:uid,String,rw")));
+        "Should have inseePropriete with username",
+        attributes.stream()
+            .anyMatch(
+                attribute ->
+                    attribute.getName().equalsIgnoreCase("inseepropriete")
+                        && attribute
+                            .getValue()
+                            .equalsIgnoreCase("userMapping$username:uid,String,rw")));
     assertThat(
         "Should have inseePropriete with lastname",
         attributes.stream()
@@ -123,15 +125,13 @@ public class UserStorageLdapMapperTest {
                             .getValue()
                             .equalsIgnoreCase("userMapping$lastName:sn,String,rw")));
     assertThat(
-            "Should have inseepropriete with firstname",
-            attributes.stream()
-                    .anyMatch(
-                            attribute ->
-                                    attribute.getName().equalsIgnoreCase("inseepropriete")
-                                            && attribute
-                                            .getValue()
-                                            .equalsIgnoreCase(
-                                                    "organizationMapping$identifiant:uid,String,rw")));
+        "Should have inseepropriete with firstname",
+        attributes.stream()
+            .anyMatch(
+                attribute ->
+                    attribute.getName().equalsIgnoreCase("inseepropriete")
+                        && attribute
+                            .getValue()
+                            .equalsIgnoreCase("organizationMapping$identifiant:uid,String,rw")));
   }
-
 }

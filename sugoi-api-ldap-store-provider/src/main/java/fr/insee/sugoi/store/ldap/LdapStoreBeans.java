@@ -169,35 +169,45 @@ public class LdapStoreBeans {
         LdapConfigKeys.APPLICATION_OBJECT_CLASSES,
         userStorage.getProperties().get(LdapConfigKeys.APPLICATION_OBJECT_CLASSES) != null
             ? userStorage.getProperties().get(LdapConfigKeys.APPLICATION_OBJECT_CLASSES)
-                : defaultApplicationObjectClasses);
+            : defaultApplicationObjectClasses);
     config.put(
-            LdapConfigKeys.ADDRESS_OBJECT_CLASSES,
-            userStorage.getProperties().get(LdapConfigKeys.ADDRESS_OBJECT_CLASSES) != null
-                    ? userStorage.getProperties().get(LdapConfigKeys.ADDRESS_OBJECT_CLASSES)
-                    : defaultAddressObjectClasses);
+        LdapConfigKeys.ADDRESS_OBJECT_CLASSES,
+        userStorage.getProperties().get(LdapConfigKeys.ADDRESS_OBJECT_CLASSES) != null
+            ? userStorage.getProperties().get(LdapConfigKeys.ADDRESS_OBJECT_CLASSES)
+            : defaultAddressObjectClasses);
 
     return config;
   }
 
-  public Map<MappingType, List<StoreMapping>> getCompleteMapping(Realm realm, UserStorage userStorage) {
+  public Map<MappingType, List<StoreMapping>> getCompleteMapping(
+      Realm realm, UserStorage userStorage) {
     Map<MappingType, List<StoreMapping>> resultMappings = new EnumMap<>(MappingType.class);
     if (userStorage.getUserMappings() == null || userStorage.getUserMappings().isEmpty()) {
-      resultMappings.put(MappingType.USERMAPPING, defaultUserMapping.stream().map(StoreMapping::new).collect(Collectors.toList()));
+      resultMappings.put(
+          MappingType.USERMAPPING,
+          defaultUserMapping.stream().map(StoreMapping::new).collect(Collectors.toList()));
     } else {
       resultMappings.put(MappingType.USERMAPPING, userStorage.getUserMappings());
     }
     if (realm.getApplicationMappings() == null || realm.getApplicationMappings().isEmpty()) {
-      resultMappings.put(MappingType.APPLICATIONMAPPING, defaultApplicationMapping.stream().map(StoreMapping::new).collect(Collectors.toList()));
+      resultMappings.put(
+          MappingType.APPLICATIONMAPPING,
+          defaultApplicationMapping.stream().map(StoreMapping::new).collect(Collectors.toList()));
     } else {
       resultMappings.put(MappingType.APPLICATIONMAPPING, realm.getApplicationMappings());
     }
-    if (userStorage.getOrganizationMappings() == null || userStorage.getOrganizationMappings().isEmpty()) {
-      resultMappings.put(MappingType.ORGANIZATIONMAPPING, defaultOrganizationMapping.stream().map(StoreMapping::new).collect(Collectors.toList()));
+    if (userStorage.getOrganizationMappings() == null
+        || userStorage.getOrganizationMappings().isEmpty()) {
+      resultMappings.put(
+          MappingType.ORGANIZATIONMAPPING,
+          defaultOrganizationMapping.stream().map(StoreMapping::new).collect(Collectors.toList()));
     } else {
       resultMappings.put(MappingType.ORGANIZATIONMAPPING, userStorage.getOrganizationMappings());
     }
     if (realm.getGroupMappings() == null || realm.getGroupMappings().isEmpty()) {
-      resultMappings.put(MappingType.GROUPMAPPING, defaultGroupMapping.stream().map(StoreMapping::new).collect(Collectors.toList()));
+      resultMappings.put(
+          MappingType.GROUPMAPPING,
+          defaultGroupMapping.stream().map(StoreMapping::new).collect(Collectors.toList()));
     } else {
       resultMappings.put(MappingType.GROUPMAPPING, realm.getGroupMappings());
     }
@@ -209,7 +219,7 @@ public class LdapStoreBeans {
   }
 
   public void setUseAuthenticatedConnectionForReading(
-          boolean useAuthenticatedConnectionForReading) {
+      boolean useAuthenticatedConnectionForReading) {
     this.useAuthenticatedConnectionForReading = useAuthenticatedConnectionForReading;
   }
 }

@@ -39,7 +39,8 @@ public class OrganizationLdapMapperFromObjectTest {
     Map<String, String> config = new HashMap<>();
     config.put("organization_source", "ou=organisations,o=insee,c=fr");
     config.put("address_source", "ou=address,o=insee,c=fr");
-    organizationLdapMapper = new OrganizationLdapMapper(config, StoreMappingFixture.getOrganizationStoreMappings());
+    organizationLdapMapper =
+        new OrganizationLdapMapper(config, StoreMappingFixture.getOrganizationStoreMappings());
 
     organization = new Organization();
   }

@@ -48,20 +48,25 @@ public class GenericLdapMapper {
 
           List<Attribute> correspondingAttributes =
               attributes.stream()
-                  .filter(attribute -> mappingDefinition.getStoreName().equalsIgnoreCase(attribute.getName()))
+                  .filter(
+                      attribute ->
+                          mappingDefinition.getStoreName().equalsIgnoreCase(attribute.getName()))
                   .collect(Collectors.toList());
           if (!correspondingAttributes.isEmpty()) {
             Object sugoiAttribute =
                 transformLdapAttributeToSugoiAttribute(
                     mappingDefinition.getModelType(), correspondingAttributes, config);
             if (mappingDefinition.getSugoiName().contains(".")) {
-              putSugoiAttributeInEntityMapField(sugoiAttribute, mappingDefinition.getSugoiName(), mappedEntity);
+              putSugoiAttributeInEntityMapField(
+                  sugoiAttribute, mappingDefinition.getSugoiName(), mappedEntity);
             } else {
-              putSugoiAttributeInEntityField(sugoiAttribute, mappingDefinition.getSugoiName(), mappedEntity);
+              putSugoiAttributeInEntityField(
+                  sugoiAttribute, mappingDefinition.getSugoiName(), mappedEntity);
             }
           } else if (mappingDefinition.getModelType() == ModelType.EXISTS) {
             if (mappingDefinition.getSugoiName().contains(".")) {
-              putSugoiAttributeInEntityMapField(false, mappingDefinition.getSugoiName(), mappedEntity);
+              putSugoiAttributeInEntityMapField(
+                  false, mappingDefinition.getSugoiName(), mappedEntity);
             } else {
               putSugoiAttributeInEntityField(false, mappingDefinition.getSugoiName(), mappedEntity);
             }
@@ -113,7 +118,11 @@ public class GenericLdapMapper {
               Object sugoiValue = mapToModify.get(keyToModify);
               if (sugoiValue != null) {
                 attributes.addAll(
-                    transformSugoiToAttribute(mappingDefinition.getModelType(), mappingDefinition.getStoreName(), sugoiValue, config));
+                    transformSugoiToAttribute(
+                        mappingDefinition.getModelType(),
+                        mappingDefinition.getStoreName(),
+                        sugoiValue,
+                        config));
               }
             }
           } else {
@@ -122,7 +131,11 @@ public class GenericLdapMapper {
             Object sugoiValue = sugoiField.get(entity);
             if (sugoiValue != null) {
               attributes.addAll(
-                  transformSugoiToAttribute(mappingDefinition.getModelType(), mappingDefinition.getStoreName(), sugoiValue, config));
+                  transformSugoiToAttribute(
+                      mappingDefinition.getModelType(),
+                      mappingDefinition.getStoreName(),
+                      sugoiValue,
+                      config));
             }
           }
         }

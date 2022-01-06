@@ -36,11 +36,9 @@ import static org.hamcrest.Matchers.is;
 @TestPropertySource(locations = "classpath:/application.properties")
 public class LdapRealmProviderDAOTest {
 
-  @Autowired
-  LdapRealmProviderDAOImpl ldapRealmProviderDAOImpl;
+  @Autowired LdapRealmProviderDAOImpl ldapRealmProviderDAOImpl;
 
-  @MockBean
-  private UiMappingService uiMappingService;
+  @MockBean private UiMappingService uiMappingService;
 
   @Test
   public void loadUniStorage() {
@@ -108,31 +106,68 @@ public class LdapRealmProviderDAOTest {
   @Test
   public void shouldHaveRealmMapping() {
     Realm realm = ldapRealmProviderDAOImpl.load("domaine1").get();
-    assertThat("Should have a name mapping", realm.getGroupMappings().stream().anyMatch(v -> v.equals(new StoreMapping("name", "cn", ModelType.STRING, true))));
+    assertThat(
+        "Should have a name mapping",
+        realm.getGroupMappings().stream()
+            .anyMatch(v -> v.equals(new StoreMapping("name", "cn", ModelType.STRING, true))));
 
+    assertThat(
+        "should have a groups mapping",
+        realm.getGroupMappings().stream()
+            .anyMatch(
+                v ->
+                    v.equals(
+                        new StoreMapping("users", "uniquemember", ModelType.LIST_USER, true))));
 
-    assertThat("should have a groups mapping", realm.getGroupMappings().stream().anyMatch(v -> v.equals(new StoreMapping("users", "uniquemember", ModelType.LIST_USER, true))));
-
-
-    assertThat("Should have an application mapping", realm.getApplicationMappings().stream().anyMatch(v -> v.equals(new StoreMapping("name", "ou", ModelType.STRING, true))));
-
+    assertThat(
+        "Should have an application mapping",
+        realm.getApplicationMappings().stream()
+            .anyMatch(v -> v.equals(new StoreMapping("name", "ou", ModelType.STRING, true))));
   }
 
   @Test
   public void shouldHaveUsOneMapping() {
     Realm realm = ldapRealmProviderDAOImpl.load("domaine1").get();
-    assertThat("Should have the userMapping", realm.getUserStorages().get(0).getUserMappings().stream().anyMatch(v -> v.equals(new StoreMapping("firstName", "givenname", ModelType.STRING, true))));
+    assertThat(
+        "Should have the userMapping",
+        realm.getUserStorages().get(0).getUserMappings().stream()
+            .anyMatch(
+                v -> v.equals(new StoreMapping("firstName", "givenname", ModelType.STRING, true))));
 
+    assertThat(
+        "Should have the userMapping",
+        realm.getUserStorages().get(0).getUserMappings().stream()
+            .anyMatch(
+                v ->
+                    v.equals(
+                        new StoreMapping(
+                            "attributes.insee_roles_applicatifs",
+                            "inseeRoleApplicatif",
+                            ModelType.LIST_STRING,
+                            true))));
 
-    assertThat("Should have the userMapping", realm.getUserStorages().get(0).getUserMappings().stream().anyMatch(v -> v.equals(new StoreMapping("attributes.insee_roles_applicatifs", "inseeRoleApplicatif", ModelType.LIST_STRING, true))));
+    assertThat(
+        "Should have the organizationMapping",
+        realm.getUserStorages().get(0).getOrganizationMappings().stream()
+            .anyMatch(
+                v ->
+                    v.equals(new StoreMapping("attributes.mail", "mail", ModelType.STRING, true))));
 
+    assertThat(
+        "Should have the organizationMapping",
+        realm.getUserStorages().get(0).getOrganizationMappings().stream()
+            .anyMatch(
+                v ->
+                    v.equals(
+                        new StoreMapping(
+                            "address", "inseeAdressePostaleDN", ModelType.ADDRESS, true))));
 
-    assertThat("Should have the organizationMapping", realm.getUserStorages().get(0).getOrganizationMappings().stream().anyMatch(v -> v.equals(new StoreMapping("attributes.mail", "mail", ModelType.STRING, true))));
-
-    assertThat("Should have the organizationMapping", realm.getUserStorages().get(0).getOrganizationMappings().stream().anyMatch(v -> v.equals(new StoreMapping("address", "inseeAdressePostaleDN", ModelType.ADDRESS, true))));
-
-    assertThat("Should have the userMapping", realm.getUserStorages().get(0).getUserMappings().stream().anyMatch(v -> v.equals(new StoreMapping("groups", "memberOf", ModelType.LIST_GROUP, false))));
-
+    assertThat(
+        "Should have the userMapping",
+        realm.getUserStorages().get(0).getUserMappings().stream()
+            .anyMatch(
+                v ->
+                    v.equals(new StoreMapping("groups", "memberOf", ModelType.LIST_GROUP, false))));
   }
 
   @Test
@@ -141,15 +176,14 @@ public class LdapRealmProviderDAOTest {
         ldapRealmProviderDAOImpl
             .load("domaine1")
             .get()
-                .getUiMapping()
-                .get(UIMappingType.UI_USER_MAPPING);
+            .getUiMapping()
+            .get(UIMappingType.UI_USER_MAPPING);
     assertThat("Should be 25 found uiUserMapping", 25, is(uiUserMapping.size()));
     assertThat("First one should be the id", "Identifiant", is(uiUserMapping.get(0).getName()));
     assertThat(
-            "Second one should be the password last modification date",
-            "PasswordLastChange",
-            is(uiUserMapping.get(1).getName()));
+        "Second one should be the password last modification date",
+        "PasswordLastChange",
+        is(uiUserMapping.get(1).getName()));
     assertThat("Third one should be the realm field", "Realm", is(uiUserMapping.get(2).getName()));
   }
-
 }

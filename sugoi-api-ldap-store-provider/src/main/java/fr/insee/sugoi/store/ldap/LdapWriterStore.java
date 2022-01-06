@@ -45,15 +45,17 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
 
   private final LdapReaderStore ldapReaderStore;
 
-  public LdapWriterStore(Map<String, String> config, Map<MappingType, List<StoreMapping>> mappings) {
+  public LdapWriterStore(
+      Map<String, String> config, Map<MappingType, List<StoreMapping>> mappings) {
     try {
       this.ldapPoolConnection = LdapFactory.getConnectionPoolAuthenticated(config);
       this.config = config;
       userLdapMapper = new UserLdapMapper(config, mappings.get(MappingType.USERMAPPING));
       organizationLdapMapper =
-              new OrganizationLdapMapper(config, mappings.get(MappingType.ORGANIZATIONMAPPING));
+          new OrganizationLdapMapper(config, mappings.get(MappingType.ORGANIZATIONMAPPING));
       groupLdapMapper = new GroupLdapMapper(config, mappings.get(MappingType.GROUPMAPPING));
-      applicationLdapMapper = new ApplicationLdapMapper(config, mappings.get(MappingType.APPLICATIONMAPPING));
+      applicationLdapMapper =
+          new ApplicationLdapMapper(config, mappings.get(MappingType.APPLICATIONMAPPING));
       addressLdapMapper = new AddressLdapMapper(config);
       ldapReaderStore = new LdapReaderStore(config, mappings);
     } catch (LDAPException e) {

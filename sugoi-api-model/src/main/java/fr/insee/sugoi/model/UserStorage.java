@@ -27,20 +27,15 @@ public class UserStorage implements Serializable {
   private String organizationSource;
   private String addressSource;
 
-  @IgnoreSizeOf
-  private Map<String, String> properties = new HashMap<>();
+  @IgnoreSizeOf private Map<String, String> properties = new HashMap<>();
 
-  @IgnoreSizeOf
-  private List<StoreMapping> userMappings;
+  @IgnoreSizeOf private List<StoreMapping> userMappings;
 
-  @IgnoreSizeOf
-  private List<StoreMapping> organizationMappings;
-
+  @IgnoreSizeOf private List<StoreMapping> organizationMappings;
 
   public List<StoreMapping> getUserMappings() {
     return userMappings;
   }
-
 
   public void setUserMappings(List<StoreMapping> userMappings) {
     this.userMappings = userMappings;
@@ -97,6 +92,4 @@ public class UserStorage implements Serializable {
   public void addProperty(String key, String value) {
     this.properties.put(key, value);
   }
-
-
 }

@@ -128,28 +128,30 @@ public class UserStorageLdapMapper {
               "inseepropriete",
               String.format(
                   "groupSourcePattern$%s",
-                      userStorage.getProperties().get("group_source_pattern"))));
+                  userStorage.getProperties().get("group_source_pattern"))));
     }
     if (userStorage.getProperties().containsKey("group_filter_pattern")) {
       attributes.add(
-              new Attribute(
-                      "inseepropriete",
-                      String.format(
-                              "groupFilterPattern$%s",
-                              userStorage.getProperties().get("group_filter_pattern"))));
+          new Attribute(
+              "inseepropriete",
+              String.format(
+                  "groupFilterPattern$%s",
+                  userStorage.getProperties().get("group_filter_pattern"))));
     }
     if (userStorage.getUserMappings() != null) {
       for (StoreMapping storeMapping : userStorage.getUserMappings()) {
         attributes.add(
-                new Attribute(
-                        "inseepropriete", String.format("%s$%s", "userMapping", storeMapping.toStoreString())));
+            new Attribute(
+                "inseepropriete",
+                String.format("%s$%s", "userMapping", storeMapping.toStoreString())));
       }
     }
     if (userStorage.getOrganizationMappings() != null) {
       for (StoreMapping storeMapping : userStorage.getOrganizationMappings()) {
         attributes.add(
-                new Attribute(
-                        "inseepropriete", String.format("%s$%s", "organizationMapping", storeMapping.toStoreString())));
+            new Attribute(
+                "inseepropriete",
+                String.format("%s$%s", "organizationMapping", storeMapping.toStoreString())));
       }
     }
     return attributes;

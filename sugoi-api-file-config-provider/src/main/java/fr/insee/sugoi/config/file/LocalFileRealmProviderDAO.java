@@ -37,9 +37,9 @@ import java.util.stream.Collectors;
 
 @Component
 @ConditionalOnProperty(
-        value = "fr.insee.sugoi.realm.config.type",
-        havingValue = "local",
-        matchIfMissing = true)
+    value = "fr.insee.sugoi.realm.config.type",
+    havingValue = "local",
+    matchIfMissing = true)
 public class LocalFileRealmProviderDAO implements RealmProvider {
 
   @Value("${fr.insee.sugoi.realm.config.local.path:classpath:/realms.json}")

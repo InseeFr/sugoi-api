@@ -69,7 +69,6 @@ public class LdapReaderStoreTest {
     us.addProperty("group_filter_pattern", groupFilterPattern);
     us.addProperty("group_source_pattern", groupSourcePattern);
 
-
     us.setUserMappings(StoreMappingFixture.getUserStoreMappings());
     us.setOrganizationMappings(StoreMappingFixture.getOrganizationStoreMappings());
     return us;
