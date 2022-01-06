@@ -28,7 +28,6 @@ import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.ldap.utils.mapper.*;
 import fr.insee.sugoi.model.*;
 import fr.insee.sugoi.model.technics.StoreMapping;
-
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.*;

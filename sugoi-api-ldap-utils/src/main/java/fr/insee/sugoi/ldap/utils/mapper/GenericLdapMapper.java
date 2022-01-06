@@ -24,7 +24,6 @@ import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.technics.ModelType;
 import fr.insee.sugoi.model.technics.StoreMapping;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.security.cert.CertificateException;

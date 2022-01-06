@@ -23,7 +23,6 @@ import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.Realm.UIMappingType;
 import fr.insee.sugoi.model.technics.StoreMapping;
-
 import java.util.ArrayList;
 import java.util.List;
 

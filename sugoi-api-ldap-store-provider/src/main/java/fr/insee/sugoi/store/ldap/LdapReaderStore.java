@@ -26,7 +26,6 @@ import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;
 import fr.insee.sugoi.model.technics.StoreMapping;
-
 import java.util.*;
 import java.util.stream.Collectors;
 

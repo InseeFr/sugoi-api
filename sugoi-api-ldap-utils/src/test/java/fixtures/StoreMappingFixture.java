@@ -15,7 +15,6 @@ package fixtures;
 
 import fr.insee.sugoi.model.technics.ModelType;
 import fr.insee.sugoi.model.technics.StoreMapping;
-
 import java.util.ArrayList;
 import java.util.List;
 

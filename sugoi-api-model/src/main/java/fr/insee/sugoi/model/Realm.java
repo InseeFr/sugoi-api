@@ -16,13 +16,12 @@ package fr.insee.sugoi.model;
 import com.fasterxml.jackson.annotation.JsonValue;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import fr.insee.sugoi.model.technics.UiField;
-import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
-
 import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
 
 public class Realm implements Serializable {
 

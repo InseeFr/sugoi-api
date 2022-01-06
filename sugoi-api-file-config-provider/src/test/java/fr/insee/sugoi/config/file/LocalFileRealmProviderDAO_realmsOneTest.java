@@ -13,6 +13,10 @@
 */
 package fr.insee.sugoi.config.file;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
+
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.technics.ModelType;
@@ -21,10 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isA;
 
 @SpringBootTest(classes = LocalFileRealmProviderDAO.class)
 @TestPropertySource(

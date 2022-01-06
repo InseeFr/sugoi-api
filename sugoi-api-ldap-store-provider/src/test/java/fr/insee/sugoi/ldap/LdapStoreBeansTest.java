@@ -13,6 +13,8 @@
 */
 package fr.insee.sugoi.ldap;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import fr.insee.sugoi.ldap.fixtures.StoreMappingFixture;
 import fr.insee.sugoi.model.MappingType;
 import fr.insee.sugoi.model.Realm;
@@ -20,16 +22,13 @@ import fr.insee.sugoi.model.UserStorage;
 import fr.insee.sugoi.model.technics.ModelType;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import fr.insee.sugoi.store.ldap.LdapStoreBeans;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
-
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.MatcherAssert.assertThat;
 
 @SpringBootTest(classes = LdapStoreBeans.class)
 public class LdapStoreBeansTest {

@@ -14,12 +14,11 @@
 package fr.insee.sugoi.model;
 
 import fr.insee.sugoi.model.technics.StoreMapping;
-import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
 
 public class UserStorage implements Serializable {
   private String name;

@@ -13,20 +13,19 @@
 */
 package fr.insee.sugoi.ldap.utils.mapper;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import com.unboundid.ldap.sdk.Attribute;
 import fixtures.StoreMappingFixture;
 import fr.insee.sugoi.model.Application;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = ApplicationLdapMapper.class)
 public class ApplicationLdapMapperFromAttributesTest {

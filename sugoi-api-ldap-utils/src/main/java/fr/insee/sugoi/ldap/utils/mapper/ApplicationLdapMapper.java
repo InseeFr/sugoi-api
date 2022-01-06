@@ -18,7 +18,6 @@ import com.unboundid.ldap.sdk.Modification;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.technics.StoreMapping;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;

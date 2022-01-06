@@ -19,7 +19,6 @@ import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.UserStorage;
 import fr.insee.sugoi.model.technics.StoreMapping;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
