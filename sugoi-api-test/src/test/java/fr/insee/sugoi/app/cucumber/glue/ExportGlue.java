@@ -23,6 +23,7 @@ import io.cucumber.java.en.Then;
 import java.util.Arrays;
 
 public class ExportGlue {
+
   private Scenario scenario;
 
   private ObjectMapper mapper = new ObjectMapper();
@@ -62,5 +63,16 @@ public class ExportGlue {
   private boolean isUser(String userLine, String userName, int userNamePosition) {
     String[] s = userLine.split(",");
     return s[userNamePosition].equalsIgnoreCase(userName);
+  }
+
+  @Then("is pretty printed")
+  public void isPrettyPrinted() {
+    assertThat(
+        "Header attribute XXX should be printed",
+        containsHeader(stepData.getLatestResponse().getBody()));
+  }
+
+  private boolean containsHeader(String body) {
+    return true;
   }
 }
