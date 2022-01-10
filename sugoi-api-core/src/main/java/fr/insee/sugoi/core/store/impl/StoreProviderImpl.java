@@ -23,8 +23,8 @@ import fr.insee.sugoi.core.store.StoreStorage;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +35,7 @@ public class StoreProviderImpl implements StoreProvider {
 
   @Autowired private StoreStorage storeStorage;
 
-  protected static final Logger logger = LogManager.getLogger(StoreProviderImpl.class);
+  protected static final Logger logger = LoggerFactory.getLogger(StoreProviderImpl.class);
 
   @Override
   public Store getStoreForUserStorage(String realmName, String userStorageName) {

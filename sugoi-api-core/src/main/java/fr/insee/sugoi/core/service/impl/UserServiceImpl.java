@@ -40,10 +40,10 @@ import fr.insee.sugoi.model.paging.SearchType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.passay.CharacterRule;
 import org.passay.PasswordGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserService {
   @Autowired(required = false)
   private SeeAlsoService seeAlsoService;
 
-  protected static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
+  protected static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
   @Override
   public ProviderResponse create(

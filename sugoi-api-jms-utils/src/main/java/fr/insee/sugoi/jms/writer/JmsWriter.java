@@ -23,8 +23,8 @@ import java.util.Map;
 import java.util.UUID;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.JmsException;
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class JmsWriter {
 
-  private static final Logger logger = LogManager.getLogger(JmsWriter.class);
+  private static final Logger logger = LoggerFactory.getLogger(JmsWriter.class);
 
   @Autowired
   @Qualifier("synchronous")

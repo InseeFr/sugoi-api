@@ -33,15 +33,15 @@ import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;
 import java.util.Map;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class OrganizationServiceImpl implements OrganizationService {
 
-  protected static final Logger logger = LogManager.getLogger(OrganizationServiceImpl.class);
+  protected static final Logger logger = LoggerFactory.getLogger(OrganizationServiceImpl.class);
 
   @Autowired private StoreProvider storeProvider;
 

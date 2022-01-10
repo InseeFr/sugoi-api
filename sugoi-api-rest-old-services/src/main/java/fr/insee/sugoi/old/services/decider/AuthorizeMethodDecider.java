@@ -18,8 +18,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.text.StrSubstitutor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -41,7 +41,7 @@ public class AuthorizeMethodDecider {
   @Value("${fr.insee.sugoi.api.old.enable.preauthorize:false}")
   private boolean enable;
 
-  private static final Logger logger = LogManager.getLogger(AuthorizeMethodDecider.class);
+  private static final Logger logger = LoggerFactory.getLogger(AuthorizeMethodDecider.class);
 
   public boolean isAtLeastConsultant(String domaine) {
     if (enable) {
