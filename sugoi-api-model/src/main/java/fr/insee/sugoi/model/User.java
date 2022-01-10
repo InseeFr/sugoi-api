@@ -18,7 +18,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import java.io.Serializable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @JsonInclude(Include.NON_NULL)
 public class User implements Serializable {
@@ -42,6 +41,19 @@ public class User implements Serializable {
 
   public User(String username) {
     this.username = username;
+  }
+
+  public Optional<Object> get(String attributeName) throws NoSuchFieldException {
+    try {
+      if (attributeName.contains(".")) {
+        String[] s = attributeName.split("\\.");
+        Map<?, ?> mapOfAttributes = (Map<?, ?>) this.getClass().getDeclaredField(s[0]).get(this);
+        return Optional.ofNullable(mapOfAttributes.getOrDefault(s[1], null));
+      }
+      return Optional.ofNullable(this.getClass().getDeclaredField(attributeName).get(this));
+    } catch (IllegalAccessException e) {
+      return Optional.empty();
+    }
   }
 
   public List<Habilitation> getHabilitations() {
@@ -142,23 +154,5 @@ public class User implements Serializable {
 
   public void setMetadatas(Map<String, Object> metadatas) {
     this.metadatas = metadatas;
-  }
-
-  public void removeFromHabilitations(String appName, String role, String property) {
-    this.habilitations =
-        this.habilitations.stream()
-            .filter(
-                habilitation ->
-                    !(habilitation.getApplication().equals(appName)
-                        && habilitation.getRole().equals(role)
-                        && habilitation.getProperty().equals(property)))
-            .collect(Collectors.toList());
-  }
-
-  public void removeFromHabilitations(String habilitationId) {
-    this.habilitations =
-        this.habilitations.stream()
-            .filter(habilitation -> !(habilitation.getId().equals(habilitationId)))
-            .collect(Collectors.toList());
   }
 }

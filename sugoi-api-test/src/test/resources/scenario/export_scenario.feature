@@ -15,5 +15,6 @@ Feature: Export scenario synchrone
     When the client perform GET request on url /realms/domaine1/export/users/export.csv
     And show body received
     Then the client receives status code 200
+    Then is pretty printed
     Then testc has been exported
     Then nogroup has been exported

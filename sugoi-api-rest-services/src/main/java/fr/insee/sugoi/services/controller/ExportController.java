@@ -13,14 +13,17 @@
 */
 package fr.insee.sugoi.services.controller;
 
+import fr.insee.sugoi.core.exceptions.UserStorageNotFoundException;
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.core.service.UserService;
-import fr.insee.sugoi.model.*;
+import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;
+import fr.insee.sugoi.model.technics.StoreMapping;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,9 +34,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
@@ -137,59 +138,108 @@ public class ExportController {
       habilitations.forEach(
           habilitationName -> searchUser.addHabilitation(new Habilitation(habilitationName)));
     }
-
-    List<String> storageToFind = new ArrayList<>();
-
-    if (storage != null && !storage.isEmpty()) {
-      storageToFind.add(storage);
-    } else {
-      storageToFind =
-          configService.getRealm(realm).getUserStorages().stream()
-              .map(UserStorage::getName)
-              .collect(Collectors.toList());
-    }
-
-    int allResultsSize = 0;
+    CSVPrinter csvPrinter;
     try {
       response.setCharacterEncoding("UTF-8");
       response.setContentType("text/csv");
-      CSVPrinter csvPrinter = new CSVPrinter(response.getWriter(), CSVFormat.DEFAULT);
+      csvPrinter = new CSVPrinter(response.getWriter(), CSVFormat.DEFAULT);
       // print headers on the first line
-      csvPrinter.printRecord(getFieldsAsStringList(new User()));
 
-      for (String storageName : storageToFind) {
-
-        // set the page to maintain the search request pagination
-        PageableResult pageable = new PageableResult(pageSize, 0, null);
-
-        while (true) {
-          PageResult<User> foundUsers =
-              userService.findByProperties(realm, storageName, searchUser, pageable, typeRecherche);
-          csvPrinter.printRecords(
-              foundUsers.getResults().stream()
-                  .map(this::toStringList)
-                  .collect(Collectors.toList()));
-          csvPrinter.flush();
-
-          if (foundUsers.isHasMoreResult()) {
-            if (allResultsSize > maxSizeOutput) {
-              csvPrinter.close();
-              throw new RuntimeException("too much result");
-            }
-            pageable = new PageableResult(pageSize, 0, foundUsers.getSearchToken());
-          } else {
-            break;
-          }
-        }
-        csvPrinter.flush();
-      }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    // too late, data already send
-    // response.setStatus(HttpStatus.OK.value());
-    // response.setHeader("X-TotalSize", String.valueOf(allResultsSize));
 
+    List<StoreMapping> storeMappings =
+        storage != null && !storage.isEmpty()
+            ? configService
+                .getRealm(realm)
+                .getUserStorageByName(storage)
+                .orElseThrow(() -> new UserStorageNotFoundException(realm, storage))
+                .getUserMappings()
+            : configService.getRealm(realm).getUserStorages().stream()
+                .flatMap(storage1 -> storage1.getUserMappings().stream())
+                .distinct()
+                .collect(Collectors.toList());
+    try {
+      csvPrinter.printRecord(
+          storeMappings.stream().map(StoreMapping::getSugoiName).collect(Collectors.toList()));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    if (storage != null && !storage.isEmpty()) {
+      getExportUsersWithStorages(
+          searchUser, storage, storeMappings, realm, typeRecherche, csvPrinter);
+    } else {
+      configService
+          .getRealm(realm)
+          .getUserStorages()
+          .forEach(
+              storage1 ->
+                  getExportUsersWithStorages(
+                      searchUser,
+                      storage1.getName(),
+                      storeMappings,
+                      realm,
+                      typeRecherche,
+                      csvPrinter));
+    }
+  }
+
+  private void getExportUsersWithStorages(
+      User searchUser,
+      String storageName,
+      List<StoreMapping> headerMappings,
+      String realm,
+      SearchType typeRecherche,
+      CSVPrinter csvPrinter) {
+    try {
+
+      // set the page to maintain the search request pagination
+      PageableResult pageable = new PageableResult(pageSize, 0, null);
+
+      while (true) {
+        PageResult<User> foundUsers =
+            userService.findByProperties(realm, storageName, searchUser, pageable, typeRecherche);
+        for (User foundUser : foundUsers.getResults()) {
+          List<String> attributesToPrint = new ArrayList<>();
+          for (StoreMapping headerMapping : headerMappings) {
+            String newAttribute;
+            switch (headerMapping.getModelType()) {
+              case LIST_HABILITATION:
+              case LIST_GROUP:
+                newAttribute =
+                    ((List<?>)
+                            foundUser.get(headerMapping.getSugoiName()).orElse(new ArrayList<>()))
+                        .stream().map(Object::toString).collect(Collectors.joining(",", "", ""));
+                break;
+              case ORGANIZATION:
+                newAttribute =
+                    ((Organization)
+                            foundUser.get(headerMapping.getSugoiName()).orElse(new Organization()))
+                        .getIdentifiant();
+                break;
+              default:
+                newAttribute = foundUser.get(headerMapping.getSugoiName()).orElse("").toString();
+            }
+
+            attributesToPrint.add(newAttribute);
+          }
+          csvPrinter.printRecord(attributesToPrint);
+          csvPrinter.flush();
+        }
+
+        if (foundUsers.isHasMoreResult()) {
+          csvPrinter.close();
+          pageable = new PageableResult(pageSize, 0, foundUsers.getSearchToken());
+        } else {
+          break;
+        }
+      }
+      csvPrinter.flush();
+    } catch (IOException | NoSuchFieldException e) {
+      e.printStackTrace();
+    }
   }
 
   @GetMapping(path = {"/realms/{realm}/export/users/export.csv"})
@@ -257,29 +307,5 @@ public class ExportController {
         habilitations,
         groupFilter,
         response);
-  }
-
-  private <T> List<String> getFieldsAsStringList(T t) {
-    return Arrays.stream(t.getClass().getDeclaredFields())
-        .map(Field::getName)
-        .collect(Collectors.toList());
-  }
-
-  private <T> List<String> toStringList(T t) {
-    List<String> list = new ArrayList<>();
-    for (Field f : t.getClass().getDeclaredFields()) {
-      f.setAccessible(true);
-      try {
-        Object value = f.get(t);
-        if (value == null) {
-          list.add("");
-        } else {
-          list.add(value.toString());
-        }
-      } catch (IllegalArgumentException | IllegalAccessException e) {
-        throw new RuntimeException(e);
-      }
-    }
-    return list;
   }
 }

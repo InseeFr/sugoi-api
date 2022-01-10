@@ -17,10 +17,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import fr.insee.sugoi.model.technics.UiField;
 import java.io.Serializable;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
 
 public class Realm implements Serializable {
@@ -123,6 +120,10 @@ public class Realm implements Serializable {
 
   public Map<String, String> getProperties() {
     return properties;
+  }
+
+  public Optional<UserStorage> getUserStorageByName(String name) {
+    return userStorages.stream().filter(s -> s.getName().equalsIgnoreCase(name)).findFirst();
   }
 
   @Override

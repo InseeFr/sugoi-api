@@ -267,7 +267,6 @@ public class GenericGlue {
       } catch (Exception e) {
         System.out.println("App is not ready sleeping...");
         System.out.println(e.getMessage());
-        e.printStackTrace();
         Thread.sleep(20000);
         System.out.println("continue...");
       }
