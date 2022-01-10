@@ -26,6 +26,7 @@ public class Realm implements Serializable {
 
   private String name;
   private String url;
+  private String port;
   private String appSource;
   private List<UserStorage> userStorages;
   @IgnoreSizeOf private Map<String, String> properties = new HashMap<>();
@@ -75,6 +76,14 @@ public class Realm implements Serializable {
 
   public void setUrl(String url) {
     this.url = url;
+  }
+
+  public String getPort() {
+    return this.port;
+  }
+
+  public void setPort(String port) {
+    this.port = port;
   }
 
   public String getAppSource() {

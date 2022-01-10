@@ -44,6 +44,8 @@ public class RealmLdapMapper {
       if (property.length == 2) {
         if (property[0].equalsIgnoreCase("ldapUrl")) {
           realm.setUrl(property[1]);
+        } else if (property[0].equalsIgnoreCase("ldapPort")) {
+          realm.setPort(property[1]);
         } else if (property[0].equalsIgnoreCase("enableMailUnicity")) {
           realm.addProperty(GlobalKeysConfig.VERIFY_MAIL_UNICITY, property[1]);
         } else if (property[0].equalsIgnoreCase("branchesApplicativesPossibles")) {
@@ -101,6 +103,10 @@ public class RealmLdapMapper {
     attributes.add(new Attribute("objectClass", "inseeOrganizationalRole"));
     if (realm.getUrl() != null) {
       attributes.add(new Attribute("inseepropriete", String.format("ldapUrl$%s", realm.getUrl())));
+    }
+    if (realm.getPort() != null) {
+      attributes.add(
+          new Attribute("inseepropriete", String.format("ldapPort$%s", realm.getPort())));
     }
     if (realm.getProperties().containsKey(GlobalKeysConfig.REALM_DESCRIPTION)) {
       attributes.add(

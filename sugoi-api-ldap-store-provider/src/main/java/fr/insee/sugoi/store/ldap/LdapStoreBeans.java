@@ -108,7 +108,7 @@ public class LdapStoreBeans {
         LdapConfigKeys.NAME,
         userStorage.getName() != null ? userStorage.getName() : realm.getName());
     config.put(LdapConfigKeys.URL, realm.getUrl());
-    config.put(LdapConfigKeys.PORT, defaultPort);
+    config.put(LdapConfigKeys.PORT, realm.getPort() != null ? realm.getPort() : defaultPort);
     config.put(LdapConfigKeys.USERNAME, defaultUsername);
     config.put(LdapConfigKeys.PASSWORD, defaultPassword);
     config.put(
