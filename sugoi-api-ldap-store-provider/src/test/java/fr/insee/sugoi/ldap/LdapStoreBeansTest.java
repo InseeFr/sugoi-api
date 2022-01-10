@@ -101,6 +101,7 @@ public class LdapStoreBeansTest {
     Realm realm = new Realm();
     realm.setName("domaine1");
     realm.setUrl("localhost");
+    realm.setPort("390");
     realm.setAppSource(appSource);
 
     Map<String, Map<String, String>> mappings = new HashMap<>();
@@ -155,5 +156,13 @@ public class LdapStoreBeansTest {
         "Should have the default mappings in the realm when not set",
         mappings.get("applicationMapping").get("name"),
         is("ou,String,rw"));
+  }
+
+  @Test
+  public void beanShouldHaveItsOwnPort() {
+    assertThat(
+        "Port should be realm configured port 390",
+        ldapStoreBeans.generateConfig(realm(), userStorage()).get("port"),
+        is("390"));
   }
 }
