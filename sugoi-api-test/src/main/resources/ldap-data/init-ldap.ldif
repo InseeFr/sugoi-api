@@ -322,6 +322,17 @@ inseegroupedefaut: prop_role_applitest
 inseegroupedefaut: role2_applitest
 inseegroupedefaut: prop1_TestIgnoreCase_applitest
 inseegroupedefaut: Prop2_TestIgnoreCase_applitest
+memberOf: cn=Utilisateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
+
+dn: uid=nogroup,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+inseeOrganisationDN: uid=testo,ou=organisations,ou=clients_domaine1,o=insee,c=fr
+uid: nogroup
 
 dn: uid=testo,ou=organisations,ou=clients_domaine1,o=insee,c=fr
 objectClass: top
@@ -459,6 +470,7 @@ inseegroupedefaut: prop_role_applitest
 inseegroupedefaut: role2_applitest
 inseegroupedefaut: prop1_TestIgnoreCase_applitest
 inseegroupedefaut: Prop2_TestIgnoreCase_applitest
+memberOf: cn=Utilisateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
 
 
 
@@ -522,3 +534,4 @@ cn: test_password
 sn: test_password
 givenname: test_password
 uid: test_password
+memberOf: cn=Utilisateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr

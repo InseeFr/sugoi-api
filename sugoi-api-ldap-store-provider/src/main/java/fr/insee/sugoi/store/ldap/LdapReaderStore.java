@@ -270,19 +270,19 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       MapperType object, LdapMapper<MapperType> mapper, String searchType) {
     if (searchType.equalsIgnoreCase("AND")) {
       return LdapFilter.and(
-          mapper.mapToAttributes(object).stream()
+          mapper.createAttributesForFilter(object).stream()
               .filter(attribute -> !attribute.getValue().equals(""))
               .map(attribute -> LdapFilter.contains(attribute.getName(), attribute.getValue()))
               .collect(Collectors.toList()));
     } else if (searchType.equalsIgnoreCase("OR")) {
       List<Filter> objectClassListFilter =
-          mapper.mapToAttributes(object).stream()
+          mapper.createAttributesForFilter(object).stream()
               .filter(attribute -> attribute.getName().equals("objectClass"))
               .map(attribute -> LdapFilter.contains(attribute.getName(), attribute.getValue()))
               .collect(Collectors.toList());
 
       List<Filter> attributeListFilter =
-          mapper.mapToAttributes(object).stream()
+          mapper.createAttributesForFilter(object).stream()
               .filter(
                   attribute ->
                       !attribute.getName().equals("objectClass")
