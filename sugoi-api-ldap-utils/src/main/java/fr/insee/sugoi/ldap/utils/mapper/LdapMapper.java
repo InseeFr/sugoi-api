@@ -25,4 +25,6 @@ public interface LdapMapper<ResultType> {
   public List<Attribute> mapToAttributes(ResultType object);
 
   public List<Modification> createMods(ResultType object);
+
+  public List<Attribute> createAttributesForFilter(ResultType object);
 }

@@ -42,9 +42,16 @@ public class ApplicationLdapMapper implements LdapMapper<Application> {
         attributes, Application.class, config, mapping);
   }
 
+  @Override
   public List<Attribute> mapToAttributes(Application application) {
     return GenericLdapMapper.mapObjectToLdapAttributes(
-        application, Application.class, config, mapping, objectClasses);
+        application, Application.class, config, mapping, objectClasses, true);
+  }
+
+  @Override
+  public List<Attribute> createAttributesForFilter(Application application) {
+    return GenericLdapMapper.mapObjectToLdapAttributes(
+        application, Application.class, config, mapping, objectClasses, false);
   }
 
   public List<Modification> createMods(Application updatedApplication) {
