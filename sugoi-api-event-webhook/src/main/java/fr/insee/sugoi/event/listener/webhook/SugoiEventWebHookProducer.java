@@ -48,23 +48,27 @@ public class SugoiEventWebHookProducer {
   @EventListener
   public void handleContextStart(SugoiEvent cse) {
     SugoiEventTypeEnum eventType = cse.getEventType();
-    String webHookTag = (String) cse.getProperties().get(EventKeysConfig.WEBSERVICE_TAG);
-    Map<String, Object> values = getValuesForTemplateFromEvent(cse);
-    switch (eventType) {
-      case RESET_PASSWORD:
-        getServiceConfiguredForTag(getTagWithDefaultMail(webHookTag))
-            .forEach(webHookName -> webHookService.resetPassword(webHookName, values));
-        break;
-      case SEND_LOGIN:
-        getServiceConfiguredForTag(getTagWithDefaultMail(webHookTag))
-            .forEach(webHookName -> webHookService.sendLogin(webHookName, values));
-        break;
-      case CHANGE_PASSWORD:
-        getServiceConfiguredForTag(webHookTag)
-            .forEach(webHookName -> webHookService.changePassword(webHookName, values));
-        break;
-      default:
-        break;
+    if (eventType == SugoiEventTypeEnum.RESET_PASSWORD
+        || eventType == SugoiEventTypeEnum.SEND_LOGIN
+        || eventType == SugoiEventTypeEnum.CHANGE_PASSWORD) {
+      String webHookTag = (String) cse.getProperties().get(EventKeysConfig.WEBSERVICE_TAG);
+      Map<String, Object> values = getValuesForTemplateFromEvent(cse);
+      switch (eventType) {
+        case RESET_PASSWORD:
+          getServiceConfiguredForTag(getTagWithDefaultMail(webHookTag))
+              .forEach(webHookName -> webHookService.resetPassword(webHookName, values));
+          break;
+        case SEND_LOGIN:
+          getServiceConfiguredForTag(getTagWithDefaultMail(webHookTag))
+              .forEach(webHookName -> webHookService.sendLogin(webHookName, values));
+          break;
+        case CHANGE_PASSWORD:
+          getServiceConfiguredForTag(webHookTag)
+              .forEach(webHookName -> webHookService.changePassword(webHookName, values));
+          break;
+        default:
+          break;
+      }
     }
   }
 
