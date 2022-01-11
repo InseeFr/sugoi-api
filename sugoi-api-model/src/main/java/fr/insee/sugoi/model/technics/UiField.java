@@ -24,6 +24,7 @@ public class UiField implements Serializable, Comparable<UiField> {
   private String helpText;
   private String path;
   private String type;
+  private Boolean required = false;
   private Boolean modifiable;
   private String tag;
   private int order;
@@ -105,5 +106,13 @@ public class UiField implements Serializable, Comparable<UiField> {
 
   public void setOrder(int order) {
     this.order = order;
+  }
+
+  public Boolean getRequired() {
+    return this.required;
+  }
+
+  public void setRequired(Boolean required) {
+    this.required = required;
   }
 }
