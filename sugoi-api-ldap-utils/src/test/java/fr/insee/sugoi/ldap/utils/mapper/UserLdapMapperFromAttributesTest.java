@@ -17,8 +17,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import com.unboundid.ldap.sdk.Attribute;
-import fixtures.StoreMappingFixture;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
 import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -35,6 +35,14 @@
 
         <dependency>
             <groupId>fr.insee.sugoi</groupId>
+            <artifactId>sugoi-api-model</artifactId>
+		    <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.insee.sugoi</groupId>
             <artifactId>sugoi-api-distribution-full-env</artifactId>
         </dependency>
 

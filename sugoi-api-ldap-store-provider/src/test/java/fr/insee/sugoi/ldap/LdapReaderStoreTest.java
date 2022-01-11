@@ -16,8 +16,8 @@ package fr.insee.sugoi.ldap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import fr.insee.sugoi.ldap.fixtures.StoreMappingFixture;
 import fr.insee.sugoi.model.*;
+import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.store.ldap.LdapReaderStore;

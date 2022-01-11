@@ -49,6 +49,11 @@ public class StoreMappingFixture {
         new StoreMapping("attributes.hasPassword", "userPassword", ModelType.EXISTS, false));
     mapping.add(
         new StoreMapping("metadatas.modifyTimestamp", "modifyTimestamp", ModelType.STRING, false));
+    mapping.add(
+        new StoreMapping(
+            "attributes.additionalMail", "inseeMailCorrespondant", ModelType.STRING, true));
+    mapping.add(
+        new StoreMapping("attributes.passwordShouldBeReset", "pwdReset", ModelType.STRING, false));
     return mapping;
   }
 
@@ -71,7 +76,6 @@ public class StoreMappingFixture {
     mappings.add(new StoreMapping("attributes.description", "description", ModelType.STRING, true));
     mappings.add(new StoreMapping("attributes.mail", "mail", ModelType.STRING, true));
     mappings.add(new StoreMapping("address", "inseeAdressePostaleDN", ModelType.ADDRESS, true));
-    mappings.add(new StoreMapping("inseeClefChiffrement", "gpgkey", ModelType.ADDRESS, true));
     mappings.add(
         new StoreMapping("organization", "inseeOrganisationDN", ModelType.ORGANIZATION, true));
     return mappings;

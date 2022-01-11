@@ -16,8 +16,8 @@ package fr.insee.sugoi.ldap.utils.mapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.unboundid.ldap.sdk.Attribute;
-import fixtures.StoreMappingFixture;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
