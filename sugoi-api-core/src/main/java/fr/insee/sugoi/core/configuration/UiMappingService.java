@@ -129,7 +129,11 @@ public class UiMappingService {
         String[] optionsProperties = fieldProperties[8].split(";");
         Map<String, String> options = new HashMap<>();
         for (String optionProperty : optionsProperties) {
-          options.put(optionProperty.split("=")[0], optionProperty.split("=")[1]);
+          if (optionProperty.equals("required")) {
+            uifield.setRequired(true);
+          } else {
+            options.put(optionProperty.split("=")[0], optionProperty.split("=")[1]);
+          }
         }
         uifield.setOptions(options);
       }
