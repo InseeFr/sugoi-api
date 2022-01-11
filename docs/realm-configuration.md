@@ -4,6 +4,7 @@
   - [Realm configuration](#realm-configuration)
     - [Ui mapping](#ui-mapping)
     - [Realm configuration properties](#realm-configuration-properties)
+      - [Realm configuration properties on password](#realm-configuration-properties-on-password)
   - [UserStorage configuration](#userstorage-configuration)
     - [Generic UserStorage properties](#generic-userstorage-properties)
     - [Userstorage properties with a LDAP Store Provider](#userstorage-properties-with-a-ldap-store-provider)
@@ -83,6 +84,23 @@ with :
 | app-managed-attribute-patterns-list | "(.\*)\_$(application),$(application)\\$\\$(.\*)" |                                                                                     yes |         | The pattern that the attribute value must follow                                                                                                                                                                           |
 | vlv_enabled                         |                   true or false                   |                                                                yes, disabled by default |         | Allowed to make vlv search on ldap                                                                                                                                                                                         |
 | sort_key                            |                        uid                        |                                                                                      no |         | Attribute on which ordered will be done when making a paging request                                                                                                                                                       |
+
+#### Realm configuration properties on password
+
+Realm properties on password generation and validation. See [general configuration](configuration.md#password-configuration) for default values.
+
+| Field name                          |                      Example                      | Default | Description |
+| ----------------------------- | :---------: | :------------: | ------------------------------------ |
+| create_password_WITHUpperCase | true | fr.insee.sugoi.password.create.withUpperCase | Set if a sugoi generated password is generated with uppercase |
+| create_password_WITHLowerCase | false | fr.insee.sugoi.password.create.withLowerCase | Set if a sugoi generated password is generated with lowercase |
+| create_password_WITHDigit | true | fr.insee.sugoi.password.create.withDigits | Set if a sugoi generated password is generated with digit |
+| create_password_WITHSpecial | true | fr.insee.sugoi.password.create.withSpecial | Set if a sugoi generated password is generated with special characters |
+| create_password_size | 20 | fr.insee.sugoi.password.create.length | Set the size of a sugoi generated password |
+| validate_password_WITHUpperCase | false | fr.insee.sugoi.password.validate.withUpperCase | Define if a new password provided by the user is valid if it has no uppercase |
+| validate_password_WITHLowerCase | true | fr.insee.sugoi.password.validate.withLowerCase | Define if a new password provided by the user is valid if it has no lowercase |
+| validate_password_WITHDigit | true | fr.insee.sugoi.password.validate.withDigits | Define if a new password provided by the user is valid if it has no digit |
+| validate_password_WITHSpecial | true | fr.insee.sugoi.password.validate.withSpecial | Define if a new password provided by the user is valid if it has no special characters |
+| validate_password_size | 20 | fr.insee.sugoi.password.validate.minimal.length | Define a minimum size to check if a new password provided by the user is valid |
 
 ## UserStorage configuration
 

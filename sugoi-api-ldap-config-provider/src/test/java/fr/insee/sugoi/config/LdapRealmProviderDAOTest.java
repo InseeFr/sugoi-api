@@ -165,4 +165,13 @@ public class LdapRealmProviderDAOTest {
         is(uiUserMapping.get(1).getName()));
     assertThat("Third one should be the realm field", "Realm", is(uiUserMapping.get(2).getName()));
   }
+
+  @Test
+  public void shouldHaveAPasswordLength() {
+    Realm realm = ldapRealmProviderDAOImpl.load("domaine1").get();
+    assertThat(
+        "Should have a password length",
+        realm.getProperties().get("create_password_WITHUpperCase"),
+        is("true"));
+  }
 }

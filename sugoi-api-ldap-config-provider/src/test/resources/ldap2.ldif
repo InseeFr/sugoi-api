@@ -145,6 +145,7 @@ dn: cn=Profil_domaine1_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We
 cn: Profil_domaine1_WebServiceLdap
 objectclass: inseeOrganizationalRole
 inseepropriete: ldapUrl$localhost
+inseePropriete: create_password_WITHUpperCase$true
 inseepropriete: ldapPort$10389
 inseepropriete: brancheContact$ou=contacts,ou=clients_domaine1,o=insee,c=fr
 inseepropriete: brancheAdresse$ou=adresses,ou=clients_domaine1,o=insee,c=fr
