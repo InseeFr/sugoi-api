@@ -84,6 +84,8 @@ public class RealmLdapMapper {
               .getUiMapping()
               .computeIfAbsent(UIMappingType.UI_USER_MAPPING, l -> new ArrayList<>())
               .add(uiMappingService.convertStringToUIField(property[1]));
+        } else {
+          realm.addProperty(property[0], property[1]);
         }
       }
     }
