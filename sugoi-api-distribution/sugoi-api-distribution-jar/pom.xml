@@ -146,10 +146,7 @@
       <artifactId>sugoi-api-jms-store-provider</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.fusesource.jansi</groupId>
-      <artifactId>jansi</artifactId>
-    </dependency>
+
 
     <dependency>
       <groupId>fr.insee.sugoi</groupId>
