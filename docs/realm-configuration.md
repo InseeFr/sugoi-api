@@ -60,7 +60,7 @@ Realm ui mappings is a map containing two list of ui mapping : a uiUserMapping l
 
 A UI mapping is defined as follow :
 
-name;helpTextTitle;helpText;path;type;modifiable;tag[;order;required;option:value...]
+name;helpTextTitle;helpText;path;type;modifiable;tag[;order;required;option=value...]
 
 with :
 
@@ -73,6 +73,8 @@ with :
 - tag : a tag defining a category for the field
 - order : an int to order the different fields
 - required: if field must be tag as required on the ui side
+
+A list of custom key/values can be added at the end.
 
 ### Realm configuration properties
 
