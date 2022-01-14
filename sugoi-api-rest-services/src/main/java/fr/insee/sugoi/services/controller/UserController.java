@@ -114,7 +114,7 @@ public class UserController {
           @RequestParam(name = "mail", required = false)
           String mail,
       @Parameter(description = "User's common name of user to search ", required = false)
-          @RequestParam(name = "CommonName", required = false)
+          @RequestParam(name = "commonName", required = false)
           String commonName,
       @Parameter(description = "User's description", required = false)
           @RequestParam(name = "description", required = false)
