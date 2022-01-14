@@ -13,12 +13,14 @@
 */
 package fr.insee.sugoi.commons.services.configuration;
 
+import fr.insee.sugoi.commons.services.configuration.basic.CustomAuthorityMapper;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.ArrayUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -70,6 +72,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   private String monitorUserName = "monitor";
   private String monitorUserPassword;
+
+  @Value("${fr.insee.sugoi.security.default-roles-for-users:}")
+  private List<String> defaultRolesForUsers;
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
@@ -141,7 +146,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
           List<String> roles =
               (List<String>)
                   claims.getOrDefault(claimPath[claimPath.length - 1], new ArrayList<>());
-
+          roles.addAll(defaultRolesForUsers);
           return roles.stream()
               .map(
                   s ->
@@ -180,7 +185,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
           .groupSearchBase(ldapAccountManagmentGroupeBase)
           .groupSearchSubtree(ldapAccountManagmentGroupSubtree)
           .contextSource()
-          .url(ldapAccountManagmentUrl);
+          .url(ldapAccountManagmentUrl)
+          .and()
+          .authoritiesMapper(new CustomAuthorityMapper(defaultRolesForUsers));
     }
   }
 
