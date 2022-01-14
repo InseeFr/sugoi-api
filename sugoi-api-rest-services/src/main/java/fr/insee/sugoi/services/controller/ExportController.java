@@ -15,9 +15,7 @@ package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.core.service.UserService;
-import fr.insee.sugoi.model.Habilitation;
-import fr.insee.sugoi.model.Organization;
-import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.*;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;
@@ -42,11 +40,7 @@ import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "Export objects", description = "Endpoints to export all objects in some formats")
@@ -90,30 +84,30 @@ public class ExportController {
               required = false)
           @PathVariable(name = "storage", required = false)
           String storage,
-      @Parameter(description = "User's identifiant of user to search ", required = false)
+      @Parameter(description = "User's identifiant of user to search ")
           @RequestParam(name = "identifiant", required = false)
           String identifiant,
-      @Parameter(description = "User's mail of user to search ", required = false)
+      @Parameter(description = "User's mail of user to search ")
           @RequestParam(name = "mail", required = false)
           String mail,
-      @Parameter(description = "User's commun name of user to search ", required = false)
+      @Parameter(description = "User's commun name of user to search ")
           @RequestParam(name = "nomCommun", required = false)
           String nomCommun,
-      @Parameter(description = "User's description", required = false)
+      @Parameter(description = "User's description")
           @RequestParam(name = "description", required = false)
           String description,
-      @Parameter(description = "User rattached organization", required = false)
+      @Parameter(description = "User rattached organization")
           @RequestParam(name = "organisationId", required = false)
           String organisationId,
-      @Parameter(description = "Search type can be OR or AND ", required = false)
+      @Parameter(description = "Search type can be OR or AND ")
           @RequestParam(name = "typeRecherche", defaultValue = "AND", required = true)
           SearchType typeRecherche,
-      @Parameter(description = "User's habilitations of user to search ", required = false)
+      @Parameter(description = "User's habilitations of user to search ")
           @RequestParam(name = "habilitation", required = false)
           List<String> habilitations,
-      @Parameter(description = "User's application of user to search ", required = false)
-          @RequestParam(name = "application", required = false)
-          String application,
+      @Parameter(description = "Filter on group")
+          @RequestParam(name = "groupFilter", required = false)
+          String groupFilter,
       HttpServletResponse response) {
 
     // set the user which will serve as a model to retrieve the matching users
@@ -121,6 +115,7 @@ public class ExportController {
     searchUser.setUsername(identifiant);
     searchUser.setLastName(nomCommun);
     searchUser.setMail(mail);
+    if (groupFilter != null) searchUser.setGroups(List.of(new Group(groupFilter)));
     if (organisationId != null) {
       Organization organizationSearch = new Organization();
       organizationSearch.setIdentifiant(organisationId);
@@ -138,7 +133,7 @@ public class ExportController {
     } else {
       storageToFind =
           configService.getRealm(realm).getUserStorages().stream()
-              .map(us -> us.getName())
+              .map(UserStorage::getName)
               .collect(Collectors.toList());
     }
 
@@ -226,9 +221,9 @@ public class ExportController {
       @Parameter(description = "User's habilitations of user to search ", required = false)
           @RequestParam(name = "habilitation", required = false)
           List<String> habilitations,
-      @Parameter(description = "User's application of user to search ", required = false)
-          @RequestParam(name = "application", required = false)
-          String application,
+      @Parameter(description = "Filter on group")
+          @RequestParam(name = "groupFilter", required = false)
+          String groupFilter,
       HttpServletResponse response) {
     getAllUsers(
         realm,
@@ -240,13 +235,13 @@ public class ExportController {
         organisationId,
         typeRecherche,
         habilitations,
-        application,
+        groupFilter,
         response);
   }
 
   private <T> List<String> getFieldsAsStringList(T t) {
-    return Arrays.asList(t.getClass().getDeclaredFields()).stream()
-        .map(f -> f.getName())
+    return Arrays.stream(t.getClass().getDeclaredFields())
+        .map(Field::getName)
         .collect(Collectors.toList());
   }
 

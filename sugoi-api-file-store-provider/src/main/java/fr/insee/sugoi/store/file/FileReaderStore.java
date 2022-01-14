@@ -86,26 +86,7 @@ public class FileReaderStore implements ReaderStore {
   @Override
   public Optional<Organization> getOrganization(String id) {
     if (config.get(FileKeysConfig.ORGANIZATION_SOURCE) != null) {
-      Resource realmsResource =
-          resourceLoader.getResource(config.get(FileKeysConfig.ORGANIZATION_SOURCE) + id);
-      if (realmsResource.exists()) {
-        Organization organization = loadResourceContent(realmsResource, Organization.class);
-        // suborganization is loaded as an independant resource
-        if (organization.getOrganization() != null
-            && organization.getOrganization().getIdentifiant() != null) {
-          try {
-            String subOrganizationId = organization.getOrganization().getIdentifiant();
-            organization.setOrganization(
-                getOrganization(subOrganizationId)
-                    .orElseThrow(() -> new OrganizationNotFoundException(subOrganizationId)));
-          } catch (RuntimeException e) {
-            logger.error("Unable to retrieve organization's suborganization", e);
-          }
-        }
-        return Optional.of(organization);
-      } else {
-        return Optional.empty();
-      }
+      return getOrganization(id, false);
     } else {
       throw new UnsupportedOperationException(
           "Organizations feature not configured for this storage");
@@ -282,5 +263,30 @@ public class FileReaderStore implements ReaderStore {
   @Override
   public Optional<Group> getManagerGroup(String applicationName) {
     throw new NotImplementedException();
+  }
+
+  private Optional<Organization> getOrganization(String id, boolean isSubOrganization) {
+    Resource realmsResource =
+        resourceLoader.getResource(config.get(FileKeysConfig.ORGANIZATION_SOURCE) + id);
+    if (realmsResource.exists()) {
+      Organization organization = loadResourceContent(realmsResource, Organization.class);
+      // suborganization is loaded as an independant resource
+      // and only when it is not already a nested organization
+      if (!isSubOrganization
+          && organization.getOrganization() != null
+          && organization.getOrganization().getIdentifiant() != null) {
+        try {
+          String subOrganizationId = organization.getOrganization().getIdentifiant();
+          organization.setOrganization(
+              getOrganization(subOrganizationId, true)
+                  .orElseThrow(() -> new OrganizationNotFoundException(subOrganizationId)));
+        } catch (RuntimeException e) {
+          logger.error("Unable to retrieve organization's suborganization", e);
+        }
+      }
+      return Optional.of(organization);
+    } else {
+      return Optional.empty();
+    }
   }
 }

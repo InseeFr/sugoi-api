@@ -14,6 +14,7 @@
 package fr.insee.sugoi.event.listener.webhook;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
@@ -27,6 +28,7 @@ import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.event.listener.webhook.service.impl.WebHookServiceImpl;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -121,7 +123,10 @@ public class CredentialWebhookTest {
         "Property from template properties should have been kept",
         "prop",
         is(propertiesOfProperties.get("new_property")));
-    assertThat("Mail should be the user one", properties.get("mail"), is("toto@insee.fr"));
+    assertThat(
+        "Mails should contains the user one",
+        (List<String>) properties.get("mails"),
+        containsInAnyOrder("toto@insee.fr"));
     assertThat(
         "Password should be the one returned by service",
         properties.get("password"),
@@ -148,9 +153,9 @@ public class CredentialWebhookTest {
 
     Map<String, Object> properties = argumentCaptorProperties.getValue();
     assertThat(
-        "Mail should be the one defined in properties",
-        "admin@insee.fr",
-        is(properties.get("mail")));
+        "Mails should contains the one defined in properties",
+        (List<String>) properties.get("mails"),
+        containsInAnyOrder("admin@insee.fr"));
   }
 
   @Test
@@ -173,7 +178,10 @@ public class CredentialWebhookTest {
         "Property from template properties should have been kept",
         "prop",
         is(propertiesOfProperties.get("new_property")));
-    assertThat("Mail should be the user one", properties.get("mail"), is("toto@insee.fr"));
+    assertThat(
+        "Mails should contains the user one",
+        (List<String>) properties.get("mails"),
+        containsInAnyOrder("toto@insee.fr"));
     assertThat(
         "User should have its username", ((User) properties.get("user")).getUsername(), is("toto"));
   }
@@ -205,6 +213,9 @@ public class CredentialWebhookTest {
         "Property from template properties should have been kept",
         "prop",
         is(propertiesOfProperties.get("new_property")));
-    assertThat("Mail should be the user one", properties.get("mail"), is("toto@insee.fr"));
+    assertThat(
+        "Mails should contains the user one",
+        (List<String>) properties.get("mails"),
+        containsInAnyOrder("toto@insee.fr"));
   }
 }

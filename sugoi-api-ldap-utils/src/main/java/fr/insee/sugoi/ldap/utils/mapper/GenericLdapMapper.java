@@ -102,7 +102,8 @@ public class GenericLdapMapper {
       Class<SugoiType> entityClazz,
       Map<String, String> config,
       Map<String, String> mapping,
-      List<String> objectClasses) {
+      List<String> objectClasses,
+      boolean isToWrite) {
     List<Attribute> attributes = new ArrayList<>();
     if (objectClasses != null && !objectClasses.isEmpty()) {
       attributes.add(new Attribute("objectClass", objectClasses));
@@ -115,7 +116,7 @@ public class GenericLdapMapper {
         ModelType mappingType = ModelType.valueOf(splitedMappingDefinition[1].toUpperCase());
         String readonlyStatus = splitedMappingDefinition[2];
         String fieldToSetName = mappingDefinition.getKey();
-        if (!readonlyStatus.equalsIgnoreCase("ro")) {
+        if (!readonlyStatus.equalsIgnoreCase("ro") || !isToWrite) {
           if (fieldToSetName.contains(".")) {
             String[] splitedFieldName = fieldToSetName.split("\\.");
             String mapToModifyName = splitedFieldName[0];
@@ -310,6 +311,6 @@ public class GenericLdapMapper {
       O entity, Class<O> propertiesClazz, Map<String, String> config, Map<String, String> mapping) {
     return LdapUtils.convertAttributesToModifications(
         // Modification => no need to specify object classes
-        mapObjectToLdapAttributes(entity, propertiesClazz, config, mapping, null));
+        mapObjectToLdapAttributes(entity, propertiesClazz, config, mapping, null, true));
   }
 }

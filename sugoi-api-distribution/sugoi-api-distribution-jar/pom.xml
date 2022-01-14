@@ -6,7 +6,7 @@
   <parent>
     <groupId>fr.insee.sugoi</groupId>
     <artifactId>sugoi-api-distribution</artifactId>
-    <version>0.10.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>sugoi-api-distribution-jar</artifactId>
@@ -136,10 +136,7 @@
       <artifactId>sugoi-api-jms-store-provider</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.fusesource.jansi</groupId>
-      <artifactId>jansi</artifactId>
-    </dependency>
+
 
     <dependency>
       <groupId>fr.insee.sugoi</groupId>

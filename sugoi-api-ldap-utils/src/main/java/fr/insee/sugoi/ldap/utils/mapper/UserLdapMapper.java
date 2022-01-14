@@ -80,7 +80,13 @@ public class UserLdapMapper implements LdapMapper<User> {
   @Override
   public List<Attribute> mapToAttributes(User u) {
     return GenericLdapMapper.mapObjectToLdapAttributes(
-        u, User.class, config, mapping, objectClasses);
+        u, User.class, config, mapping, objectClasses, true);
+  }
+
+  @Override
+  public List<Attribute> createAttributesForFilter(User u) {
+    return GenericLdapMapper.mapObjectToLdapAttributes(
+        u, User.class, config, mapping, objectClasses, false);
   }
 
   @Override

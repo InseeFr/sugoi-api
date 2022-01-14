@@ -246,6 +246,16 @@ inseegroupedefaut: Prop2_TestIgnoreCase_applitest
 memberOf: cn=Utilisateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
 inseeMailCorrespondant: other@insee.fr
 
+dn: uid=nogroup,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+inseeOrganisationDN: uid=testo,ou=organisations,ou=clients_domaine1,o=insee,c=fr
+uid: nogroup
+
 dn: uid=byebye,ou=contacts,ou=clients_domaine1,o=insee,c=fr
 objectClass: top
 objectClass: inseeCompte
@@ -383,6 +393,12 @@ uid: testo
 description: Insee
 inseeOrganisationDN: uid=testi,ou=organisations,ou=clients_domaine1,o=insee,c=fr
 inseeAdressePostaleDN: l=testa,ou=adresses,ou=clients_domaine1,o=insee,c=fr
+
+dn: uid=loopednested,ou=organisations,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeOrganisation
+uid: loopednested
+inseeOrganisationDN: uid=loopednested,ou=organisations,ou=clients_domaine1,o=insee,c=fr
 
 dn: uid=testi,ou=organisations,ou=clients_domaine1,o=insee,c=fr
 objectClass: top
@@ -562,6 +578,7 @@ inseegroupedefaut: prop_role_applitest
 inseegroupedefaut: role2_applitest
 inseegroupedefaut: prop1_TestIgnoreCase_applitest
 inseegroupedefaut: Prop2_TestIgnoreCase_applitest
+memberOf: cn=Utilisateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
 
 
 

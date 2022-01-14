@@ -27,6 +27,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -56,7 +57,7 @@ public class WebHookServiceImpl implements WebHookService {
 
   @Override
   public void resetPassword(String webHookName, Map<String, Object> values) {
-    if (!((String) values.get(EventKeysConfig.MAIL)).isBlank()) {
+    if (!((List<String>) values.get(EventKeysConfig.MAILS)).isEmpty()) {
       sendRequestToWebhookFromTemplate(
           values, webHookName, "_reset_template", ".default.reset.template");
     } else {
@@ -66,13 +67,17 @@ public class WebHookServiceImpl implements WebHookService {
 
   @Override
   public void changePassword(String webHookName, Map<String, Object> values) {
-    sendRequestToWebhookFromTemplate(
-        values, webHookName, "_changepwd_template", ".default.changepwd.template");
+    if (!((List<String>) values.get(EventKeysConfig.MAILS)).isEmpty()) {
+      sendRequestToWebhookFromTemplate(
+          values, webHookName, "_changepwd_template", ".default.changepwd.template");
+    } else {
+      throw new NoReceiverMailException("There is no mail address to send the message to");
+    }
   }
 
   @Override
   public void sendLogin(String webHookName, Map<String, Object> values) {
-    if (!((String) values.get(EventKeysConfig.MAIL)).isBlank()) {
+    if (!((List<String>) values.get(EventKeysConfig.MAILS)).isEmpty()) {
       sendRequestToWebhookFromTemplate(
           values, webHookName, "_send_login_template", ".default.send-login.template");
     } else {

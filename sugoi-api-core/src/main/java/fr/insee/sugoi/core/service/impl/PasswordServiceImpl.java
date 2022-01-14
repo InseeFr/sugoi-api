@@ -64,16 +64,6 @@ public class PasswordServiceImpl implements PasswordService {
   private Boolean pValidateWithSpecial;
 
   @Override
-  public String generatePassword() {
-    return generatePassword(
-        pCreateWithUpperCase,
-        pCreateWithLowerCase,
-        pCreateWithDigits,
-        pCreateWithSpecial,
-        pCreateSize);
-  }
-
-  @Override
   public boolean validatePassword(
       String password,
       Boolean withUpperCase,
@@ -119,15 +109,13 @@ public class PasswordServiceImpl implements PasswordService {
       Integer size) {
 
     PasswordGenerator passwordGenerator = new PasswordGenerator();
-    String password =
-        passwordGenerator.generatePassword(
-            size != null ? size : pCreateSize,
-            generateRandomPasswordCharacterRules(
-                withUpperCase != null ? withUpperCase : pCreateWithUpperCase,
-                withLowerCase != null ? withLowerCase : pCreateWithLowerCase,
-                withDigit != null ? withDigit : pCreateWithDigits,
-                withSpecial != null ? withSpecial : pCreateWithSpecial));
-    return password;
+    return passwordGenerator.generatePassword(
+        size != null ? size : pCreateSize,
+        generateRandomPasswordCharacterRules(
+            withUpperCase != null ? withUpperCase : pCreateWithUpperCase,
+            withLowerCase != null ? withLowerCase : pCreateWithLowerCase,
+            withDigit != null ? withDigit : pCreateWithDigits,
+            withSpecial != null ? withSpecial : pCreateWithSpecial));
   }
 
   public List<CharacterRule> generateRandomPasswordCharacterRules(

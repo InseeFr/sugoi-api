@@ -16,12 +16,7 @@ package fr.insee.sugoi.ldap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import fr.insee.sugoi.model.Application;
-import fr.insee.sugoi.model.Group;
-import fr.insee.sugoi.model.Organization;
-import fr.insee.sugoi.model.Realm;
-import fr.insee.sugoi.model.User;
-import fr.insee.sugoi.model.UserStorage;
+import fr.insee.sugoi.model.*;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.store.ldap.LdapReaderStore;
@@ -159,6 +154,14 @@ public class LdapReaderStoreTest {
   }
 
   @Test
+  public void testGetLoopedNestedOrganization() {
+    assertThat(
+        "An organization which is its own suborganization should not lead to loop",
+        ldapReaderStore.getOrganization("loopednested").get().getOrganization().getIdentifiant(),
+        is("loopednested"));
+  }
+
+  @Test
   public void testSearchAllOrganizations() {
     PageableResult pageableResult = new PageableResult();
     List<Organization> organizations =
@@ -221,6 +224,9 @@ public class LdapReaderStoreTest {
     assertThat(
         "Should contain testc",
         users.stream().anyMatch(user -> user.getUsername().equals("testc")));
+    assertThat(
+        "Should contain nogroup",
+        users.stream().anyMatch(user -> user.getUsername().equals("nogroup")));
   }
 
   @Test
@@ -231,6 +237,20 @@ public class LdapReaderStoreTest {
     List<User> users = ldapReaderStore.searchUsers(testUser, pageableResult, "AND").getResults();
     assertThat("Should find one result", users.size(), is(1));
     assertThat("First element found should be testc", users.get(0).getUsername(), is("testc"));
+  }
+
+  @Test
+  public void testSearchUsersWithMatchingGroup() {
+    User testUser = new User();
+    testUser.setGroups(List.of(new Group("Utilisateurs_Applitest")));
+    List<User> users =
+        ldapReaderStore.searchUsers(testUser, new PageableResult(), "AND").getResults();
+    assertThat(
+        "Should return user testc",
+        users.stream().anyMatch(user -> user.getUsername().equalsIgnoreCase("testc")));
+    assertThat(
+        "Should not return user agarder",
+        users.stream().noneMatch(user -> user.getUsername().equalsIgnoreCase("agarder")));
   }
 
   @Test

@@ -15,8 +15,6 @@ package fr.insee.sugoi.core.service;
 
 public interface PasswordService {
 
-  String generatePassword();
-
   String generatePassword(
       Boolean withUpperCase,
       Boolean withLowerCase,

@@ -181,13 +181,11 @@ public class LocalFileWriteRealmTest {
   @Test
   public void addOrganizationMappingTest() {
     Realm realmToModify = localFileConfig.load("tomodify").get();
-    if (!realmToModify.getUserStorages().get(0).getMappings().containsKey("organizationMapping")) {
-      realmToModify
-          .getUserStorages()
-          .get(0)
-          .getMappings()
-          .put("organizationMapping", new HashMap<>());
-    }
+    realmToModify
+        .getUserStorages()
+        .get(0)
+        .getMappings()
+        .put("organizationMapping", new HashMap<>());
     realmToModify
         .getUserStorages()
         .get(0)

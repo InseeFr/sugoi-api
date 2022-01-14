@@ -19,6 +19,7 @@ import fr.insee.sugoi.core.event.model.SugoiEvent;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.event.listener.webhook.service.WebHookService;
 import fr.insee.sugoi.model.User;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,9 @@ public class SugoiEventWebHookProducer {
   @Value("${sugoi.api.event.webhook.name}")
   private List<String> webHookNames;
 
+  @Value("${sugoi.api.event.webhook.mail.secondaryMailAttribute}")
+  private String secondaryMailAttribute;
+
   @Autowired private Environment env;
 
   @Autowired private WebHookService webHookService;
@@ -48,31 +52,35 @@ public class SugoiEventWebHookProducer {
   @EventListener
   public void handleContextStart(SugoiEvent cse) {
     SugoiEventTypeEnum eventType = cse.getEventType();
-    String webHookTag = (String) cse.getProperties().get(EventKeysConfig.WEBSERVICE_TAG);
-    Map<String, Object> values = getValuesForTemplateFromEvent(cse);
-    switch (eventType) {
-      case RESET_PASSWORD:
-        getServiceConfiguredForTag(getTagWithDefaultMail(webHookTag))
-            .forEach(webHookName -> webHookService.resetPassword(webHookName, values));
-        break;
-      case SEND_LOGIN:
-        getServiceConfiguredForTag(getTagWithDefaultMail(webHookTag))
-            .forEach(webHookName -> webHookService.sendLogin(webHookName, values));
-        break;
-      case CHANGE_PASSWORD:
-        getServiceConfiguredForTag(webHookTag)
-            .forEach(webHookName -> webHookService.changePassword(webHookName, values));
-        break;
-      default:
-        break;
+    if (eventType == SugoiEventTypeEnum.RESET_PASSWORD
+        || eventType == SugoiEventTypeEnum.SEND_LOGIN
+        || eventType == SugoiEventTypeEnum.CHANGE_PASSWORD) {
+      String webHookTag = (String) cse.getProperties().get(EventKeysConfig.WEBSERVICE_TAG);
+      Map<String, Object> values = getValuesForTemplateFromEvent(cse);
+      switch (eventType) {
+        case RESET_PASSWORD:
+          getServiceConfiguredForTag(getTagWithDefaultMail(webHookTag))
+              .forEach(webHookName -> webHookService.resetPassword(webHookName, values));
+          break;
+        case SEND_LOGIN:
+          getServiceConfiguredForTag(getTagWithDefaultMail(webHookTag))
+              .forEach(webHookName -> webHookService.sendLogin(webHookName, values));
+          break;
+        case CHANGE_PASSWORD:
+          getServiceConfiguredForTag(webHookTag)
+              .forEach(webHookName -> webHookService.changePassword(webHookName, values));
+          break;
+        default:
+          break;
+      }
     }
   }
 
   private Map<String, Object> getValuesForTemplateFromEvent(SugoiEvent event) {
     Map<String, Object> values = new HashMap<>();
-
+    User user = null;
     if (event.getProperties().containsKey(EventKeysConfig.USER)) {
-      User user = (User) event.getProperties().get(EventKeysConfig.USER);
+      user = (User) event.getProperties().get(EventKeysConfig.USER);
       values.put(EventKeysConfig.USER, user);
       values.put(EventKeysConfig.USER_ID, user.getUsername());
     } else if (event.getProperties().containsKey(EventKeysConfig.USER_ID)) {
@@ -84,7 +92,9 @@ public class SugoiEventWebHookProducer {
 
     values.put(GlobalKeysConfig.REALM, realm);
     values.put(GlobalKeysConfig.USERSTORAGE, userStorage);
-    values.put(EventKeysConfig.MAIL, event.getProperties().get(EventKeysConfig.MAIL));
+    values.put(
+        EventKeysConfig.MAILS,
+        determineUserMails((String) event.getProperties().get(EventKeysConfig.MAIL), user));
     values.put(EventKeysConfig.PASSWORD, password);
     values.put(EventKeysConfig.PROPERTIES, event.getProperties().get(EventKeysConfig.PROPERTIES));
     return values;
@@ -100,5 +110,18 @@ public class SugoiEventWebHookProducer {
 
   private String getTagWithDefaultMail(String maybeNullTag) {
     return maybeNullTag != null && !maybeNullTag.isBlank() ? maybeNullTag : "MAIL";
+  }
+
+  private List<String> determineUserMails(String emailProvided, User user) {
+    List<String> mails = new ArrayList<>();
+    if (emailProvided != null) {
+      mails.add(emailProvided);
+      return mails;
+    }
+    if (user != null) {
+      mails.add(user.getMail());
+      mails.addAll((List<String>) user.getAttributes().get(secondaryMailAttribute));
+    }
+    return mails;
   }
 }

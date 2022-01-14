@@ -49,7 +49,13 @@ public class OrganizationLdapMapper implements LdapMapper<Organization> {
   @Override
   public List<Attribute> mapToAttributes(Organization organization) {
     return GenericLdapMapper.mapObjectToLdapAttributes(
-        organization, Organization.class, config, mapping, objectClasses);
+        organization, Organization.class, config, mapping, objectClasses, true);
+  }
+
+  @Override
+  public List<Attribute> createAttributesForFilter(Organization organization) {
+    return GenericLdapMapper.mapObjectToLdapAttributes(
+        organization, Organization.class, config, mapping, objectClasses, false);
   }
 
   @Override

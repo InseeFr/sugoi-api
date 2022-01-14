@@ -44,6 +44,7 @@ public class EventKeysConfig extends GlobalKeysConfig {
   public static final String USER_PROPERTIES = "userProperties";
 
   public static final String MAIL = "mail";
+  public static final String MAILS = "mails";
   public static final String ADDRESS = "address";
   public static final String PROPERTIES = "properties";
 
