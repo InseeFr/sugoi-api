@@ -116,6 +116,12 @@ public class UserController {
       @Parameter(description = "User's common name of user to search ", required = false)
           @RequestParam(name = "commonName", required = false)
           String commonName,
+      @Parameter(description = "User's firstname of user to search ", required = false)
+          @RequestParam(name = "firstName", required = false)
+          String firstName,
+      @Parameter(description = "User's lastname of user to search ", required = false)
+          @RequestParam(name = "lastName", required = false)
+          String lastName,
       @Parameter(description = "User's description", required = false)
           @RequestParam(name = "description", required = false)
           String description,
@@ -141,6 +147,8 @@ public class UserController {
     // set the user which will serve as a model to retrieve the matching users
     User searchUser = new User();
     searchUser.setUsername(identifiant);
+    searchUser.setFirstName(firstName);
+    searchUser.setLastName(lastName);
     if (commonName != null) {
       searchUser.getAttributes().put("common_name", commonName);
     }
@@ -208,6 +216,12 @@ public class UserController {
       @Parameter(description = "User's common name of user to search ", required = false)
           @RequestParam(name = "commonName", required = false)
           String commonName,
+      @Parameter(description = "User's firstname of user to search ", required = false)
+          @RequestParam(name = "firstName", required = false)
+          String firstName,
+      @Parameter(description = "User's lastname of user to search ", required = false)
+          @RequestParam(name = "lastName", required = false)
+          String lastName,
       @Parameter(description = "User's description", required = false)
           @RequestParam(name = "description", required = false)
           String description,
@@ -235,6 +249,8 @@ public class UserController {
         identifiant,
         mail,
         commonName,
+        firstName,
+        lastName,
         description,
         organisationId,
         size,
