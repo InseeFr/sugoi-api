@@ -90,10 +90,16 @@ public class ExportController {
       @Parameter(description = "User's mail of user to search ")
           @RequestParam(name = "mail", required = false)
           String mail,
-      @Parameter(description = "User's commun name of user to search ")
-          @RequestParam(name = "nomCommun", required = false)
-          String nomCommun,
-      @Parameter(description = "User's description")
+      @Parameter(description = "User's common name of user to search ", required = false)
+          @RequestParam(name = "commonName", required = false)
+          String commonName,
+      @Parameter(description = "User's firstname of user to search ", required = false)
+          @RequestParam(name = "firstName", required = false)
+          String firstName,
+      @Parameter(description = "User's lastname of user to search ", required = false)
+          @RequestParam(name = "lastName", required = false)
+          String lastName,
+      @Parameter(description = "User's description", required = false)
           @RequestParam(name = "description", required = false)
           String description,
       @Parameter(description = "User rattached organization")
@@ -113,9 +119,13 @@ public class ExportController {
     // set the user which will serve as a model to retrieve the matching users
     User searchUser = new User();
     searchUser.setUsername(identifiant);
-    searchUser.setLastName(nomCommun);
+    searchUser.setFirstName(firstName);
+    searchUser.setLastName(lastName);
     searchUser.setMail(mail);
     if (groupFilter != null) searchUser.setGroups(List.of(new Group(groupFilter)));
+    if (commonName != null) {
+      searchUser.getAttributes().put("common_name", commonName);
+    }
     if (organisationId != null) {
       Organization organizationSearch = new Organization();
       organizationSearch.setIdentifiant(organisationId);
@@ -206,9 +216,15 @@ public class ExportController {
       @Parameter(description = "User's mail of user to search ", required = false)
           @RequestParam(name = "mail", required = false)
           String mail,
-      @Parameter(description = "User's commun name of user to search ", required = false)
-          @RequestParam(name = "nomCommun", required = false)
-          String nomCommun,
+      @Parameter(description = "User's common name of user to search ", required = false)
+          @RequestParam(name = "commonName", required = false)
+          String commonName,
+      @Parameter(description = "User's firstname of user to search ", required = false)
+          @RequestParam(name = "firstName", required = false)
+          String firstName,
+      @Parameter(description = "User's lastname of user to search ", required = false)
+          @RequestParam(name = "lastName", required = false)
+          String lastName,
       @Parameter(description = "User's description", required = false)
           @RequestParam(name = "description", required = false)
           String description,
@@ -230,7 +246,9 @@ public class ExportController {
         null,
         identifiant,
         mail,
-        nomCommun,
+        commonName,
+        firstName,
+        lastName,
         description,
         organisationId,
         typeRecherche,
