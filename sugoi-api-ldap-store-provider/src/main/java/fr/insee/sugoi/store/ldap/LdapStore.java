@@ -22,15 +22,15 @@ import fr.insee.sugoi.ldap.utils.mapper.GroupLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
 import java.util.Map;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LdapStore {
 
   protected LDAPConnectionPool ldapPoolConnection;
   protected LDAPConnection ldapMonoConnection;
 
-  protected static final Logger logger = LogManager.getLogger(LdapReaderStore.class);
+  protected static final Logger logger = LoggerFactory.getLogger(LdapReaderStore.class);
 
   protected UserLdapMapper userLdapMapper;
   protected OrganizationLdapMapper organizationLdapMapper;

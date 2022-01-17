@@ -23,8 +23,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.core.env.Environment;
@@ -46,7 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
     value = {@SecurityRequirement(name = "oAuth"), @SecurityRequirement(name = "basic")})
 public class DebugController {
 
-  private static final Logger logger = LogManager.getLogger(DebugController.class);
+  private static final Logger logger = LoggerFactory.getLogger(DebugController.class);
   private static final String RETOUR_A_LA_LIGNE = "\n";
 
   @Autowired Environment env;
@@ -107,7 +107,7 @@ public class DebugController {
       }
 
     } catch (Exception e) {
-      logger.error(e, e);
+      logger.error(e.getMessage(), e);
       sb.append("Récupération des properties impossible !" + RETOUR_A_LA_LIGNE);
     }
 

@@ -14,15 +14,15 @@
 package fr.insee.sugoi.core.seealso;
 
 import fr.insee.sugoi.model.User;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SeeAlsoService {
 
-  protected static final Logger logger = LogManager.getLogger(SeeAlsoService.class);
+  protected static final Logger logger = LoggerFactory.getLogger(SeeAlsoService.class);
 
   @Autowired private MapProtocolSeeAlsoDecorator mapProtocol;
 
