@@ -21,8 +21,8 @@ import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "fr.insee.sugoi.store")
 public class StoreStorageImpl implements StoreStorage {
 
-  private static final Logger logger = LogManager.getLogger(StoreStorageImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(StoreStorageImpl.class);
 
   private static final Map<String, Store> connections = new HashMap<>();
 

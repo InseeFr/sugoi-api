@@ -32,14 +32,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class OuganextSugoiMapper {
 
-  private static final Logger logger = LogManager.getLogger(OuganextSugoiMapper.class);
+  private static final Logger logger = LoggerFactory.getLogger(OuganextSugoiMapper.class);
 
   /**
    * Convert Ouganext O object to Sugoi N object
