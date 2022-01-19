@@ -249,8 +249,8 @@ public class LdapReaderStoreTest {
         "Should return user testc",
         users.stream().anyMatch(user -> user.getUsername().equalsIgnoreCase("testc")));
     assertThat(
-        "Should not return user agarder",
-        users.stream().noneMatch(user -> user.getUsername().equalsIgnoreCase("agarder")));
+        "Should not return user nogroup",
+        users.stream().noneMatch(user -> user.getUsername().equalsIgnoreCase("nogroup")));
   }
 
   @Test

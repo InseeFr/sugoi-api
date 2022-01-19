@@ -267,10 +267,9 @@ public class GenericLdapMapper {
                             ldapAttributeName,
                             String.format(
                                 // TODO should be a param
-                                "cn",
+                                "cn=%s,",
                                 //
-                                group.getName(),
-                                config.get(LdapConfigKeys.APP_SOURCE))))
+                                group.getName())))
                 .collect(Collectors.toList());
       case LIST_STRING:
         return ((List<String>) sugoiValue)
