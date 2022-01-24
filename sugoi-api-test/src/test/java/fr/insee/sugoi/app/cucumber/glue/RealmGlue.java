@@ -67,4 +67,14 @@ public class RealmGlue {
     Realm realm = mapper.readValue(stepData.getLatestResponse().getBody(), Realm.class);
     assertThat(realm.getProperties().get("description"), is(description));
   }
+
+  @Then("the client expect uiUserMapping to contain {}")
+  public void expect_uiusermapping_to_contain(String uiMappingProperty)
+      throws JsonMappingException, JsonProcessingException {
+    Realm realm = mapper.readValue(stepData.getLatestResponse().getBody(), Realm.class);
+    assertThat(
+        "UiField " + uiMappingProperty + " should be contained in realm",
+        realm.getUiMapping().get(Realm.UIMappingType.UI_USER_MAPPING).stream()
+            .anyMatch(uifield -> uifield.getName().equalsIgnoreCase(uiMappingProperty)));
+  }
 }

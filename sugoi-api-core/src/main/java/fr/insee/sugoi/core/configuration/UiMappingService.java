@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -139,9 +140,24 @@ public class UiMappingService {
       }
       return uifield;
     } catch (Exception e) {
-      logger.info("Entry " + entry + " not parseable");
+      logger.info("Entry {} not parseable", entry);
       return null;
     }
+  }
+
+  public String convertUIFieldToString(UiField uiField) {
+    List<String> uiFieldStrings = new ArrayList<>();
+    uiFieldStrings.add(uiField.getName());
+    uiFieldStrings.add(uiField.getHelpTextTitle());
+    uiFieldStrings.add(uiField.getHelpText());
+    uiFieldStrings.add(uiField.getPath());
+    uiFieldStrings.add(uiField.getType());
+    uiFieldStrings.add(String.valueOf(uiField.getModifiable()));
+    uiFieldStrings.add(uiField.getTag());
+    uiFieldStrings.add(String.valueOf(uiField.getOrder()));
+    if (uiField.getRequired()) uiFieldStrings.add("required");
+    uiField.getOptions().forEach((k, v) -> uiFieldStrings.add(k + "=" + v));
+    return uiFieldStrings.stream().collect(Collectors.joining(";"));
   }
 
   private int getIntOrInfty(String intString) {

@@ -113,6 +113,30 @@ public class RealmLdapMapper {
               "inseepropriete",
               String.format("branchesApplicativesPossibles$%s", realm.getAppSource())));
     }
+    if (realm.getUiMapping().containsKey(Realm.UIMappingType.UI_USER_MAPPING)
+        && realm.getUiMapping().get(Realm.UIMappingType.UI_USER_MAPPING) != null) {
+      realm
+          .getUiMapping()
+          .get(Realm.UIMappingType.UI_USER_MAPPING)
+          .forEach(
+              uf ->
+                  attributes.add(
+                      new Attribute(
+                          "inseepropriete",
+                          String.format(
+                              "uiUserMapping$%s", uiMappingService.convertUIFieldToString(uf)))));
+    }
+    if (realm.getUiMapping().containsKey(Realm.UIMappingType.UI_ORGANIZATION_MAPPING)
+        && realm.getUiMapping().get(Realm.UIMappingType.UI_ORGANIZATION_MAPPING) != null) {
+      realm
+          .getUiMapping()
+          .get(Realm.UIMappingType.UI_ORGANIZATION_MAPPING)
+          .forEach(
+              uf ->
+                  attributes.add(
+                      new Attribute(
+                          "inseepropriete", String.format("uiOrganizationMapping$%s", uf))));
+    }
     realm
         .getProperties()
         .forEach(
