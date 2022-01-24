@@ -1,4 +1,4 @@
-Feature: Realms scenario asynchrone
+Feature: Realms scenario synchrone
     Performing actions on realms
 
     Background: Use tomcat1
@@ -91,6 +91,18 @@ Feature: Realms scenario asynchrone
                 "uiMapping": {
                 "uiOrganizationMapping": [],
                 "uiUserMapping": [
+                    {
+                        "name": "Identifiant",
+                        "helpTextTitle": "Identifiant de l'utilisateur",
+                        "helpText": "Il servira pour le rechercher a travers l'annuaire. Caracteres autorises alphabetiques chiffres apostrophes espaces tirets",
+                        "path": "username",
+                        "type": "string",
+                        "required": true,
+                        "modifiable": true,
+                        "tag": "main",
+                        "order": 2147483647,
+                        "options": {}
+                    }
                 ]
                 },
                 "readerType": "LdapReaderStore",
@@ -99,6 +111,7 @@ Feature: Realms scenario asynchrone
             """
         And show body received
         Then the client receives status code 201
+        Then the client expect uiUserMapping to contain Identifiant
     
     Scenario: Update realm
         When the client perform PUT request with body on url /realms/newrealm body:
@@ -175,6 +188,42 @@ Feature: Realms scenario asynchrone
                 "uiMapping": {
                 "uiOrganizationMapping": [],
                 "uiUserMapping": [
+                    {
+                        "name": "Identifiant",
+                        "helpTextTitle": "Identifiant de l'utilisateur",
+                        "helpText": "Il servira pour le rechercher a travers l'annuaire. Caracteres autorises alphabetiques chiffres apostrophes espaces tirets",
+                        "path": "username",
+                        "type": "string",
+                        "required": true,
+                        "modifiable": true,
+                        "tag": "main",
+                        "order": 2147483647,
+                        "options": {}
+                    },
+                    {
+                        "name": "Nom commun",
+                        "helpTextTitle": "Nom commun de l'utilisateur",
+                        "helpText": "Caracteres autorises alphabetiques chiffres apostrophes espaces tirets",
+                        "path": "attributes.common_name",
+                        "type": "string",
+                        "required": false,
+                        "modifiable": true,
+                        "tag": "main",
+                        "order": 2147483647,
+                        "options": {}
+                    },
+                    {
+                        "name": "Nom",
+                        "helpTextTitle": "Nom de l'utilisateur",
+                        "helpText": "Caracteres autorises alphabetiques chiffres apostrophes espaces tirets",
+                        "path": "lastName",
+                        "type": "string",
+                        "required": false,
+                        "modifiable": true,
+                        "tag": "main",
+                        "order": 2147483647,
+                        "options": {}
+                    }
                 ]
                 },
                 "readerType": "LdapReaderStore",
@@ -184,6 +233,8 @@ Feature: Realms scenario asynchrone
         And show body received
         Then the client receives status code 200
         Then the client expect description to be I'm updated
+        Then the client expect uiUserMapping to contain Identifiant
+        Then the client expect uiUserMapping to contain Nom Commun
     
     Scenario: Delete realm
         When the client perform DELETE request on url /realms/newrealm

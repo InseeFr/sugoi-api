@@ -19,15 +19,15 @@ import java.util.Map;
 
 public class UiField implements Serializable, Comparable<UiField> {
 
-  private String name;
-  private String helpTextTitle;
-  private String helpText;
-  private String path;
-  private String type;
-  private Boolean required = false;
-  private Boolean modifiable;
-  private String tag;
-  private int order;
+  private String name = "";
+  private String helpTextTitle = "";
+  private String helpText = "";
+  private String path = "";
+  private String type = "";
+  private boolean required = false;
+  private boolean modifiable = false;
+  private String tag = "";
+  private int order = Integer.MAX_VALUE;
 
   private Map<String, String> options = new HashMap<>();
 
@@ -76,11 +76,11 @@ public class UiField implements Serializable, Comparable<UiField> {
     this.type = type;
   }
 
-  public Boolean getModifiable() {
+  public boolean getModifiable() {
     return this.modifiable;
   }
 
-  public void setModifiable(Boolean modifiable) {
+  public void setModifiable(boolean modifiable) {
     this.modifiable = modifiable;
   }
 
@@ -108,11 +108,11 @@ public class UiField implements Serializable, Comparable<UiField> {
     this.order = order;
   }
 
-  public Boolean getRequired() {
+  public boolean getRequired() {
     return this.required;
   }
 
-  public void setRequired(Boolean required) {
+  public void setRequired(boolean required) {
     this.required = required;
   }
 }

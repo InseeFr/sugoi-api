@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.is;
 import fr.insee.sugoi.core.configuration.UiMappingService;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
+import fr.insee.sugoi.model.technics.UiField;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -140,6 +141,28 @@ public class LdapRealmProviderWriteTest {
         "Url should have changed",
         ldapRealmProviderDAOImpl.load("tomodify").get().getUrl(),
         is("new_url"));
+  }
+
+  @Test
+  public void addUiUserMapping() {
+    Realm realmToModify = ldapRealmProviderDAOImpl.load("tomodify").get();
+    UiField uiField = new UiField();
+    uiField.setName("Identifiant");
+    uiField.setTag("main");
+    realmToModify.getUiMapping().get(Realm.UIMappingType.UI_USER_MAPPING).add(uiField);
+    ldapRealmProviderDAOImpl.updateRealm(realmToModify, null);
+    assertThat(
+        "Should have a uiUserMapping Identifiant",
+        ldapRealmProviderDAOImpl
+            .load("tomodify")
+            .get()
+            .getUiMapping()
+            .get(Realm.UIMappingType.UI_USER_MAPPING)
+            .stream()
+            .anyMatch(
+                uf ->
+                    uf.getName().equalsIgnoreCase("Identifiant")
+                        && uf.getTag().equalsIgnoreCase("main")));
   }
 
   @Test
