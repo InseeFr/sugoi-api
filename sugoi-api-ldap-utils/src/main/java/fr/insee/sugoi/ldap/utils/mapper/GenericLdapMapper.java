@@ -18,10 +18,7 @@ import com.unboundid.ldap.sdk.Modification;
 import fr.insee.sugoi.core.exceptions.LdapMappingConfigurationException;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
-import fr.insee.sugoi.model.Group;
-import fr.insee.sugoi.model.Habilitation;
-import fr.insee.sugoi.model.Organization;
-import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.*;
 import fr.insee.sugoi.model.technics.ModelType;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import java.lang.reflect.Field;
@@ -164,9 +161,7 @@ public class GenericLdapMapper {
         orga.setIdentifiant(LdapUtils.getNodeValueFromDN(attrs.get(0).getValue()));
         return orga;
       case ADDRESS:
-        Map<String, String> address = new HashMap<>();
-        address.put("id", LdapUtils.getNodeValueFromDN(attrs.get(0).getValue()));
-        return address;
+        return new PostalAddress(LdapUtils.getNodeValueFromDN(attrs.get(0).getValue()));
       case LIST_HABILITATION:
         List<String> values = new ArrayList<>();
         attrs.stream().forEach(attribute -> values.addAll(Arrays.asList(attribute.getValues())));
@@ -174,7 +169,7 @@ public class GenericLdapMapper {
             .filter(
                 attributeValue ->
                     attributeValue.split("_").length == 2 || attributeValue.split("_").length == 3)
-            .map(attributeValue -> new Habilitation(attributeValue))
+            .map(Habilitation::new)
             .collect(Collectors.toList());
       case LIST_USER:
         values = new ArrayList<>();
@@ -232,7 +227,7 @@ public class GenericLdapMapper {
                     ((Organization) sugoiValue).getIdentifiant(),
                     config.get(LdapConfigKeys.ORGANIZATION_SOURCE))));
       case ADDRESS:
-        if (((Map<String, String>) sugoiValue).containsKey("id")
+        if (((PostalAddress) sugoiValue).getId() != null
             && config.get(LdapConfigKeys.ADDRESS_SOURCE) != null) {
           return List.of(
               new Attribute(
@@ -242,7 +237,7 @@ public class GenericLdapMapper {
                       // TODO should be a param
                       "l",
                       //
-                      ((Map<String, String>) sugoiValue).get("id"),
+                      ((PostalAddress) sugoiValue).getId(),
                       config.get(LdapConfigKeys.ADDRESS_SOURCE))));
         } else return List.of();
       case LIST_HABILITATION:

@@ -100,10 +100,10 @@ public class LdapReaderStoreTest {
     Organization organization = ldapReaderStore.getOrganization("testo").get();
     assertThat("Should get testo", organization.getIdentifiant(), is("testo"));
     assertThat(
-        "Should get address first line", organization.getAddress().get("line1"), is("Insee"));
+        "Should get address first line", organization.getAddress().getLines()[0], is("Insee"));
     assertThat(
         "Should get address second line",
-        organization.getAddress().get("line4"),
+        organization.getAddress().getLines()[3],
         is("88 AVE VERDIER"));
     assertThat(
         "Should have description Insee",
@@ -111,7 +111,7 @@ public class LdapReaderStoreTest {
         is("Insee"));
     Organization suborga = organization.getOrganization();
     assertThat("Should have sub organization testi", suborga.getIdentifiant(), is("testi"));
-    assertThat("Suborga must have address", suborga.getAddress().get("line1"), is("Insee"));
+    assertThat("Suborga must have address", suborga.getAddress().getLines()[0], is("Insee"));
   }
 
   @Test
@@ -158,13 +158,15 @@ public class LdapReaderStoreTest {
   public void testGetUser() {
     User user = ldapReaderStore.getUser("testc").get();
     assertThat("Should get testc", user.getUsername(), is("testc"));
-    assertThat("Should get address first line", user.getAddress().get("line1"), is("Insee"));
+    assertThat("Should get address first line", user.getAddress().getLines()[0], is("Insee"));
     assertThat(
-        "Should get address second line", user.getAddress().get("line4"), is("88 AVE VERDIER"));
+        "Should get address second line", user.getAddress().getLines()[3], is("88 AVE VERDIER"));
     assertThat(
         "Should have organization testo", user.getOrganization().getIdentifiant(), is("testo"));
     assertThat(
-        "testo should have address", user.getOrganization().getAddress().get("line1"), is("Insee"));
+        "testo should have address",
+        user.getOrganization().getAddress().getLines()[0],
+        is("Insee"));
     assertThat(
         "Should have a group",
         user.getGroups().stream()

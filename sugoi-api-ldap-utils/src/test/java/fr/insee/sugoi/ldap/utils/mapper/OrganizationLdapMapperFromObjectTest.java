@@ -17,6 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.unboundid.ldap.sdk.Attribute;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.PostalAddress;
 import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
 import java.util.HashMap;
 import java.util.List;
@@ -85,10 +86,9 @@ public class OrganizationLdapMapperFromObjectTest {
   @Test
   public void getOrganizationAddressAttributesFromJavaObject() {
 
-    Map<String, String> address = new HashMap<>();
-    address.put("line1", "33 rue des Fleurs");
-    address.put("line2", "56700 Fleurville");
-    address.put("id", "generatedBefore");
+    PostalAddress address = new PostalAddress("generatedBefore");
+    address.setLines(new String[] {"33 rue des Fleurs", "56700 Fleurville"});
+
     organization.setAddress(address);
     List<Attribute> mappedAttributes = organizationLdapMapper.mapToAttributes(organization);
 

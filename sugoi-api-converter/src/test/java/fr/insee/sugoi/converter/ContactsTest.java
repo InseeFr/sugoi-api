@@ -13,9 +13,7 @@
 */
 package fr.insee.sugoi.converter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
@@ -23,16 +21,11 @@ import fr.insee.sugoi.converter.ouganext.AdresseOuganext;
 import fr.insee.sugoi.converter.ouganext.ContactOuganext;
 import fr.insee.sugoi.converter.ouganext.OrganisationOuganext;
 import fr.insee.sugoi.converter.utils.CustomObjectMapper;
-import fr.insee.sugoi.model.Group;
-import fr.insee.sugoi.model.Habilitation;
-import fr.insee.sugoi.model.Organization;
-import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.*;
 import java.security.cert.CertificateException;
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.xml.bind.JAXBException;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.DiffBuilder;
@@ -85,9 +78,8 @@ public class ContactsTest {
     user.setMail("toto@test.fr");
     user.setUsername("toto");
     Organization organization = new Organization();
-    Map<String, String> address = new HashMap<>();
-    address.put("ligneDeux", "Lentreprise");
-    address.put("ligneCinq", "CEDEX");
+    PostalAddress address = new PostalAddress();
+    address.setLines(new String[] {null, "Lentreprise", null, null, "CEDEX"});
     organization.setIdentifiant("Lorganisation");
     organization.setAddress(address);
     user.addAttributes("description", "ce user est trop cool");
@@ -204,7 +196,7 @@ public class ContactsTest {
       OuganextSugoiMapper osm = new OuganextSugoiMapper();
       User user = osm.serializeToSugoi(contact, User.class);
       String expectedJson =
-          "{\"lastName\":\"test\",\"firstName\":\"test\",\"mail\":\"tes.tkmgfdl@jhk.gmail\",\"username\":\"test\",\"organization\":{\"identifiant\":\"lorganisation\",\"gpgkey\":null,\"organization\":null,\"address\":{},\"metadatas\":{},\"attributes\":{\"proprietes\":null,\"nomCommun\":null,\"mail\":null,\"domaineDeGestion\":null,\"repertoireDeDistribution\":null,\"description\":null,\"numeroTelephone\":null,\"facSimile\":null}},\"groups\":[],\"habilitations\":[],\"address\":{\"LigneQuatre\":\"\",\"LigneUne\":\"15 rue Gabriel Peri\",\"LigneDeux\":\"\",\"LigneCinq\":\"\",\"LigneSix\":\"\",\"LigneTrois\":\"\",\"LigneSept\":\"92240 Malakoff\"},\"metadatas\":{\"dateCreation\":null,\"hasPassword\":false},\"attributes\":{\"proprietes\":null,\"insee_roles_applicatifs\":null,\"nomCommun\":\"Test\",\"domaineDeGestion\":\"testDG\",\"repertoireDeDistribution\":null,\"description\":\"description\",\"telephonePortable\":\"061245789636\",\"codePin\":\"AAA=\",\"numeroTelephone\":\"0123456789\",\"identifiantMetier\":\"123456789\",\"civilite\":\"Camarade\",\"facSimile\":\"0123456789\"}}";
+          "{\"lastName\":\"test\",\"firstName\":\"test\",\"mail\":\"tes.tkmgfdl@jhk.gmail\",\"username\":\"test\",\"organization\":{\"identifiant\":\"lorganisation\",\"gpgkey\":null,\"organization\":null,\"metadatas\":{},\"attributes\":{\"proprietes\":null,\"nomCommun\":null,\"mail\":null,\"domaineDeGestion\":null,\"repertoireDeDistribution\":null,\"description\":null,\"numeroTelephone\":null,\"facSimile\":null}},\"groups\":[],\"habilitations\":[],\"address\":[\"15 rue Gabriel Peri\",\"\",\"\",\"\",\"\",\"\",\"92240 Malakoff\"],\"metadatas\":{\"dateCreation\":null,\"hasPassword\":false},\"attributes\":{\"proprietes\":null,\"insee_roles_applicatifs\":null,\"nomCommun\":\"Test\",\"domaineDeGestion\":\"testDG\",\"repertoireDeDistribution\":null,\"description\":\"description\",\"telephonePortable\":\"061245789636\",\"codePin\":\"AAA=\",\"numeroTelephone\":\"0123456789\",\"identifiantMetier\":\"123456789\",\"civilite\":\"Camarade\",\"facSimile\":\"0123456789\"}}";
       assertEquals(expectedJson, CustomObjectMapper.JsonObjectMapper().writeValueAsString(user));
     } catch (Exception e) {
       fail(e);

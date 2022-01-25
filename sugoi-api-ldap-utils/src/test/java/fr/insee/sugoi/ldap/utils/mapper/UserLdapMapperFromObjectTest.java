@@ -19,6 +19,7 @@ import com.unboundid.ldap.sdk.Attribute;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.PostalAddress;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
 import java.util.*;
@@ -134,11 +135,11 @@ public class UserLdapMapperFromObjectTest {
   @Test
   public void getUserAddressAttributesFromJavaObject() {
 
-    Map<String, String> address = new HashMap<>();
-    address.put("line1", "33 rue des Fleurs");
-    address.put("line2", "56700 Fleurville");
-    address.put("id", "generatedBefore");
-    user.setAddress(address);
+    PostalAddress postalAddress = new PostalAddress();
+    String[] adresses = {"33 rue des Fleurs", "56700 Fleurville"};
+    postalAddress.setLines(adresses);
+    postalAddress.setId("generatedBefore");
+    user.setAddress(postalAddress);
     List<Attribute> mappedAttributes = userLdapMapper.mapToAttributes(user);
 
     assertThat(

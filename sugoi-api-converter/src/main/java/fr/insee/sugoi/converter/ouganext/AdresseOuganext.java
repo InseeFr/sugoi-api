@@ -69,6 +69,42 @@ public class AdresseOuganext {
   @JacksonXmlProperty(localName = "LigneSept", namespace = Namespace.INSEE)
   protected String ligneSept;
 
+  public AdresseOuganext(String[] lines) {
+    for (int i = 1; i <= lines.length; i++) {
+      setLine(lines[i - 1], i);
+    }
+  }
+
+  public AdresseOuganext() {}
+
+  private void setLine(String value, int nbLine) {
+    switch (nbLine) {
+      case 1:
+        this.ligneUne = value;
+        break;
+      case 2:
+        this.ligneDeux = value;
+        break;
+      case 3:
+        this.ligneTrois = value;
+        break;
+      case 4:
+        this.ligneQuatre = value;
+        break;
+      case 5:
+        this.ligneCinq = value;
+        break;
+      case 6:
+        this.ligneSix = value;
+        break;
+      case 7:
+        this.ligneSept = value;
+        break;
+      default:
+        break;
+    }
+  }
+
   public String getLigneUne() {
     return ligneUne;
   }

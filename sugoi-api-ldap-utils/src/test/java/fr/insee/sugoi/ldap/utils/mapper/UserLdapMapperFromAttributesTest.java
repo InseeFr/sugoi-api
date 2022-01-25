@@ -156,7 +156,7 @@ public class UserLdapMapperFromAttributesTest {
     attributes.add(addressAttribute);
     User mappedUser = userLdapMapper.mapFromAttributes(attributes);
 
-    assertThat("Should have address id", mappedUser.getAddress().get("id"), is("generatedBefore"));
+    assertThat("Should have address id", mappedUser.getAddress().getId(), is("generatedBefore"));
   }
 
   @Test

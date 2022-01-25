@@ -15,11 +15,9 @@ package fr.insee.sugoi.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @JsonInclude(Include.NON_NULL)
@@ -36,7 +34,7 @@ public class User implements Serializable {
   private List<Group> groups = new ArrayList<>();
   private List<Habilitation> habilitations = new ArrayList<>();
 
-  private Map<String, String> address = new HashMap<>();
+  @JsonUnwrapped private PostalAddress address;
   private Map<String, Object> metadatas = new HashMap<>();
   private Map<String, Object> attributes = new HashMap<>();
 
@@ -106,16 +104,12 @@ public class User implements Serializable {
     this.groups = groups;
   }
 
-  public Map<String, String> getAddress() {
-    return this.address;
+  public PostalAddress getAddress() {
+    return address;
   }
 
-  public void addAddress(String name, String value) {
-    this.address.put(name, value);
-  }
-
-  public void setAddress(Map<String, String> address) {
-    this.address = address;
+  public void setAddress(PostalAddress postalAddress) {
+    this.address = postalAddress;
   }
 
   public Map<String, Object> getMetadatas() {
