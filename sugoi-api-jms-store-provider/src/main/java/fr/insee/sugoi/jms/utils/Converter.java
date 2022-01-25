@@ -17,10 +17,7 @@ import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.model.SugoiUser;
-import fr.insee.sugoi.model.Application;
-import fr.insee.sugoi.model.Group;
-import fr.insee.sugoi.model.Organization;
-import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -46,7 +43,7 @@ public class Converter {
       user.setCertificate((byte[]) linkedHashMap.get("certificate"));
       user.setOrganization(toOrganization(linkedHashMap.get("organization")));
       user.setMetadatas((Map<String, Object>) linkedHashMap.get("metadatas"));
-      user.setAddress((Map<String, String>) linkedHashMap.get("address"));
+      user.setAddress(toPostalAddress(linkedHashMap.get("address")));
       user.setAttributes((Map<String, Object>) linkedHashMap.get("attributes"));
       return user;
     }
@@ -59,7 +56,7 @@ public class Converter {
       Organization organization = new Organization();
       organization.setIdentifiant((String) linkedHashMap.get("identifiant"));
       organization.setGpgkey((byte[]) linkedHashMap.get("gpgkey"));
-      organization.setAddress((Map<String, String>) linkedHashMap.get("address"));
+      organization.setAddress(toPostalAddress(linkedHashMap.get("address")));
       organization.setAttributes((Map<String, Object>) linkedHashMap.get("attributes"));
       organization.setMetadatas((Map<String, Object>) linkedHashMap.get("metadatas"));
       organization.setOrganization(
@@ -156,5 +153,16 @@ public class Converter {
       out.writeObject(object);
       return bos.toByteArray();
     }
+  }
+
+  public PostalAddress toPostalAddress(Object object) {
+    ArrayList<String> linkedHashMap = (ArrayList<String>) object;
+    if (linkedHashMap != null) {
+      String[] lines = linkedHashMap.toArray(new String[8]);
+      PostalAddress postalAddress = new PostalAddress();
+      postalAddress.setLines(lines);
+      return postalAddress;
+    }
+    return null;
   }
 }

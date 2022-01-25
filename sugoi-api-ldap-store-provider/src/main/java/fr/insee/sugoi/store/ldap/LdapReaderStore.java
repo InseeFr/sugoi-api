@@ -64,10 +64,10 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     logger.debug("Searching user {}", id);
     SearchResultEntry entry = getEntryByDn(getUserDN(id));
     User user = (entry != null) ? userLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
-    if (user != null && user.getAddress() != null && user.getAddress().containsKey("id")) {
-      Map<String, String> address = getAddress(user.getAddress().get("id"));
+    if (user != null && user.getAddress() != null && user.getAddress().getId() != null) {
+      PostalAddress address = getAddress(user.getAddress().getId());
       if (address != null) {
-        address.put("id", user.getAddress().get("id"));
+        address.setId(user.getAddress().getId());
         user.setAddress(address);
       }
     }
@@ -333,9 +333,11 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     return pageResult;
   }
 
-  private Map<String, String> getAddress(String addressId) {
+  private PostalAddress getAddress(String addressId) {
     SearchResultEntry addressResult = getEntryByDn(getAddressDN(addressId));
-    return addressResult != null ? addressLdapMapper.mapFromSearchEntry(addressResult) : null;
+    return addressResult != null
+        ? addressLdapMapper.getAddressFromSearchEntry(addressResult)
+        : null;
   }
 
   @Override
@@ -348,10 +350,10 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     User user = null;
     if (users.getResults().size() == 1) {
       user = users.getResults().get(0);
-      if (user.getAddress() != null && user.getAddress().containsKey("id")) {
-        Map<String, String> address = getAddress(user.getAddress().get("id"));
+      if (user.getAddress() != null && user.getAddress().getId() != null) {
+        PostalAddress address = getAddress(user.getAddress().getId());
         if (address != null) {
-          address.put("id", user.getAddress().get("id"));
+          address.setId(user.getAddress().getId());
           user.setAddress(address);
         }
       }
@@ -380,10 +382,10 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     SearchResultEntry entry = getEntryByDn(getOrganizationDN(id));
     Organization org =
         (entry != null) ? organizationLdapMapper.mapFromAttributes(entry.getAttributes()) : null;
-    if (org != null && org.getAddress() != null && org.getAddress().containsKey("id")) {
-      Map<String, String> address = getAddress(org.getAddress().get("id"));
+    if (org != null && org.getAddress() != null && org.getAddress().getId() != null) {
+      PostalAddress address = getAddress(org.getAddress().getId());
       if (address != null) {
-        address.put("id", org.getAddress().get("id"));
+        address.setId(org.getAddress().getId());
         org.setAddress(address);
       }
     }

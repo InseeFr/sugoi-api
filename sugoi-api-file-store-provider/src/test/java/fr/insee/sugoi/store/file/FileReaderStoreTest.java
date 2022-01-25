@@ -14,14 +14,9 @@
 package fr.insee.sugoi.store.file;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 
-import fr.insee.sugoi.model.Application;
-import fr.insee.sugoi.model.Group;
-import fr.insee.sugoi.model.Organization;
-import fr.insee.sugoi.model.Realm;
-import fr.insee.sugoi.model.User;
-import fr.insee.sugoi.model.UserStorage;
+import fr.insee.sugoi.model.*;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import java.util.HashMap;
@@ -72,10 +67,10 @@ public class FileReaderStoreTest {
     Organization organization = fileReaderStore.getOrganization("testo").get();
     assertThat("Should get testo", organization.getIdentifiant(), is("testo"));
     assertThat(
-        "Should get address first line", organization.getAddress().get("line1"), is("Insee"));
+        "Should get address first line", organization.getAddress().getLines()[0], is("Insee"));
     assertThat(
-        "Should get address second line",
-        organization.getAddress().get("line4"),
+        "Should get address fourth line",
+        organization.getAddress().getLines()[3],
         is("88 AVE VERDIER"));
     assertThat(
         "Should have description Insee",
@@ -83,7 +78,7 @@ public class FileReaderStoreTest {
         is("Insee"));
     Organization suborga = organization.getOrganization();
     assertThat("Should have sub organization testi", suborga.getIdentifiant(), is("testi"));
-    assertThat("Suborga must have address", suborga.getAddress().get("line1"), is("Insee"));
+    assertThat("Suborga must have address", suborga.getAddress().getLines()[0], is("Insee"));
   }
 
   @Test
@@ -135,13 +130,15 @@ public class FileReaderStoreTest {
   public void testGetUser() {
     User user = fileReaderStore.getUser("testc").get();
     assertThat("Should get testc", user.getUsername(), is("testc"));
-    assertThat("Should get address first line", user.getAddress().get("line1"), is("Insee"));
+    assertThat("Should get address first line", user.getAddress().getLines()[0], is("Insee"));
     assertThat(
-        "Should get address second line", user.getAddress().get("line4"), is("88 AVE VERDIER"));
+        "Should get address second line", user.getAddress().getLines()[3], is("88 AVE VERDIER"));
     assertThat(
         "Should have organization testo", user.getOrganization().getIdentifiant(), is("testo"));
     assertThat(
-        "testo should have address", user.getOrganization().getAddress().get("line1"), is("Insee"));
+        "testo should have address",
+        user.getOrganization().getAddress().getLines()[0],
+        is("Insee"));
     assertThat(
         "Should have a group",
         user.getGroups().stream()

@@ -13,9 +13,7 @@
 */
 package fr.insee.sugoi.converter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
@@ -23,10 +21,9 @@ import fr.insee.sugoi.converter.ouganext.AdresseOuganext;
 import fr.insee.sugoi.converter.ouganext.OrganisationOuganext;
 import fr.insee.sugoi.converter.utils.CustomObjectMapper;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.PostalAddress;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
@@ -65,9 +62,8 @@ public class OrganisationTest {
   public static Organization generateOrganization(boolean withSubOrganization) {
     Organization organization = new Organization();
     organization.setIdentifiant("Toto");
-    Map<String, String> address = new HashMap<>();
-    address.put("ligneDeux", "Lentreprise");
-    address.put("ligneCinq", "CEDEX");
+    PostalAddress address = new PostalAddress();
+    address.setLines(new String[] {null, "Lentreprise", null, null, "CEDEX"});
     organization.setAddress(address);
     organization.addAttributes("toto", "tata");
     organization.addAttributes("nomCommun", "Commun");
@@ -131,7 +127,7 @@ public class OrganisationTest {
       OuganextSugoiMapper osm = new OuganextSugoiMapper();
       Organization organization = osm.serializeToSugoi(organisation, Organization.class);
       String expectedJson =
-          "{\"identifiant\":\"XJHFLG4\",\"gpgkey\":null,\"organization\":{\"identifiant\":\"133546546\",\"gpgkey\":null,\"organization\":null,\"address\":{},\"metadatas\":{},\"attributes\":{\"proprietes\":null,\"nomCommun\":\"Test Organisation\",\"mail\":null,\"domaineDeGestion\":null,\"repertoireDeDistribution\":null,\"description\":null,\"numeroTelephone\":null,\"facSimile\":null}},\"address\":{\"LigneQuatre\":\"\",\"LigneUne\":\"17 bd adolphe pinard\",\"LigneDeux\":\"\",\"LigneCinq\":\"\",\"LigneSix\":\"\",\"LigneTrois\":\"\",\"LigneSept\":\"92240 Malakoff\"},\"metadatas\":{},\"attributes\":{\"proprietes\":[\"Test1\",\"Test2\"],\"nomCommun\":\"INSEE-DG\",\"mail\":\"accueil@domain.tld\",\"domaineDeGestion\":\"TEST\",\"repertoireDeDistribution\":null,\"description\":\"INSEE\",\"numeroTelephone\":null,\"facSimile\":\"0123456789\"}}";
+          "{\"identifiant\":\"XJHFLG4\",\"gpgkey\":null,\"organization\":{\"identifiant\":\"133546546\",\"gpgkey\":null,\"organization\":null,\"metadatas\":{},\"attributes\":{\"proprietes\":null,\"nomCommun\":\"Test Organisation\",\"mail\":null,\"domaineDeGestion\":null,\"repertoireDeDistribution\":null,\"description\":null,\"numeroTelephone\":null,\"facSimile\":null}},\"address\":[\"17 bd adolphe pinard\",\"\",\"\",\"\",\"\",\"\",\"92240 Malakoff\"],\"metadatas\":{},\"attributes\":{\"proprietes\":[\"Test1\",\"Test2\"],\"nomCommun\":\"INSEE-DG\",\"mail\":\"accueil@domain.tld\",\"domaineDeGestion\":\"TEST\",\"repertoireDeDistribution\":null,\"description\":\"INSEE\",\"numeroTelephone\":null,\"facSimile\":\"0123456789\"}}";
       assertEquals(
           expectedJson, CustomObjectMapper.JsonObjectMapper().writeValueAsString(organization));
     } catch (Exception e) {
@@ -141,34 +137,31 @@ public class OrganisationTest {
 
   @Test
   public void testConvertOrganizationToOrganisationXml() throws JsonProcessingException {
-    try {
-      Organization organization = generateOrganization(true);
-      OuganextSugoiMapper osm = new OuganextSugoiMapper();
-      OrganisationOuganext organisation =
-          osm.serializeToOuganext(organization, OrganisationOuganext.class);
-      String expectedXml =
-          "<?xml version='1.0' encoding='UTF-8'?>\r\n"
-              + "<ns1:Organisation xmlns:ns1=\"http://xml.insee.fr/schema/annuaire\" xmlns:ns2=\"http://xml.insee.fr/schema\">\r\n"
-              + "  <Identifiant>Toto</Identifiant>\r\n"
-              + "  <NomCommun>Commun</NomCommun>\r\n"
-              + "  <DomaineDeGestion>tutu</DomaineDeGestion>\r\n"
-              + "  <adressePostale >\r\n"
-              + "    <ns2:LigneDeux>Lentreprise</ns2:LigneDeux>\r\n"
-              + "    <ns2:LigneCinq>CEDEX</ns2:LigneCinq>\r\n"
-              + "  </adressePostale>\r\n"
-              + "  <OrganisationDeRattachementUri>Toto</OrganisationDeRattachementUri>\r\n"
-              + "  <Propriete>prop</Propriete>\r\n"
-              + "  <Propriete>prop2</Propriete>\r\n"
-              + "</ns1:Organisation>\r\n";
 
-      Diff myDiff =
-          DiffBuilder.compare(expectedXml)
-              .checkForSimilar()
-              .withTest(CustomObjectMapper.XMLObjectMapper().writeValueAsString(organisation))
-              .build();
-      assertFalse(myDiff.hasDifferences());
-    } catch (Exception e) {
-      fail(e);
-    }
+    Organization organization = generateOrganization(true);
+    OuganextSugoiMapper osm = new OuganextSugoiMapper();
+    OrganisationOuganext organisation =
+        osm.serializeToOuganext(organization, OrganisationOuganext.class);
+    String expectedXml =
+        "<?xml version='1.0' encoding='UTF-8'?>\r\n"
+            + "<ns1:Organisation xmlns:ns1=\"http://xml.insee.fr/schema/annuaire\" xmlns:ns2=\"http://xml.insee.fr/schema\">\r\n"
+            + "  <Identifiant>Toto</Identifiant>\r\n"
+            + "  <NomCommun>Commun</NomCommun>\r\n"
+            + "  <DomaineDeGestion>tutu</DomaineDeGestion>\r\n"
+            + "  <adressePostale >\r\n"
+            + "    <ns2:LigneDeux>Lentreprise</ns2:LigneDeux>\r\n"
+            + "    <ns2:LigneCinq>CEDEX</ns2:LigneCinq>\r\n"
+            + "  </adressePostale>\r\n"
+            + "  <OrganisationDeRattachementUri>Toto</OrganisationDeRattachementUri>\r\n"
+            + "  <Propriete>prop</Propriete>\r\n"
+            + "  <Propriete>prop2</Propriete>\r\n"
+            + "</ns1:Organisation>\r\n";
+
+    Diff myDiff =
+        DiffBuilder.compare(expectedXml)
+            .checkForSimilar()
+            .withTest(CustomObjectMapper.XMLObjectMapper().writeValueAsString(organisation))
+            .build();
+    assertFalse(myDiff.hasDifferences());
   }
 }

@@ -14,18 +14,10 @@
 package fr.insee.sugoi.converter.mapper;
 
 import fr.insee.sugoi.converter.exception.OuganextParsingException;
-import fr.insee.sugoi.converter.ouganext.AdresseOuganext;
-import fr.insee.sugoi.converter.ouganext.ApplicationOuganext;
-import fr.insee.sugoi.converter.ouganext.HabilitationsOuganext;
-import fr.insee.sugoi.converter.ouganext.OrganisationOuganext;
-import fr.insee.sugoi.converter.ouganext.ProfilOuganext;
-import fr.insee.sugoi.converter.ouganext.RoleOuganext;
+import fr.insee.sugoi.converter.ouganext.*;
 import fr.insee.sugoi.converter.utils.MapFromAttribute;
 import fr.insee.sugoi.converter.utils.MapFromHashmapElement;
-import fr.insee.sugoi.model.Habilitation;
-import fr.insee.sugoi.model.Organization;
-import fr.insee.sugoi.model.Realm;
-import fr.insee.sugoi.model.UserStorage;
+import fr.insee.sugoi.model.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -47,7 +39,6 @@ public class OuganextSugoiMapper {
    * @param <O>
    * @param <N>
    * @param ouganextObject
-   * @param sugoiObject
    * @return
    * @throws IllegalArgumentException
    * @throws IllegalAccessException
@@ -92,8 +83,8 @@ public class OuganextSugoiMapper {
             Field sugoiField = sugoiObject.getClass().getDeclaredField("address");
             sugoiField.setAccessible(true);
             if (ouganextFieldObject != null) {
-              Map<String, String> address =
-                  createAddressFromAdresse((AdresseOuganext) ouganextFieldObject);
+              PostalAddress address =
+                  createSugoiAddressFromOuganextAddress((AdresseOuganext) ouganextFieldObject);
               sugoiField.set(sugoiObject, address);
             }
           }
@@ -129,15 +120,9 @@ public class OuganextSugoiMapper {
   /**
    * Convert Sugoi N object to Ouganext O object
    *
-   * @param oldObject
-   * @param newObject
    * @return
    * @throws IllegalArgumentException
-   * @throws IllegalAccessException
-   * @throws NoSuchFieldException
    * @throws SecurityException
-   * @throws InvocationTargetException
-   * @throws NoSuchMethodException
    */
   @SuppressWarnings("unchecked")
   public <O, N> N serializeToOuganext(O sugoiObject, Class<N> clazz) {
@@ -175,7 +160,7 @@ public class OuganextSugoiMapper {
             sugoiField.setAccessible(true);
             Object sugoiFieldObject = sugoiField.get(sugoiObject);
             AdresseOuganext adresse =
-                createAdresseFromAddress((Map<String, String>) sugoiFieldObject);
+                createOuganextAddressFromSugoiAddress((PostalAddress) sugoiFieldObject);
             ouganextObjectField.set(ouganextObject, adresse);
           }
 
@@ -229,29 +214,23 @@ public class OuganextSugoiMapper {
     }
   }
 
-  private AdresseOuganext createAdresseFromAddress(Map<String, String> address) {
-    AdresseOuganext adresse = new AdresseOuganext();
-    adresse.setLigneUne(address.get("ligneUne"));
-    adresse.setLigneDeux(address.get("ligneDeux"));
-    adresse.setLigneTrois(address.get("ligneTrois"));
-    adresse.setLigneQuatre(address.get("ligneQuatre"));
-    adresse.setLigneCinq(address.get("ligneCinq"));
-    adresse.setLigneSix(address.get("ligneSix"));
-    adresse.setLigneSept(address.get("ligneSept"));
-    return adresse;
+  private AdresseOuganext createOuganextAddressFromSugoiAddress(PostalAddress sugoiAddress) {
+    return new AdresseOuganext(sugoiAddress.getLines());
   }
 
-  private Map<String, String> createAddressFromAdresse(AdresseOuganext adresse)
-      throws IllegalAccessException, NoSuchFieldException {
-    Map<String, String> address = new HashMap<>();
-    address.put("LigneUne", (String) adresse.getLigneUne());
-    address.put("LigneDeux", (String) adresse.getLigneDeux());
-    address.put("LigneTrois", (String) adresse.getLigneTrois());
-    address.put("LigneQuatre", (String) adresse.getLigneQuatre());
-    address.put("LigneCinq", (String) adresse.getLigneCinq());
-    address.put("LigneSix", (String) adresse.getLigneSix());
-    address.put("LigneSept", (String) adresse.getLigneSept());
-    return address;
+  private PostalAddress createSugoiAddressFromOuganextAddress(AdresseOuganext ouganextAddress) {
+    PostalAddress sugoiAddress = new PostalAddress();
+    sugoiAddress.setLines(
+        new String[] {
+          ouganextAddress.getLigneUne(),
+          ouganextAddress.getLigneDeux(),
+          ouganextAddress.getLigneTrois(),
+          ouganextAddress.getLigneQuatre(),
+          ouganextAddress.getLigneCinq(),
+          ouganextAddress.getLigneSix(),
+          ouganextAddress.getLigneSept()
+        });
+    return sugoiAddress;
   }
 
   private static String getAnnotationAttributeName(Field field) {

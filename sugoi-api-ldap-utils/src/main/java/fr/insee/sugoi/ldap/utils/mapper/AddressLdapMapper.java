@@ -17,8 +17,8 @@ import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import com.unboundid.ldap.sdk.ModificationType;
 import com.unboundid.ldap.sdk.SearchResultEntry;
+import fr.insee.sugoi.model.PostalAddress;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,34 +35,31 @@ public class AddressLdapMapper {
     // }
   }
 
-  public Map<String, String> mapFromSearchEntry(SearchResultEntry searchResultEntry) {
-    Map<String, String> address = new HashMap<>();
-    for (int i = 1; i < 8; i++) {
-      address.put(
-          "line" + String.valueOf(i),
-          searchResultEntry.getAttributeValue(
-              "inseeAdressePostaleCorrespondantLigne" + String.valueOf(i)));
+  public PostalAddress getAddressFromSearchEntry(SearchResultEntry searchResultEntry) {
+    PostalAddress address = new PostalAddress();
+    String[] lines = new String[7];
+    for (int i = 1; i <= lines.length; i++) {
+      lines[i - 1] =
+          searchResultEntry.getAttributeValue("inseeAdressePostaleCorrespondantLigne" + i);
     }
+    address.setLines(lines);
     return address;
   }
 
-  public List<Attribute> mapToAttributes(Map<String, String> address) {
+  public List<Attribute> addressToAttributes(PostalAddress address) {
     List<Attribute> attributes = new ArrayList<>();
-    for (int i = 1; i < 8; i++) {
-      if (address.containsKey("line" + String.valueOf(i))
-          && address.get("line" + String.valueOf(i)) != null) {
+    for (int i = 1; i <= address.getLines().length; i++) {
+      if (address.getLines()[i - 1] != null && !address.getLines()[i - 1].isBlank()) {
         attributes.add(
-            new Attribute(
-                "inseeAdressePostaleCorrespondantLigne" + String.valueOf(i),
-                address.get("line" + String.valueOf(i))));
+            new Attribute("inseeAdressePostaleCorrespondantLigne" + i, address.getLines()[i - 1]));
       }
     }
     attributes.add(new Attribute("objectClass", objectClasses));
     return attributes;
   }
 
-  public List<Modification> createMods(Map<String, String> address) {
-    return mapToAttributes(address).stream()
+  public List<Modification> createMods(PostalAddress address) {
+    return addressToAttributes(address).stream()
         .map(
             attribute ->
                 new Modification(

@@ -1,1 +1,1 @@
-{"identifiant":"testo","gpgkey":null,"organization":{"identifiant":"testi","gpgkey":null,"organization":null,"address":{"line1":"Insee","line4":"88 AVE VERDIER"},"metadatas":{},"attributes":{}},"address":{"line1":"Insee","line4":"88 AVE VERDIER"},"metadatas":{},"attributes":{"description":"Insee"}}
+{"identifiant":"testo","gpgkey":null,"organization":{"identifiant":"testi","gpgkey":null,"organization":null,"address":["Insee","","","88 AVE VERDIER"],"metadatas":{},"attributes":{}},"address":["Insee","","","88 AVE VERDIER"],"metadatas":{},"attributes":{"description":"Insee"}}

@@ -90,8 +90,8 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
           .forEach(
               group ->
                   deleteUserFromGroup(group.getAppName(), group.getName(), id, providerRequest));
-      if (currentUser.getAddress().get("id") != null) {
-        deleteAddress(currentUser.getAddress().get("id"));
+      if (currentUser.getAddress() != null && currentUser.getAddress().getId() != null) {
+        deleteAddress(currentUser.getAddress().getId());
       }
       DeleteRequest dr = new DeleteRequest(getUserDN(id));
       ldapPoolConnection.delete(dr);
@@ -111,9 +111,9 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public ProviderResponse createUser(User user, ProviderRequest providerRequest) {
     try {
-      if (user.getAddress() != null && user.getAddress().size() > 0) {
+      if (user.getAddress() != null && user.getAddress().isNotEmpty()) {
         UUID addressUuid = createAddress(user.getAddress());
-        user.addAddress("id", addressUuid.toString());
+        user.getAddress().setId(addressUuid.toString());
       }
       AddRequest userAddRequest =
           new AddRequest(getUserDN(user.getUsername()), userLdapMapper.mapToAttributes(user));
@@ -140,14 +140,13 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
                           config.get(LdapConfigKeys.REALM_NAME),
                           config.get(LdapConfigKeys.USERSTORAGE_NAME),
                           updatedUser.getUsername()));
-      if (updatedUser.getAddress() != null && updatedUser.getAddress().size() > 0) {
-        if (currentUser.getAddress() != null && currentUser.getAddress().containsKey("id")) {
-          updateAddress(currentUser.getAddress().get("id"), updatedUser.getAddress());
+      if (updatedUser.getAddress() != null && updatedUser.getAddress().isNotEmpty()) {
+        if (currentUser.getAddress() != null && currentUser.getAddress().getId() != null) {
+          updateAddress(currentUser.getAddress().getId(), updatedUser.getAddress());
         } else {
-          Map<String, String> newAddress = new HashMap<>();
-          newAddress.put("id", createAddress(updatedUser.getAddress()).toString());
+          PostalAddress newAddress =
+              new PostalAddress(createAddress(updatedUser.getAddress()).toString());
           updatedUser.setAddress(newAddress);
-          createAddress(updatedUser.getAddress());
         }
       }
       ModifyRequest mr =
@@ -258,8 +257,9 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
                           config.get(LdapConfigKeys.REALM_NAME),
                           config.get(LdapConfigKeys.USERSTORAGE_NAME),
                           name));
-      if (currentOrganization.getAddress().get("id") != null) {
-        deleteAddress(currentOrganization.getAddress().get("id"));
+      if (currentOrganization.getAddress() != null
+          && currentOrganization.getAddress().getId() != null) {
+        deleteAddress(currentOrganization.getAddress().getId());
       }
       DeleteRequest dr = new DeleteRequest(getOrganizationDN(name));
       ldapPoolConnection.delete(dr);
@@ -281,9 +281,9 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       Organization organization, ProviderRequest providerRequest) {
     if (ldapReaderStore.getOrganization(organization.getIdentifiant()).isEmpty()) {
       try {
-        if (organization.getAddress() != null && organization.getAddress().size() > 0) {
+        if (organization.getAddress() != null && organization.getAddress().isNotEmpty()) {
           UUID addressUuid = createAddress(organization.getAddress());
-          organization.addAddress("id", addressUuid.toString());
+          organization.getAddress().setId(addressUuid.toString());
         }
         AddRequest ar =
             new AddRequest(
@@ -326,13 +326,13 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
                           config.get(LdapConfigKeys.REALM_NAME),
                           config.get(LdapConfigKeys.USERSTORAGE_NAME),
                           updatedOrganization.getIdentifiant()));
-      if (updatedOrganization.getAddress() != null && updatedOrganization.getAddress().size() > 0) {
-        if (currentOrganization.getAddress().containsKey("id")) {
-          updateAddress(
-              currentOrganization.getAddress().get("id"), updatedOrganization.getAddress());
+      if (updatedOrganization.getAddress() != null
+          && updatedOrganization.getAddress().isNotEmpty()) {
+        if (currentOrganization.getAddress().getId() != null) {
+          updateAddress(currentOrganization.getAddress().getId(), updatedOrganization.getAddress());
         } else {
-          Map<String, String> newAddress = new HashMap<>();
-          newAddress.put("id", createAddress(updatedOrganization.getAddress()).toString());
+          PostalAddress newAddress =
+              new PostalAddress(createAddress(updatedOrganization.getAddress()).toString());
           updatedOrganization.setAddress(newAddress);
         }
       }
@@ -714,16 +714,16 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
    * @return chosen id
    * @throws LDAPException
    */
-  private UUID createAddress(Map<String, String> address) throws LDAPException {
+  private UUID createAddress(PostalAddress address) throws LDAPException {
     UUID addressUUID = UUID.randomUUID();
     AddRequest addressAddRequest =
         new AddRequest(
-            getAddressDN(addressUUID.toString()), addressLdapMapper.mapToAttributes(address));
+            getAddressDN(addressUUID.toString()), addressLdapMapper.addressToAttributes(address));
     ldapPoolConnection.add(addressAddRequest);
     return addressUUID;
   }
 
-  private void updateAddress(String id, Map<String, String> newAddress) throws LDAPException {
+  private void updateAddress(String id, PostalAddress newAddress) throws LDAPException {
     ModifyRequest modifyRequest =
         new ModifyRequest(getAddressDN(id), addressLdapMapper.createMods(newAddress));
     ldapPoolConnection.modify(modifyRequest);

@@ -99,6 +99,6 @@ public class OrganizationLdapMapperFromAttributesTest {
     Organization mappedOrganization = organizationLdapMapper.mapFromAttributes(attributes);
 
     assertThat(
-        "Should have address id", mappedOrganization.getAddress().get("id"), is("generatedBefore"));
+        "Should have address id", mappedOrganization.getAddress().getId(), is("generatedBefore"));
   }
 }
