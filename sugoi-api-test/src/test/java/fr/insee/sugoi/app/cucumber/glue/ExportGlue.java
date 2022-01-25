@@ -54,10 +54,18 @@ public class ExportGlue {
 
   public boolean containsUser(String csv, String userName) {
     String[] result = csv.split("\n");
+    int userNamePosition = 0;
 
-    int userNamePosition =
-        result[0].substring(0, result[0].lastIndexOf("username")).split(",").length;
-    return Arrays.stream(result).anyMatch(userLine -> isUser(userLine, userName, userNamePosition));
+    String[] headers = result[0].split(",");
+    for (int i = 0; i < headers.length; i++) {
+      if ("userName".equalsIgnoreCase(headers[i])) {
+        userNamePosition = i;
+        break;
+      }
+    }
+    int finalUserNamePosition = userNamePosition;
+    return Arrays.stream(result)
+        .anyMatch(userLine -> isUser(userLine, userName, finalUserNamePosition));
   }
 
   private boolean isUser(String userLine, String userName, int userNamePosition) {
