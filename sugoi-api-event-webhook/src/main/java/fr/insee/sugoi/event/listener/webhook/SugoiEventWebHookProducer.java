@@ -41,6 +41,10 @@ public class SugoiEventWebHookProducer {
   @Value("${sugoi.api.event.webhook.name}")
   private List<String> webHookNames;
 
+  @Value(
+      "#{'${sugoi.api.event.webhook.enabled.events:SEND_LOGIN,CHANGE_PASSWORD,REINIT_PASSWORD}'.split(',')}")
+  private List<String> webhookEnabledEvents;
+
   @Value("${sugoi.api.event.webhook.mail.secondaryMailAttribute}")
   private String secondaryMailAttribute;
 
@@ -52,13 +56,13 @@ public class SugoiEventWebHookProducer {
   @EventListener
   public void handleContextStart(SugoiEvent cse) {
     SugoiEventTypeEnum eventType = cse.getEventType();
-    if (eventType == SugoiEventTypeEnum.RESET_PASSWORD
-        || eventType == SugoiEventTypeEnum.SEND_LOGIN
-        || eventType == SugoiEventTypeEnum.CHANGE_PASSWORD) {
+    if (webhookEnabledEvents.stream()
+        .anyMatch(event -> SugoiEventTypeEnum.valueOf(event).equals(eventType))) {
+
       String webHookTag = (String) cse.getProperties().get(EventKeysConfig.WEBSERVICE_TAG);
       Map<String, Object> values = getValuesForTemplateFromEvent(cse);
       switch (eventType) {
-        case RESET_PASSWORD:
+        case REINIT_PASSWORD:
           getServiceConfiguredForTag(getTagWithDefaultMail(webHookTag))
               .forEach(webHookName -> webHookService.resetPassword(webHookName, values));
           break;

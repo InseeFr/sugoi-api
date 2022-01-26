@@ -93,7 +93,7 @@ public class CredentialsServiceImpl implements CredentialsService {
       sugoiEventPublisher.publishCustomEvent(
           realm,
           userStorage,
-          SugoiEventTypeEnum.RESET_PASSWORD,
+          SugoiEventTypeEnum.REINIT_PASSWORD,
           Map.ofEntries(
               Map.entry(EventKeysConfig.PROPERTIES, templateProperties),
               Map.entry(
