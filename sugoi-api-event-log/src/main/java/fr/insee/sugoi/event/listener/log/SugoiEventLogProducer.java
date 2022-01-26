@@ -254,7 +254,7 @@ public class SugoiEventLogProducer {
         toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
         toLog.put(EventKeysConfig.USER_ID, (String) properties.get(EventKeysConfig.USER_ID));
         break;
-      case RESET_PASSWORD:
+      case REINIT_PASSWORD:
         toLog.put(EventKeysConfig.REALM, realm);
         toLog.put(EventKeysConfig.USERSTORAGE, userStorage);
         toLog.put(
