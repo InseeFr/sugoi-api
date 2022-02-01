@@ -119,6 +119,10 @@ public class GenericGlue {
         stepData.setLatestResponse(
             webRequest.executeUpdate(stepData.getDefaultTomcatUrl() + url, headers, body));
         break;
+      case "PATCH":
+        stepData.setLatestResponse(
+            webRequest.executePatch(stepData.getDefaultTomcatUrl() + url, headers, body));
+        break;
     }
   }
 
@@ -182,6 +186,10 @@ public class GenericGlue {
       case "PUT":
         stepData.setLatestResponse(
             webRequest.executeUpdate(stepData.getDefaultTomcatUrl() + url, headers, null));
+        break;
+      case "PATCH":
+        stepData.setLatestResponse(
+            webRequest.executePatch(stepData.getDefaultTomcatUrl() + url, headers, null));
         break;
     }
   }
