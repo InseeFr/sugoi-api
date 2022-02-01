@@ -198,3 +198,19 @@ Feature: User scenario
         When the client perform GET request on url /realms/domaine2/users/mail/invalid@mail.fr
         And show body received
         Then the client receives status code 501
+
+    Scenario: Perform patch on single attribute 
+        When the client perform PATCH request on url /realms/domaine1/users/testc/inseegroupedefaut/toto' 
+        Then the client receives status code 204
+
+    Scenario: Perform patch on single attribute (already exist)
+        When the client perform PATCH request on url /realms/domaine1/users/testc/inseegroupedefaut/toto' 
+        Then the client receives status code 204
+
+    Scenario: Perform Delete on single attribute
+        When the client perform PATCH request on url /realms/domaine1/users/testc/inseegroupedefaut/toto' 
+        Then the client receives status code 204
+
+    Scenario: Perform Delete on single attribute (already delete)
+        When the client perform PATCH request on url /realms/domaine1/users/testc/inseegroupedefaut/toto' 
+        Then the client receives status code 204

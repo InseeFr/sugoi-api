@@ -13,23 +13,27 @@
 */
 package fr.insee.sugoi.app.cucumber.utils;
 
+import fr.insee.sugoi.app.cucumber.configuration.RestTemplateConfiguration;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 public class WebRequest {
 
+  private RestTemplate restTemplate;
+
   private static final String BASE_URL = "http://localhost:8080";
+
+  public WebRequest() {
+    this.restTemplate = RestTemplateConfiguration.getRestTemplate();
+  }
 
   public ResponseResults executeGet(String url, Map<String, String> headers, String body)
       throws IOException {
-    RestTemplate restTemplate = new RestTemplate();
-
     final Map<String, String> _headers = new HashMap<>();
     _headers.put("Accept", "application/json");
     _headers.put("Content-Type", "application/json");
@@ -55,7 +59,6 @@ public class WebRequest {
 
   public ResponseResults executeDelete(String url, Map<String, String> headers, String body)
       throws IOException {
-    RestTemplate restTemplate = new RestTemplate();
 
     final Map<String, String> _headers = new HashMap<>();
     _headers.put("Accept", "application/json");
@@ -83,7 +86,6 @@ public class WebRequest {
 
   public ResponseResults executeUpdate(String url, Map<String, String> headers, String body)
       throws IOException {
-    RestTemplate restTemplate = new RestTemplate();
 
     final Map<String, String> _headers = new HashMap<>();
     _headers.put("Accept", "application/json");
@@ -111,8 +113,6 @@ public class WebRequest {
 
   public ResponseResults executePost(String url, Map<String, String> headers, String body)
       throws IOException {
-    RestTemplate restTemplate = new RestTemplate();
-    restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
 
     final Map<String, String> _headers = new HashMap<>();
     _headers.put("Accept", "application/json");
@@ -129,6 +129,32 @@ public class WebRequest {
     return restTemplate.execute(
         BASE_URL + url,
         HttpMethod.POST,
+        requestCallback,
+        response -> {
+          if (errorHandler.hadError) {
+            return (errorHandler.getResults());
+          } else {
+            return (new ResponseResults(response));
+          }
+        });
+  }
+
+  public ResponseResults executePatch(String url, Map<String, String> headers, String body)
+      throws IOException {
+
+    final Map<String, String> _headers = new HashMap<>();
+    _headers.put("Accept", "application/json");
+    _headers.put("Content-Type", "application/json");
+    if (headers != null) {
+      headers.keySet().stream().forEach(key -> _headers.put(key, headers.get(key)));
+    }
+    final MyRequestCallback requestCallback = new MyRequestCallback(_headers, body);
+    final ResponseResultErrorHandler errorHandler = new ResponseResultErrorHandler();
+
+    restTemplate.setErrorHandler(errorHandler);
+    return restTemplate.execute(
+        BASE_URL + url,
+        HttpMethod.PATCH,
         requestCallback,
         response -> {
           if (errorHandler.hadError) {

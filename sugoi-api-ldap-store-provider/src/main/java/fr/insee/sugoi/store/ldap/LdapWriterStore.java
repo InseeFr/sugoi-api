@@ -25,7 +25,6 @@ import com.unboundid.ldap.sdk.ModifyRequest;
 import com.unboundid.ldap.sdk.ResultCode;
 import com.unboundid.ldap.sdk.extensions.PasswordModifyExtendedRequest;
 import com.unboundid.util.SubtreeDeleter;
-import fr.insee.sugoi.core.exceptions.AppManagedAttributeException;
 import fr.insee.sugoi.core.exceptions.ApplicationAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.core.exceptions.GroupAlreadyExistException;
@@ -668,25 +667,30 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
         .getUser(userId)
         .orElseThrow(
             () -> new UserNotFoundException(config.get(LdapConfigKeys.REALM_NAME), userId));
+    ProviderResponse response = new ProviderResponse();
+
     try {
       ModifyRequest modifyAttributeRequest =
           new ModifyRequest(
               getUserDN(userId),
               new Modification(ModificationType.ADD, attributeKey, attributeValue));
       ldapPoolConnection.modify(modifyAttributeRequest);
-      ProviderResponse response = new ProviderResponse();
       response.setStatus(ProviderResponseStatus.OK);
       response.setEntityId(userId);
-      return response;
     } catch (LDAPException e) {
-      throw new RuntimeException(
-          "Failed to update user attribute "
-              + attributeKey
-              + " with value "
-              + attributeValue
-              + " while writing to LDAP",
-          e);
+      if (!e.getResultCode().equals(ResultCode.ATTRIBUTE_OR_VALUE_EXISTS)) {
+        throw new RuntimeException(
+            "Failed to update user attribute "
+                + attributeKey
+                + " with value "
+                + attributeValue
+                + " while writing to LDAP",
+            e);
+      }
+      response.setStatus(ProviderResponseStatus.OK);
+      response.setEntityId(userId);
     }
+    return response;
   }
 
   @Override
@@ -696,29 +700,29 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
         .getUser(userId)
         .orElseThrow(
             () -> new UserNotFoundException(config.get(LdapConfigKeys.REALM_NAME), userId));
-
+    ProviderResponse response = new ProviderResponse();
     try {
       ModifyRequest modifyAttributeRequest =
           new ModifyRequest(
               getUserDN(userId),
               new Modification(ModificationType.DELETE, attributeKey, attributeValue));
       ldapPoolConnection.modify(modifyAttributeRequest);
-      ProviderResponse response = new ProviderResponse();
       response.setStatus(ProviderResponseStatus.OK);
       response.setEntityId(userId);
-      return response;
     } catch (LDAPException e) {
-      if (e.getResultCode().equals(ResultCode.NO_SUCH_ATTRIBUTE)) {
-        throw new AppManagedAttributeException("Cannot delete, attribute not found", e);
+      if (!e.getResultCode().equals(ResultCode.NO_SUCH_ATTRIBUTE)) {
+        throw new RuntimeException(
+            "Failed to update user attribute "
+                + attributeKey
+                + " with value "
+                + attributeValue
+                + " while writing to LDAP",
+            e);
       }
-      throw new RuntimeException(
-          "Failed to update user attribute "
-              + attributeKey
-              + " with value "
-              + attributeValue
-              + " while writing to LDAP",
-          e);
+      response.setStatus(ProviderResponseStatus.OK);
+      response.setEntityId(userId);
     }
+    return response;
   }
 
   /**
