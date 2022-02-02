@@ -14,13 +14,11 @@
 package fr.insee.sugoi.config;
 
 import com.unboundid.ldap.sdk.AddRequest;
-import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Filter;
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
 import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldap.sdk.ModifyRequest;
 import com.unboundid.ldap.sdk.SearchRequest;
-import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
@@ -28,19 +26,20 @@ import fr.insee.sugoi.core.configuration.UiMappingService;
 import fr.insee.sugoi.core.exceptions.LdapStoreConnectionFailedException;
 import fr.insee.sugoi.core.exceptions.RealmAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
+import fr.insee.sugoi.core.exceptions.RealmWriteFailureException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.LdapFilter;
-import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.ldap.utils.mapper.RealmLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserStorageLdapMapper;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.Realm.UIMappingType;
 import fr.insee.sugoi.model.UserStorage;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -132,61 +131,12 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
               .getEntry(realmEntryPattern.replace("{realm}", realmName) + "," + baseDn);
       if (realmEntry != null) {
         logger.debug("Found entry {}", realmEntry.getDN());
-        Realm realm = RealmLdapMapper.mapFromSearchEntry(realmEntry);
-        if (realm.getReaderType() == null) {
-          realm.setReaderType(defaultReader);
-        }
-        if (realm.getWriterType() == null) {
-          realm.setWriterType(defaultWriter);
-        }
-        logger.debug("Parsing as realm {}", realm);
-        realm.setUserStorages(loadUserStorages(realmEntry));
-        realm
-            .getProperties()
-            .putIfAbsent(
-                GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST,
-                defaultAppManagedAttributeKeyList);
-
-        realm
-            .getProperties()
-            .putIfAbsent(
-                GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST,
-                defaultAppManagedAttributePatternList);
-
-        realm
-            .getProperties()
-            .putIfAbsent(GlobalKeysConfig.USERS_MAX_OUTPUT_SIZE, defaultUserMaxOutputSize);
-
-        realm
-            .getProperties()
-            .putIfAbsent(
-                GlobalKeysConfig.APPLICATIONS_MAX_OUTPUT_SIZE, defaultApplicationMaxOutputSize);
-
-        realm
-            .getProperties()
-            .putIfAbsent(GlobalKeysConfig.GROUPS_MAX_OUTPUT_SIZE, defaultGroupMaxOutputSize);
-
-        realm
-            .getProperties()
-            .putIfAbsent(
-                GlobalKeysConfig.ORGANIZATIONS_MAX_OUTPUT_SIZE, defaultOrganizationMaxOutputSize);
-
-        realm
-            .getUiMapping()
-            .putIfAbsent(UIMappingType.UI_USER_MAPPING, uiMappingService.getUserUiDefaultField());
-        realm
-            .getUiMapping()
-            .putIfAbsent(
-                UIMappingType.UI_ORGANIZATION_MAPPING,
-                uiMappingService.getOrganizationUiDefaultField());
-        sortUiLists(realm);
-        realm.getProperties().putIfAbsent(LdapConfigKeys.SORT_KEY, defaultSortKey);
-        return Optional.of(realm);
+        return Optional.of(generateRealmFromSearchEntry(realmEntry));
+      } else {
+        return Optional.empty();
       }
-      return Optional.empty();
-    } catch (Exception e) {
-      e.printStackTrace();
-      return Optional.empty();
+    } catch (LDAPException e) {
+      throw new RealmNotFoundException("Impossible de charger le realm " + realmName, e);
     }
   }
 
@@ -197,79 +147,14 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
       SearchRequest searchRequest =
           new SearchRequest(
               baseDn, SearchScope.ONE, LdapFilter.create("(objectClass=*)"), "*", "+");
-      SearchResult searchResult = ldapPoolConnection().search(searchRequest);
-      return searchResult.getSearchEntries().stream()
-          .map(
-              e -> {
-                Realm realm = RealmLdapMapper.mapFromSearchEntry(e);
-                if (realm.getReaderType() == null) {
-                  realm.setReaderType(defaultReader);
-                }
-                if (realm.getWriterType() == null) {
-                  realm.setWriterType(defaultWriter);
-                }
-
-                realm
-                    .getProperties()
-                    .putIfAbsent(
-                        GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST,
-                        defaultAppManagedAttributeKeyList);
-
-                realm
-                    .getProperties()
-                    .putIfAbsent(
-                        GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST,
-                        defaultAppManagedAttributePatternList);
-
-                realm.setUserStorages(loadUserStorages(e));
-                realm
-                    .getUiMapping()
-                    .putIfAbsent(
-                        UIMappingType.UI_USER_MAPPING, uiMappingService.getUserUiDefaultField());
-                realm
-                    .getUiMapping()
-                    .putIfAbsent(
-                        UIMappingType.UI_ORGANIZATION_MAPPING,
-                        uiMappingService.getOrganizationUiDefaultField());
-                sortUiLists(realm);
-                return realm;
-              })
-          .collect(Collectors.toList());
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new RealmNotFoundException("Impossible de charger les realms", e);
-    }
-  }
-
-  private void sortUiLists(Realm realm) {
-    try {
-      // sort ui list of field by order
-      Collections.sort(realm.getUiMapping().get(UIMappingType.UI_USER_MAPPING));
-      Collections.sort(realm.getUiMapping().get(UIMappingType.UI_ORGANIZATION_MAPPING));
-    } catch (Exception e) {
-      logger.debug("ui fields are not sorted");
-    }
-  }
-
-  private List<UserStorage> loadUserStorages(SearchResultEntry realmEntry) {
-    try {
-      String baseName = realmEntry.getAttribute("cn").getValue();
-      SearchResult userStoragesResult =
-          ldapPoolConnection()
-              .search(
-                  "cn=" + baseName + "," + baseDn,
-                  SearchScope.SUBORDINATE_SUBTREE,
-                  Filter.create("objectClass=*"));
-      if (userStoragesResult.getEntryCount() > 0) {
-        return userStoragesResult.getSearchEntries().stream()
-            .map(
-                searchEntry -> UserStorageLdapMapper.mapFromAttributes(searchEntry.getAttributes()))
-            .collect(Collectors.toList());
-      } else {
-        return List.of(UserStorageLdapMapper.mapFromAttributes(realmEntry.getAttributes()));
+      List<Realm> realms = new ArrayList<>();
+      for (SearchResultEntry searchEntry :
+          ldapPoolConnection().search(searchRequest).getSearchEntries()) {
+        realms.add(generateRealmFromSearchEntry(searchEntry));
       }
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+      return realms;
+    } catch (LDAPException e) {
+      throw new RealmNotFoundException("Impossible de charger les realms", e);
     }
   }
 
@@ -281,67 +166,49 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
             new AddRequest(
                 getRealmDn(realm.getName()),
                 RealmLdapMapper.mapToAttributes(realm, realmEntryPattern, baseDn));
-        if (realm.getUserStorages().size() == 1) {
-          UserStorageLdapMapper.mapToAttributes(realm.getUserStorages().get(0))
-              .forEach(addRequest::addAttribute);
-          ldapConnectionPoolAuthenticated().add(addRequest);
-        } else {
-          ldapConnectionPoolAuthenticated().add(addRequest);
-          for (UserStorage userStorage : realm.getUserStorages()) {
-            AddRequest userStorageAddRequest =
-                new AddRequest(
-                    String.format("cn=%s,%s", userStorage.getName(), getRealmDn(realm.getName())),
-                    UserStorageLdapMapper.mapToAttributes(userStorage));
-            ldapConnectionPoolAuthenticated().add(userStorageAddRequest);
-          }
+        ldapConnectionPoolAuthenticated().add(addRequest);
+        for (UserStorage userStorage : realm.getUserStorages()) {
+          AddRequest userStorageAddRequest =
+              new AddRequest(
+                  String.format("cn=%s,%s", userStorage.getName(), getRealmDn(realm.getName())),
+                  UserStorageLdapMapper.mapToAttributes(userStorage));
+          ldapConnectionPoolAuthenticated().add(userStorageAddRequest);
         }
         ProviderResponse response = new ProviderResponse();
         response.setStatus(ProviderResponseStatus.OK);
         response.setEntityId(realm.getName());
         return response;
       } catch (LDAPException e) {
-        throw new RuntimeException("Failed to create realm " + realm.getName(), e);
+        throw new RealmWriteFailureException("Failed to create realm " + realm.getName(), e);
       }
+    } else {
+      throw new RealmAlreadyExistException(
+          String.format("Realm %s already exist", realm.getName()));
     }
-    throw new RealmAlreadyExistException(String.format("Realm %s already exist", realm.getName()));
   }
 
   @Override
   public ProviderResponse updateRealm(Realm realm, ProviderRequest providerRequest) {
     if (load(realm.getName()).isPresent()) {
       try {
-        ModifyRequest modifyRequest;
-        if (realm.getUserStorages().size() == 1) {
-          List<Attribute> realmAttributes =
-              RealmLdapMapper.mapToAttributes(realm, realmEntryPattern, baseDn);
-          List<Attribute> userStorageAttributes =
-              UserStorageLdapMapper.mapToAttributes(realm.getUserStorages().get(0));
-          realmAttributes.addAll(userStorageAttributes);
-          modifyRequest =
+        for (UserStorage userStorage : realm.getUserStorages()) {
+          ModifyRequest userStorageModifyRequest =
               new ModifyRequest(
-                  getRealmDn(realm.getName()),
-                  LdapUtils.convertAttributesToModifications(realmAttributes));
-          ldapConnectionPoolAuthenticated().modify(modifyRequest);
-        } else {
-          for (UserStorage userStorage : realm.getUserStorages()) {
-            ModifyRequest userStorageModifyRequest =
-                new ModifyRequest(
-                    getUserStorageDn(userStorage.getName(), realm.getName()),
-                    UserStorageLdapMapper.createMods(userStorage));
-            ldapConnectionPoolAuthenticated().modify(userStorageModifyRequest);
-          }
-          modifyRequest =
-              new ModifyRequest(
-                  getRealmDn(realm.getName()),
-                  RealmLdapMapper.createMods(realm, realmEntryPattern, baseDn));
+                  getUserStorageDn(userStorage.getName(), realm.getName()),
+                  UserStorageLdapMapper.createMods(userStorage));
+          ldapConnectionPoolAuthenticated().modify(userStorageModifyRequest);
         }
+        ModifyRequest modifyRequest =
+            new ModifyRequest(
+                getRealmDn(realm.getName()),
+                RealmLdapMapper.createMods(realm, realmEntryPattern, baseDn));
         ldapConnectionPoolAuthenticated().modify(modifyRequest);
         ProviderResponse response = new ProviderResponse();
         response.setStatus(ProviderResponseStatus.OK);
         response.setEntityId(realm.getName());
         return response;
       } catch (LDAPException e) {
-        throw new RuntimeException("Failed to update realm " + realm.getName(), e);
+        throw new RealmWriteFailureException("Failed to update realm " + realm.getName(), e);
       }
     } else {
       throw new RealmNotFoundException(realm.getName());
@@ -369,8 +236,80 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
       response.setEntityId(realmName);
       return response;
     } catch (LDAPException e) {
-      throw new RuntimeException("Failed to delete realm " + realmName, e);
+      throw new RealmWriteFailureException("Failed to delete realm " + realmName, e);
     }
+  }
+
+  private List<UserStorage> loadUserStorages(SearchResultEntry realmEntry) throws LDAPException {
+    String baseName = realmEntry.getAttribute("cn").getValue();
+    return ldapPoolConnection()
+        .search(
+            "cn=" + baseName + "," + baseDn,
+            SearchScope.SUBORDINATE_SUBTREE,
+            Filter.create("objectClass=*"))
+        .getSearchEntries()
+        .stream()
+        .map(searchEntry -> UserStorageLdapMapper.mapFromAttributes(searchEntry.getAttributes()))
+        .collect(Collectors.toList());
+  }
+
+  private Realm generateRealmFromSearchEntry(SearchResultEntry searchEntry) throws LDAPException {
+    Realm realm = RealmLdapMapper.mapFromSearchEntry(searchEntry);
+    realm.setUserStorages(loadUserStorages(searchEntry));
+    addDefaultOnRealm(realm);
+    sortUiLists(realm);
+    return realm;
+  }
+
+  private void sortUiLists(Realm realm) {
+    try {
+      // sort ui list of field by order
+      Collections.sort(realm.getUiMapping().get(UIMappingType.UI_USER_MAPPING));
+      Collections.sort(realm.getUiMapping().get(UIMappingType.UI_ORGANIZATION_MAPPING));
+    } catch (Exception e) {
+      logger.debug("ui fields are not sorted");
+    }
+  }
+
+  private void addDefaultOnRealm(Realm realm) {
+    if (realm.getReaderType() == null) {
+      realm.setReaderType(defaultReader);
+    }
+    if (realm.getWriterType() == null) {
+      realm.setWriterType(defaultWriter);
+    }
+    realm
+        .getProperties()
+        .putIfAbsent(
+            GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, defaultAppManagedAttributeKeyList);
+    realm
+        .getProperties()
+        .putIfAbsent(
+            GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST,
+            defaultAppManagedAttributePatternList);
+    realm
+        .getUiMapping()
+        .putIfAbsent(UIMappingType.UI_USER_MAPPING, uiMappingService.getUserUiDefaultField());
+    realm
+        .getUiMapping()
+        .putIfAbsent(
+            UIMappingType.UI_ORGANIZATION_MAPPING,
+            uiMappingService.getOrganizationUiDefaultField());
+    realm.getProperties().putIfAbsent(LdapConfigKeys.SORT_KEY, defaultSortKey);
+    realm
+        .getProperties()
+        .putIfAbsent(GlobalKeysConfig.USERS_MAX_OUTPUT_SIZE, defaultUserMaxOutputSize);
+    realm
+        .getProperties()
+        .putIfAbsent(
+            GlobalKeysConfig.APPLICATIONS_MAX_OUTPUT_SIZE, defaultApplicationMaxOutputSize);
+    realm
+        .getProperties()
+        .putIfAbsent(GlobalKeysConfig.GROUPS_MAX_OUTPUT_SIZE, defaultGroupMaxOutputSize);
+    realm
+        .getProperties()
+        .putIfAbsent(
+            GlobalKeysConfig.ORGANIZATIONS_MAX_OUTPUT_SIZE, defaultOrganizationMaxOutputSize);
   }
 
   private LDAPConnectionPool ldapPoolConnection() {

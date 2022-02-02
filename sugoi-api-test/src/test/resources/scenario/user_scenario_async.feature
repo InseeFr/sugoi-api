@@ -30,7 +30,7 @@ Feature: User scenario asynchrone
         Then the client receives status code 404
 
     Scenario: Post user
-        When the client perform POST request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users body:
+        When the client perform POST request with body on url /realms/domaine1/storages/default/users body:
             """
             {
                 "username": "abcd"
@@ -40,7 +40,7 @@ Feature: User scenario asynchrone
         Then the client receives status code 202
 
     Scenario: Post user already exist
-        When the client perform POST request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users body:
+        When the client perform POST request with body on url /realms/domaine1/storages/default/users body:
             """
             {
                 "username": "abcd"
@@ -82,23 +82,23 @@ Feature: User scenario asynchrone
         Then the client receives status code 404
 
     Scenario: Get users (storage)
-        When the client perform GET request on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users
+        When the client perform GET request on url /realms/domaine1/storages/default/users
         And show body received
         Then the client receives status code 200
 
     Scenario: Get user (storage)
-        When the client perform GET request on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users/testc
+        When the client perform GET request on url /realms/domaine1/storages/default/users/testc
         And show body received
         Then the client receives status code 200
         Then the client expect to receive an user
 
     Scenario: Get user not exist (storage)
-        When the client perform GET request on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users/trtr
+        When the client perform GET request on url /realms/domaine1/storages/default/users/trtr
         And show body received
         Then the client receives status code 404
 
     Scenario: Post user (storage)
-        When the client perform POST request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users body:
+        When the client perform POST request with body on url /realms/domaine1/storages/default/users body:
             """
             {
                 "username": "abcd"
@@ -108,7 +108,7 @@ Feature: User scenario asynchrone
         Then the client receives status code 202
 
     Scenario: Update user (storage)
-        When the client perform PUT request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users/abcd body:
+        When the client perform PUT request with body on url /realms/domaine1/storages/default/users/abcd body:
             """
             {
                 "username": "abcd",
@@ -120,7 +120,7 @@ Feature: User scenario asynchrone
 
 
     Scenario: Update user not exist (storage)
-        When the client perform PUT request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users/abcde body:
+        When the client perform PUT request with body on url /realms/domaine1/storages/default/users/abcde body:
             """
             {
                 "username": "abcde",
@@ -131,11 +131,11 @@ Feature: User scenario asynchrone
         Then the client receives status code 202
 
     Scenario: Delete user (storage)
-        When the client perform DELETE request on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users/abcd
+        When the client perform DELETE request on url /realms/domaine1/storages/default/users/abcd
         And show body received
         Then the client receives status code 202
 
     Scenario: Delete user not exist (storage)
-        When the client perform DELETE request on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users/abcd
+        When the client perform DELETE request on url /realms/domaine1/storages/default/users/abcd
         And show body received
         Then the client receives status code 202

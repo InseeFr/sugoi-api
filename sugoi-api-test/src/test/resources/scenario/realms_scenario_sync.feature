@@ -30,7 +30,7 @@ Feature: Realms scenario synchrone
               },
               "userStorages": [
                 {
-                  "name": "Profil_domaine1_WebServiceLdap",
+                  "name": "default",
                   "userSource": "ou=contacts,ou=clients_domaine1,o=insee,c=fr",
                   "organizationSource": "ou=organisations,ou=clients_domaine1,o=insee,c=fr",
                   "addressSource": "ou=adresses,ou=clients_domaine1,o=insee,c=fr",
@@ -219,7 +219,7 @@ Feature: Realms scenario synchrone
               },
               "userStorages": [
                 {
-                  "name": "Profil_domaine1_WebServiceLdap",
+                  "name": "default",
                   "userSource": "ou=contacts,ou=clients_domaine1,o=insee,c=fr",
                   "organizationSource": "ou=organisations,ou=clients_domaine1,o=insee,c=fr",
                   "addressSource": "ou=adresses,ou=clients_domaine1,o=insee,c=fr",

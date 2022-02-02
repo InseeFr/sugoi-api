@@ -23,7 +23,7 @@ Feature: User scenario synchronous jms
         Then the client receives status code 404
 
     Scenario: Post user
-        When the client perform POST request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users body:
+        When the client perform POST request with body on url /realms/domaine1/storages/default/users body:
             """
             {
                 "username": "abcdJMS",
@@ -36,7 +36,7 @@ Feature: User scenario synchronous jms
         Then the client expect the username of user not to be null
 
     Scenario: Post user with no username
-        When the client perform POST request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users body:
+        When the client perform POST request with body on url /realms/domaine1/storages/default/users body:
             """
             {
                 "mail": "test42JMS@insee.fr"
@@ -48,7 +48,7 @@ Feature: User scenario synchronous jms
         Then the client expect the username of user not to be null
 
     Scenario: Post user with email already exit
-        When the client perform POST request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users body:
+        When the client perform POST request with body on url /realms/domaine1/storages/default/users body:
             """
             {
                 "username": "abcd2",
@@ -59,7 +59,7 @@ Feature: User scenario synchronous jms
         Then the client receives status code 409
 
     Scenario: Post user already exist
-        When the client perform POST request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users body:
+        When the client perform POST request with body on url /realms/domaine1/storages/default/users body:
             """
             {
                 "username": "abcdJMS"
