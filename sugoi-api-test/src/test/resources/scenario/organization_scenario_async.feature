@@ -24,7 +24,7 @@ Feature: Organization scenario asynchrone
         Then the client receives status code 404
 
     Scenario: Post organization
-        When the client perform POST request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/organizations body:
+        When the client perform POST request with body on url /realms/domaine1/storages/default/organizations body:
             """
             {
                 "identifiant": "identifiant"
@@ -34,7 +34,7 @@ Feature: Organization scenario asynchrone
         Then the client receives status code 202
 
     Scenario: Post organization already exist
-        When the client perform POST request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/organizations body:
+        When the client perform POST request with body on url /realms/domaine1/storages/default/organizations body:
             """
             {
                 "identifiant": "identifiant"
@@ -81,23 +81,23 @@ Feature: Organization scenario asynchrone
         Then the client receives status code 404
 
     Scenario: Get organizations (storage)
-        When the client perform GET request on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/organizations
+        When the client perform GET request on url /realms/domaine1/storages/default/organizations
         And show body received
         Then the client receives status code 200
 
     Scenario: Get organization (storage)
-        When the client perform GET request on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/organizations/testo
+        When the client perform GET request on url /realms/domaine1/storages/default/organizations/testo
         And show body received
         Then the client receives status code 200
         Then the client expect to receive an organization
 
     Scenario: Get organization not exist (storage)
-        When the client perform GET request on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/organizations/notExistOrga
+        When the client perform GET request on url /realms/domaine1/storages/default/organizations/notExistOrga
         And show body received
         Then the client receives status code 404
 
     Scenario: Post organization (storage)
-        When the client perform POST request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/organizations body:
+        When the client perform POST request with body on url /realms/domaine1/storages/default/organizations body:
             """
             {
                 "identifiant": "identifiant"
@@ -107,7 +107,7 @@ Feature: Organization scenario asynchrone
         Then the client receives status code 202
 
     Scenario: Update organization (storage)
-        When the client perform PUT request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/organizations/identifiant body:
+        When the client perform PUT request with body on url /realms/domaine1/storages/default/organizations/identifiant body:
             """
             {
                 "identifiant": "identifiant",
@@ -121,7 +121,7 @@ Feature: Organization scenario asynchrone
 
 
     Scenario: Update organization not exist (storage)
-        When the client perform PUT request with body on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/organizations/notExistOrga body:
+        When the client perform PUT request with body on url /realms/domaine1/storages/default/organizations/notExistOrga body:
             """
             {
                 "identifiant": "notExistOrga",
@@ -134,10 +134,10 @@ Feature: Organization scenario asynchrone
         Then the client receives status code 202
 
     Scenario: Delete organization (storage)
-        When the client perform DELETE request on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/organizations/identifiant
+        When the client perform DELETE request on url /realms/domaine1/storages/default/organizations/identifiant
         And show body received
         Then the client receives status code 202
     Scenario: Delete organization not exist (storage)
-        When the client perform DELETE request on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/organizations/identifiant
+        When the client perform DELETE request on url /realms/domaine1/storages/default/organizations/identifiant
         And show body received
         Then the client receives status code 202

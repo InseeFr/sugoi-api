@@ -197,15 +197,21 @@ cn: Profil_tomodify_WebServiceLdap
 objectclass: inseeOrganizationalRole
 inseepropriete: ldapUrl$localhost
 inseepropriete: ldapPort$10389
+inseepropriete: habilitationsPossibles$propriete_role_appli
+inseepropriete: branchesApplicativesPossibles$ou=Applications,o=insee,c=fr
+description: modify me
+
+dn: cn=default,cn=Profil_tomodify_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We
+ bServicesLdap_Objets,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
+cn: default
+objectclass: inseeOrganizationalRole
 inseepropriete: brancheContact$ou=contacts,ou=clients_domaine1,o=insee,c=fr
 inseepropriete: brancheAdresse$ou=adresses,ou=clients_domaine1,o=insee,c=fr
 inseepropriete: brancheOrganisation$ou=organisations,ou=clients_domaine1,o=in
  see,c=fr
 inseepropriete: groupSourcePattern$ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr
-inseepropriete: groupFilterPattern$(cn={group}_{appliname})
-inseepropriete: habilitationsPossibles$propriete_role_appli
-inseepropriete: branchesApplicativesPossibles$ou=Applications,o=insee,c=fr
 description: modify me
+inseepropriete: groupFilterPattern$(cn={group}_{appliname})
 
 dn: cn=Profil_domaine1_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We
  bServicesLdap_Objets,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
@@ -413,7 +419,7 @@ objectClass: top
 objectClass: inseeOrganisation
 uid: amodifier
 description: Autre
-dn: l=nvaddresse, ou=adresses,ou=clients_domaine1,o=insee,c=fr
+inseeAdressePostaleDN: l=nvaddresse, ou=adresses,ou=clients_domaine1,o=insee,c=fr
 
 dn: l=amodifier, ou=adresses,ou=clients_domaine1,o=insee,c=fr
 objectClass: top
