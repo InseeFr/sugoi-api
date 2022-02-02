@@ -13,9 +13,7 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class RealmAlreadyExistException extends RuntimeException {
-
-  private static final long serialVersionUID = 7532862830880519966L;
+public class RealmAlreadyExistException extends ConflictException {
 
   public RealmAlreadyExistException(String message, Throwable cause) {
     super(message, cause);

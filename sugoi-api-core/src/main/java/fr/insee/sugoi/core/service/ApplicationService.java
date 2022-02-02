@@ -17,7 +17,6 @@ import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.exceptions.ApplicationAlreadyExistException;
-import fr.insee.sugoi.model.exceptions.ApplicationNotCreatedException;
 import fr.insee.sugoi.model.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
@@ -32,7 +31,6 @@ public interface ApplicationService {
    * @param application
    * @return The created application
    * @throws ApplicationAlreadyExistException if application already exist in realm
-   * @throws ApplicationNotCreatedException if fail to create application
    */
   ProviderResponse create(String realm, Application application, ProviderRequest providerRequest);
 

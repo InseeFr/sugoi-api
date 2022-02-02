@@ -13,15 +13,13 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class OrganizationNotCreatedException extends RuntimeException {
+public abstract class ConflictException extends RuntimeException {
 
-  private static final long serialVersionUID = -1735193744573498943L;
-
-  public OrganizationNotCreatedException(String message, Throwable cause) {
+  ConflictException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public OrganizationNotCreatedException(String message) {
+  ConflictException(String message) {
     super(message);
   }
 }

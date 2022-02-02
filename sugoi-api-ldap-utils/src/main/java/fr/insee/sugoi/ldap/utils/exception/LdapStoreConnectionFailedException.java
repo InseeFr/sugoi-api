@@ -11,15 +11,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.model.exceptions;
+package fr.insee.sugoi.ldap.utils.exception;
 
-public class AppManagedAttributeException extends RuntimeException {
+import fr.insee.sugoi.model.exceptions.StoreException;
 
-  public AppManagedAttributeException(String message, Throwable cause) {
+public class LdapStoreConnectionFailedException extends StoreException {
+
+  public LdapStoreConnectionFailedException(String message, Throwable cause) {
     super(message, cause);
-  }
-
-  public AppManagedAttributeException(String message) {
-    super(message);
   }
 }

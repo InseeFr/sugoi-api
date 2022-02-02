@@ -11,9 +11,11 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package fr.insee.sugoi.model.exceptions;
+package fr.insee.sugoi.ldap.utils.exception;
 
-public class LdapMappingConfigurationException extends RuntimeException {
+import fr.insee.sugoi.model.exceptions.StoreException;
+
+public class LdapMappingConfigurationException extends StoreException {
 
   public LdapMappingConfigurationException(String message, Throwable cause) {
     super(message, cause);

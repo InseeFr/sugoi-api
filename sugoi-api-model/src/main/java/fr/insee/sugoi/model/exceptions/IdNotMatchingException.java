@@ -13,7 +13,7 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class IdNotMatchingException extends RuntimeException {
+public class IdNotMatchingException extends BadRequestException {
   public IdNotMatchingException(String id, String bodyId) {
     super(String.format("Path id %s doesn't match with body id %s", id, bodyId));
   }

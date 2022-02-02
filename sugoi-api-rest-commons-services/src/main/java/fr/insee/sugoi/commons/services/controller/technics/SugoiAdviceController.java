@@ -14,35 +14,10 @@
 package fr.insee.sugoi.commons.services.controller.technics;
 
 import fr.insee.sugoi.commons.services.view.ErrorView;
-import fr.insee.sugoi.model.exceptions.AppCannotManagedAttributeException;
-import fr.insee.sugoi.model.exceptions.AppManagedAttributeException;
-import fr.insee.sugoi.model.exceptions.ApplicationAlreadyExistException;
-import fr.insee.sugoi.model.exceptions.ApplicationNotCreatedException;
-import fr.insee.sugoi.model.exceptions.ApplicationNotFoundException;
-import fr.insee.sugoi.model.exceptions.GroupAlreadyExistException;
-import fr.insee.sugoi.model.exceptions.GroupNotCreatedException;
-import fr.insee.sugoi.model.exceptions.GroupNotFoundException;
-import fr.insee.sugoi.model.exceptions.IdNotMatchingException;
-import fr.insee.sugoi.model.exceptions.InvalidPasswordException;
-import fr.insee.sugoi.model.exceptions.InvalidTransactionIdException;
-import fr.insee.sugoi.model.exceptions.InvalidUserStorageException;
-import fr.insee.sugoi.model.exceptions.ManagerGroupNotFoundException;
-import fr.insee.sugoi.model.exceptions.NoCertificateOnUserException;
-import fr.insee.sugoi.model.exceptions.NoDomaineMappingException;
-import fr.insee.sugoi.model.exceptions.OrganizationAlreadyExistException;
-import fr.insee.sugoi.model.exceptions.OrganizationNotCreatedException;
-import fr.insee.sugoi.model.exceptions.OrganizationNotFoundException;
-import fr.insee.sugoi.model.exceptions.PasswordPolicyNotMetException;
-import fr.insee.sugoi.model.exceptions.RealmAlreadyExistException;
-import fr.insee.sugoi.model.exceptions.RealmNotCreatedException;
-import fr.insee.sugoi.model.exceptions.RealmNotFoundException;
-import fr.insee.sugoi.model.exceptions.StoragePolicyNotMetException;
-import fr.insee.sugoi.model.exceptions.UserAlreadyExistException;
-import fr.insee.sugoi.model.exceptions.UserNoEmailException;
-import fr.insee.sugoi.model.exceptions.UserNotCreatedException;
-import fr.insee.sugoi.model.exceptions.UserNotFoundByMailException;
-import fr.insee.sugoi.model.exceptions.UserNotFoundException;
-import fr.insee.sugoi.model.exceptions.UserStorageNotFoundException;
+import fr.insee.sugoi.model.exceptions.BadRequestException;
+import fr.insee.sugoi.model.exceptions.ConflictException;
+import fr.insee.sugoi.model.exceptions.ForbiddenException;
+import fr.insee.sugoi.model.exceptions.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -51,6 +26,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -60,286 +36,81 @@ public class SugoiAdviceController {
 
   private static final Logger logger = LoggerFactory.getLogger(SugoiAdviceController.class);
 
-  @ExceptionHandler(RealmNotFoundException.class)
+  @ExceptionHandler(NotFoundException.class)
   @ResponseBody
-  public ResponseEntity<ErrorView> exception(RealmNotFoundException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
+  public ResponseEntity<ErrorView> exception(NotFoundException e) {
+    ErrorView errorView = new ErrorView(e.getMessage());
     return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
   }
 
-  @ExceptionHandler(UserNotFoundException.class)
+  @ExceptionHandler(ConflictException.class)
   @ResponseBody
-  public ResponseEntity<ErrorView> exception(UserNotFoundException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(UserStorageNotFoundException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(UserStorageNotFoundException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(NoDomaineMappingException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(NoDomaineMappingException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(UserNotFoundByMailException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(UserNotFoundByMailException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(ManagerGroupNotFoundException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(ManagerGroupNotFoundException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(OrganizationNotFoundException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(OrganizationNotFoundException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(ApplicationNotFoundException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(ApplicationNotFoundException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(GroupNotFoundException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(GroupNotFoundException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(NoCertificateOnUserException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(NoCertificateOnUserException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(RealmAlreadyExistException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(RealmAlreadyExistException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
+  public ResponseEntity<ErrorView> exception(ConflictException e) {
+    ErrorView errorView = new ErrorView(e.getMessage());
     return new ResponseEntity<>(errorView, HttpStatus.CONFLICT);
   }
 
-  @ExceptionHandler(ApplicationAlreadyExistException.class)
+  @ExceptionHandler(BadRequestException.class)
   @ResponseBody
-  public ResponseEntity<ErrorView> exception(ApplicationAlreadyExistException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.CONFLICT);
+  public ResponseEntity<ErrorView> exception(BadRequestException e) {
+    ErrorView errorView = new ErrorView(e.getMessage());
+    return new ResponseEntity<>(errorView, HttpStatus.BAD_REQUEST);
   }
 
-  @ExceptionHandler(OrganizationAlreadyExistException.class)
+  @ExceptionHandler(ForbiddenException.class)
   @ResponseBody
-  public ResponseEntity<ErrorView> exception(OrganizationAlreadyExistException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.CONFLICT);
-  }
-
-  @ExceptionHandler(UserAlreadyExistException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(UserAlreadyExistException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.CONFLICT);
-  }
-
-  @ExceptionHandler(GroupAlreadyExistException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(GroupAlreadyExistException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.CONFLICT);
+  public ResponseEntity<ErrorView> exception(ForbiddenException e) {
+    ErrorView errorView = new ErrorView(e.getMessage());
+    return new ResponseEntity<>(errorView, HttpStatus.FORBIDDEN);
   }
 
   @ExceptionHandler(AccessDeniedException.class)
   @ResponseBody
   public ResponseEntity<ErrorView> exception(AccessDeniedException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
+    ErrorView errorView = new ErrorView(e.getMessage());
     return new ResponseEntity<>(errorView, HttpStatus.FORBIDDEN);
-  }
-
-  @ExceptionHandler(InvalidUserStorageException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(InvalidUserStorageException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(RealmNotCreatedException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(RealmNotCreatedException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(ApplicationNotCreatedException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(ApplicationNotCreatedException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(OrganizationNotCreatedException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(OrganizationNotCreatedException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(UserNotCreatedException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(UserNotCreatedException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(GroupNotCreatedException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(GroupNotCreatedException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(StoragePolicyNotMetException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(StoragePolicyNotMetException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.BAD_REQUEST);
-  }
-
-  @ExceptionHandler(InvalidPasswordException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(InvalidPasswordException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.FORBIDDEN);
-  }
-
-  @ExceptionHandler(PasswordPolicyNotMetException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(PasswordPolicyNotMetException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.CONFLICT);
   }
 
   @ExceptionHandler(UnsupportedOperationException.class)
   @ResponseBody
   public ResponseEntity<ErrorView> exception(UnsupportedOperationException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
+    ErrorView errorView = new ErrorView(e.getMessage());
     return new ResponseEntity<>(errorView, HttpStatus.NOT_IMPLEMENTED);
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
   @ResponseBody
   public ResponseEntity<ErrorView> exception(HttpMessageNotReadableException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
+    ErrorView errorView = new ErrorView(e.getMessage());
     return new ResponseEntity<>(errorView, HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
   @ResponseBody
   public ResponseEntity<ErrorView> exception(HttpMediaTypeNotSupportedException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
+    ErrorView errorView = new ErrorView(e.getMessage());
     return new ResponseEntity<>(errorView, HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
   @ResponseBody
   public ResponseEntity<ErrorView> exception(HttpMediaTypeNotAcceptableException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
+    ErrorView errorView = new ErrorView(e.getMessage());
     return new ResponseEntity<>(errorView, HttpStatus.BAD_REQUEST);
   }
 
-  @ExceptionHandler(UserNoEmailException.class)
+  @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
   @ResponseBody
-  public ResponseEntity<ErrorView> exception(UserNoEmailException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.BAD_REQUEST);
-    return response;
+  public ResponseEntity<ErrorView> exception(HttpRequestMethodNotSupportedException e) {
+    ErrorView errorView = new ErrorView(e.getMessage());
+    return new ResponseEntity<>(errorView, HttpStatus.METHOD_NOT_ALLOWED);
   }
 
   @ExceptionHandler(Exception.class)
   @ResponseBody
   public ResponseEntity<ErrorView> exception(Exception e) {
     logger.error(e.getMessage(), e);
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
+    ErrorView errorView = new ErrorView(e.getMessage());
     return new ResponseEntity<>(errorView, HttpStatus.INTERNAL_SERVER_ERROR);
-  }
-
-  @ExceptionHandler(AppCannotManagedAttributeException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(AppCannotManagedAttributeException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.FORBIDDEN);
-  }
-
-  @ExceptionHandler(AppManagedAttributeException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(AppManagedAttributeException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(InvalidTransactionIdException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(InvalidTransactionIdException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(IdNotMatchingException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(IdNotMatchingException e) {
-    ErrorView errorView = new ErrorView();
-    errorView.setMessage(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.BAD_REQUEST);
   }
 }

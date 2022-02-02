@@ -13,7 +13,7 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class UserNotFoundByMailException extends RuntimeException {
+public class UserNotFoundByMailException extends NotFoundException {
 
   public UserNotFoundByMailException(String message, Throwable cause) {
     super(message, cause);

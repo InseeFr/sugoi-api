@@ -13,9 +13,13 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class LdapStoreConnectionFailedException extends RuntimeException {
+public abstract class NotFoundException extends RuntimeException {
 
-  public LdapStoreConnectionFailedException(String message, Throwable cause) {
+  NotFoundException(String message, Throwable cause) {
     super(message, cause);
+  }
+
+  NotFoundException(String message) {
+    super(message);
   }
 }

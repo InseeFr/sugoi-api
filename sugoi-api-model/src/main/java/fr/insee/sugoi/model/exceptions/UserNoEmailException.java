@@ -13,32 +13,17 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class UserNoEmailException extends RuntimeException {
+public class UserNoEmailException extends BadRequestException {
 
   /** */
   private static final long serialVersionUID = 1L;
-
-  public UserNoEmailException() {}
 
   public UserNoEmailException(String message) {
     super(message);
   }
 
-  public UserNoEmailException(Throwable cause) {
-    super(cause);
-  }
-
   public UserNoEmailException(String message, Throwable cause) {
     super(message, cause);
-  }
-
-  public UserNoEmailException(
-      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-    super(message, cause, enableSuppression, writableStackTrace);
-  }
-
-  public UserNoEmailException(String realm, String userid) {
-    super(String.format("User %s  realm %s have no email", userid, realm));
   }
 
   public UserNoEmailException(String realm, String userstorage, String userid) {

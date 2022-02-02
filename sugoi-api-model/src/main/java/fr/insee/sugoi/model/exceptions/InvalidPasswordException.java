@@ -13,25 +13,13 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class InvalidPasswordException extends RuntimeException {
-
-  private static final long serialVersionUID = 1L;
-
-  private String message;
+public class InvalidPasswordException extends ForbiddenException {
 
   public InvalidPasswordException(String message) {
-    this.message = message;
+    super(message);
   }
 
   public InvalidPasswordException(String message, Throwable cause) {
     super(message, cause);
-  }
-
-  public String getMessage() {
-    return this.message;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
   }
 }

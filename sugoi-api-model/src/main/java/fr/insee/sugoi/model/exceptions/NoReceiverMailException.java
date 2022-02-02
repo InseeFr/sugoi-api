@@ -13,9 +13,7 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class NoReceiverMailException extends RuntimeException {
-
-  private static final long serialVersionUID = -1735193744573498943L;
+public class NoReceiverMailException extends BadRequestException {
 
   public NoReceiverMailException(String message, Throwable cause) {
     super(message, cause);

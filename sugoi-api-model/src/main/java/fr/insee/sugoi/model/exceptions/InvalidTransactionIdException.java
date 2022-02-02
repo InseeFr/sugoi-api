@@ -13,30 +13,13 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class InvalidTransactionIdException extends RuntimeException {
-
-  /** */
-  private static final long serialVersionUID = 1L;
-
-  private String message;
-
-  public InvalidTransactionIdException(Exception e) {
-    super(e);
-  }
+public class InvalidTransactionIdException extends NotFoundException {
 
   public InvalidTransactionIdException(String message) {
-    this.message = message;
+    super(message);
   }
 
   public InvalidTransactionIdException(String message, Throwable cause) {
     super(message, cause);
-  }
-
-  public String getMessage() {
-    return this.message;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
   }
 }

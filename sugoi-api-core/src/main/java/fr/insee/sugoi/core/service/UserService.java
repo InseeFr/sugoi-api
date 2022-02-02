@@ -17,7 +17,6 @@ import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.exceptions.UserAlreadyExistException;
-import fr.insee.sugoi.model.exceptions.UserNotCreatedException;
 import fr.insee.sugoi.model.exceptions.UserNotFoundException;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
@@ -33,7 +32,6 @@ public interface UserService {
    * @param user
    * @return the created user
    * @throws UserAlreadyExistException if an user with the same username already exist in the realm
-   * @throws UserNotCreatedException if user is not found after create
    */
   ProviderResponse create(String realm, String storage, User user, ProviderRequest providerRequest);
 

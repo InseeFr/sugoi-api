@@ -13,9 +13,7 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class UserAlreadyExistException extends RuntimeException {
-
-  private static final long serialVersionUID = -2684723501992705189L;
+public class UserAlreadyExistException extends ConflictException {
 
   public UserAlreadyExistException(String message, Throwable cause) {
     super(message, cause);

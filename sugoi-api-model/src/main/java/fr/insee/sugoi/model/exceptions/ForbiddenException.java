@@ -13,15 +13,13 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class UserNotCreatedException extends RuntimeException {
+public abstract class ForbiddenException extends RuntimeException {
 
-  private static final long serialVersionUID = -1735193744573498943L;
-
-  public UserNotCreatedException(String message, Throwable cause) {
+  ForbiddenException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public UserNotCreatedException(String message) {
+  ForbiddenException(String message) {
     super(message);
   }
 }
