@@ -13,9 +13,7 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class GroupNotFoundException extends RuntimeException {
-
-  private static final long serialVersionUID = -1230419093509057754L;
+public class GroupNotFoundException extends NotFoundException {
 
   public GroupNotFoundException(String message, Throwable cause) {
     super(message, cause);

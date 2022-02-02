@@ -13,25 +13,13 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class PasswordPolicyNotMetException extends RuntimeException {
-
-  private static final long serialVersionUID = 1L;
-
-  private String message;
+public class PasswordPolicyNotMetException extends ConflictException {
 
   public PasswordPolicyNotMetException(String message) {
-    this.message = message;
+    super(message);
   }
 
   public PasswordPolicyNotMetException(String message, Throwable cause) {
     super(message, cause);
-  }
-
-  public String getMessage() {
-    return this.message;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
   }
 }

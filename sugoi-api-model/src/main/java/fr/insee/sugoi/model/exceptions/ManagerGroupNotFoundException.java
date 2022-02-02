@@ -13,7 +13,7 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class ManagerGroupNotFoundException extends RuntimeException {
+public class ManagerGroupNotFoundException extends NotFoundException {
 
   public ManagerGroupNotFoundException(String message, Throwable cause) {
     super(message, cause);

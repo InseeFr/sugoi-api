@@ -17,7 +17,6 @@ import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.exceptions.OrganizationAlreadyExistException;
-import fr.insee.sugoi.model.exceptions.OrganizationNotCreatedException;
 import fr.insee.sugoi.model.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
@@ -33,7 +32,6 @@ public interface OrganizationService {
    * @param organization
    * @return created Organization
    * @throws OrganizationAlreadyExistException if an organization with the same name already exist
-   * @throws OrganizationNotCreatedException if the organization is not found after create
    */
   ProviderResponse create(
       String realm, String storage, Organization organization, ProviderRequest providerRequest);

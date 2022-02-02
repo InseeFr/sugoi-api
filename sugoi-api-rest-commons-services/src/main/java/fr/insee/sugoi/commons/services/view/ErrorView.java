@@ -16,6 +16,12 @@ package fr.insee.sugoi.commons.services.view;
 public class ErrorView {
   private String message;
 
+  public ErrorView(String message) {
+    this.message = message;
+  }
+
+  public ErrorView() {}
+
   public String getMessage() {
     return this.message;
   }
@@ -23,6 +29,4 @@ public class ErrorView {
   public void setMessage(String message) {
     this.message = message;
   }
-
-  public ErrorView() {}
 }

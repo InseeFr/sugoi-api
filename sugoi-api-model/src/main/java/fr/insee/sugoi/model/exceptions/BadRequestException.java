@@ -13,15 +13,13 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class GroupNotCreatedException extends RuntimeException {
+public abstract class BadRequestException extends RuntimeException {
 
-  private static final long serialVersionUID = -1735193744573498943L;
-
-  public GroupNotCreatedException(String message, Throwable cause) {
+  BadRequestException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public GroupNotCreatedException(String message) {
+  BadRequestException(String message) {
     super(message);
   }
 }

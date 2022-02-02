@@ -17,7 +17,6 @@ import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.exceptions.GroupAlreadyExistException;
-import fr.insee.sugoi.model.exceptions.GroupNotCreatedException;
 import fr.insee.sugoi.model.exceptions.GroupNotFoundException;
 import fr.insee.sugoi.model.exceptions.UserNotFoundException;
 import fr.insee.sugoi.model.paging.PageResult;
@@ -33,7 +32,6 @@ public interface GroupService {
    * @param group
    * @return the created group
    * @throws GroupAlreadyExistException if the group already exist
-   * @throws GroupNotCreatedException if fail to create group
    */
   ProviderResponse create(
       String realm, String appName, Group group, ProviderRequest providerRequest);

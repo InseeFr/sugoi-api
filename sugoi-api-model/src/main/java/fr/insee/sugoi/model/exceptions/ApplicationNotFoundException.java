@@ -13,9 +13,7 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class ApplicationNotFoundException extends RuntimeException {
-
-  private static final long serialVersionUID = -1735193744573498943L;
+public class ApplicationNotFoundException extends NotFoundException {
 
   public ApplicationNotFoundException(String realmName, String applicationId) {
     super(String.format("Application %s does not exist in realm %s", applicationId, realmName));

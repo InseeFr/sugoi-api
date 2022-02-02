@@ -13,9 +13,7 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class UserNotFoundException extends RuntimeException {
-
-  private static final long serialVersionUID = 5107823250419750984L;
+public class UserNotFoundException extends NotFoundException {
 
   public UserNotFoundException(String message, Throwable cause) {
     super(message, cause);

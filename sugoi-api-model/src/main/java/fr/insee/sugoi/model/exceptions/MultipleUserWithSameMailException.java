@@ -13,7 +13,7 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class MultipleUserWithSameMailException extends RuntimeException {
+public class MultipleUserWithSameMailException extends ConflictException {
 
   public MultipleUserWithSameMailException(String message, Throwable cause) {
     super(message, cause);

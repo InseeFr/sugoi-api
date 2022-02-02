@@ -15,7 +15,7 @@ package fr.insee.sugoi.model.exceptions;
 
 public class StoreException extends RuntimeException {
 
-  public StoreException(String message, Exception exception) {
+  public StoreException(String message, Throwable exception) {
     super(message, exception);
   }
 }

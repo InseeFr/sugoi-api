@@ -13,7 +13,7 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class AppCannotManagedAttributeException extends RuntimeException {
+public class AppCannotManagedAttributeException extends ForbiddenException {
 
   public AppCannotManagedAttributeException(String message, Throwable cause) {
     super(message, cause);

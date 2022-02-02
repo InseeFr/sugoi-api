@@ -13,9 +13,7 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class GroupAlreadyExistException extends RuntimeException {
-
-  private static final long serialVersionUID = 323376564548864249L;
+public class GroupAlreadyExistException extends ConflictException {
 
   public GroupAlreadyExistException(String message, Throwable cause) {
     super(message, cause);

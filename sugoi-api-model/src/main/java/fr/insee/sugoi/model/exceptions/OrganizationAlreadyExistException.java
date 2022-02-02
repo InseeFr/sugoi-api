@@ -13,9 +13,7 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class OrganizationAlreadyExistException extends RuntimeException {
-
-  private static final long serialVersionUID = 4933038688132892137L;
+public class OrganizationAlreadyExistException extends ConflictException {
 
   public OrganizationAlreadyExistException(String message, Throwable cause) {
     super(message, cause);

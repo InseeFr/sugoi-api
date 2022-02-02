@@ -13,7 +13,7 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class NoDomaineMappingException extends RuntimeException {
+public class NoDomaineMappingException extends NotFoundException {
 
   public NoDomaineMappingException(String message, Throwable cause) {
     super(message, cause);

@@ -13,9 +13,7 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class OrganizationNotFoundException extends RuntimeException {
-
-  private static final long serialVersionUID = -986857865844865751L;
+public class OrganizationNotFoundException extends NotFoundException {
 
   public OrganizationNotFoundException(String message, Throwable cause) {
     super(message, cause);

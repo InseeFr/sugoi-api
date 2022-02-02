@@ -13,7 +13,7 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class UserStorageNotFoundException extends RuntimeException {
+public class UserStorageNotFoundException extends NotFoundException {
 
   public UserStorageNotFoundException(String message, Throwable cause) {
     super(message, cause);

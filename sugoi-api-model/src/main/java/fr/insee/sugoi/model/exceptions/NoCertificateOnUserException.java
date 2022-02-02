@@ -13,7 +13,7 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class NoCertificateOnUserException extends RuntimeException {
+public class NoCertificateOnUserException extends NotFoundException {
 
   public NoCertificateOnUserException(String realmName, String userID) {
     super(String.format("User %s on realm %s does not have a certificate", userID, realmName));

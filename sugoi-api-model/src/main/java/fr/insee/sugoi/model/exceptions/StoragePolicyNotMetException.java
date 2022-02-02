@@ -13,7 +13,7 @@
 */
 package fr.insee.sugoi.model.exceptions;
 
-public class StoragePolicyNotMetException extends RuntimeException {
+public class StoragePolicyNotMetException extends BadRequestException {
 
   public StoragePolicyNotMetException(String message, Throwable cause) {
     super(message, cause);
