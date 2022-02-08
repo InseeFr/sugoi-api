@@ -99,16 +99,35 @@ Sugoi-api implements spring security with full customization allowed
 | fr.insee.sugoi.security.ldap-account-managment-groupe-base |             |               |         |
 | fr.insee.sugoi.security.bearer-authentication-enabled      |             |               |         |
 | spring.security.oauth2.resourceserver.jwt.jwk-set-uri      |             |               |         |
-| fr.insee.sugoi.api.old.regexp.role.consultant              |             |               |         |
-| fr.insee.sugoi.api.old.regexp.role.gestionnaire            |             |               |         |
-| fr.insee.sugoi.api.old.regexp.role.admin                   |             |               |         |
 | fr.insee.sugoi.api.old.enable.preauthorize                 |             |               |         |
-| fr.insee.sugoi.api.regexp.role.reader                      |             |               |         |
-| fr.insee.sugoi.api.regexp.role.writer                      |             |               |         |
-| fr.insee.sugoi.api.regexp.role.admin                       |             |               |         |
-| fr.insee.sugoi.api.regexp.role.app.manager                 |             |               |         |
-| fr.insee.sugoi.api.regexp.role.password.manager            |             |               |         |
 | fr.insee.sugoi.api.enable.preauthorize                     |             |               |         |
+
+### Regex for Sugoi Roles on Realm and UserStorage
+
+Roles on sugoi are configured by properties following patterns which can be filled with `application`, `realm` and `userstorage` to scope the right to a realm, a userstorage in a realm or an application (specific to application manager).
+
+For example, by setting the pattern for reader READER_$(realm), READER_FIRSTREALM will be able to manage the realm firstRealm, READER_SECONDREALM will be able to manage secondRealm. By setting the pattern READER_$(realm)_$(userstorage), the user with role READER_FIRSTREALM_FIRSTUS will be able to manage the userstorage firstUS in the realm firstRealm.
+
+A user with role APPMANAGER_FIRSTREALM_MYAPPLICATION, with the pattern APPMANAGER_$(realm)_$(application) set for app manager will be able to manage the application myApplication in the realm firstRealm (create groups in myApplication, add or remove users from group...).
+
+A wildcard '*' can also be used but should be done knowingly (for example with a pattern for admin set to ROLE_\*_ADMIN users with ROLE_SUGOI_ADMIN and users with ROLE_APPLICATION_ADMIN will be both considered as admin).
+
+To match with spring security requirements all roles should begin by ROLE\_ and should be uppercase.
+
+See [concepts](concepts.md#access-control-and-permissions) to understand what the roles allow to do.
+
+Old roles are used for compatibility with Ouganext. Then the userstorage scope cannot be used and the keyword $(domaine) is used instead of $(realm).
+
+| Properties                                                 | Description | example |
+| ---------------------------------------------------------- | :---------: | ------: |
+| fr.insee.sugoi.api.regexp.role.reader                      | List of patterns to define which users are reader on a realm. Each pattern should contain $(realm) and can contain $(userstorage) for scoping the reader role to userstorage | ROLE_READER_$(realm)_SUGOI,ROLE_READER_$(realm)_$(userstorage)_SUGOI |
+| fr.insee.sugoi.api.regexp.role.writer                      |  List of patterns to define which users are writer on a realm. Each pattern should contain $(realm) and can contain $(userstorage) for scoping the writer role to userstorage  |  ROLE_WRITER_$(realm)_SUGOI,ROLE_WRITER_$(realm)_$(userstorage)_SUGOI |
+| fr.insee.sugoi.api.regexp.role.admin                       |  List of patterns to define which users are admin | ROLE_ADMIN_SUGOI,ROLE_ADMIN |
+| fr.insee.sugoi.api.regexp.role.app.manager                 | List of patterns to define which users manages apps. Each pattern should contain $(realm) and $(application) to define in which realm and on which application the right should apply. | APPMANAGER_$(realm)_$(application) |
+| fr.insee.sugoi.api.regexp.role.password.manager            |  List of patterns to define which users can manage password operations on user. Each pattern should contain $(realm) and can contain $(userstorage) for scoping the writer role to userstorage. | PWDMANAGER_$(realm),PWDMANAGER_$(userstorage) |
+| fr.insee.sugoi.api.old.regexp.role.consultant              | List of patterns to define which users can have the reader right on compatibility interface. Should contain $(domaine).  | ROLE_OUGANEXT_CONSULTANT_$(domaine) |
+| fr.insee.sugoi.api.old.regexp.role.gestionnaire            | List of patterns to define which users can have the writer right on compatibility interface. Should contain $(domaine). |  ROLE_OUGANEXT_GESTIONNAIRE_$(domaine) |
+| fr.insee.sugoi.api.old.regexp.role.admin    | List of patterns to define which users can have the admin right on compatibility interface. | ROLE_OUGANEXT_ADMIN_$(domaine) |
 
 #### Password configuration
 

@@ -53,9 +53,13 @@ Users, organizations and applications can come from multiple storages and can be
 
 ## Access control and permissions
 
-Users can authenticate on sugoi with basic authentication, bearer authentication or ldap authentication. For now users will have rights on the application only by using ldap authentication. The permissions are checked from groups defined in security.ldap-account-managment-url property (see [configuration](configuration.md)).
+Users can authenticate on sugoi with basic authentication, bearer authentication or ldap authentication.
 
-There are five profiles on sugoi permission model : admin, read and write, password and application manager. A user have a right when it belong to the corresonding ldap group. All profiles are scoped to realm except the admin group. Sugoi management groups are entirely configurable with patterns, those patterns accept the `*` wildcard. All the pattern configuration should be done in uppercase (as this is the way spring-security fills `Authorities`).
+There are five profiles on sugoi permission model : admin, reader and writer, password and application manager. All profiles are scoped to realm or userstorage except the admin group. Application manager is scoped to an application inside a realm.
+
+When a user is scoped to a userstorage it has to use endpoints specifying the userstorage.
+
+All roles are defined by patterns. See [configuration](configuration.md#regex-for-sugoi-roles-on-realm-and-userstorage) for how to configure these patterns.
 
 ### Administrator
 
@@ -63,43 +67,50 @@ The admin group is defined via the regexp.role.admin property.
 
 An administrator can :
 
-- read, create, modify or delete any realms.
-- read, create, modify or delete userstorages.
+- read, create, modify or delete any realms and userstorages in realms.
 - do whatever the writer can do on all realms.
 - request all actuator endpoints.
 
 ### Writer
 
-The writer group is defined via the regexp.role.writer property. It is scoped to one realm.
+The writer group is defined via the regexp.role.writer property. It can be scoped to a realm or to a userstorage in a realm if its rights contains a userstorage pattern.
 
-A writer can :
+A writer on the entire realm can :
 
-- modify and create users on the realms they manage
-- modify and create organizations on the realms they manage
-- modify and create application and groups on the realms they manage
-- do whatever a reader can do on the realms they manage.
+- modify and create users on the realm they manage
+- modify and create organizations on the realm they manage
+- modify and create application and groups on the realm they manage, add users in groups
+- do whatever a reader on the realm can do
+
+A writer on a userstorage can :
+
+- modify and create users on the userstorage they manage
+- modify and create organizations on the userstorage they manage
+- do whatever a reader on the userstorage can do
+
+A writer on a userstorage cannot manage applications or add users in groups.
 
 ### Reader
 
-The reader group is defined via the regexp.role.reader property. It is scoped to one realm.
+The reader group is defined via the regexp.role.reader property. It is scoped to one realm or one userstorage.
 
 A reader can :
 
-- read users, organizations, applications and groups on the realm they are reader on.
+- read users, organizations, applications and groups on the realm or userstorage they are reader on.
 
 ### Password manager
 
-The password manager role is defined via the regexp.role.password.manager property. It is scoped to one realm.
+The password manager role is defined via the regexp.role.password.manager property. It is scoped to one realm or one userstorage. A password manager is automatically reader of the realm or userstorage.
 
-Password manager can initialize passwords, update password (with a given password or not) or validate a password on its realm.
+Password manager can initialize passwords, update password (with a given password or not) or validate a password of the users of the entire realm if scoped to realm or the users of the userstorage if scoped to the userstorage.
 
 ### Application manager
 
-The application manager role is defined via the regexp.role.application.manager property. 
+The application manager role is defined via the regexp.role.application.manager property. The reader role is needed for this role to be effective.
 
-Application manager can update an application and the associated groups (add or remove members, as well as create or delete groups). This also enable reader rights on a realm.
+Application manager can update an application and the associated groups (add or remove members, as well as create or delete groups).
 
-Creating or deleting an application requires writer privileges.
+On the contrary, creating or deleting an application requires writer privileges.
 
 ## Providers
 
