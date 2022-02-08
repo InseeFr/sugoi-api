@@ -15,7 +15,6 @@ package fr.insee.sugoi.services.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
@@ -24,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
 import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
+import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.service.CertificateService;
@@ -31,11 +31,13 @@ import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.paging.PageResult;
+import fr.insee.sugoi.model.paging.PageableResult;
+import fr.insee.sugoi.model.paging.SearchType;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -69,6 +71,20 @@ public class UserControllerTest {
   User user1, user2, user1Updated;
   PageResult<User> pageResult;
 
+  class UserMailMatcher implements ArgumentMatcher<User> {
+
+    private String mail;
+
+    public UserMailMatcher(String mail) {
+      this.mail = mail;
+    }
+
+    @Override
+    public boolean matches(User user) {
+      return user.getMail().equals(mail);
+    }
+  }
+
   @BeforeEach
   public void setup() {
     user1 = new User();
@@ -95,420 +111,375 @@ public class UserControllerTest {
 
   @Test
   @WithMockUser
-  public void retrieveAllUsers() {
-    try {
+  public void retrieveAllUsers() throws Exception {
 
-      Mockito.when(
-              userService.findByProperties(
-                  Mockito.anyString(),
-                  Mockito.isNull(),
-                  Mockito.any(),
-                  Mockito.any(),
-                  Mockito.any()))
-          .thenReturn(pageResult);
+    Mockito.when(
+            userService.findByProperties(
+                Mockito.eq("domaine1"),
+                Mockito.isNull(),
+                Mockito.any(User.class),
+                Mockito.any(PageableResult.class),
+                Mockito.any(SearchType.class)))
+        .thenReturn(pageResult);
 
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/realms/domaine1/users").accept(MediaType.APPLICATION_JSON);
-      MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-      TypeReference<PageResult<User>> mapType = new TypeReference<PageResult<User>>() {};
-      PageResult<User> appRes = objectMapper.readValue(response.getContentAsString(), mapType);
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.get("/realms/domaine1/users").accept(MediaType.APPLICATION_JSON);
+    MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+    TypeReference<PageResult<User>> mapType = new TypeReference<PageResult<User>>() {};
+    PageResult<User> appRes = objectMapper.readValue(response.getContentAsString(), mapType);
 
-      assertThat(
-          "First element should be Toto", appRes.getResults().get(0).getUsername(), is("Toto"));
-      assertThat(
-          "Toto should have mail toto@insee.fr",
-          appRes.getResults().get(0).getMail(),
-          is("toto@insee.fr"));
-      assertThat(
-          "Second element should be Tata", appRes.getResults().get(1).getUsername(), is("Tata"));
-      assertThat(
-          "Tata should have mail tata@insee.fr",
-          appRes.getResults().get(1).getMail(),
-          is("tata@insee.fr"));
-      assertThat("Response code should be 200", response.getStatus(), is(200));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+    assertThat(
+        "First element should be Toto", appRes.getResults().get(0).getUsername(), is("Toto"));
+    assertThat(
+        "Toto should have mail toto@insee.fr",
+        appRes.getResults().get(0).getMail(),
+        is("toto@insee.fr"));
+    assertThat(
+        "Second element should be Tata", appRes.getResults().get(1).getUsername(), is("Tata"));
+    assertThat(
+        "Tata should have mail tata@insee.fr",
+        appRes.getResults().get(1).getMail(),
+        is("tata@insee.fr"));
+    assertThat("Response code should be 200", response.getStatus(), is(200));
   }
 
-  @Disabled
   @Test
   @WithMockUser
-  public void shouldRetrieveSomeUsers() {}
+  public void shouldRetrieveSomeUsers() throws Exception {
+
+    List<User> users = new ArrayList<>();
+    users.add(user1);
+    users.add(user1Updated);
+    PageResult<User> pageResultWithTotoMailUser = new PageResult<User>();
+    pageResultWithTotoMailUser.setResults(users);
+    pageResultWithTotoMailUser.setSearchToken("mySearchToken");
+
+    Mockito.when(
+            userService.findByProperties(
+                Mockito.eq("domaine1"),
+                Mockito.isNull(),
+                Mockito.argThat(new UserMailMatcher("toto")),
+                Mockito.any(PageableResult.class),
+                Mockito.any(SearchType.class)))
+        .thenReturn(pageResultWithTotoMailUser);
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.get("/realms/domaine1/users")
+            .param("mail", "toto")
+            .accept(MediaType.APPLICATION_JSON);
+    MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+    TypeReference<PageResult<User>> mapType = new TypeReference<PageResult<User>>() {};
+    PageResult<User> appRes = objectMapper.readValue(response.getContentAsString(), mapType);
+
+    assertThat(
+        "First element should be Toto", appRes.getResults().get(0).getUsername(), is("Toto"));
+    assertThat(
+        "Second element should be Toto as well",
+        appRes.getResults().get(1).getUsername(),
+        is("Toto"));
+    assertThat("Response code should be 200", response.getStatus(), is(200));
+  }
 
   @Test
   @WithMockUser
-  public void shouldGetUserByID() {
-    try {
+  public void shouldGetUserByID() throws Exception {
 
-      Mockito.when(userService.findById("domaine1", null, "Toto")).thenReturn(user1);
+    Mockito.when(userService.findById("domaine1", null, "Toto")).thenReturn(user1);
 
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/realms/domaine1/users/Toto")
-              .accept(MediaType.APPLICATION_JSON);
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.get("/realms/domaine1/users/Toto")
+            .accept(MediaType.APPLICATION_JSON);
 
-      MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-      User res = objectMapper.readValue(response.getContentAsString(), User.class);
+    MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+    User res = objectMapper.readValue(response.getContentAsString(), User.class);
 
-      verify(userService).findById("domaine1", null, "Toto");
-      assertThat("User returned should be Toto", res.getUsername(), is("Toto"));
-      assertThat(
-          "User returned should have toto@insee.fr as mail", res.getMail(), is("toto@insee.fr"));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+    verify(userService).findById("domaine1", null, "Toto");
+    assertThat("User returned should be Toto", res.getUsername(), is("Toto"));
+    assertThat(
+        "User returned should have toto@insee.fr as mail", res.getMail(), is("toto@insee.fr"));
   }
 
   // Test write requests
 
   @Test
   @WithMockUser
-  public void deleteShouldCallDeleteService() {
-    try {
+  public void deleteShouldCallDeleteService() throws Exception {
 
-      Mockito.doReturn(new ProviderResponse("", "requestId", ProviderResponseStatus.OK, null, null))
-          .when(userService)
-          .delete(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+    Mockito.doReturn(new ProviderResponse("", "requestId", ProviderResponseStatus.OK, null, null))
+        .when(userService)
+        .delete(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
 
-      Mockito.when(userService.findById(Mockito.anyString(), Mockito.isNull(), Mockito.anyString()))
-          .thenReturn(user1)
-          .thenReturn(user1);
+    Mockito.when(userService.findById("domaine1", null, "supprimemoi"))
+        .thenReturn(user1)
+        .thenReturn(user1);
 
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/realms/domaine1/storages/toto/users/supprimemoi")
-              .accept(MediaType.APPLICATION_JSON)
-              .with(csrf());
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.delete("/realms/domaine1/storages/toto/users/supprimemoi")
+            .accept(MediaType.APPLICATION_JSON)
+            .with(csrf());
 
-      mockMvc.perform(requestBuilder).andReturn();
-      verify(userService).delete(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+    mockMvc.perform(requestBuilder).andReturn();
+    verify(userService).delete(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
   }
 
   @Test
   @WithMockUser
-  public void updateShouldCallUpdateServiceAndReturnNewApp() {
-    try {
+  public void updateShouldCallUpdateServiceAndReturnNewApp() throws Exception {
 
-      Mockito.when(userService.findById(Mockito.anyString(), Mockito.any(), Mockito.any()))
-          .thenReturn(user1)
-          .thenReturn(user1Updated);
+    Mockito.when(userService.findById("domaine1", "storage", "Toto"))
+        .thenReturn(user1)
+        .thenReturn(user1Updated);
 
-      Mockito.doReturn(
-              new ProviderResponse("", "requestId", ProviderResponseStatus.OK, user1Updated, null))
-          .when(userService)
-          .update(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any());
+    Mockito.doReturn(
+            new ProviderResponse("", "requestId", ProviderResponseStatus.OK, user1Updated, null))
+        .when(userService)
+        .update(
+            Mockito.eq("domaine1"),
+            Mockito.eq("storage"),
+            Mockito.argThat(new UserMailMatcher("new.toto@insee.fr")),
+            Mockito.any(ProviderRequest.class));
 
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/realms/domaine1/storages/domaine1/users/Toto")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(user1Updated))
-              .accept(MediaType.APPLICATION_JSON)
-              .with(csrf());
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.put("/realms/domaine1/storages/storage/users/Toto")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(user1Updated))
+            .accept(MediaType.APPLICATION_JSON)
+            .with(csrf());
 
-      MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
-      verify(userService).update(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any());
-      assertThat(
-          "Should get updated user",
-          objectMapper.readValue(response.getContentAsString(), User.class).getMail(),
-          is("new.toto@insee.fr"));
+    verify(userService)
+        .update(
+            Mockito.eq("domaine1"),
+            Mockito.eq("storage"),
+            Mockito.argThat(new UserMailMatcher("new.toto@insee.fr")),
+            Mockito.any(ProviderRequest.class));
+    assertThat(
+        "Should get updated user",
+        objectMapper.readValue(response.getContentAsString(), User.class).getMail(),
+        is("new.toto@insee.fr"));
 
-      assertThat(
-          "Should get location",
-          response.getHeader("Location"),
-          is("http://localhost/realms/domaine1/storages/domaine1/users/Toto"));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+    assertThat(
+        "Should get location",
+        response.getHeader("Location"),
+        is("http://localhost/realms/domaine1/storages/storage/users/Toto"));
   }
 
   @Test
   @WithMockUser
-  public void postShouldCallPostServiceAndReturnNewApp() {
+  public void postShouldCallPostServiceAndReturnNewUser() throws Exception {
 
-    try {
-      Mockito.doReturn(
-              new ProviderResponse("", "requestId", ProviderResponseStatus.OK, user1, null))
-          .when(userService)
-          .create(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any());
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post(
-                  "/realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(user1))
-              .accept(MediaType.APPLICATION_JSON)
-              .with(csrf());
+    Mockito.doReturn(new ProviderResponse("", "requestId", ProviderResponseStatus.OK, user1, null))
+        .when(userService)
+        .create(
+            Mockito.eq("domaine1"),
+            Mockito.eq("Profil_domaine1_WebServiceLdap"),
+            Mockito.argThat(new UserMailMatcher("toto@insee.fr")),
+            Mockito.any(ProviderRequest.class));
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post(
+                "/realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(user1))
+            .accept(MediaType.APPLICATION_JSON)
+            .with(csrf());
 
-      MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-      verify(userService)
-          .create(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any());
-      assertThat(
-          "Should get new user",
-          objectMapper.readValue(response.getContentAsString(), User.class).getUsername(),
-          is("Toto"));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+    MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+    verify(userService)
+        .create(
+            Mockito.eq("domaine1"),
+            Mockito.eq("Profil_domaine1_WebServiceLdap"),
+            Mockito.argThat(new UserMailMatcher("toto@insee.fr")),
+            Mockito.any(ProviderRequest.class));
+    assertThat(
+        "Should get new user",
+        objectMapper.readValue(response.getContentAsString(), User.class).getUsername(),
+        is("Toto"));
   }
 
   // Test location headers
   @Test
   @WithMockUser
-  public void getNextLocationInSearchResponse() {
-    try {
+  public void getNextLocationInSearchResponse() throws Exception {
 
-      pageResult.setHasMoreResult(true);
+    pageResult.setHasMoreResult(true);
 
-      Mockito.when(
-              userService.findByProperties(
-                  Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
-          .thenReturn(pageResult);
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/realms/domaine1/users?size=2")
-              .accept(MediaType.APPLICATION_JSON);
+    Mockito.when(
+            userService.findByProperties(
+                Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+        .thenReturn(pageResult);
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.get("/realms/domaine1/users?size=2")
+            .accept(MediaType.APPLICATION_JSON);
 
-      assertThat(
-          "Location header gives next page",
-          mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
-          is("http://localhost/realms/domaine1/users?size=2&searchToken=mySearchToken"));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+    assertThat(
+        "Location header gives next page",
+        mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
+        is("http://localhost/realms/domaine1/users?size=2&searchToken=mySearchToken"));
   }
 
   @Test
   @WithMockUser
-  public void getObjectLocationInUserCreationResponse() {
-    try {
+  public void getObjectLocationInUserCreationResponse() throws Exception {
 
-      Mockito.when(
-              userService.create(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any()))
-          .thenReturn(
-              new ProviderResponse(
-                  user1.getUsername(), null, ProviderResponseStatus.OK, null, null));
+    Mockito.when(
+            userService.create(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any()))
+        .thenReturn(
+            new ProviderResponse(user1.getUsername(), null, ProviderResponseStatus.OK, null, null));
 
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post(
-                  "/realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(user1))
-              .accept(MediaType.APPLICATION_JSON)
-              .with(csrf());
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post(
+                "/realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(user1))
+            .accept(MediaType.APPLICATION_JSON)
+            .with(csrf());
 
-      assertThat(
-          "Location header gives get uri",
-          mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
-          is(
-              "http://localhost/realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users/Toto"));
-
-    } catch (Exception e1) {
-      e1.printStackTrace();
-      fail();
-    }
+    assertThat(
+        "Location header gives get uri",
+        mockMvc.perform(requestBuilder).andReturn().getResponse().getHeader("Location"),
+        is("http://localhost/realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users/Toto"));
   }
 
   // Test response codes on error
   @Test
-  public void get401OnCreateUserWhenNotAuhtenticated() {
-    try {
+  public void get401OnCreateUserWhenNotAuhtenticated() throws Exception {
 
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post(
-                  "/realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(user1))
-              .accept(MediaType.APPLICATION_JSON)
-              .with(csrf());
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post(
+                "/realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(user1))
+            .accept(MediaType.APPLICATION_JSON)
+            .with(csrf());
 
-      assertThat(
-          "Should respond 401",
-          mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
-          is(401));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+    assertThat(
+        "Should respond 401",
+        mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
+        is(401));
   }
 
   @Test
-  public void get401OnDeleteUserWhenNotAuhtenticated() {
-    try {
+  public void get401OnDeleteUserWhenNotAuhtenticated() throws Exception {
 
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/realms/domaine1/users/supprimemoi")
-              .accept(MediaType.APPLICATION_JSON)
-              .with(csrf());
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.delete("/realms/domaine1/users/supprimemoi")
+            .accept(MediaType.APPLICATION_JSON)
+            .with(csrf());
 
-      assertThat(
-          "Should respond 401",
-          mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
-          is(401));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+    assertThat(
+        "Should respond 401",
+        mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
+        is(401));
   }
 
   @Test
-  public void get401OnUpdateUserWhenNotAuhtenticated() {
-    try {
+  public void get401OnUpdateUserWhenNotAuhtenticated() throws Exception {
 
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/realms/domaine1/users/Toto")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(user1))
-              .accept(MediaType.APPLICATION_JSON)
-              .with(csrf());
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.put("/realms/domaine1/users/Toto")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(user1))
+            .accept(MediaType.APPLICATION_JSON)
+            .with(csrf());
 
-      assertThat(
-          "Should respond 401",
-          mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
-          is(401));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+    assertThat(
+        "Should respond 401",
+        mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
+        is(401));
   }
 
   @Test
   @WithMockUser
-  public void get409WhenCreatingAlreadyExistingUser() {
-    try {
+  public void get409WhenCreatingAlreadyExistingUser() throws Exception {
 
-      Mockito.doThrow(new UserAlreadyExistException(""))
-          .when(userService)
-          .create(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any());
+    Mockito.doThrow(new UserAlreadyExistException(""))
+        .when(userService)
+        .create(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any());
 
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.post(
-                  "/realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(user1))
-              .accept(MediaType.APPLICATION_JSON)
-              .with(csrf());
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post(
+                "/realms/domaine1/storages/Profil_domaine1_WebServiceLdap/users")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(user1))
+            .accept(MediaType.APPLICATION_JSON)
+            .with(csrf());
 
-      assertThat(
-          "Should respond 409",
-          mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
-          is(409));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+    assertThat(
+        "Should respond 409",
+        mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
+        is(409));
   }
 
   @Test
   @WithMockUser
-  public void get404WhenNoUserIsFoundWhenGetById() {
-    try {
+  public void get404WhenNoUserIsFoundWhenGetById() throws Exception {
 
-      Mockito.when(userService.findById(Mockito.anyString(), Mockito.isNull(), Mockito.anyString()))
-          .thenThrow(new UserNotFoundException("domaine1", "dontexist"));
+    Mockito.when(userService.findById(Mockito.anyString(), Mockito.isNull(), Mockito.anyString()))
+        .thenThrow(new UserNotFoundException("domaine1", "dontexist"));
 
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/realms/domaine1/users/dontexist")
-              .accept(MediaType.APPLICATION_JSON);
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.get("/realms/domaine1/users/dontexist")
+            .accept(MediaType.APPLICATION_JSON);
 
-      assertThat(
-          "Should respond 404",
-          mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
-          is(404));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+    assertThat(
+        "Should respond 404",
+        mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
+        is(404));
   }
 
   @Test
   @WithMockUser
-  public void get400WhenNoUserIdDoesntMatchBody() {
-    try {
+  public void get400WhenUserIdDoesntMatchBody() throws Exception {
 
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/realms/domaine1/users/dontexist")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(user1))
-              .accept(MediaType.APPLICATION_JSON)
-              .with(csrf());
-      assertThat(
-          "Should respond 404",
-          mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
-          is(400));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.put("/realms/domaine1/users/dontexist")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(user1))
+            .accept(MediaType.APPLICATION_JSON)
+            .with(csrf());
+    assertThat(
+        "Should respond 400",
+        mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
+        is(400));
   }
 
   @Test
   @WithMockUser
-  public void get404WhenNoUserIsFoundWhenUpdate() {
-    try {
+  public void get404WhenNoUserIsFoundWhenUpdate() throws Exception {
 
-      Mockito.doThrow(new UserNotFoundException("domaine1", "Toto"))
-          .when(userService)
-          .findById("domaine1", null, "Toto");
+    Mockito.doThrow(new UserNotFoundException("domaine1", "Toto"))
+        .when(userService)
+        .findById("domaine1", null, "Toto");
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.put("/realms/domaine1/users/Toto")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(user1))
+            .accept(MediaType.APPLICATION_JSON)
+            .with(csrf());
 
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/realms/domaine1/users/Toto")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsString(user1))
-              .accept(MediaType.APPLICATION_JSON)
-              .with(csrf());
-
-      assertThat(
-          "Should respond 404",
-          mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
-          is(404));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+    assertThat(
+        "Should respond 404",
+        mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
+        is(404));
   }
 
   @Test
   @WithMockUser
-  public void get404WhenNoUserIsFoundWhenDelete() {
-    try {
+  public void get404WhenNoUserIsFoundWhenDelete() throws Exception {
 
-      Mockito.doThrow(new UserNotFoundException("domaine1", "dontexist"))
-          .when(userService)
-          .findById("domaine1", null, "dontexist");
+    Mockito.doThrow(new UserNotFoundException("domaine1", "dontexist"))
+        .when(userService)
+        .findById("domaine1", null, "dontexist");
 
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/realms/domaine1/users/dontexist")
-              .accept(MediaType.APPLICATION_JSON)
-              .with(csrf());
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.delete("/realms/domaine1/users/dontexist")
+            .accept(MediaType.APPLICATION_JSON)
+            .with(csrf());
 
-      assertThat(
-          "Should respond 404",
-          mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
-          is(HttpStatus.NOT_FOUND.value()));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+    assertThat(
+        "Should respond 404",
+        mockMvc.perform(requestBuilder).andReturn().getResponse().getStatus(),
+        is(HttpStatus.NOT_FOUND.value()));
   }
 }
