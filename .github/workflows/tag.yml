@@ -28,7 +28,7 @@ jobs:
           git checkout -b release-${{ github.event.inputs.version }}
           mvn -B versions:set -DnewVersion=${{ github.event.inputs.version }}  -DgenerateBackupPoms=false
           echo -e "# ${{ github.event.inputs.version }} \n\n" >> changelog.tmp
-          git log $(git describe --tags --abbrev=0)..HEAD --no-decorate --pretty=format:"- %s" >> changelog.tmp
+          git log --pretty=format:"- %s" `git tag --sort=-committerdate | head -1`...@ >> changelog.tmp
           echo -e "\n\n" >> changelog.tmp
           cat CHANGELOG.md >> changelog.tmp
           mv changelog.tmp CHANGELOG.md
