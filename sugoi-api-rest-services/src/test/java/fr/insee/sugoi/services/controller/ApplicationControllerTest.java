@@ -22,6 +22,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.sugoi.commons.services.configuration.SecurityConfiguration;
 import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
 import fr.insee.sugoi.core.exceptions.ApplicationAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
@@ -29,9 +30,11 @@ import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.service.ApplicationService;
+import fr.insee.sugoi.core.service.impl.PermissionServiceImpl;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
+import fr.insee.sugoi.services.decider.AuthorizeMethodDecider;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,7 +55,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @SpringBootTest(
-    classes = {ApplicationController.class, SugoiAdviceController.class},
+    classes = {
+      ApplicationController.class,
+      SugoiAdviceController.class,
+      AuthorizeMethodDecider.class,
+      PermissionServiceImpl.class,
+      SecurityConfiguration.class
+    },
     properties = "spring.config.location=classpath:/controller/application.properties")
 @AutoConfigureMockMvc
 @EnableWebMvc
@@ -235,12 +244,6 @@ public class ApplicationControllerTest {
   }
 
   @Test
-  public void searchAllApplicationsNotAuthenticatedLeadsTo401() throws Exception {
-    assertThat(
-        "Response code should be 401", searchAllApplicationOnDomaine1().getStatus(), is(401));
-  }
-
-  @Test
   @WithMockUser(roles = "SUGOI_ADMIN")
   public void searchApplicationsByNameCriteria() throws Exception {
 
@@ -325,12 +328,6 @@ public class ApplicationControllerTest {
     assertThat("Should respond 409", createApplicationOnDomaine1(application).getStatus(), is(409));
   }
 
-  @Test
-  public void get401OnCreateApplicationWhenNotAuhtenticated() throws Exception {
-    assertThat(
-        "Should respond 401", createApplicationOnDomaine1(new Application()).getStatus(), is(401));
-  }
-
   // Test delete application
 
   @Test
@@ -341,12 +338,6 @@ public class ApplicationControllerTest {
     verify(applicationService)
         .delete(
             Mockito.eq("domaine1"), Mockito.eq("supprimemoi"), Mockito.any(ProviderRequest.class));
-  }
-
-  @Test
-  public void get401OnDeleteApplicationWhenNotAuhtenticated() throws Exception {
-    assertThat(
-        "Should respond 401", deleteApplicationOnDomaine1("supprimemoi").getStatus(), is(401));
   }
 
   @Test
@@ -386,14 +377,6 @@ public class ApplicationControllerTest {
   }
 
   @Test
-  public void get401OnUpdateApplicationWhenNotAuhtenticated() throws Exception {
-    assertThat(
-        "Should respond 401",
-        updateApplicationOnDomaine1("toUpdate", new Application()).getStatus(),
-        is(401));
-  }
-
-  @Test
   @WithMockUser(roles = "SUGOI_ADMIN")
   public void get400WhenApplicationIdDoesntMatchBody() throws Exception {
     Application toUpdateAppli = new Application();
@@ -413,6 +396,55 @@ public class ApplicationControllerTest {
         "Should respond 404",
         updateApplicationOnDomaine1("dontexist", dontexist).getStatus(),
         is(404));
+  }
+
+  // tests on rights
+
+  @Test
+  @WithMockUser(roles = "SUGOI_domaine2_Reader")
+  public void badRealmShouldNotBeAuthorized() throws Exception {
+    assertThat(
+        "should not be authorized",
+        getApplicationOnDomaine1ByName("SuperAppli").getStatus(),
+        is(403));
+  }
+
+  @Test
+  @WithMockUser(roles = "SUGOI_domaine1_Reader")
+  public void readerOnGoodRealmShouldBeAuthorized() throws Exception {
+    assertThat(
+        "A reader on the entire realm should read the applications",
+        getApplicationOnDomaine1ByName("SuperAppli").getStatus(),
+        is(200));
+  }
+
+  @Test
+  @WithMockUser(roles = "SUGOI_domaine1_$(userStorage)_Reader")
+  public void readerOnSubUSShouldNotBeAuthorized() throws Exception {
+    assertThat(
+        "User having rights to read on a sub userstorage should not be able to read applications",
+        getApplicationOnDomaine1ByName("SuperAppli").getStatus(),
+        is(403));
+  }
+
+  @Test
+  @WithMockUser(roles = "SUGOI_domaine1_$(userStorage)_Writer")
+  public void writerOnSubUSShouldNotBeAuthorized() throws Exception {
+    assertThat(
+        "User having rights to write on a sub userstorage should not be able to modify applications",
+        getApplicationOnDomaine1ByName("SuperAppli").getStatus(),
+        is(403));
+  }
+
+  @Test
+  @WithMockUser(roles = {"ASI_ELSE", "SUGOI_domaine1_domaine1_Reader"})
+  public void appManagerOnBadAppShouldNotBeAuthorized() throws Exception {
+    Application newApp = new Application();
+    newApp.setName("toto");
+    assertThat(
+        "User having write on application Else should not have rights on application toto",
+        updateApplicationOnDomaine1("toto", newApp).getStatus(),
+        is(403));
   }
 
   private MockHttpServletResponse searchAllApplicationOnDomaine1() throws Exception {

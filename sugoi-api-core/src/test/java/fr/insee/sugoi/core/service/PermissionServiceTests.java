@@ -86,6 +86,19 @@ public class PermissionServiceTests {
   }
 
   @Test
+  public void testPatternAreRemoved() {
+    SugoiUser sugoiUser =
+        new SugoiUser(
+            "toto",
+            List.of("role_$reader_realm2_sugoi", "role_reader_realm1_$(userstorage)_sugoi"));
+    assertThat(
+        "User cannot read realm1 with fake pattern role",
+        !permissions.isReader(sugoiUser, "realm1", null));
+    assertThat(
+        "User can read realm2 even with $ symbol", permissions.isReader(sugoiUser, "realm2", null));
+  }
+
+  @Test
   public void testAppManager() {
     try {
       SugoiUser sugoiUser =
