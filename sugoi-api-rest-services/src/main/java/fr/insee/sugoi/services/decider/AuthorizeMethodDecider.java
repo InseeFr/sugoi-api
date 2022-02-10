@@ -31,7 +31,7 @@ public class AuthorizeMethodDecider {
 
   private static final Logger logger = LoggerFactory.getLogger(AuthorizeMethodDecider.class);
 
-  @Value("${fr.insee.sugoi.api.enable.preauthorize}")
+  @Value("${fr.insee.sugoi.api.enable.preauthorize:true}")
   private boolean enable;
 
   @Autowired PermissionService permissionService;

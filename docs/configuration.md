@@ -112,7 +112,7 @@ Sugoi-api implements spring security with full customization allowed
 | fr.insee.sugoi.api.regexp.role.admin                       |             |               |         |
 | fr.insee.sugoi.api.regexp.role.app.manager                 |             |               |         |
 | fr.insee.sugoi.api.regexp.role.password.manager            |             |               |         |
-| fr.insee.sugoi.api.enable.preauthorize                     |             |               |         |
+| fr.insee.sugoi.api.enable.preauthorize                     | Set to false to disable role validation on sugoi. Should not false on production. | true |         |
 
 #### Password configuration
 
