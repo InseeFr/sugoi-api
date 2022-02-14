@@ -16,6 +16,7 @@ package fr.insee.sugoi.ldap.utils.mapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.unboundid.ldap.sdk.Attribute;
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
 import java.util.HashMap;
@@ -36,8 +37,8 @@ public class ApplicationLdapMapperFromObjectTest {
   public void setup() {
 
     Map<String, String> config = new HashMap<>();
-    config.put("app_source", "ou=monappli,ou=Applications,o=insee,c=fr");
-    config.put("address_source", "ou=address,o=insee,c=fr");
+    config.put(GlobalKeysConfig.APP_SOURCE, "ou=monappli,ou=Applications,o=insee,c=fr");
+    config.put(GlobalKeysConfig.ADDRESS_SOURCE, "ou=address,o=insee,c=fr");
     applicationLdapMapper =
         new ApplicationLdapMapper(config, StoreMappingFixture.getApplicationStoreMappings());
     application = new Application();

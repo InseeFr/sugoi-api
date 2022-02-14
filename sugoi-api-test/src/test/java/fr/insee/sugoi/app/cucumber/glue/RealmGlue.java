@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.app.cucumber.utils.StepData;
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.model.Realm;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
@@ -65,7 +66,7 @@ public class RealmGlue {
   public void expect_description_of_realm_to_be(String description)
       throws JsonMappingException, JsonProcessingException {
     Realm realm = mapper.readValue(stepData.getLatestResponse().getBody(), Realm.class);
-    assertThat(realm.getProperties().get("description"), is(description));
+    assertThat(realm.getProperties().get(GlobalKeysConfig.REALM_DESCRIPTION), is(description));
   }
 
   @Then("the client expect uiUserMapping to contain {}")

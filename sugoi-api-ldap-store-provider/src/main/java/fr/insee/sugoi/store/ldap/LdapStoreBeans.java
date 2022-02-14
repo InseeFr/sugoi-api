@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.store.ldap;
 
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.MappingType;
 import fr.insee.sugoi.model.Realm;
@@ -118,10 +119,10 @@ public class LdapStoreBeans {
         LdapConfigKeys.READ_CONNECTION_AUTHENTICATED,
         String.valueOf(useAuthenticatedConnectionForReading));
     config.put(LdapConfigKeys.POOL_SIZE, defaultPoolSize);
-    config.put(LdapConfigKeys.USER_SOURCE, userStorage.getUserSource());
-    config.put(LdapConfigKeys.APP_SOURCE, realm.getAppSource());
-    config.put(LdapConfigKeys.ORGANIZATION_SOURCE, userStorage.getOrganizationSource());
-    config.put(LdapConfigKeys.ADDRESS_SOURCE, userStorage.getAddressSource());
+    config.put(GlobalKeysConfig.USER_SOURCE, userStorage.getUserSource());
+    config.put(GlobalKeysConfig.APP_SOURCE, realm.getAppSource());
+    config.put(GlobalKeysConfig.ORGANIZATION_SOURCE, userStorage.getOrganizationSource());
+    config.put(GlobalKeysConfig.ADDRESS_SOURCE, userStorage.getAddressSource());
     config.put(
         LdapConfigKeys.GROUP_SOURCE_PATTERN,
         realm.getProperties().get(LdapConfigKeys.GROUP_SOURCE_PATTERN) != null

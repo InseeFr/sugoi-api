@@ -16,6 +16,7 @@ package fr.insee.sugoi.ldap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.MappingType;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
@@ -71,8 +72,8 @@ public class LdapStoreBeansTest {
     us.setUserSource(userSource);
     us.setAddressSource(addressSource);
     us.setName("default");
-    us.addProperty("group_filter_pattern", groupFilterPattern);
-    us.addProperty("group_source_pattern", groupSourcePattern);
+    us.getProperties().put(LdapConfigKeys.GROUP_FILTER_PATTERN, groupFilterPattern);
+    us.getProperties().put(LdapConfigKeys.GROUP_SOURCE_PATTERN, groupSourcePattern);
 
     us.setUserMappings(StoreMappingFixture.getUserStoreMappings());
     return us;

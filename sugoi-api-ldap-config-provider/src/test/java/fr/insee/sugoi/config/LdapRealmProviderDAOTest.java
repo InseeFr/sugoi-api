@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.is;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.configuration.UiMappingService;
+import fr.insee.sugoi.model.PasswordPolicyConstants;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.Realm.UIMappingType;
 import fr.insee.sugoi.model.UserStorage;
@@ -192,7 +193,11 @@ public class LdapRealmProviderDAOTest {
     Realm realm = ldapRealmProviderDAOImpl.load("domaine1").get();
     assertThat(
         "Should have a password length",
-        realm.getUserStorages().get(0).getProperties().get("create_password_WITHUpperCase"),
+        realm
+            .getUserStorages()
+            .get(0)
+            .getProperties()
+            .get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE),
         is("true"));
   }
 
@@ -202,7 +207,7 @@ public class LdapRealmProviderDAOTest {
         ldapRealmProviderDAOImpl.load("domaine1").get().getUserStorageByName("default").get();
     assertThat(
         "Should get validate password with uppercase from realm",
-        userstorage.getProperties().get("validate_password_WITHUpperCase"),
+        userstorage.getProperties().get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE),
         is("true"));
   }
 }

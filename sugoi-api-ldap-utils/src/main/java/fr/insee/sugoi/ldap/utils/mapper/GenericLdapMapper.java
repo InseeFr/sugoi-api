@@ -16,6 +16,7 @@ package fr.insee.sugoi.ldap.utils.mapper;
 import com.unboundid.asn1.ASN1OctetString;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Group;
@@ -233,10 +234,10 @@ public class GenericLdapMapper {
                     "uid",
                     //
                     ((Organization) sugoiValue).getIdentifiant(),
-                    config.get(LdapConfigKeys.ORGANIZATION_SOURCE))));
+                    config.get(GlobalKeysConfig.ORGANIZATION_SOURCE))));
       case ADDRESS:
         if (((PostalAddress) sugoiValue).getId() != null
-            && config.get(LdapConfigKeys.ADDRESS_SOURCE) != null) {
+            && config.get(GlobalKeysConfig.ADDRESS_SOURCE) != null) {
           return List.of(
               new Attribute(
                   ldapAttributeName,
@@ -246,7 +247,7 @@ public class GenericLdapMapper {
                       "l",
                       //
                       ((PostalAddress) sugoiValue).getId(),
-                      config.get(LdapConfigKeys.ADDRESS_SOURCE))));
+                      config.get(GlobalKeysConfig.ADDRESS_SOURCE))));
         } else return List.of();
       case LIST_HABILITATION:
         return ((List<Habilitation>) sugoiValue)
