@@ -14,6 +14,7 @@
 package fr.insee.sugoi.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import fr.insee.sugoi.model.technics.UiField;
 import java.io.Serializable;
@@ -27,7 +28,10 @@ public class Realm implements Serializable {
   private String port;
   private String appSource;
   private List<UserStorage> userStorages;
-  @IgnoreSizeOf private Map<String, String> properties = new HashMap<>();
+
+  @JsonDeserialize(using = RealmConfigKeysDeserializer.class)
+  @IgnoreSizeOf
+  private Map<RealmConfigKeys, String> properties = new HashMap<>();
 
   @IgnoreSizeOf
   private Map<UIMappingType, List<UiField>> uiMapping = new EnumMap<>(UIMappingType.class);
@@ -110,15 +114,15 @@ public class Realm implements Serializable {
     this.appSource = appSource;
   }
 
-  public void setProperties(Map<String, String> properties) {
+  public void setProperties(Map<RealmConfigKeys, String> properties) {
     this.properties = properties;
   }
 
-  public void addProperty(String name, String value) {
+  public void addProperty(RealmConfigKeys name, String value) {
     this.properties.put(name, value);
   }
 
-  public Map<String, String> getProperties() {
+  public Map<RealmConfigKeys, String> getProperties() {
     return properties;
   }
 

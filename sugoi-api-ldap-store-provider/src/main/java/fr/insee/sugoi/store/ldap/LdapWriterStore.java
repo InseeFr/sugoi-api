@@ -44,6 +44,7 @@ import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.MappingType;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.PostalAddress;
+import fr.insee.sugoi.model.RealmConfigKeys;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.exceptions.ApplicationAlreadyExistException;
 import fr.insee.sugoi.model.exceptions.ApplicationNotFoundException;
@@ -78,7 +79,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   private final LdapReaderStore ldapReaderStore;
 
   public LdapWriterStore(
-      Map<String, String> config, Map<MappingType, List<StoreMapping>> mappings) {
+      Map<RealmConfigKeys, String> config, Map<MappingType, List<StoreMapping>> mappings) {
     try {
       this.ldapPoolConnection = LdapFactory.getConnectionPoolAuthenticated(config);
       this.config = config;

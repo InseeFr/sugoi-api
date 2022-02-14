@@ -18,6 +18,7 @@ import com.unboundid.ldap.sdk.Modification;
 import com.unboundid.ldap.sdk.ModificationType;
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import fr.insee.sugoi.model.PostalAddress;
+import fr.insee.sugoi.model.RealmConfigKeys;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,10 +26,10 @@ import java.util.stream.Collectors;
 
 public class AddressLdapMapper {
 
-  public Map<String, String> config;
+  public Map<RealmConfigKeys, String> config;
   public String[] objectClasses = {"InseeAdressePostale", "locality", "top"};
 
-  public AddressLdapMapper(Map<String, String> config) {
+  public AddressLdapMapper(Map<RealmConfigKeys, String> config) {
     // TODO Only if this mapper become more generic
     // if (config.get(LdapConfigKeys.ADDRESS_OBJECT_CLASSES) != null) {
     // objectClasses = config.get(LdapConfigKeys.ADDRESS_OBJECT_CLASSES).split(",");

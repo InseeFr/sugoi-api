@@ -476,7 +476,7 @@ public class UserController {
     User foundUser = userService.findById(realm, null, id);
     return updateUsers(
         realm,
-        (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
+        (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
         id,
         isAsynchronous,
         isUrgent,
@@ -592,7 +592,7 @@ public class UserController {
     User foundUser = userService.findById(realm, null, id);
     return deleteUsers(
         realm,
-        (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
+        (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
         id,
         isAsynchronous,
         isUrgent,
@@ -776,7 +776,7 @@ public class UserController {
       throws CertificateException {
     User user = userService.findById(realm, null, id);
     return getUserCertificate(
-        realm, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id);
+        realm, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()), id);
   }
 
   @PutMapping(
@@ -875,7 +875,7 @@ public class UserController {
     User user = userService.findById(realm, null, id);
     return updateUserCertificate(
         realm,
-        (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
+        (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
         id,
         file,
         isAsynchronous,
@@ -976,7 +976,7 @@ public class UserController {
     User user = userService.findById(realm, null, id);
     return deleteUserCertificate(
         realm,
-        (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
+        (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
         id,
         isAsynchronous,
         isUrgent,

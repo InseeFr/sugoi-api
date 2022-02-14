@@ -13,19 +13,39 @@
 */
 package fr.insee.sugoi.model;
 
-import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Optional;
 
-public class PasswordPolicyConstants implements Serializable {
+public enum PasswordPolicyConstants implements RealmConfigKeys {
+  CREATE_PASSWORD_WITH_UPPERCASE("create_password_WITHUpperCase"),
+  CREATE_PASSWORD_WITH_LOWERCASE("create_password_WITHLowerCase"),
+  CREATE_PASSWORD_WITH_DIGITS("create_password_WITHDigit"),
+  CREATE_PASSWORD_WITH_SPECIAL("create_password_WITHSpecial"),
+  CREATE_PASSWORD_SIZE("create_password_size"),
+  VALIDATE_PASSWORD_WITH_UPPERCASE("validate_password_WITHUpperCase"),
+  VALIDATE_PASSWORD_WITH_LOWERCASE("validate_password_WITHLowerCase"),
+  VALIDATE_PASSWORD_WITH_DIGITS("validate_password_WITHDigit"),
+  VALIDATE_PASSWORD_WITH_SPECIAL("validate_password_WITHSpecial"),
+  VALIDATE_PASSWORD_MIN_SIZE("validate_password_size");
 
-  public static final String CREATE_PASSWORD_WITH_UPPERCASE = "create_password_WITHUpperCase";
-  public static final String CREATE_PASSWORD_WITH_LOWERCASE = "create_password_WITHLowerCase";
-  public static final String CREATE_PASSWORD_WITH_DIGITS = "create_password_WITHDigit";
-  public static final String CREATE_PASSWORD_WITH_SPECIAL = "create_password_WITHSpecial";
-  public static final String CREATE_PASSWORD_SIZE = "create_password_size";
+  private String name;
 
-  public static final String VALIDATE_PASSWORD_WITH_UPPERCASE = "validate_password_WITHUpperCase";
-  public static final String VALIDATE_PASSWORD_WITH_LOWERCASE = "validate_password_WITHLowerCase";
-  public static final String VALIDATE_PASSWORD_WITH_DIGITS = "validate_password_WITHDigit";
-  public static final String VALIDATE_PASSWORD_WITH_SPECIAL = "validate_password_WITHSpecial";
-  public static final String VALIDATE_PASSWORD_MIN_SIZE = "validate_password_size";
+  PasswordPolicyConstants(String name) {
+    this.name = name;
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  public static Optional<PasswordPolicyConstants> getPasswordPolicyConstant(String name) {
+    return Arrays.stream(PasswordPolicyConstants.values())
+        .filter(gkc -> gkc.getName().equalsIgnoreCase(name))
+        .findFirst();
+  }
+
+  public static RealmConfigKeys getRealmConfigKey(String key) {
+    return getPasswordPolicyConstant(key).orElse(null);
+  }
 }

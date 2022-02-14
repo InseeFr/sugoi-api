@@ -17,6 +17,7 @@ import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.MappingType;
 import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.RealmConfigKeys;
 import fr.insee.sugoi.model.UserStorage;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import java.util.EnumMap;
@@ -107,8 +108,8 @@ public class LdapStoreBeans {
         generateConfig(realm, userStorage), getCompleteMapping(realm, userStorage));
   }
 
-  public Map<String, String> generateConfig(Realm realm, UserStorage userStorage) {
-    Map<String, String> config = new HashMap<>();
+  public Map<RealmConfigKeys, String> generateConfig(Realm realm, UserStorage userStorage) {
+    Map<RealmConfigKeys, String> config = new HashMap<>();
     config.put(LdapConfigKeys.REALM_NAME, realm.getName());
     config.put(LdapConfigKeys.USERSTORAGE_NAME, userStorage.getName());
     config.put(LdapConfigKeys.URL, realm.getUrl());

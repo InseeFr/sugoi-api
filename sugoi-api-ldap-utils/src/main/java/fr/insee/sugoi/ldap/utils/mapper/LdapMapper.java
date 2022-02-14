@@ -15,6 +15,7 @@ package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
+import fr.insee.sugoi.model.RealmConfigKeys;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import java.util.Collection;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.Map;
 
 public abstract class LdapMapper<ResultType> {
 
-  protected Map<String, String> config;
+  protected Map<RealmConfigKeys, String> config;
   protected List<String> objectClasses;
   protected List<StoreMapping> mappings;
 

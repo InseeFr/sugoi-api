@@ -15,6 +15,7 @@ package fr.insee.sugoi.store.file;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.RealmConfigKeys;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,8 +38,8 @@ public class FileStoreBeans {
     return new FileWriterStore(generateConfig(realm, userStorage));
   }
 
-  public Map<String, String> generateConfig(Realm realm, UserStorage userStorage) {
-    Map<String, String> config = new HashMap<>();
+  public Map<RealmConfigKeys, String> generateConfig(Realm realm, UserStorage userStorage) {
+    Map<RealmConfigKeys, String> config = new HashMap<>();
     config.put(GlobalKeysConfig.APP_SOURCE, realm.getAppSource());
     config.put(GlobalKeysConfig.USER_SOURCE, userStorage.getUserSource());
     config.put(GlobalKeysConfig.ORGANIZATION_SOURCE, userStorage.getOrganizationSource());

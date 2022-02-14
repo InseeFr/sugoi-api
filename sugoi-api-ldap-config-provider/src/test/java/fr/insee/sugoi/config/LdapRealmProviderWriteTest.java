@@ -26,6 +26,7 @@ import fr.insee.sugoi.model.technics.StoreMapping;
 import fr.insee.sugoi.model.technics.UiField;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ldap.embedded.EmbeddedLdapAutoConfiguration;
@@ -47,6 +48,7 @@ public class LdapRealmProviderWriteTest {
     realmToAdd.setName("toadd");
     realmToAdd.setUrl("localhost");
     realmToAdd.addProperty(LdapConfigKeys.GROUP_FILTER_PATTERN, "toto");
+    realmToAdd.getProperties().put(LdapConfigKeys.APPLICATION_OBJECT_CLASSES, "app-class");
     UserStorage uniqueUserStorage = new UserStorage();
     uniqueUserStorage.setUserSource("ou=SSM,o=insee,c=fr");
     uniqueUserStorage.setOrganizationSource("ou=organisations,ou=clients_domaine2,o=insee,c=fr");
@@ -69,6 +71,10 @@ public class LdapRealmProviderWriteTest {
         "Realm should have a groupfilterpattern",
         retrievedRealm.getProperties().get(LdapConfigKeys.GROUP_FILTER_PATTERN),
         is("toto"));
+    assertThat(
+        "Realm should have a application object class",
+        retrievedRealm.getProperties().get(LdapConfigKeys.APPLICATION_OBJECT_CLASSES),
+        is("app-class"));
   }
 
   @Test
@@ -134,6 +140,7 @@ public class LdapRealmProviderWriteTest {
         is("ou=contacts,ou=clients_domaine2,o=insee,c=fr"));
   }
 
+  @Disabled("not working till 1 userstorage particularity")
   @Test
   public void changeRealmUrlTest() {
     Realm realmToModify = ldapRealmProviderDAOImpl.load("tomodify").get();

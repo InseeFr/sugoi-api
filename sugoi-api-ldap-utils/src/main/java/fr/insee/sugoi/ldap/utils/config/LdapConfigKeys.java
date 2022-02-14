@@ -13,28 +13,48 @@
 */
 package fr.insee.sugoi.ldap.utils.config;
 
-import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
+import fr.insee.sugoi.model.RealmConfigKeys;
+import java.util.Arrays;
+import java.util.Optional;
 
-public class LdapConfigKeys extends GlobalKeysConfig {
+public enum LdapConfigKeys implements RealmConfigKeys {
+  URL("ldapUrl"),
+  PORT("ldapPort"),
+  USERNAME("username"),
+  PASSWORD("password"),
+  POOL_SIZE("pool_size"),
+  GROUP_SOURCE_PATTERN("groupSourcePattern"),
+  GROUP_MANAGER_SOURCE_PATTERN("group_manager_source_pattern"),
+  GROUP_FILTER_PATTERN("groupFilterPattern"),
+  REALM_NAME("realm_name"),
+  VLV_ENABLED("vlvEnabled"),
+  SORT_KEY("sortKey"),
+  USER_OBJECT_CLASSES("user_object_classes"),
+  ORGANIZATION_OBJECT_CLASSES("organization_object_classes"),
+  GROUP_OBJECT_CLASSES("group_object_classes"),
+  APPLICATION_OBJECT_CLASSES("application_object_classes"),
+  ADDRESS_OBJECT_CLASSES("address_object_classes"),
+  USERSTORAGE_NAME("userstorage_name"),
+  READ_CONNECTION_AUTHENTICATED("read_connection_authenticated");
 
-  public static final String URL = "url";
-  public static final String PORT = "port";
-  public static final String USERNAME = "username";
-  public static final String PASSWORD = "password";
-  public static final String POOL_SIZE = "pool_size";
-  public static final String GROUP_SOURCE_PATTERN = "group_source_pattern";
-  public static final String GROUP_MANAGER_SOURCE_PATTERN = "group_manager_source_pattern";
-  public static final String GROUP_FILTER_PATTERN = "group_filter_pattern";
-  public static final String REALM_NAME = "realm_name";
-  public static final String TYPE = "TYPE";
-  public static final String VLV_ENABLED = "vlvEnabled";
-  public static final String SORT_KEY = "sortKey";
-  public static final String USER_OBJECT_CLASSES = "user_object_classes";
-  public static final String ORGANIZATION_OBJECT_CLASSES = "organization_object_classes";
-  public static final String GROUP_OBJECT_CLASSES = "group_object_classes";
-  public static final String APPLICATION_OBJECT_CLASSES = "application_object_classes";
-  public static final String ADDRESS_OBJECT_CLASSES = "address_object_classes";
-  public static final String USERSTORAGE_NAME = "userstorage_name";
-  public static final String UNIQUE_EMAILS = "unique_emails";
-  public static final String READ_CONNECTION_AUTHENTICATED = "read_connection_authenticated";
+  private String name;
+
+  LdapConfigKeys(String name) {
+    this.name = name;
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  public static Optional<LdapConfigKeys> getLdapConfigKeys(String name) {
+    return Arrays.stream(LdapConfigKeys.values())
+        .filter(gkc -> gkc.getName().equalsIgnoreCase(name))
+        .findFirst();
+  }
+
+  public static RealmConfigKeys getRealmConfigKey(String key) {
+    return getLdapConfigKeys(key).orElse(null);
+  }
 }

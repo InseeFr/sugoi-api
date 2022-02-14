@@ -16,6 +16,7 @@ package fr.insee.sugoi.ldap.utils.mapper;
 import com.unboundid.ldap.sdk.Attribute;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Application;
+import fr.insee.sugoi.model.RealmConfigKeys;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,7 +25,7 @@ import java.util.Map;
 
 public class ApplicationLdapMapper extends LdapMapper<Application> {
 
-  public ApplicationLdapMapper(Map<String, String> config, List<StoreMapping> mappings) {
+  public ApplicationLdapMapper(Map<RealmConfigKeys, String> config, List<StoreMapping> mappings) {
     this.config = config;
     if (config.get(LdapConfigKeys.APPLICATION_OBJECT_CLASSES) != null) {
       objectClasses =

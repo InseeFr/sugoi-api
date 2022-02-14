@@ -24,6 +24,7 @@ import fr.insee.sugoi.core.service.PasswordService;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.PasswordPolicyConstants;
+import fr.insee.sugoi.model.RealmConfigKeys;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.exceptions.PasswordPolicyNotMetException;
 import fr.insee.sugoi.model.exceptions.RealmNotFoundException;
@@ -67,19 +68,21 @@ public class CredentialsServiceImpl implements CredentialsService {
       if (StringUtils.isEmpty(computeReceiverMail(templateProperties, user.getMail()))) {
         throw new UserNoEmailException(realm, userStorage, userId);
       }
-      Map<String, String> userStorageProperties =
+
+      Map<RealmConfigKeys, String> userStorageProperties =
           realmProvider
               .load(realm)
               .orElseThrow(() -> new RealmNotFoundException(realm))
               .getUserStorageByName(userStorage)
               .orElseThrow(() -> new UserStorageNotFoundException(realm, userStorage))
               .getProperties();
-
       String password =
           passwordService.generatePassword(
               userStorageProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE)
                       != null
-                  ? Boolean.parseBoolean(PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE)
+                  ? Boolean.parseBoolean(
+                      userStorageProperties.get(
+                          PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE))
                   : null,
               userStorageProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_LOWERCASE)
                       != null
@@ -151,7 +154,7 @@ public class CredentialsServiceImpl implements CredentialsService {
 
       User user = userService.findById(realm, userStorage, userId);
 
-      Map<String, String> userStorageProperties =
+      Map<RealmConfigKeys, String> userStorageProperties =
           realmProvider
               .load(realm)
               .orElseThrow(() -> new RealmNotFoundException(realm))
@@ -211,7 +214,7 @@ public class CredentialsServiceImpl implements CredentialsService {
       ProviderRequest providerRequest) {
     try {
 
-      Map<String, String> realmProperties =
+      Map<RealmConfigKeys, String> realmProperties =
           realmProvider
               .load(realm)
               .orElseThrow(() -> new RealmNotFoundException(realm))
@@ -312,7 +315,8 @@ public class CredentialsServiceImpl implements CredentialsService {
     }
   }
 
-  private Boolean validatePassword(String password, Map<String, String> userStorageProperties) {
+  private Boolean validatePassword(
+      String password, Map<RealmConfigKeys, String> userStorageProperties) {
     return passwordService.validatePassword(
         password,
         userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE) != null

@@ -29,6 +29,7 @@ import com.unboundid.ldap.sdk.controls.VirtualListViewRequestControl;
 import com.unboundid.ldap.sdk.controls.VirtualListViewResponseControl;
 import com.unboundid.util.Base64;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
+import fr.insee.sugoi.model.RealmConfigKeys;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import java.text.ParseException;
@@ -81,7 +82,7 @@ public class LdapUtils {
   }
 
   public static void setRequestControls(
-      SearchRequest searchRequest, PageableResult pageable, Map<String, String> config) {
+      SearchRequest searchRequest, PageableResult pageable, Map<RealmConfigKeys, String> config) {
     if (config.get(LdapConfigKeys.VLV_ENABLED).equalsIgnoreCase("true")) {
       // TODO test if this code works on vlv
       searchRequest.addControl(

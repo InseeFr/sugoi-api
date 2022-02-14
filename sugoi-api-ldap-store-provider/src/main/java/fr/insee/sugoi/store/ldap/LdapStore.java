@@ -22,6 +22,7 @@ import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.GroupLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
+import fr.insee.sugoi.model.RealmConfigKeys;
 import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -40,7 +41,7 @@ public class LdapStore {
   protected ApplicationLdapMapper applicationLdapMapper;
   protected AddressLdapMapper addressLdapMapper;
 
-  protected Map<String, String> config;
+  protected Map<RealmConfigKeys, String> config;
 
   protected String getGroupSource(String appName) {
     if (StringUtils.isNotBlank(config.get(LdapConfigKeys.GROUP_SOURCE_PATTERN))) {

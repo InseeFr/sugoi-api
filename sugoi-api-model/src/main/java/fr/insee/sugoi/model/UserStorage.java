@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -26,7 +27,9 @@ public class UserStorage implements Serializable {
   private String organizationSource;
   private String addressSource;
 
-  @IgnoreSizeOf private Map<String, String> properties = new HashMap<>();
+  @JsonDeserialize(using = RealmConfigKeysDeserializer.class)
+  @IgnoreSizeOf
+  private Map<RealmConfigKeys, String> properties = new HashMap<>();
 
   @IgnoreSizeOf private List<StoreMapping> userMappings;
 
@@ -80,15 +83,15 @@ public class UserStorage implements Serializable {
     this.addressSource = addressSource;
   }
 
-  public Map<String, String> getProperties() {
+  public Map<RealmConfigKeys, String> getProperties() {
     return properties;
   }
 
-  public void setProperties(Map<String, String> properties) {
+  public void setProperties(Map<RealmConfigKeys, String> properties) {
     this.properties = properties;
   }
 
-  public void addProperty(String key, String value) {
+  public void addProperty(RealmConfigKeys key, String value) {
     this.properties.put(key, value);
   }
 }

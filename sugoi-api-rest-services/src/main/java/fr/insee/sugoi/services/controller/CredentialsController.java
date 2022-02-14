@@ -186,7 +186,7 @@ public class CredentialsController {
     return reinitPassword(
         templatePropertiesView,
         realm,
-        (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
+        (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
         id,
         webserviceTag,
         changePasswordResetStatus,
@@ -302,7 +302,7 @@ public class CredentialsController {
     return changePassword(
         pcr,
         realm,
-        (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
+        (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
         id,
         webserviceTag,
         isAsynchronous,
@@ -420,7 +420,7 @@ public class CredentialsController {
     User user = userService.findById(realm, null, id);
     return initPassword(
         realm,
-        (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
+        (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
         id,
         passwordView,
         changePasswordResetStatus,
@@ -498,7 +498,10 @@ public class CredentialsController {
           PasswordView passwordView) {
     User user = userService.findById(realm, null, id);
     return validatePassword(
-        realm, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE), id, passwordView);
+        realm,
+        (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
+        id,
+        passwordView);
   }
 
   @PostMapping(value = "/realms/{realm}/users/{id}/send-login")
@@ -518,7 +521,7 @@ public class CredentialsController {
     return sendLogin(
         realm,
         id,
-        (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
+        (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
         webserviceTag,
         templatePropertiesView);
   }

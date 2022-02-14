@@ -23,6 +23,7 @@ import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.PostalAddress;
+import fr.insee.sugoi.model.RealmConfigKeys;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.exceptions.LdapMappingConfigurationException;
 import fr.insee.sugoi.model.technics.ModelType;
@@ -44,9 +45,8 @@ public class GenericLdapMapper {
   public static <ReturnType> ReturnType mapLdapAttributesToObject(
       Collection<Attribute> attributes,
       Class<ReturnType> returnClazz,
-      Map<String, String> config,
+      Map<RealmConfigKeys, String> config,
       List<StoreMapping> mappings) {
-
     try {
       ReturnType mappedEntity = returnClazz.getDeclaredConstructor().newInstance();
       for (StoreMapping mappingDefinition : mappings) {
@@ -100,7 +100,7 @@ public class GenericLdapMapper {
   @SuppressWarnings("unchecked")
   private static <SugoiType> List<Attribute> mapObjectToLdapAttributes(
       SugoiType entity,
-      Map<String, String> config,
+      Map<RealmConfigKeys, String> config,
       List<StoreMapping> mappings,
       List<String> objectClasses,
       boolean isToWrite) {
@@ -158,7 +158,7 @@ public class GenericLdapMapper {
   }
 
   private static Object transformLdapAttributeToSugoiAttribute(
-      ModelType type, List<Attribute> attrs, Map<String, String> config)
+      ModelType type, List<Attribute> attrs, Map<RealmConfigKeys, String> config)
       throws CertificateException {
     switch (type) {
       case STRING:
@@ -220,7 +220,10 @@ public class GenericLdapMapper {
 
   @SuppressWarnings("unchecked")
   private static List<Attribute> transformSugoiToAttribute(
-      ModelType type, String ldapAttributeName, Object sugoiValue, Map<String, String> config) {
+      ModelType type,
+      String ldapAttributeName,
+      Object sugoiValue,
+      Map<RealmConfigKeys, String> config) {
     switch (type) {
       case STRING:
         return List.of(new Attribute(ldapAttributeName, (String) sugoiValue));
@@ -308,7 +311,7 @@ public class GenericLdapMapper {
 
   public static <SugoiType> List<Attribute> mapObjectToLdapAttributesForCreation(
       SugoiType entity,
-      Map<String, String> config,
+      Map<RealmConfigKeys, String> config,
       List<StoreMapping> mappings,
       List<String> objectClasses) {
     return getAttributesWithoutEmptyValue(
@@ -317,7 +320,7 @@ public class GenericLdapMapper {
 
   public static <SugoiType> List<Attribute> mapObjectToLdapAttributesForFilter(
       SugoiType entity,
-      Map<String, String> config,
+      Map<RealmConfigKeys, String> config,
       List<StoreMapping> mappings,
       List<String> objectClasses) {
     return getAttributesWithoutEmptyValue(
@@ -325,7 +328,7 @@ public class GenericLdapMapper {
   }
 
   public static <O> List<Modification> createMods(
-      O entity, Map<String, String> config, List<StoreMapping> mappings) {
+      O entity, Map<RealmConfigKeys, String> config, List<StoreMapping> mappings) {
     return LdapUtils.convertAttributesToModifications(
         // Modification => no need to specify object classes
         mapObjectToLdapAttributes(entity, config, mappings, null, true));

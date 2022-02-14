@@ -50,7 +50,7 @@ public class SerializeTest {
           + "    }"
           + "    ],"
           + "    \"properties\": {"
-          + "        \"app-managed-attribute-keys-list\": \"inseegroupedefaut,inseeroleapplicatif\","
+          + "        \"create_password_WITHUpperCase\": \"true\","
           + "        \"description\": \"Le profil domaine6<br/>Test <b>html</b> in description\""
           + "    },"
           + "    \"uiMapping\": {"
@@ -66,5 +66,9 @@ public class SerializeTest {
   public void serializeRealmTest() throws JsonProcessingException {
     Realm realm = objectMapper.readValue(realmToTest, Realm.class);
     assertThat("Should be domaine1", realm.getName(), is("newrealm"));
+    assertThat(
+        "Should have password property",
+        realm.getProperties().get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE),
+        is("true"));
   }
 }
