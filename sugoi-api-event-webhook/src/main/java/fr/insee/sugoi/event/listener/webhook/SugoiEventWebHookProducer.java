@@ -13,7 +13,6 @@
 */
 package fr.insee.sugoi.event.listener.webhook;
 
-import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEvent;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
@@ -94,8 +93,8 @@ public class SugoiEventWebHookProducer {
     String realm = event.getRealm();
     String userStorage = event.getUserStorage() != null ? event.getUserStorage() : "default";
 
-    values.put(GlobalKeysConfig.REALM, realm);
-    values.put(GlobalKeysConfig.USERSTORAGE, userStorage);
+    values.put(EventKeysConfig.REALM, realm);
+    values.put(EventKeysConfig.USERSTORAGE, userStorage);
     values.put(
         EventKeysConfig.MAILS,
         determineUserMails((String) event.getProperties().get(EventKeysConfig.MAIL), user));

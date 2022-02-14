@@ -13,10 +13,13 @@
 */
 package fr.insee.sugoi.core.event.configuration;
 
-import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
+public class EventKeysConfig {
 
-public class EventKeysConfig extends GlobalKeysConfig {
+  private EventKeysConfig() {}
+
+  public static final String REALM = "realm";
   public static final String REALM_NAME = "realmName";
+  public static final String USERSTORAGE = "userStorage";
   public static final String ORGANIZATION = "organization";
   public static final String ORGANIZATION_ID = "organizationId";
   public static final String ORGANIZATION_FILTER = "organizationFilter";
