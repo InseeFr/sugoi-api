@@ -17,6 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import fr.insee.sugoi.model.technics.ModelType;
@@ -81,7 +82,7 @@ public class LocalFileWriteRealmTest {
     UserStorage uniqueUserStorage = new UserStorage();
     uniqueUserStorage.setUserSource("ou=SSM,o=insee,c=fr");
     uniqueUserStorage.setOrganizationSource("ou=organisations,ou=clients_domaine2,o=insee,c=fr");
-    uniqueUserStorage.addProperty("group_filter_pattern", "toto");
+    uniqueUserStorage.getProperties().put(LdapConfigKeys.GROUP_FILTER_PATTERN, "toto");
     realmToAdd.setUserStorages(List.of(uniqueUserStorage));
     assertThat("Realm should not exist", localFileConfig.load("toadd").isEmpty());
     localFileConfig.createRealm(realmToAdd, null);
@@ -98,7 +99,11 @@ public class LocalFileWriteRealmTest {
         is("ou=organisations,ou=clients_domaine2,o=insee,c=fr"));
     assertThat(
         "Realm should have a groupfilterpattern",
-        retrievedRealm.getUserStorages().get(0).getProperties().get("group_filter_pattern"),
+        retrievedRealm
+            .getUserStorages()
+            .get(0)
+            .getProperties()
+            .get(LdapConfigKeys.GROUP_FILTER_PATTERN),
         is("toto"));
   }
 
@@ -111,12 +116,12 @@ public class LocalFileWriteRealmTest {
     userStorage1.setName("first");
     userStorage1.setUserSource("ou=SSM,o=insee,c=fr");
     userStorage1.setOrganizationSource("ou=organisations,ou=clients_domaine2,o=insee,c=fr");
-    userStorage1.addProperty("group_filter_pattern", "toto");
+    userStorage1.getProperties().put(LdapConfigKeys.GROUP_FILTER_PATTERN, "toto");
     UserStorage userStorage2 = new UserStorage();
     userStorage2.setName("second");
     userStorage2.setUserSource("ou=SSM,o=insee,c=fr");
     userStorage2.setOrganizationSource("ou=organisations,ou=clients_domaine2,o=insee,c=fr");
-    userStorage2.addProperty("group_filter_pattern", "toto");
+    userStorage2.getProperties().put(LdapConfigKeys.GROUP_FILTER_PATTERN, "toto");
     List<UserStorage> userStorages = new ArrayList<>();
     userStorages.add(userStorage1);
     userStorages.add(userStorage2);
@@ -133,7 +138,11 @@ public class LocalFileWriteRealmTest {
         is("ou=SSM,o=insee,c=fr"));
     assertThat(
         "Realm should have a groupfilterpattern",
-        retrievedRealm.getUserStorages().get(0).getProperties().get("group_filter_pattern"),
+        retrievedRealm
+            .getUserStorages()
+            .get(0)
+            .getProperties()
+            .get(LdapConfigKeys.GROUP_FILTER_PATTERN),
         is("toto"));
   }
 

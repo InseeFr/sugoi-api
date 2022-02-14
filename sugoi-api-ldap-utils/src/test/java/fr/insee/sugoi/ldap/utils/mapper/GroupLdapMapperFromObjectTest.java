@@ -18,6 +18,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import com.unboundid.ldap.sdk.ModificationType;
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
@@ -40,8 +41,8 @@ public class GroupLdapMapperFromObjectTest {
   public void setup() {
 
     Map<String, String> config = new HashMap<>();
-    config.put("address_source", "ou=address,o=insee,c=fr");
-    config.put("user_source", "ou=contacts,o=insee,c=fr");
+    config.put(GlobalKeysConfig.ADDRESS_SOURCE, "ou=address,o=insee,c=fr");
+    config.put(GlobalKeysConfig.USER_SOURCE, "ou=contacts,o=insee,c=fr");
     groupLdapMapper = new GroupLdapMapper(config, StoreMappingFixture.getGroupStoreMappings());
     group = new Group();
   }

@@ -16,6 +16,7 @@ package fr.insee.sugoi.ldap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.*;
 import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
 import fr.insee.sugoi.model.paging.PageResult;
@@ -77,8 +78,8 @@ public class LdapReaderStoreTest {
     realm.setName("domaine1");
     realm.setUrl("localhost");
     realm.setAppSource(appSource);
-    realm.addProperty("group_filter_pattern", groupFilterPattern);
-    realm.addProperty("group_source_pattern", groupSourcePattern);
+    realm.addProperty(LdapConfigKeys.GROUP_FILTER_PATTERN, groupFilterPattern);
+    realm.addProperty(LdapConfigKeys.GROUP_SOURCE_PATTERN, groupSourcePattern);
     realm.setGroupMappings(StoreMappingFixture.getGroupStoreMappings());
     realm.setApplicationMappings(StoreMappingFixture.getApplicationStoreMappings());
 

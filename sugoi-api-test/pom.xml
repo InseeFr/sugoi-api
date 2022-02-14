@@ -67,6 +67,12 @@
         </dependency>
 
         <dependency>
+            <groupId>fr.insee.sugoi</groupId>
+            <artifactId>sugoi-api-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>me.jvt.cucumber</groupId>
             <artifactId>reporting-plugin</artifactId>
             <scope>test</scope>
