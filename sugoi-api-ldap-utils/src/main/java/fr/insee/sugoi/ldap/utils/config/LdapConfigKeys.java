@@ -17,7 +17,6 @@ import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 
 public class LdapConfigKeys extends GlobalKeysConfig {
 
-  public static final String NAME = "name";
   public static final String URL = "url";
   public static final String PORT = "port";
   public static final String USERNAME = "username";
