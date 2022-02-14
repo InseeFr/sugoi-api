@@ -157,7 +157,7 @@ public class LdapStoreBeansTest {
   public void beanShouldHaveItsOwnPort() {
     assertThat(
         "Port should be realm configured port 390",
-        ldapStoreBeans.generateConfig(realm(), userStorage()).get("port"),
+        ldapStoreBeans.generateConfig(realm(), userStorage()).get(LdapConfigKeys.PORT),
         is("390"));
   }
 }

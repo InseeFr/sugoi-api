@@ -391,7 +391,7 @@ public class OrganizationController {
     Organization org = organizationService.findById(realm, null, id);
     return updateOrganizations(
         realm,
-        (String) org.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
+        (String) org.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
         id,
         isAsynchronous,
         isUrgent,
@@ -498,7 +498,7 @@ public class OrganizationController {
     Organization org = organizationService.findById(realm, null, id);
     return deleteOrganizations(
         realm,
-        (String) org.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
+        (String) org.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
         id,
         isAsynchronous,
         isUrgent,
@@ -612,7 +612,7 @@ public class OrganizationController {
             organizationService
                 .findById(realm, null, id)
                 .getMetadatas()
-                .get(GlobalKeysConfig.USERSTORAGE),
+                .get(GlobalKeysConfig.USERSTORAGE.getName()),
         id);
   }
 
@@ -707,7 +707,7 @@ public class OrganizationController {
     Organization organization = organizationService.findById(realm, null, id);
     return updateOrganizationGpgKey(
         realm,
-        (String) organization.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
+        (String) organization.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
         id,
         file,
         isAsynchronous,
@@ -802,7 +802,7 @@ public class OrganizationController {
     Organization organization = organizationService.findById(realm, null, id);
     return deleteOrganizationGpgKey(
         realm,
-        (String) organization.getMetadatas().get(GlobalKeysConfig.USERSTORAGE),
+        (String) organization.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
         id,
         isAsynchronous,
         isUrgent,

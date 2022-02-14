@@ -13,25 +13,45 @@
 */
 package fr.insee.sugoi.core.configuration;
 
-public class GlobalKeysConfig {
+import fr.insee.sugoi.model.RealmConfigKeys;
+import java.util.Arrays;
+import java.util.Optional;
 
-  public static final String REALM = "realm";
-  public static final String REALM_DESCRIPTION = "description";
+public enum GlobalKeysConfig implements RealmConfigKeys {
+  REALM("realm"),
+  REALM_DESCRIPTION("description"),
+  USERSTORAGE("userStorage"),
+  USER_SOURCE("user_source"),
+  APP_SOURCE("branchesApplicativesPossibles"),
+  ORGANIZATION_SOURCE("organization_source"),
+  ADDRESS_SOURCE("address_source"),
+  SEEALSO_ATTRIBUTES("seealso_attributes"),
+  APP_MANAGED_ATTRIBUTE_KEYS_LIST("app_managed_attribute_key"),
+  APP_MANAGED_ATTRIBUTE_PATTERNS_LIST("app_managed_attribute_pattern"),
+  VERIFY_MAIL_UNICITY("enableMailUnicity"),
+  USERS_MAX_OUTPUT_SIZE("usersMaxOutputSize"),
+  APPLICATIONS_MAX_OUTPUT_SIZE("applicationsMaxOutputSize"),
+  GROUPS_MAX_OUTPUT_SIZE("groupsMaxOutputSize"),
+  ORGANIZATIONS_MAX_OUTPUT_SIZE("organizationsMaxOutputSize");
 
-  public static final String USERSTORAGE = "userStorage";
+  private String name;
 
-  public static final String USER_SOURCE = "user_source";
-  public static final String APP_SOURCE = "app_source";
-  public static final String ORGANIZATION_SOURCE = "organization_source";
-  public static final String ADDRESS_SOURCE = "address_source";
+  GlobalKeysConfig(String name) {
+    this.name = name;
+  }
 
-  public static final String SEEALSO_ATTRIBUTES = "seealso_attributes";
-  public static final String APP_MANAGED_ATTRIBUTE_KEYS_LIST = "app-managed-attribute-keys-list";
-  public static final String APP_MANAGED_ATTRIBUTE_PATTERNS_LIST =
-      "app-managed-attribute-patterns-list";
-  public static final String VERIFY_MAIL_UNICITY = "verify_mail_unicity";
-  public static final String USERS_MAX_OUTPUT_SIZE = "users_max_output_size";
-  public static final String APPLICATIONS_MAX_OUTPUT_SIZE = "applications_max_output_size";
-  public static final String GROUPS_MAX_OUTPUT_SIZE = "groups_max_output_size";
-  public static final String ORGANIZATIONS_MAX_OUTPUT_SIZE = "organizationsMaxOutputSize";
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  public static Optional<GlobalKeysConfig> getGlobalKeyConfig(String name) {
+    return Arrays.stream(GlobalKeysConfig.values())
+        .filter(gkc -> gkc.getName().equalsIgnoreCase(name))
+        .findFirst();
+  }
+
+  public static RealmConfigKeys getRealmConfigKey(String key) {
+    return getGlobalKeyConfig(key).orElse(null);
+  }
 }

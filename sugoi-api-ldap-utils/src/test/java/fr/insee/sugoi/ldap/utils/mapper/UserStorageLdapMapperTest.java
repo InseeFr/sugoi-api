@@ -17,6 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import com.unboundid.ldap.sdk.Attribute;
+import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.UserStorage;
 import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
 import fr.insee.sugoi.model.technics.ModelType;
@@ -89,6 +90,20 @@ public class UserStorageLdapMapperTest {
   }
 
   @Test
+  public void getUserStorageObjectClassFromAttributes() {
+    String[] values = {
+      "user_object_classes$top,person",
+    };
+    Attribute cnAttribute = new Attribute("cn", "userStorageName");
+    Attribute inseeProprieteAttributes = new Attribute("inseepropriete", values);
+    UserStorage userStorage =
+        UserStorageLdapMapper.mapFromAttributes(List.of(inseeProprieteAttributes, cnAttribute));
+    assertThat(
+        "user storage should have  user object classes",
+        userStorage.getProperties().get(LdapConfigKeys.USER_OBJECT_CLASSES).equals("top,person"));
+  }
+
+  @Test
   public void getMappingAttributesFromUserStorage() {
     UserStorage userStorage = new UserStorage();
 
@@ -122,5 +137,21 @@ public class UserStorageLdapMapperTest {
                         && attribute
                             .getValue()
                             .equalsIgnoreCase("organizationMapping$identifiant:uid,String,rw")));
+  }
+
+  @Test
+  public void getObjectClassesAttributesFromUserStorage() {
+    UserStorage userStorage = new UserStorage();
+    userStorage.addProperty(LdapConfigKeys.USER_OBJECT_CLASSES, "top,person,other");
+    List<Attribute> attributes = UserStorageLdapMapper.mapToAttributes(userStorage);
+    assertThat(
+        "Should have inseePropriete with user object classes",
+        attributes.stream()
+            .anyMatch(
+                attribute ->
+                    attribute.getName().equalsIgnoreCase("inseepropriete")
+                        && attribute
+                            .getValue()
+                            .equalsIgnoreCase("user_object_classes$top,person,other")));
   }
 }

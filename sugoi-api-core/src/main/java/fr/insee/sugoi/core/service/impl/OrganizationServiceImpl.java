@@ -172,8 +172,8 @@ public class OrganizationServiceImpl implements OrganizationService {
               .getResults()
               .forEach(
                   org -> {
-                    org.addMetadatas(GlobalKeysConfig.REALM, realm);
-                    org.addMetadatas(GlobalKeysConfig.USERSTORAGE, us.getName());
+                    org.addMetadatas(GlobalKeysConfig.REALM.getName(), realm);
+                    org.addMetadatas(GlobalKeysConfig.USERSTORAGE.getName(), us.getName());
                   });
           result.getResults().addAll(temResult.getResults());
           result.setTotalElements(

@@ -18,6 +18,7 @@ import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
 import com.unboundid.ldap.sdk.LDAPException;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
+import fr.insee.sugoi.model.RealmConfigKeys;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -39,7 +40,7 @@ public class LdapFactory {
    * @return
    * @throws LDAPException
    */
-  public static LDAPConnectionPool getConnectionPool(Map<String, String> config)
+  public static LDAPConnectionPool getConnectionPool(Map<RealmConfigKeys, String> config)
       throws LDAPException {
     // Check if a ldap connection pool already exist for this userStorage and create
     // it if it doesn't exist
@@ -72,13 +73,13 @@ public class LdapFactory {
     return openLdapPoolConnection.get(name);
   }
 
-  public static LDAPConnection getSingleConnection(Map<String, String> config)
+  public static LDAPConnection getSingleConnection(Map<RealmConfigKeys, String> config)
       throws LDAPException {
     return getSingleConnection(config, false);
   }
 
-  public static LDAPConnection getSingleConnection(Map<String, String> config, boolean forceErase)
-      throws LDAPException {
+  public static LDAPConnection getSingleConnection(
+      Map<RealmConfigKeys, String> config, boolean forceErase) throws LDAPException {
     String key =
         config.get(LdapConfigKeys.REALM_NAME)
             + "_"
@@ -114,8 +115,8 @@ public class LdapFactory {
    * @return
    * @throws LDAPException
    */
-  public static LDAPConnectionPool getConnectionPoolAuthenticated(Map<String, String> config)
-      throws LDAPException {
+  public static LDAPConnectionPool getConnectionPoolAuthenticated(
+      Map<RealmConfigKeys, String> config) throws LDAPException {
     // Check if a ldap connection pool already exist for this userStorage and create
     // it if it doesn't exist
     String name =
@@ -150,13 +151,13 @@ public class LdapFactory {
     return openLdapPoolConnection.get(name);
   }
 
-  public static LDAPConnection getSingleConnectionAuthenticated(Map<String, String> config)
+  public static LDAPConnection getSingleConnectionAuthenticated(Map<RealmConfigKeys, String> config)
       throws LDAPException {
     return getSingleConnectionAuthenticated(config, false);
   }
 
   public static LDAPConnection getSingleConnectionAuthenticated(
-      Map<String, String> config, boolean forceErase) throws LDAPException {
+      Map<RealmConfigKeys, String> config, boolean forceErase) throws LDAPException {
     String name =
         config.get(LdapConfigKeys.REALM_NAME)
             + "_"
@@ -188,7 +189,7 @@ public class LdapFactory {
   }
 
   public static boolean validateUserPassword(
-      Map<String, String> config, String userdn, String password) throws LDAPException {
+      Map<RealmConfigKeys, String> config, String userdn, String password) throws LDAPException {
     try (LDAPConnection conn =
         new LDAPConnection(
             config.get(LdapConfigKeys.URL), Integer.valueOf(config.get(LdapConfigKeys.PORT)))) {

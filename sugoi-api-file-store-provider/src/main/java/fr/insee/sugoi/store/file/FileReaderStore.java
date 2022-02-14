@@ -19,6 +19,7 @@ import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.RealmConfigKeys;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.model.exceptions.MultipleUserWithSameMailException;
@@ -50,10 +51,10 @@ public class FileReaderStore implements ReaderStore {
   private static final Logger logger = LoggerFactory.getLogger(FileReaderStore.class);
 
   @Autowired ResourceLoader resourceLoader;
-  private Map<String, String> config;
+  private Map<RealmConfigKeys, String> config;
   private ObjectMapper mapper = new ObjectMapper();
 
-  public FileReaderStore(Map<String, String> generateConfig) {
+  public FileReaderStore(Map<RealmConfigKeys, String> generateConfig) {
     this.config = generateConfig;
   }
 

@@ -22,6 +22,8 @@ import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.Realm.UIMappingType;
+import fr.insee.sugoi.model.RealmConfigKeys;
+import fr.insee.sugoi.model.RealmConfigKeysFinder;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import fr.insee.sugoi.model.technics.UiField;
 import fr.insee.sugoi.model.technics.exceptions.EntryIsNotUIFieldException;
@@ -34,6 +36,7 @@ import org.slf4j.LoggerFactory;
 public class RealmLdapMapper {
 
   private static final Logger logger = LoggerFactory.getLogger(RealmLdapMapper.class);
+  static RealmConfigKeysFinder realmConfigKeysConfiguration = new RealmConfigKeysFinder();
 
   static UiMappingService uiMappingService = new UiMappingService();
 
@@ -48,38 +51,21 @@ public class RealmLdapMapper {
       String[] property = inseeProperty.split("\\$", 2);
       // Test if property is valid
       if (property.length == 2) {
-        if (property[0].equalsIgnoreCase("ldapUrl")) {
-          realm.setUrl(property[1]);
-        } else if (property[0].equalsIgnoreCase("ldapPort")) {
-          realm.setPort(property[1]);
-        } else if (property[0].equalsIgnoreCase("enableMailUnicity")) {
-          realm.addProperty(GlobalKeysConfig.VERIFY_MAIL_UNICITY, property[1]);
-        } else if (property[0].equalsIgnoreCase("branchesApplicativesPossibles")) {
-          realm.setAppSource(property[1]);
-        } else if (property[0].equalsIgnoreCase("seealso_attributes")) {
-          realm.addProperty(GlobalKeysConfig.SEEALSO_ATTRIBUTES, property[1]);
-        } else if (property[0].equalsIgnoreCase("vlv_enabled")) {
-          realm.addProperty(LdapConfigKeys.VLV_ENABLED, property[1]);
+        RealmConfigKeys configKey = realmConfigKeysConfiguration.getRealmConfigKey(property[0]);
+        if (configKey != null) {
+          if (configKey.equals(LdapConfigKeys.URL)) {
+            realm.setUrl(property[1]);
+          } else if (configKey.equals(GlobalKeysConfig.APP_SOURCE)) {
+            realm.setAppSource(property[1]);
+          } else if (configKey.equals(LdapConfigKeys.PORT)) {
+            realm.setPort(property[1]);
+          } else {
+            realm.getProperties().put(configKey, property[1]);
+          }
         } else if (property[0].equalsIgnoreCase("default_writer_type")) {
           realm.setWriterType(property[1]);
         } else if (property[0].equalsIgnoreCase("default_reader_type")) {
           realm.setReaderType(property[1]);
-        } else if (property[0].equalsIgnoreCase("app_managed_attribute_key")) {
-          realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, property[1]);
-        } else if (property[0].equalsIgnoreCase("app_managed_attribute_pattern")) {
-          realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, property[1]);
-        } else if (property[0].equalsIgnoreCase("sort_key")) {
-          realm.addProperty(LdapConfigKeys.SORT_KEY, property[1]);
-        } else if (property[0].equalsIgnoreCase("groupSourcePattern")) {
-          realm.addProperty(LdapConfigKeys.GROUP_SOURCE_PATTERN, property[1]);
-        } else if (property[0].equalsIgnoreCase(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN)) {
-          realm.addProperty(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN, property[1]);
-        } else if (property[0].equalsIgnoreCase("groupFilterPattern")) {
-          realm.addProperty(LdapConfigKeys.GROUP_FILTER_PATTERN, property[1]);
-        } else if (property[0].equalsIgnoreCase(LdapConfigKeys.APPLICATION_OBJECT_CLASSES)) {
-          realm.addProperty(LdapConfigKeys.APPLICATION_OBJECT_CLASSES, property[1]);
-        } else if (property[0].equalsIgnoreCase(LdapConfigKeys.GROUP_OBJECT_CLASSES)) {
-          realm.addProperty(LdapConfigKeys.GROUP_OBJECT_CLASSES, property[1]);
         } else if (property[0].equalsIgnoreCase("applicationMapping")) {
 
           if (realm.getApplicationMappings() == null) {
@@ -110,16 +96,6 @@ public class RealmLdapMapper {
           } catch (EntryIsNotUIFieldException e) {
             logger.debug(e.getLocalizedMessage());
           }
-        } else if (property[0].equalsIgnoreCase("usersMaxOutputSize")) {
-          realm.addProperty(GlobalKeysConfig.USERS_MAX_OUTPUT_SIZE, property[1]);
-        } else if (property[0].equalsIgnoreCase("applicationsMaxOutputSize")) {
-          realm.addProperty(GlobalKeysConfig.APPLICATIONS_MAX_OUTPUT_SIZE, property[1]);
-        } else if (property[0].equalsIgnoreCase("groupsMaxOutputSize")) {
-          realm.addProperty(GlobalKeysConfig.GROUPS_MAX_OUTPUT_SIZE, property[1]);
-        } else if (property[0].equalsIgnoreCase("organizationsMaxOutputSize")) {
-          realm.addProperty(GlobalKeysConfig.ORGANIZATIONS_MAX_OUTPUT_SIZE, property[1]);
-        } else {
-          realm.addProperty(property[0], property[1]);
         }
       }
     }
@@ -143,13 +119,14 @@ public class RealmLdapMapper {
     if (realm.getProperties().containsKey(GlobalKeysConfig.REALM_DESCRIPTION)) {
       attributes.add(
           new Attribute(
-              "description", realm.getProperties().get(GlobalKeysConfig.REALM_DESCRIPTION)));
+              GlobalKeysConfig.REALM_DESCRIPTION.getName(),
+              realm.getProperties().get(GlobalKeysConfig.REALM_DESCRIPTION)));
     }
     if (realm.getAppSource() != null) {
       attributes.add(
           new Attribute(
               "inseepropriete",
-              String.format("branchesApplicativesPossibles$%s", realm.getAppSource())));
+              String.format("%s$%s", GlobalKeysConfig.APP_SOURCE, realm.getAppSource())));
     }
     if (realm.getUiMapping().containsKey(Realm.UIMappingType.UI_USER_MAPPING)
         && realm.getUiMapping().get(Realm.UIMappingType.UI_USER_MAPPING) != null) {
@@ -173,36 +150,14 @@ public class RealmLdapMapper {
                           "inseepropriete", String.format("uiOrganizationMapping$%s", uf))));
     }
 
-    if (realm.getProperties().containsKey(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN)) {
-      attributes.add(
-          new Attribute(
-              LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN,
-              realm.getProperties().get(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN)));
-    }
-    if (realm.getProperties().containsKey(LdapConfigKeys.GROUP_SOURCE_PATTERN)) {
-      attributes.add(
-          new Attribute(
-              "inseepropriete",
-              String.format(
-                  "groupSourcePattern$%s",
-                  realm.getProperties().get(LdapConfigKeys.GROUP_SOURCE_PATTERN))));
-    }
-    if (realm.getProperties().containsKey(LdapConfigKeys.GROUP_FILTER_PATTERN)) {
-      attributes.add(
-          new Attribute(
-              "inseepropriete",
-              String.format(
-                  "groupFilterPattern$%s",
-                  realm.getProperties().get(LdapConfigKeys.GROUP_FILTER_PATTERN))));
-    }
-
     realm
         .getProperties()
         .forEach(
-            (propertyName, propertyValue) ->
+            (configKey, propertyValue) ->
                 attributes.add(
                     new Attribute(
-                        "inseepropriete", String.format("%s$%s", propertyName, propertyValue))));
+                        "inseepropriete",
+                        String.format("%s$%s", configKey.getName(), propertyValue))));
     if (realm.getApplicationMappings() != null) {
       for (StoreMapping storeMapping : realm.getApplicationMappings()) {
         attributes.add(

@@ -35,23 +35,18 @@ public class UserStorageLdapMapper {
               for (String value : attribute.getValues()) {
                 String[] property = value.split("\\$");
                 if (property.length == 2) {
-
+                  LdapConfigKeys.getLdapConfigKeys(property[0])
+                      .ifPresent(
+                          configKey -> userStorage.getProperties().put(configKey, property[1]));
                   if (property[0].equalsIgnoreCase("brancheContact")) {
                     userStorage.setUserSource(property[1]);
                   } else if (property[0].equalsIgnoreCase("brancheOrganisation")) {
                     userStorage.setOrganizationSource(property[1]);
                   } else if (property[0].equalsIgnoreCase("brancheAdresse")) {
                     userStorage.setAddressSource(property[1]);
-                  } else if (property[0].equalsIgnoreCase("groupSourcePattern")) {
-                    userStorage.addProperty("group_source_pattern", property[1]);
-                  } else if (property[0].equalsIgnoreCase("groupManagerSourcePattern")) {
-                    userStorage.addProperty("group_manager_source_pattern", property[1]);
-                  } else if (property[0].equalsIgnoreCase("groupFilterPattern")) {
-                    userStorage.addProperty("group_filter_pattern", property[1]);
                   }
                   // ex with userMapping$username:uid,string,rw
                   else if (property[0].equalsIgnoreCase("userMapping")) {
-
                     if (userStorage.getUserMappings() == null) {
                       userStorage.setUserMappings(new ArrayList<>());
                     }
@@ -62,21 +57,6 @@ public class UserStorageLdapMapper {
                       userStorage.setOrganizationMappings(new ArrayList<>());
                     }
                     userStorage.getOrganizationMappings().add(new StoreMapping(property[1]));
-                  } else if (property[0].equalsIgnoreCase(LdapConfigKeys.USER_OBJECT_CLASSES)) {
-                    userStorage.addProperty(LdapConfigKeys.USER_OBJECT_CLASSES, property[1]);
-                  } else if (property[0].equalsIgnoreCase(
-                      LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES)) {
-                    userStorage.addProperty(
-                        LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES, property[1]);
-                  } else if (property[0].equalsIgnoreCase(LdapConfigKeys.GROUP_OBJECT_CLASSES)) {
-                    userStorage.addProperty(LdapConfigKeys.GROUP_OBJECT_CLASSES, property[1]);
-                  } else if (property[0].equalsIgnoreCase(
-                      LdapConfigKeys.APPLICATION_OBJECT_CLASSES)) {
-                    userStorage.addProperty(LdapConfigKeys.APPLICATION_OBJECT_CLASSES, property[1]);
-                  } else if (property[0].equalsIgnoreCase(LdapConfigKeys.ADDRESS_OBJECT_CLASSES)) {
-                    userStorage.addProperty(LdapConfigKeys.ADDRESS_OBJECT_CLASSES, property[1]);
-                  } else {
-                    userStorage.addProperty(property[0], property[1]);
                   }
                 }
               }
@@ -111,7 +91,14 @@ public class UserStorageLdapMapper {
               "inseepropriete",
               String.format("brancheOrganisation$%s", userStorage.getOrganizationSource())));
     }
-
+    userStorage
+        .getProperties()
+        .forEach(
+            (propertyKey, propertyValue) ->
+                attributes.add(
+                    new Attribute(
+                        "inseepropriete",
+                        String.format("%s$%s", propertyKey.getName(), propertyValue))));
     if (userStorage.getUserMappings() != null) {
       for (StoreMapping storeMapping : userStorage.getUserMappings()) {
         attributes.add(

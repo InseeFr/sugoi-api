@@ -21,6 +21,7 @@ import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.PostalAddress;
+import fr.insee.sugoi.model.RealmConfigKeys;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
 import java.util.*;
@@ -39,7 +40,7 @@ public class UserLdapMapperFromObjectTest {
   @BeforeEach
   public void setup() {
 
-    Map<String, String> config = new HashMap<>();
+    Map<RealmConfigKeys, String> config = new HashMap<>();
     config.put(GlobalKeysConfig.ORGANIZATION_SOURCE, "ou=organisations,o=insee,c=fr");
     config.put(GlobalKeysConfig.ADDRESS_SOURCE, "ou=address,o=insee,c=fr");
     config.put(LdapConfigKeys.USER_OBJECT_CLASSES, "top,person");

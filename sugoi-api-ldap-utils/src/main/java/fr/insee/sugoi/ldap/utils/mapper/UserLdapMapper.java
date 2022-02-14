@@ -15,6 +15,7 @@ package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.Attribute;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
+import fr.insee.sugoi.model.RealmConfigKeys;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.exceptions.InvalidCertificateException;
 import fr.insee.sugoi.model.technics.StoreMapping;
@@ -32,7 +33,7 @@ import java.util.Map;
 
 public class UserLdapMapper extends LdapMapper<User> {
 
-  public UserLdapMapper(Map<String, String> config, List<StoreMapping> mappings) {
+  public UserLdapMapper(Map<RealmConfigKeys, String> config, List<StoreMapping> mappings) {
     this.config = config;
     if (config.get(LdapConfigKeys.USER_OBJECT_CLASSES) != null) {
       objectClasses = Arrays.asList(config.get(LdapConfigKeys.USER_OBJECT_CLASSES).split(","));

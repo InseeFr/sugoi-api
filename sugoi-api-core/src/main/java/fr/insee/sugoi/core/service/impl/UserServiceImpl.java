@@ -260,8 +260,8 @@ public class UserServiceImpl implements UserService {
               .getReaderStore(realmName, nonNullStorage)
               .getUser(id)
               .orElseThrow(() -> new UserNotFoundException(realmName, nonNullStorage, id));
-      user.addMetadatas(GlobalKeysConfig.REALM, realmName.toLowerCase());
-      user.addMetadatas(GlobalKeysConfig.USERSTORAGE, nonNullStorage.toLowerCase());
+      user.addMetadatas(GlobalKeysConfig.REALM.getName(), realmName.toLowerCase());
+      user.addMetadatas(GlobalKeysConfig.USERSTORAGE.getName(), nonNullStorage.toLowerCase());
       if (seeAlsoService != null
           && realm.getProperties().containsKey(GlobalKeysConfig.SEEALSO_ATTRIBUTES)) {
         for (String seeAlso : findUserSeeAlsos(realm, user)) {
@@ -460,8 +460,8 @@ public class UserServiceImpl implements UserService {
               .getReaderStore(realmName, storageName)
               .getUserByMail(mail)
               .orElseThrow(() -> new UserNotFoundByMailException(realmName, nonNullStorage, mail));
-      user.addMetadatas(GlobalKeysConfig.REALM, realmName.toLowerCase());
-      user.addMetadatas(GlobalKeysConfig.USERSTORAGE, storageName.toLowerCase());
+      user.addMetadatas(GlobalKeysConfig.REALM.getName(), realmName.toLowerCase());
+      user.addMetadatas(GlobalKeysConfig.USERSTORAGE.getName(), storageName.toLowerCase());
       if (seeAlsoService != null
           && realm.getProperties().containsKey(GlobalKeysConfig.SEEALSO_ATTRIBUTES)) {
         for (String seeAlso : findUserSeeAlsos(realm, user)) {

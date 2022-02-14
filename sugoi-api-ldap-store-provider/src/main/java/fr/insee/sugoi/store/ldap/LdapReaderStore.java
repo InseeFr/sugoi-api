@@ -20,8 +20,19 @@ import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.LdapFilter;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
-import fr.insee.sugoi.ldap.utils.mapper.*;
-import fr.insee.sugoi.model.*;
+import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;
+import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
+import fr.insee.sugoi.ldap.utils.mapper.GroupLdapMapper;
+import fr.insee.sugoi.ldap.utils.mapper.LdapMapper;
+import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
+import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
+import fr.insee.sugoi.model.Application;
+import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.MappingType;
+import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.PostalAddress;
+import fr.insee.sugoi.model.RealmConfigKeys;
+import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.exceptions.MultipleUserWithSameMailException;
 import fr.insee.sugoi.model.exceptions.StoreException;
 import fr.insee.sugoi.model.paging.PageResult;
@@ -35,7 +46,7 @@ import org.apache.commons.lang.StringUtils;
 public class LdapReaderStore extends LdapStore implements ReaderStore {
 
   public LdapReaderStore(
-      Map<String, String> config, Map<MappingType, List<StoreMapping>> mappings) {
+      Map<RealmConfigKeys, String> config, Map<MappingType, List<StoreMapping>> mappings) {
     logger.debug("Configuring LdapReaderStore with config : {}", config);
     try {
       if (Boolean.TRUE.equals(

@@ -16,6 +16,7 @@ package fr.insee.sugoi.ldap;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.MappingType;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
@@ -57,8 +58,8 @@ public class LdapStoreBeansWithDefaultTest {
     us.setUserSource(userSource);
     us.setAddressSource(addressSource);
     us.setName("default");
-    us.addProperty("group_filter_pattern", groupFilterPattern);
-    us.addProperty("group_source_pattern", groupSourcePattern);
+    us.addProperty(LdapConfigKeys.GROUP_FILTER_PATTERN, groupFilterPattern);
+    us.addProperty(LdapConfigKeys.GROUP_SOURCE_PATTERN, groupSourcePattern);
     return us;
   }
 

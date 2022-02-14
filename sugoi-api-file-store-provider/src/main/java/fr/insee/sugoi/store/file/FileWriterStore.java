@@ -23,6 +23,7 @@ import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.RealmConfigKeys;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.model.exceptions.GroupAlreadyExistException;
@@ -41,11 +42,11 @@ public class FileWriterStore implements WriterStore {
 
   @Autowired ResourceLoader resourceLoader;
 
-  private Map<String, String> config;
+  private Map<RealmConfigKeys, String> config;
   private ObjectMapper mapper = new ObjectMapper();
   FileReaderStore fileReaderStore;
 
-  public FileWriterStore(Map<String, String> generateConfig) {
+  public FileWriterStore(Map<RealmConfigKeys, String> generateConfig) {
     this.config = generateConfig;
     this.fileReaderStore = new FileReaderStore(generateConfig);
   }

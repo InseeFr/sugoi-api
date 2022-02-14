@@ -34,6 +34,7 @@ import fr.insee.sugoi.ldap.utils.mapper.RealmLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserStorageLdapMapper;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.Realm.UIMappingType;
+import fr.insee.sugoi.model.RealmConfigKeys;
 import fr.insee.sugoi.model.UserStorage;
 import fr.insee.sugoi.model.exceptions.LdapStoreConnectionFailedException;
 import fr.insee.sugoi.model.exceptions.RealmAlreadyExistException;
@@ -157,8 +158,8 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   }
 
   private void addDefaultProperties(
-      UserStorage userstorage, Map<String, String> defaultRealmProperties) {
-    for (Entry<String, String> entry : defaultRealmProperties.entrySet()) {
+      UserStorage userstorage, Map<RealmConfigKeys, String> defaultRealmProperties) {
+    for (Entry<RealmConfigKeys, String> entry : defaultRealmProperties.entrySet()) {
       userstorage.getProperties().putIfAbsent(entry.getKey(), entry.getValue());
     }
   }
@@ -246,7 +247,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   }
 
   private List<UserStorage> loadUserStorages(
-      String realmName, Map<String, String> defaultRealmProperties) throws LDAPException {
+      String realmName, Map<RealmConfigKeys, String> defaultRealmProperties) throws LDAPException {
     List<UserStorage> userstorages =
         ldapPoolConnection()
             .search(
@@ -328,7 +329,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
         if (useAuthenticatedConnectionForReading) {
           ldapConnectionPool = ldapConnectionPoolAuthenticated();
         } else {
-          Map<String, String> config = new HashMap<>();
+          Map<RealmConfigKeys, String> config = new HashMap<>();
           config.put(LdapConfigKeys.URL, url);
           config.put(LdapConfigKeys.PORT, String.valueOf(port));
           config.put(LdapConfigKeys.POOL_SIZE, defaultPoolSize);
@@ -345,7 +346,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   private LDAPConnectionPool ldapConnectionPoolAuthenticated() {
     try {
       if (ldapConnectionPoolAuthenticated == null) {
-        Map<String, String> config = new HashMap<>();
+        Map<RealmConfigKeys, String> config = new HashMap<>();
         config.put(LdapConfigKeys.URL, url);
         config.put(LdapConfigKeys.PORT, String.valueOf(port));
         config.put(LdapConfigKeys.POOL_SIZE, defaultPoolSize);
