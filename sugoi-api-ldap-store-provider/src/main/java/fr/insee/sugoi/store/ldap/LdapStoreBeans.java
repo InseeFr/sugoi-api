@@ -13,7 +13,6 @@
 */
 package fr.insee.sugoi.store.ldap;
 
-import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.MappingType;
 import fr.insee.sugoi.model.Realm;
@@ -111,9 +110,6 @@ public class LdapStoreBeans {
     Map<String, String> config = new HashMap<>();
     config.put(LdapConfigKeys.REALM_NAME, realm.getName());
     config.put(LdapConfigKeys.USERSTORAGE_NAME, userStorage.getName());
-    config.put(
-        LdapConfigKeys.NAME,
-        userStorage.getName() != null ? userStorage.getName() : realm.getName());
     config.put(LdapConfigKeys.URL, realm.getUrl());
     config.put(LdapConfigKeys.PORT, realm.getPort() != null ? realm.getPort() : defaultPort);
     config.put(LdapConfigKeys.USERNAME, defaultUsername);
@@ -122,11 +118,6 @@ public class LdapStoreBeans {
         LdapConfigKeys.READ_CONNECTION_AUTHENTICATED,
         String.valueOf(useAuthenticatedConnectionForReading));
     config.put(LdapConfigKeys.POOL_SIZE, defaultPoolSize);
-    config.put(
-        LdapConfigKeys.UNIQUE_EMAILS,
-        realm.getProperties().get(GlobalKeysConfig.VERIFY_MAIL_UNICITY) != null
-            ? realm.getProperties().get(GlobalKeysConfig.VERIFY_MAIL_UNICITY)
-            : "false");
     config.put(LdapConfigKeys.USER_SOURCE, userStorage.getUserSource());
     config.put(LdapConfigKeys.APP_SOURCE, realm.getAppSource());
     config.put(LdapConfigKeys.ORGANIZATION_SOURCE, userStorage.getOrganizationSource());

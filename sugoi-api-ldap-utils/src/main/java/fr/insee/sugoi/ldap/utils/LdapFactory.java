@@ -46,12 +46,15 @@ public class LdapFactory {
     String key =
         config.get(LdapConfigKeys.REALM_NAME)
             + "_"
-            + config.get(LdapConfigKeys.NAME)
+            + config.get(LdapConfigKeys.USERSTORAGE_NAME)
             + "_"
             + config.hashCode()
             + "_R";
     String name =
-        config.get(LdapConfigKeys.REALM_NAME) + "_" + config.get(LdapConfigKeys.NAME) + "_R";
+        config.get(LdapConfigKeys.REALM_NAME)
+            + "_"
+            + config.get(LdapConfigKeys.USERSTORAGE_NAME)
+            + "_R";
 
     if (!openLdapPoolConnectionConfig.containsKey(key)) {
       if (openLdapPoolConnection.containsKey(name)) {
@@ -79,12 +82,15 @@ public class LdapFactory {
     String key =
         config.get(LdapConfigKeys.REALM_NAME)
             + "_"
-            + config.get(LdapConfigKeys.NAME)
+            + config.get(LdapConfigKeys.USERSTORAGE_NAME)
             + "_"
             + config.hashCode()
             + "_R";
     String name =
-        config.get(LdapConfigKeys.REALM_NAME) + "_" + config.get(LdapConfigKeys.NAME) + "_R";
+        config.get(LdapConfigKeys.REALM_NAME)
+            + "_"
+            + config.get(LdapConfigKeys.USERSTORAGE_NAME)
+            + "_R";
 
     if (!openLdapMonoConnectionConfig.containsKey(key) || forceErase) {
       if (openLdapMonoConnection.containsKey(name) && openLdapMonoConnection.get(name) != null
@@ -113,11 +119,14 @@ public class LdapFactory {
     // Check if a ldap connection pool already exist for this userStorage and create
     // it if it doesn't exist
     String name =
-        config.get(LdapConfigKeys.REALM_NAME) + "_" + config.get(LdapConfigKeys.NAME) + "_RW";
+        config.get(LdapConfigKeys.REALM_NAME)
+            + "_"
+            + config.get(LdapConfigKeys.USERSTORAGE_NAME)
+            + "_RW";
     String key =
         config.get(LdapConfigKeys.REALM_NAME)
             + "_"
-            + config.get(LdapConfigKeys.NAME)
+            + config.get(LdapConfigKeys.USERSTORAGE_NAME)
             + "_"
             + config.hashCode()
             + "_RW";
@@ -149,11 +158,14 @@ public class LdapFactory {
   public static LDAPConnection getSingleConnectionAuthenticated(
       Map<String, String> config, boolean forceErase) throws LDAPException {
     String name =
-        config.get(LdapConfigKeys.REALM_NAME) + "_" + config.get(LdapConfigKeys.NAME) + "_RW";
+        config.get(LdapConfigKeys.REALM_NAME)
+            + "_"
+            + config.get(LdapConfigKeys.USERSTORAGE_NAME)
+            + "_RW";
     String key =
         config.get(LdapConfigKeys.REALM_NAME)
             + "_"
-            + config.get(LdapConfigKeys.NAME)
+            + config.get(LdapConfigKeys.USERSTORAGE_NAME)
             + "_"
             + config.hashCode()
             + "_RW";
