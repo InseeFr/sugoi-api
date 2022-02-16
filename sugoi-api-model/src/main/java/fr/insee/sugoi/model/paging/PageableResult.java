@@ -53,4 +53,14 @@ public class PageableResult implements Serializable {
   public void setSearchToken(String searchToken) {
     this.searchToken = searchToken;
   }
+
+  /**
+   * Sets the size to the smaller number between the asked size and the maxOutPutSize in the realm
+   * configuration
+   *
+   * @param realmValue: the maxOutPutSize of the realm configuration
+   */
+  public void setSizeWithMax(int realmValue) {
+    size = Math.min(size, realmValue);
+  }
 }

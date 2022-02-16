@@ -24,6 +24,8 @@ import fr.insee.sugoi.model.paging.PageResult;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Then;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ApplicationGlue {
   private Scenario scenario;
@@ -78,5 +80,19 @@ public class ApplicationGlue {
   @Then("the client want to see the application list")
   public void show_list() {
     scenario.log(stepData.getApplication().toString());
+  }
+
+  @Then("The client expect to receive a list of {int} application\\(s)")
+  public void theClientExpectToReceiveAListOfApplicationS(int size) {
+    List<Application> applicationList = new ArrayList<>();
+    ObjectMapper mapper = new ObjectMapper();
+    try {
+      PageResult<Application> applications =
+          mapper.readValue(stepData.getLatestResponse().getBody(), PageResult.class);
+      applicationList = applications.getResults();
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    assertThat("Data receive is a list of user", applicationList.size(), is(size));
   }
 }

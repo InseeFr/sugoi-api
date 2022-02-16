@@ -84,6 +84,14 @@ public class RealmLdapMapper {
               .getUiMapping()
               .computeIfAbsent(UIMappingType.UI_USER_MAPPING, l -> new ArrayList<>())
               .add(uiMappingService.convertStringToUIField(property[1]));
+        } else if (property[0].equalsIgnoreCase("usersMaxOutputSize")) {
+          realm.addProperty(GlobalKeysConfig.USERS_MAX_OUTPUT_SIZE, property[1]);
+        } else if (property[0].equalsIgnoreCase("applicationsMaxOutputSize")) {
+          realm.addProperty(GlobalKeysConfig.APPLICATIONS_MAX_OUTPUT_SIZE, property[1]);
+        } else if (property[0].equalsIgnoreCase("groupsMaxOutputSize")) {
+          realm.addProperty(GlobalKeysConfig.GROUPS_MAX_OUTPUT_SIZE, property[1]);
+        } else if (property[0].equalsIgnoreCase("organizationsMaxOutputSize")) {
+          realm.addProperty(GlobalKeysConfig.ORGANIZATIONS_MAX_OUTPUT_SIZE, property[1]);
         } else {
           realm.addProperty(property[0], property[1]);
         }

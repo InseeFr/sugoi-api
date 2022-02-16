@@ -82,3 +82,10 @@ Feature: Applications scenario
         When the client perform DELETE request on url /realms/domaine1/applications/MyApp2
         And show body received
         Then the client receives status code 404
+
+    Scenario: Get max output applications
+        When the client perform GET request on url /realms/maxsize/applications
+        And show body received
+        Then the client receives status code 200
+        Then the client expect to receive a list of applications
+        Then The client expect to receive a list of 1 application(s)

@@ -153,7 +153,7 @@ inseepropriete: brancheOrganisation$ou=organisations,ou=clients_domaine1,o=in
 inseepropriete: groupSourcePattern$ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr
 inseepropriete: groupFilterPattern$(cn={group}_{appliname})
 inseepropriete: habilitationsPossibles$propriete_role_appli
-inseepropriete: branchesApplicativesPossibles$applitest
+inseepropriete: branchesApplicativesPossibles$ou=Applications,o=insee,c=fr
 inseepropriete: user_object_classes$top,inseeCompte,inseeContact,inseeAttributsAuthentification,inseeAttributsHabilitation,inseeAttributsCommunication
 inseepropriete: organization_object_classes$top,inseeOrganisation
 description: domaine1
@@ -171,7 +171,7 @@ inseepropriete: brancheOrganisation$ou=organisations,ou=clients_domaine1,o=in
 inseepropriete: groupSourcePattern$ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr
 inseepropriete: groupFilterPattern$(cn={group}_{appliname})
 inseepropriete: habilitationsPossibles$propriete_role_appli
-inseepropriete: branchesApplicativesPossibles$applitest
+inseepropriete: branchesApplicativesPossibles$ou=Applications,o=insee,c=fr
 description: domainesugoi
 
 dn: cn=Profil_uppercaseTest_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We
@@ -187,7 +187,7 @@ inSeepropriete: brancheOrganisation$ou=organisations,ou=clients_domaine1,o=in
 inseePropriete: groupSourcePattern$ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr
 inseePropriete: groupFilterPattern$(cn={group}_{appliname})
 inseePropriete: habilitationsPossibles$propriete_role_appli
-inseePropriete: branchesApplicativesPossibles$applitest
+inseePropriete: branchesApplicativesPossibles$ou=Applications,o=insee,c=fr
 description: upperCaseTest
 
 dn: cn=Utilisateurs_contacts_domaine1_WebServicesLdap,ou=WebServicesLdap_Obje
@@ -461,7 +461,7 @@ inseepropriete: ldapUrl$localhost
 inseepropriete: ldapPort$10389
 inseepropriete: brancheContact$ou=SSM,o=insee,c=fr
 inseepropriete: objectclasscontact$top,person,organizationalPerson,inetOrgPerson,inseeAuthenticatedUser
-inseepropriete: branchesApplicativesPossibles$applitest
+inseepropriete: branchesApplicativesPossibles$ou=Applications,o=insee,c=fr
 inseepropriete: groupSourcePattern$ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr
 inseepropriete: groupFilterPattern$(cn={group}_{appliname})
 inseepropriete: user_object_classes$top,inseeCompte,inseeContact,inseeAttributsAuthentification,inseeAttributsHabilitation,inseeAttributsCommunication

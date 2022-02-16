@@ -111,6 +111,18 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
 
   private LDAPConnectionPool ldapConnectionPool;
 
+  @Value("${fr.insee.sugoi.users.maxoutputsize:1000}")
+  private String defaultUserMaxOutputSize;
+
+  @Value("${fr.insee.sugoi.applications.maxoutputsize:1000}")
+  private String defaultApplicationMaxOutputSize;
+
+  @Value("${fr.insee.sugoi.groups.maxoutputsize:1000}")
+  private String defaultGroupMaxOutputSize;
+
+  @Value("${fr.insee.sugoi.organizations.maxoutputsize:1000}")
+  private String defaultOrganizationMaxOutputSize;
+
   @Override
   public Optional<Realm> load(String realmName) {
     logger.info("Loading configuration from ldap://{}:{}/{}", url, port, baseDn);
@@ -129,16 +141,36 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
         }
         logger.debug("Parsing as realm {}", realm);
         realm.setUserStorages(loadUserStorages(realmEntry));
-        if (realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST) == null) {
-          realm.addProperty(
-              GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, defaultAppManagedAttributeKeyList);
-        }
-        if (realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST)
-            == null) {
-          realm.addProperty(
-              GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST,
-              defaultAppManagedAttributePatternList);
-        }
+        realm
+            .getProperties()
+            .putIfAbsent(
+                GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST,
+                defaultAppManagedAttributeKeyList);
+
+        realm
+            .getProperties()
+            .putIfAbsent(
+                GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST,
+                defaultAppManagedAttributePatternList);
+
+        realm
+            .getProperties()
+            .putIfAbsent(GlobalKeysConfig.USERS_MAX_OUTPUT_SIZE, defaultUserMaxOutputSize);
+
+        realm
+            .getProperties()
+            .putIfAbsent(
+                GlobalKeysConfig.APPLICATIONS_MAX_OUTPUT_SIZE, defaultApplicationMaxOutputSize);
+
+        realm
+            .getProperties()
+            .putIfAbsent(GlobalKeysConfig.GROUPS_MAX_OUTPUT_SIZE, defaultGroupMaxOutputSize);
+
+        realm
+            .getProperties()
+            .putIfAbsent(
+                GlobalKeysConfig.ORGANIZATIONS_MAX_OUTPUT_SIZE, defaultOrganizationMaxOutputSize);
+
         realm
             .getUiMapping()
             .putIfAbsent(UIMappingType.UI_USER_MAPPING, uiMappingService.getUserUiDefaultField());
@@ -176,18 +208,19 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
                 if (realm.getWriterType() == null) {
                   realm.setWriterType(defaultWriter);
                 }
-                if (realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST)
-                    == null) {
-                  realm.addProperty(
-                      GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST,
-                      defaultAppManagedAttributeKeyList);
-                }
-                if (realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST)
-                    == null) {
-                  realm.addProperty(
-                      GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST,
-                      defaultAppManagedAttributePatternList);
-                }
+
+                realm
+                    .getProperties()
+                    .putIfAbsent(
+                        GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST,
+                        defaultAppManagedAttributeKeyList);
+
+                realm
+                    .getProperties()
+                    .putIfAbsent(
+                        GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST,
+                        defaultAppManagedAttributePatternList);
+
                 realm.setUserStorages(loadUserStorages(e));
                 realm
                     .getUiMapping()
@@ -249,8 +282,8 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
                 getRealmDn(realm.getName()),
                 RealmLdapMapper.mapToAttributes(realm, realmEntryPattern, baseDn));
         if (realm.getUserStorages().size() == 1) {
-          UserStorageLdapMapper.mapToAttributes(realm.getUserStorages().get(0)).stream()
-              .forEach(attribute -> addRequest.addAttribute(attribute));
+          UserStorageLdapMapper.mapToAttributes(realm.getUserStorages().get(0))
+              .forEach(addRequest::addAttribute);
           ldapConnectionPoolAuthenticated().add(addRequest);
         } else {
           ldapConnectionPoolAuthenticated().add(addRequest);

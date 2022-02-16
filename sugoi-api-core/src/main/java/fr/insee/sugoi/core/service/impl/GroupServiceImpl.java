@@ -19,13 +19,16 @@ import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
 import fr.insee.sugoi.core.exceptions.ManagerGroupNotFoundException;
+import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
+import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
@@ -42,6 +45,8 @@ public class GroupServiceImpl implements GroupService {
   @Autowired private SugoiEventPublisher sugoiEventPublisher;
 
   @Autowired private UserService userService;
+
+  @Autowired private RealmProvider realmProvider;
 
   @Override
   public ProviderResponse create(
@@ -132,7 +137,9 @@ public class GroupServiceImpl implements GroupService {
   public PageResult<Group> findByProperties(
       String realm, String appName, Group groupFilter, PageableResult pageableResult) {
     try {
-
+      Realm r = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
+      pageableResult.setSizeWithMax(
+          Integer.parseInt(r.getProperties().get(GlobalKeysConfig.GROUPS_MAX_OUTPUT_SIZE)));
       PageResult<Group> groups =
           storeProvider
               .getReaderStore(realm)

@@ -152,6 +152,9 @@ public class OrganizationServiceImpl implements OrganizationService {
       SearchType typeRecherche) {
     PageResult<Organization> result = new PageResult<>();
     result.setPageSize(pageableResult.getSize());
+    Realm r = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
+    pageableResult.setSizeWithMax(
+        Integer.parseInt(r.getProperties().get(GlobalKeysConfig.ORGANIZATIONS_MAX_OUTPUT_SIZE)));
     try {
       if (storageName != null) {
         result =
@@ -159,7 +162,6 @@ public class OrganizationServiceImpl implements OrganizationService {
                 .getReaderStore(realm, storageName)
                 .searchOrganizations(organizationFilter, pageableResult, typeRecherche.name());
       } else {
-        Realm r = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
         for (UserStorage us : r.getUserStorages()) {
           ReaderStore readerStore =
               storeProvider.getStoreForUserStorage(realm, us.getName()).getReader();

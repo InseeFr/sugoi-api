@@ -141,3 +141,10 @@ Feature: Groups scenario admin
         Then the client receives status code 200
         Then the client expect to receive a group
         Then the client expect the group contains user TESTC
+
+    Scenario: Get groups
+        When the client perform GET request on url /realms/maxsize/applications/applitest/groups
+        And show body received
+        Then the client receives status code 200
+        Then the client expect to receive a list of groups
+        Then The client expect to receive a list of 1 group(s)

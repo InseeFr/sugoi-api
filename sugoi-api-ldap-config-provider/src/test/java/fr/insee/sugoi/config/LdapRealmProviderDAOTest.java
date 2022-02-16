@@ -40,7 +40,7 @@ public class LdapRealmProviderDAOTest {
   @Test
   public void loadUniStorage() {
     Realm realm = ldapRealmProviderDAOImpl.load("domaine1").get();
-    assertThat("Should have appSource", realm.getAppSource(), is("applitest"));
+    assertThat("Should have appSource", realm.getAppSource(), is("ou=Applications,o=insee,c=fr"));
     assertThat(
         "Default userstorage should have usersource",
         realm.getUserStorages().get(0).getUserSource(),

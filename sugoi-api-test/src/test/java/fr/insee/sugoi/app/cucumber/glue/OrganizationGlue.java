@@ -24,6 +24,8 @@ import fr.insee.sugoi.model.paging.PageResult;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Then;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OrganizationGlue {
 
@@ -80,5 +82,20 @@ public class OrganizationGlue {
   public void show_list() {
     scenario.log(stepData.getOrganizations().toString());
     System.out.println(stepData.getOrganizations());
+  }
+
+  @Then("The client expect to receive a list of {int} organization\\(s)")
+  public void theClientExpectToReceiveAListOfOrganizationS(int size) {
+
+    List<Organization> organizationList = new ArrayList<>();
+    ObjectMapper mapper = new ObjectMapper();
+    try {
+      PageResult<Organization> organizations =
+          mapper.readValue(stepData.getLatestResponse().getBody(), PageResult.class);
+      organizationList = organizations.getResults();
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    assertThat("Data receive is a list of user", organizationList.size(), is(size));
   }
 }

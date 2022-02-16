@@ -13,16 +13,20 @@
 */
 package fr.insee.sugoi.core.service.impl;
 
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
+import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
+import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.ApplicationService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Application;
+import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;
@@ -35,6 +39,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
   @Autowired private StoreProvider storeProvider;
   @Autowired private SugoiEventPublisher sugoiEventPublisher;
+  @Autowired private RealmProvider realmProvider;
 
   @Override
   public ProviderResponse create(
@@ -145,7 +150,9 @@ public class ApplicationServiceImpl implements ApplicationService {
   public PageResult<Application> findByProperties(
       String realm, Application applicationFilter, PageableResult pageableResult) {
     try {
-
+      Realm r = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
+      pageableResult.setSizeWithMax(
+          Integer.parseInt(r.getProperties().get(GlobalKeysConfig.APPLICATIONS_MAX_OUTPUT_SIZE)));
       PageResult<Application> apps =
           storeProvider
               .getReaderStore(realm)

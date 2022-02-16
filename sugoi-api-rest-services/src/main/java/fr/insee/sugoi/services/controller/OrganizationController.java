@@ -182,6 +182,7 @@ public class OrganizationController {
       @Parameter(description = "Default search can be AND or OR", required = true)
           @RequestParam(name = "typeRecherche", defaultValue = "AND", required = true)
           SearchType typeRecherche) {
+
     return getOrganizations(
         realm, null, identifiant, email, searchCookie, size, offset, typeRecherche);
   }

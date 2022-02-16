@@ -22,6 +22,8 @@ import fr.insee.sugoi.app.cucumber.utils.StepData;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.paging.PageResult;
 import io.cucumber.java.en.Then;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class GroupGlue {
@@ -76,5 +78,19 @@ public class GroupGlue {
             .collect(Collectors.toList())
             .contains(user);
     assertThat("the client expect the group contains user " + user, in, is(true));
+  }
+
+  @Then("The client expect to receive a list of {int} group\\(s)")
+  public void theClientExpectToReceiveAListOfGroupS(int size) {
+    List<Group> groupList = new ArrayList<>();
+    ObjectMapper mapper = new ObjectMapper();
+    try {
+      PageResult<Group> groups =
+          mapper.readValue(stepData.getLatestResponse().getBody(), PageResult.class);
+      groupList = groups.getResults();
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    assertThat("Data receive is a list of user", groupList.size(), is(size));
   }
 }
