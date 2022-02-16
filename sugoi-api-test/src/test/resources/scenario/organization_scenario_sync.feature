@@ -146,3 +146,10 @@ Feature: Organization scenario
         When the client perform DELETE request on url /realms/domaine1/storages/Profil_domaine1_WebServiceLdap/organizations/testo
         And show body received
         Then the client receives status code 404
+
+    Scenario: Get organizations
+        When the client perform GET request on url /realms/maxsize/organizations
+        And show body received
+        Then the client receives status code 200
+        Then the client expect to receive a list of organizations
+        Then The client expect to receive a list of 1 organization(s)

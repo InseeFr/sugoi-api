@@ -41,6 +41,7 @@ import fr.insee.sugoi.model.paging.SearchType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.passay.CharacterRule;
 import org.passay.PasswordGenerator;
 import org.slf4j.Logger;
@@ -94,9 +95,9 @@ public class UserServiceImpl implements UserService {
             user.setUsername(id);
             // unicity requiered at realm level
             idGeneratedAndUnique =
-                !realmLoaded.getUserStorages().stream()
+                realmLoaded.getUserStorages().stream()
                     .map(us -> storeProvider.getReaderStore(realm, us.getName()).getUser(id))
-                    .anyMatch(u -> u.isPresent());
+                    .noneMatch(Optional::isPresent);
           } while (!idGeneratedAndUnique);
         } else {
           // check id unicity
@@ -104,7 +105,7 @@ public class UserServiceImpl implements UserService {
               .map(
                   us ->
                       storeProvider.getReaderStore(realm, us.getName()).getUser(user.getUsername()))
-              .anyMatch(u -> u.isPresent())) {
+              .anyMatch(Optional::isPresent)) {
             throw new UserAlreadyExistException(
                 "User " + user.getUsername() + " already exist in realm " + realm);
           }
@@ -123,7 +124,7 @@ public class UserServiceImpl implements UserService {
                         storeProvider
                             .getReaderStore(realm, us.getName())
                             .getUserByMail(user.getMail()))
-                .anyMatch(u -> u.isPresent())) {
+                .anyMatch(Optional::isPresent)) {
           throw new UserAlreadyExistException(
               "A user has the same mail " + user.getMail() + " in realm " + realm);
         }
@@ -137,7 +138,7 @@ public class UserServiceImpl implements UserService {
           SugoiEventTypeEnum.CREATE_USER,
           Map.ofEntries(Map.entry(EventKeysConfig.USER, user)));
 
-      // TODO Must be done here because at the provider level we doesn't have the
+      // TODO Must be done here because at the provider level we don't have the
       // readerstore
       if (!providerRequest.isAsynchronousAllowed()
           && response.getStatus().equals(ProviderResponseStatus.OK)) {
@@ -294,7 +295,10 @@ public class UserServiceImpl implements UserService {
       SearchType typeRecherche) {
 
     PageResult<User> result = new PageResult<>();
-    result.setPageSize(pageable.getSize());
+    Realm r = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
+    pageable.setSizeWithMax(
+        Integer.parseInt(r.getProperties().get(GlobalKeysConfig.USERS_MAX_OUTPUT_SIZE)));
+
     try {
       if (storage != null) {
         result =
@@ -309,7 +313,6 @@ public class UserServiceImpl implements UserService {
                   user.addMetadatas(EventKeysConfig.USERSTORAGE, storage);
                 });
       } else {
-        Realm r = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
         for (UserStorage us : r.getUserStorages()) {
           ReaderStore readerStore =
               storeProvider.getStoreForUserStorage(realm, us.getName()).getReader();

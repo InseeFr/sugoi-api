@@ -49,17 +49,7 @@ public class StoreProviderImpl implements StoreProvider {
   @Override
   public ReaderStore getReaderStore(String realm, String storage) {
     if (storage != null) {
-      return this.getStoreForUserStorage(
-              realm,
-              (storage != null)
-                  ? storage
-                  : realmProvider
-                      .load(realm)
-                      .orElseThrow(() -> new RealmNotFoundException(realm))
-                      .getUserStorages()
-                      .get(0)
-                      .getName())
-          .getReader();
+      return this.getStoreForUserStorage(realm, storage).getReader();
     }
     logger.info("User storage can not be null");
     throw new InvalidUserStorageException("User storage can not be null");

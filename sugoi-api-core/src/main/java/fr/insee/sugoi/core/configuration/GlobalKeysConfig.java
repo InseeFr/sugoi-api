@@ -30,4 +30,8 @@ public class GlobalKeysConfig {
   public static final String APP_MANAGED_ATTRIBUTE_PATTERNS_LIST =
       "app-managed-attribute-patterns-list";
   public static final String VERIFY_MAIL_UNICITY = "verify_mail_unicity";
+  public static final String USERS_MAX_OUTPUT_SIZE = "users_max_output_size";
+  public static final String APPLICATIONS_MAX_OUTPUT_SIZE = "applications_max_output_size";
+  public static final String GROUPS_MAX_OUTPUT_SIZE = "groups_max_output_size";
+  public static final String ORGANIZATIONS_MAX_OUTPUT_SIZE = "organizationsMaxOutputSize";
 }

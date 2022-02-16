@@ -214,3 +214,10 @@ Feature: User scenario
     Scenario: Perform Delete on single attribute (already delete)
         When the client perform PATCH request on url /realms/domaine1/users/testc/inseegroupedefaut/toto' 
         Then the client receives status code 204
+
+        Scenario: Get max output size from ldap configuration
+            When the client perform GET request on url /realms/maxsize/users
+            And show body received
+            Then the client receives status code 200
+            Then the client expect to receive a list of users
+            Then The client expect to receive a list of 2 user(s)
