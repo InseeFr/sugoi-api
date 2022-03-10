@@ -15,16 +15,30 @@ package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
+import fr.insee.sugoi.model.technics.StoreMapping;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
-public interface LdapMapper<ResultType> {
+public abstract class LdapMapper<ResultType> {
 
-  public ResultType mapFromAttributes(Collection<Attribute> attributes);
+  protected Map<String, String> config;
+  protected List<String> objectClasses;
+  protected List<StoreMapping> mappings;
 
-  public List<Attribute> mapToAttributes(ResultType object);
+  public abstract ResultType mapFromAttributes(Collection<Attribute> attributes);
 
-  public List<Modification> createMods(ResultType object);
+  public List<Attribute> mapToAttributesForCreation(ResultType object) {
+    return GenericLdapMapper.mapObjectToLdapAttributesForCreation(
+        object, config, mappings, objectClasses);
+  }
 
-  public List<Attribute> createAttributesForFilter(ResultType object);
+  public List<Modification> createMods(ResultType object) {
+    return GenericLdapMapper.createMods(object, config, mappings);
+  }
+
+  public List<Attribute> createAttributesForFilter(ResultType object) {
+    return GenericLdapMapper.mapObjectToLdapAttributesForFilter(
+        object, config, mappings, objectClasses);
+  }
 }

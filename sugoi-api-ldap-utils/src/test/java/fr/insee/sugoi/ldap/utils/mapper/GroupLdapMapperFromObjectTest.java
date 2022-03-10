@@ -16,6 +16,8 @@ package fr.insee.sugoi.ldap.utils.mapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.unboundid.ldap.sdk.Attribute;
+import com.unboundid.ldap.sdk.Modification;
+import com.unboundid.ldap.sdk.ModificationType;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
@@ -49,7 +51,7 @@ public class GroupLdapMapperFromObjectTest {
 
     group.setName("group");
     group.setDescription("le groupe");
-    List<Attribute> mappedAttributes = groupLdapMapper.mapToAttributes(group);
+    List<Attribute> mappedAttributes = groupLdapMapper.mapToAttributesForCreation(group);
 
     assertThat(
         "Should have name",
@@ -67,6 +69,25 @@ public class GroupLdapMapperFromObjectTest {
   }
 
   @Test
+  public void getSimpleGroupAttributesFromJavaObjectWhenEmptyField() {
+
+    group.setName("group");
+    group.setDescription("");
+    List<Attribute> mappedAttributes = groupLdapMapper.mapToAttributesForCreation(group);
+
+    assertThat(
+        "Should have name",
+        mappedAttributes.stream()
+            .anyMatch(
+                attribute ->
+                    attribute.getName().equals("cn") && attribute.getValue().equals("group")));
+    assertThat(
+        "Should have description",
+        mappedAttributes.stream()
+            .noneMatch(attribute -> attribute.getName().equals("description")));
+  }
+
+  @Test
   public void getGroupGroupAttributesFromJavaObject() {
 
     User user1 = new User("user1");
@@ -75,7 +96,7 @@ public class GroupLdapMapperFromObjectTest {
     users.add(user1);
     users.add(user2);
     group.setUsers(users);
-    List<Attribute> mappedAttributes = groupLdapMapper.mapToAttributes(group);
+    List<Attribute> mappedAttributes = groupLdapMapper.mapToAttributesForCreation(group);
 
     assertThat(
         "Should not have user user1",
@@ -93,14 +114,17 @@ public class GroupLdapMapperFromObjectTest {
                         && attribute.getValue().equals("uid=user2,ou=contacts,o=insee,c=fr"))));
   }
 
-  // Necessary for the change mod construction (for deleting empty value attributes)
   @Test
-  public void emptyStringShouldNotBeRemoved() {
+  public void emptyStringShouldBeDeletedWhenModification() {
     group.setName("group");
     group.setDescription("");
-    List<Attribute> mappedAttributes = groupLdapMapper.mapToAttributes(group);
+    List<Modification> modifications = groupLdapMapper.createMods(group);
     assertThat(
-        "Should have a empty description attribute",
-        mappedAttributes.stream().anyMatch(attribute -> attribute.getName().equals("description")));
+        "Should delete empty description attribute",
+        modifications.stream()
+            .anyMatch(
+                mod ->
+                    mod.getModificationType().equals(ModificationType.DELETE)
+                        && mod.getAttributeName().equals("description")));
   }
 }

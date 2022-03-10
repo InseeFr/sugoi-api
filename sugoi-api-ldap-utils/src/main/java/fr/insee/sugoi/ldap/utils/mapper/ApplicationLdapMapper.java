@@ -14,7 +14,6 @@
 package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.Attribute;
-import com.unboundid.ldap.sdk.Modification;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.technics.StoreMapping;
@@ -23,11 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class ApplicationLdapMapper implements LdapMapper<Application> {
-
-  Map<String, String> config;
-  List<String> objectClasses;
-  List<StoreMapping> mappings;
+public class ApplicationLdapMapper extends LdapMapper<Application> {
 
   public ApplicationLdapMapper(Map<String, String> config, List<StoreMapping> mappings) {
     this.config = config;
@@ -41,20 +36,5 @@ public class ApplicationLdapMapper implements LdapMapper<Application> {
   public Application mapFromAttributes(Collection<Attribute> attributes) {
     return GenericLdapMapper.mapLdapAttributesToObject(
         attributes, Application.class, config, mappings);
-  }
-
-  public List<Attribute> mapToAttributes(Application application) {
-    return GenericLdapMapper.mapObjectToLdapAttributes(
-        application, Application.class, config, mappings, objectClasses, true);
-  }
-
-  @Override
-  public List<Attribute> createAttributesForFilter(Application application) {
-    return GenericLdapMapper.mapObjectToLdapAttributes(
-        application, Application.class, config, mappings, objectClasses, false);
-  }
-
-  public List<Modification> createMods(Application updatedApplication) {
-    return GenericLdapMapper.createMods(updatedApplication, Application.class, config, mappings);
   }
 }

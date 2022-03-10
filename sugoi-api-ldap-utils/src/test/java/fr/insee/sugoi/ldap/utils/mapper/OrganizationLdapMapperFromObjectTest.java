@@ -49,7 +49,8 @@ public class OrganizationLdapMapperFromObjectTest {
   public void getSimpleOrganizationAttributesFromJavaObject() {
 
     organization.setIdentifiant("orga");
-    List<Attribute> mappedAttributes = organizationLdapMapper.mapToAttributes(organization);
+    List<Attribute> mappedAttributes =
+        organizationLdapMapper.mapToAttributesForCreation(organization);
 
     assertThat(
         "Should have id",
@@ -64,7 +65,8 @@ public class OrganizationLdapMapperFromObjectTest {
 
     organization.addAttributes("description", "Ceci est une organization");
     organization.addAttributes("mail", "orga@insee.fr");
-    List<Attribute> mappedAttributes = organizationLdapMapper.mapToAttributes(organization);
+    List<Attribute> mappedAttributes =
+        organizationLdapMapper.mapToAttributesForCreation(organization);
 
     assertThat(
         "Should have description",
@@ -90,7 +92,8 @@ public class OrganizationLdapMapperFromObjectTest {
     address.setLines(new String[] {"33 rue des Fleurs", "56700 Fleurville"});
 
     organization.setAddress(address);
-    List<Attribute> mappedAttributes = organizationLdapMapper.mapToAttributes(organization);
+    List<Attribute> mappedAttributes =
+        organizationLdapMapper.mapToAttributesForCreation(organization);
 
     assertThat(
         "Should have address attribute",
@@ -109,7 +112,8 @@ public class OrganizationLdapMapperFromObjectTest {
     Organization organizationOfOrganization = new Organization();
     organizationOfOrganization.setIdentifiant("orgaDorga");
     organization.setOrganization(organizationOfOrganization);
-    List<Attribute> mappedAttributes = organizationLdapMapper.mapToAttributes(organization);
+    List<Attribute> mappedAttributes =
+        organizationLdapMapper.mapToAttributesForCreation(organization);
 
     assertThat(
         "Should have dependent organization",
