@@ -15,7 +15,9 @@ package fr.insee.sugoi.ldap.utils;
 
 import com.unboundid.ldap.sdk.Filter;
 import com.unboundid.ldap.sdk.LDAPException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LdapFilter {
 
@@ -23,10 +25,15 @@ public class LdapFilter {
     return Filter.createPresenceFilter(property);
   }
 
-  public static Filter contains(String property, String value) {
-    return property.equalsIgnoreCase("objectclass")
-        ? Filter.createEqualityFilter("objectclass", value)
-        : Filter.createSubAnyFilter(property, value);
+  public static Filter contains(String property, String[] values) {
+    return LdapFilter.and(
+        Arrays.asList(values).stream()
+            .map(
+                value ->
+                    property.equalsIgnoreCase("objectclass")
+                        ? Filter.createEqualityFilter("objectclass", value)
+                        : Filter.createSubAnyFilter(property, value))
+            .collect(Collectors.toList()));
   }
 
   public static Filter equalsProperty(String property, String value) {

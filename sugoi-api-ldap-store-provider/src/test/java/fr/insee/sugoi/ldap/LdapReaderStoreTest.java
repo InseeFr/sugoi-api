@@ -295,6 +295,9 @@ public class LdapReaderStoreTest {
     assertThat(
         "Should contain administrateur",
         groups.stream().anyMatch(group -> group.getName().equals("Administrateurs_Applitest")));
+    assertThat(
+        "Should not contain a user because of objectclasses",
+        groups.stream().noneMatch(group -> group.getName().equals("notagroup_applitest")));
   }
 
   @Test

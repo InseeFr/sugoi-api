@@ -246,13 +246,16 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       return LdapFilter.and(
           mapper.createAttributesForFilter(object).stream()
               .filter(attribute -> !attribute.getValue().equals(""))
-              .map(attribute -> LdapFilter.contains(attribute.getName(), attribute.getValue()))
+              .map(
+                  attribute -> {
+                    return LdapFilter.contains(attribute.getName(), attribute.getValues());
+                  })
               .collect(Collectors.toList()));
     } else if (searchType.equalsIgnoreCase("OR")) {
       List<Filter> objectClassListFilter =
           mapper.createAttributesForFilter(object).stream()
               .filter(attribute -> attribute.getName().equals("objectClass"))
-              .map(attribute -> LdapFilter.contains(attribute.getName(), attribute.getValue()))
+              .map(attribute -> LdapFilter.contains(attribute.getName(), attribute.getValues()))
               .collect(Collectors.toList());
 
       List<Filter> attributeListFilter =
@@ -261,7 +264,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
                   attribute ->
                       !attribute.getName().equals("objectClass")
                           && !attribute.getValue().equals(""))
-              .map(attribute -> LdapFilter.contains(attribute.getName(), attribute.getValue()))
+              .map(attribute -> LdapFilter.contains(attribute.getName(), attribute.getValues()))
               .collect(Collectors.toList());
 
       if (!objectClassListFilter.isEmpty() && attributeListFilter.isEmpty()) {
