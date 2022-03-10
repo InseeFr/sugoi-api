@@ -79,8 +79,7 @@ public class LdapWriterStoreTest {
     us.setUserSource(userSource);
     us.setAddressSource(addressSource);
     us.setName("default");
-    us.addProperty("group_filter_pattern", groupFilterPattern);
-    us.addProperty("group_source_pattern", groupSourcePattern);
+
     us.addProperty(
         LdapConfigKeys.USER_OBJECT_CLASSES,
         "top,inseeContact,inseeAttributsHabilitation,inseeAttributsCommunication");
@@ -101,7 +100,8 @@ public class LdapWriterStoreTest {
     realm.addProperty(
         GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, appManagedAttributePattern);
     realm.addProperty(LdapConfigKeys.UNIQUE_EMAILS, "false");
-
+    realm.addProperty("group_filter_pattern", groupFilterPattern);
+    realm.addProperty("group_source_pattern", groupSourcePattern);
     realm.setApplicationMappings(StoreMappingFixture.getApplicationStoreMappings());
     realm.setGroupMappings(StoreMappingFixture.getGroupStoreMappings());
 

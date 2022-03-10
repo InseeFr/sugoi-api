@@ -64,7 +64,16 @@ public class RealmLdapMapper {
           realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, property[1]);
         } else if (property[0].equalsIgnoreCase("sort_key")) {
           realm.addProperty(LdapConfigKeys.SORT_KEY, property[1]);
-
+        } else if (property[0].equalsIgnoreCase("groupSourcePattern")) {
+          realm.addProperty(LdapConfigKeys.GROUP_SOURCE_PATTERN, property[1]);
+        } else if (property[0].equalsIgnoreCase(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN)) {
+          realm.addProperty(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN, property[1]);
+        } else if (property[0].equalsIgnoreCase("groupFilterPattern")) {
+          realm.addProperty(LdapConfigKeys.GROUP_FILTER_PATTERN, property[1]);
+        } else if (property[0].equalsIgnoreCase(LdapConfigKeys.APPLICATION_OBJECT_CLASSES)) {
+          realm.addProperty(LdapConfigKeys.APPLICATION_OBJECT_CLASSES, property[1]);
+        } else if (property[0].equalsIgnoreCase(LdapConfigKeys.GROUP_OBJECT_CLASSES)) {
+          realm.addProperty(LdapConfigKeys.GROUP_OBJECT_CLASSES, property[1]);
         } else if (property[0].equalsIgnoreCase("applicationMapping")) {
 
           if (realm.getApplicationMappings() == null) {
@@ -153,6 +162,30 @@ public class RealmLdapMapper {
                       new Attribute(
                           "inseepropriete", String.format("uiOrganizationMapping$%s", uf))));
     }
+
+    if (realm.getProperties().containsKey(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN)) {
+      attributes.add(
+          new Attribute(
+              LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN,
+              realm.getProperties().get(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN)));
+    }
+    if (realm.getProperties().containsKey(LdapConfigKeys.GROUP_SOURCE_PATTERN)) {
+      attributes.add(
+          new Attribute(
+              "inseepropriete",
+              String.format(
+                  "groupSourcePattern$%s",
+                  realm.getProperties().get(LdapConfigKeys.GROUP_SOURCE_PATTERN))));
+    }
+    if (realm.getProperties().containsKey(LdapConfigKeys.GROUP_FILTER_PATTERN)) {
+      attributes.add(
+          new Attribute(
+              "inseepropriete",
+              String.format(
+                  "groupFilterPattern$%s",
+                  realm.getProperties().get(LdapConfigKeys.GROUP_FILTER_PATTERN))));
+    }
+
     realm
         .getProperties()
         .forEach(

@@ -65,8 +65,6 @@ public class LdapReaderStoreTest {
     us.setUserSource(userSource);
     us.setAddressSource(addressSource);
     us.setName("default");
-    us.addProperty("group_filter_pattern", groupFilterPattern);
-    us.addProperty("group_source_pattern", groupSourcePattern);
 
     us.setUserMappings(StoreMappingFixture.getUserStoreMappings());
     us.setOrganizationMappings(StoreMappingFixture.getOrganizationStoreMappings());
@@ -79,7 +77,8 @@ public class LdapReaderStoreTest {
     realm.setName("domaine1");
     realm.setUrl("localhost");
     realm.setAppSource(appSource);
-
+    realm.addProperty("group_filter_pattern", groupFilterPattern);
+    realm.addProperty("group_source_pattern", groupSourcePattern);
     realm.setGroupMappings(StoreMappingFixture.getGroupStoreMappings());
     realm.setApplicationMappings(StoreMappingFixture.getApplicationStoreMappings());
 

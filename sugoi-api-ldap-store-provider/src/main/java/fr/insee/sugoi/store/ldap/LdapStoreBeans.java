@@ -130,18 +130,18 @@ public class LdapStoreBeans {
     config.put(LdapConfigKeys.ADDRESS_SOURCE, userStorage.getAddressSource());
     config.put(
         LdapConfigKeys.GROUP_SOURCE_PATTERN,
-        userStorage.getProperties().get("group_source_pattern") != null
-            ? userStorage.getProperties().get("group_source_pattern")
+        realm.getProperties().get(LdapConfigKeys.GROUP_SOURCE_PATTERN) != null
+            ? realm.getProperties().get(LdapConfigKeys.GROUP_SOURCE_PATTERN)
             : defaultGroupSourcePattern);
     config.put(
         LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN,
-        userStorage.getProperties().get("group_manager_source_pattern") != null
-            ? userStorage.getProperties().get("group_manager_source_pattern")
+        realm.getProperties().get(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN) != null
+            ? realm.getProperties().get(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN)
             : defaultGroupManagerSourcePattern);
     config.put(
         LdapConfigKeys.GROUP_FILTER_PATTERN,
-        userStorage.getProperties().get("group_filter_pattern") != null
-            ? userStorage.getProperties().get("group_filter_pattern")
+        realm.getProperties().get(LdapConfigKeys.GROUP_FILTER_PATTERN) != null
+            ? realm.getProperties().get(LdapConfigKeys.GROUP_FILTER_PATTERN)
             : defaultGroupFilterPattern);
     config.put(LdapConfigKeys.REALM_NAME, realm.getName());
     config.put(
@@ -161,13 +161,13 @@ public class LdapStoreBeans {
             : defaultOrganizationObjectClasses);
     config.put(
         LdapConfigKeys.GROUP_OBJECT_CLASSES,
-        userStorage.getProperties().get(LdapConfigKeys.GROUP_OBJECT_CLASSES) != null
-            ? userStorage.getProperties().get(LdapConfigKeys.GROUP_OBJECT_CLASSES)
+        realm.getProperties().get(LdapConfigKeys.GROUP_OBJECT_CLASSES) != null
+            ? realm.getProperties().get(LdapConfigKeys.GROUP_OBJECT_CLASSES)
             : defaultGroupObjectClasses);
     config.put(
         LdapConfigKeys.APPLICATION_OBJECT_CLASSES,
-        userStorage.getProperties().get(LdapConfigKeys.APPLICATION_OBJECT_CLASSES) != null
-            ? userStorage.getProperties().get(LdapConfigKeys.APPLICATION_OBJECT_CLASSES)
+        realm.getProperties().get(LdapConfigKeys.APPLICATION_OBJECT_CLASSES) != null
+            ? realm.getProperties().get(LdapConfigKeys.APPLICATION_OBJECT_CLASSES)
             : defaultApplicationObjectClasses);
     config.put(
         LdapConfigKeys.ADDRESS_OBJECT_CLASSES,
