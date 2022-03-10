@@ -35,6 +35,17 @@ Feature: Groups scenario admin
         Then the client receives status code 201
         Then the client expect to receive a group
 
+    Scenario: Post group
+        When the client perform POST request with body on url /realms/domaine1/applications/applitest/groups body:
+            """
+            {
+                "name": "Users_fake_AppliTest",
+                "description": ""
+            }
+            """
+        And show body received
+        Then the client receives status code 201
+        Then the client expect to receive a group
 
     Scenario: Post group already exist
         When the client perform POST request with body on url /realms/domaine1/applications/applitest/groups body:

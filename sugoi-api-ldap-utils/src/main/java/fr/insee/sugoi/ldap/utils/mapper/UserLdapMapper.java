@@ -14,20 +14,23 @@
 package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.Attribute;
-import com.unboundid.ldap.sdk.Modification;
 import fr.insee.sugoi.core.exceptions.InvalidCertificateException;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import java.io.ByteArrayInputStream;
-import java.security.cert.*;
-import java.util.*;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class UserLdapMapper implements LdapMapper<User> {
-
-  Map<String, String> config;
-  List<String> objectClasses;
-  List<StoreMapping> mappings;
+public class UserLdapMapper extends LdapMapper<User> {
 
   public UserLdapMapper(Map<String, String> config, List<StoreMapping> mappings) {
     this.config = config;
@@ -49,23 +52,6 @@ public class UserLdapMapper implements LdapMapper<User> {
       }
     }
     return user;
-  }
-
-  @Override
-  public List<Attribute> mapToAttributes(User u) {
-    return GenericLdapMapper.mapObjectToLdapAttributes(
-        u, User.class, config, mappings, objectClasses, true);
-  }
-
-  @Override
-  public List<Attribute> createAttributesForFilter(User u) {
-    return GenericLdapMapper.mapObjectToLdapAttributes(
-        u, User.class, config, mappings, objectClasses, false);
-  }
-
-  @Override
-  public List<Modification> createMods(User updatedUser) {
-    return GenericLdapMapper.createMods(updatedUser, User.class, config, mappings);
   }
 
   private Map<String, String> getParsedCertMetadatas(User user) throws CertificateException {

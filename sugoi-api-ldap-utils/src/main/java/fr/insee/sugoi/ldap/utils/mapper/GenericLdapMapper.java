@@ -13,18 +13,27 @@
 */
 package fr.insee.sugoi.ldap.utils.mapper;
 
+import com.unboundid.asn1.ASN1OctetString;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import fr.insee.sugoi.core.exceptions.LdapMappingConfigurationException;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
-import fr.insee.sugoi.model.*;
+import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.Habilitation;
+import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.PostalAddress;
+import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.technics.ModelType;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.security.cert.CertificateException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -88,9 +97,8 @@ public class GenericLdapMapper {
   }
 
   @SuppressWarnings("unchecked")
-  public static <SugoiType> List<Attribute> mapObjectToLdapAttributes(
+  private static <SugoiType> List<Attribute> mapObjectToLdapAttributes(
       SugoiType entity,
-      Class<SugoiType> entityClazz,
       Map<String, String> config,
       List<StoreMapping> mappings,
       List<String> objectClasses,
@@ -141,7 +149,7 @@ public class GenericLdapMapper {
             "Error occured while mapping attribute to Ldap. Must be caused by the configuration "
                 + mappingDefinition
                 + " for entity "
-                + entityClazz.getName(),
+                + entity.getClass().getName(),
             e);
       }
     }
@@ -297,10 +305,43 @@ public class GenericLdapMapper {
     modelField.set(sugoiEntity, map);
   }
 
+  public static <SugoiType> List<Attribute> mapObjectToLdapAttributesForCreation(
+      SugoiType entity,
+      Map<String, String> config,
+      List<StoreMapping> mappings,
+      List<String> objectClasses) {
+    return getAttributesWithoutEmptyValue(
+        mapObjectToLdapAttributes(entity, config, mappings, objectClasses, true));
+  }
+
+  public static <SugoiType> List<Attribute> mapObjectToLdapAttributesForFilter(
+      SugoiType entity,
+      Map<String, String> config,
+      List<StoreMapping> mappings,
+      List<String> objectClasses) {
+    return getAttributesWithoutEmptyValue(
+        mapObjectToLdapAttributes(entity, config, mappings, objectClasses, false));
+  }
+
   public static <O> List<Modification> createMods(
-      O entity, Class<O> propertiesClazz, Map<String, String> config, List<StoreMapping> mappings) {
+      O entity, Map<String, String> config, List<StoreMapping> mappings) {
     return LdapUtils.convertAttributesToModifications(
         // Modification => no need to specify object classes
-        mapObjectToLdapAttributes(entity, propertiesClazz, config, mappings, null, true));
+        mapObjectToLdapAttributes(entity, config, mappings, null, true));
+  }
+
+  private static List<Attribute> getAttributesWithoutEmptyValue(List<Attribute> attributes) {
+    return attributes.stream()
+        .map(GenericLdapMapper::getAttributeWithoutEmptyValues)
+        .filter(attribute -> attribute.getValues().length > 0)
+        .collect(Collectors.toList());
+  }
+
+  private static Attribute getAttributeWithoutEmptyValues(Attribute attribute) {
+    ASN1OctetString[] valuesFiltered =
+        Arrays.asList(attribute.getRawValues()).stream()
+            .filter(value -> value.getValueLength() > 0)
+            .toArray(ASN1OctetString[]::new);
+    return new Attribute(attribute.getName(), valuesFiltered);
   }
 }

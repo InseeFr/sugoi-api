@@ -13,7 +13,16 @@
 */
 package fr.insee.sugoi.store.ldap;
 
-import com.unboundid.ldap.sdk.*;
+import com.unboundid.ldap.sdk.AddRequest;
+import com.unboundid.ldap.sdk.Attribute;
+import com.unboundid.ldap.sdk.DeleteRequest;
+import com.unboundid.ldap.sdk.ExtendedResult;
+import com.unboundid.ldap.sdk.LDAPConnectionPool;
+import com.unboundid.ldap.sdk.LDAPException;
+import com.unboundid.ldap.sdk.Modification;
+import com.unboundid.ldap.sdk.ModificationType;
+import com.unboundid.ldap.sdk.ModifyRequest;
+import com.unboundid.ldap.sdk.ResultCode;
 import com.unboundid.ldap.sdk.extensions.PasswordModifyExtendedRequest;
 import com.unboundid.util.SubtreeDeleter;
 import fr.insee.sugoi.core.exceptions.ApplicationAlreadyExistException;
@@ -35,12 +44,24 @@ import fr.insee.sugoi.core.service.impl.CertificateServiceImpl;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
-import fr.insee.sugoi.ldap.utils.mapper.*;
-import fr.insee.sugoi.model.*;
+import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;
+import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
+import fr.insee.sugoi.ldap.utils.mapper.GroupLdapMapper;
+import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
+import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
+import fr.insee.sugoi.model.Application;
+import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.MappingType;
+import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.PostalAddress;
+import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 public class LdapWriterStore extends LdapStore implements WriterStore {
 
@@ -116,7 +137,8 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
         user.getAddress().setId(addressUuid.toString());
       }
       AddRequest userAddRequest =
-          new AddRequest(getUserDN(user.getUsername()), userLdapMapper.mapToAttributes(user));
+          new AddRequest(
+              getUserDN(user.getUsername()), userLdapMapper.mapToAttributesForCreation(user));
       ldapPoolConnection.add(userAddRequest);
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to create user. Provider message : " + e.getMessage(), e);
@@ -205,7 +227,8 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
         }
         AddRequest ar =
             new AddRequest(
-                getGroupDN(appName, group.getName()), groupLdapMapper.mapToAttributes(group));
+                getGroupDN(appName, group.getName()),
+                groupLdapMapper.mapToAttributesForCreation(group));
         ldapPoolConnection.add(ar);
       } else {
         throw new StoragePolicyNotMetException("Group pattern won't match");
@@ -288,7 +311,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
         AddRequest ar =
             new AddRequest(
                 getOrganizationDN(organization.getIdentifiant()),
-                organizationLdapMapper.mapToAttributes(organization));
+                organizationLdapMapper.mapToAttributesForCreation(organization));
         ldapPoolConnection.add(ar);
       } catch (LDAPException e) {
         throw new RuntimeException(
@@ -541,7 +564,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
         AddRequest ar =
             new AddRequest(
                 getApplicationDN(application.getName()),
-                applicationLdapMapper.mapToAttributes(application));
+                applicationLdapMapper.mapToAttributesForCreation(application));
         ldapPoolConnection.add(ar);
         AddRequest groupsAR =
             new AddRequest(

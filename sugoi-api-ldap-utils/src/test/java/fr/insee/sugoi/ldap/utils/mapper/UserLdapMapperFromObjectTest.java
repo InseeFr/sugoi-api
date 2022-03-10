@@ -55,7 +55,7 @@ public class UserLdapMapperFromObjectTest {
     user.setFirstName("Toto");
     user.setLastName("Tata");
     user.setMail("toto@insee.fr");
-    List<Attribute> mappedAttributes = userLdapMapper.mapToAttributes(user);
+    List<Attribute> mappedAttributes = userLdapMapper.mapToAttributesForCreation(user);
     assertThat(
         "Should have right objectClasses",
         mappedAttributes.stream()
@@ -98,7 +98,7 @@ public class UserLdapMapperFromObjectTest {
     user.addAttributes("phone_number", "012345678");
     user.addAttributes("description", "Ceci est un user");
     user.addAttributes("personal_title", "Camarade");
-    List<Attribute> mappedAttributes = userLdapMapper.mapToAttributes(user);
+    List<Attribute> mappedAttributes = userLdapMapper.mapToAttributesForCreation(user);
 
     assertThat(
         "Should have cn",
@@ -140,7 +140,7 @@ public class UserLdapMapperFromObjectTest {
     postalAddress.setLines(adresses);
     postalAddress.setId("generatedBefore");
     user.setAddress(postalAddress);
-    List<Attribute> mappedAttributes = userLdapMapper.mapToAttributes(user);
+    List<Attribute> mappedAttributes = userLdapMapper.mapToAttributesForCreation(user);
 
     assertThat(
         "Should have address attribute",
@@ -162,7 +162,7 @@ public class UserLdapMapperFromObjectTest {
     habilitations.add(habilitation1);
     habilitations.add(habilitation2);
     user.setHabilitations(habilitations);
-    List<Attribute> mappedAttributes = userLdapMapper.mapToAttributes(user);
+    List<Attribute> mappedAttributes = userLdapMapper.mapToAttributesForCreation(user);
 
     assertThat(
         "Should have first habilitation in inseeGroupeDefault",
@@ -187,7 +187,7 @@ public class UserLdapMapperFromObjectTest {
     Organization organization = new Organization();
     organization.setIdentifiant("SuperOrga");
     user.setOrganization(organization);
-    List<Attribute> mappedAttributes = userLdapMapper.mapToAttributes(user);
+    List<Attribute> mappedAttributes = userLdapMapper.mapToAttributesForCreation(user);
 
     assertThat(
         "Should have SuperOrga link",
@@ -204,7 +204,7 @@ public class UserLdapMapperFromObjectTest {
   public void dontGetUserModifyTimestampFromJavaObject() {
 
     user.addMetadatas("modifyTimestamp", "toto");
-    List<Attribute> mappedAttributes = userLdapMapper.mapToAttributes(user);
+    List<Attribute> mappedAttributes = userLdapMapper.mapToAttributesForCreation(user);
 
     assertThat(
         "Shouldn't have a modifyTimestamp",
@@ -219,7 +219,7 @@ public class UserLdapMapperFromObjectTest {
     inseeRoleApplicatif.add("toto");
     inseeRoleApplicatif.add("tata");
     user.addAttributes("insee_roles_applicatifs", inseeRoleApplicatif);
-    List<Attribute> mappedAttributes = userLdapMapper.mapToAttributes(user);
+    List<Attribute> mappedAttributes = userLdapMapper.mapToAttributesForCreation(user);
 
     assertThat(
         "Should have attribute inseeRoleApplicatif toto",

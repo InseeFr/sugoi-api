@@ -47,7 +47,8 @@ public class ApplicationLdapMapperFromObjectTest {
   public void getSimpleApplicationAttributesFromJavaObject() {
 
     application.setName("application");
-    List<Attribute> mappedAttributes = applicationLdapMapper.mapToAttributes(application);
+    List<Attribute> mappedAttributes =
+        applicationLdapMapper.mapToAttributesForCreation(application);
 
     assertThat(
         "Should have name",
