@@ -41,9 +41,7 @@ public class UserStorageLdapMapperTest {
     String[] values = {
       "brancheContact$ou=contacts,ou=clients_domaine1,o=insee,c=fr",
       "brancheAdresse$ou=adresses,ou=clients_domaine1,o=insee,c=fr",
-      "brancheOrganisation$ou=organisations,ou=clients_domaine1,o=insee,c=fr",
-      "groupSourcePattern$ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr",
-      "groupFilterPattern$(cn={group}_{appliname})"
+      "brancheOrganisation$ou=organisations,ou=clients_domaine1,o=insee,c=fr"
     };
     Attribute brancheContactAttribute = new Attribute("inseepropriete", values);
     Attribute cnAttribute = new Attribute("cn", "userStorageName");
@@ -63,14 +61,6 @@ public class UserStorageLdapMapperTest {
         "Should have organizationSource",
         userStorage.getOrganizationSource(),
         is("ou=organisations,ou=clients_domaine1,o=insee,c=fr"));
-    assertThat(
-        "Should have group source pattern",
-        userStorage.getProperties().get("group_source_pattern"),
-        is("ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr"));
-    assertThat(
-        "Should have group filter pattern",
-        userStorage.getProperties().get("group_filter_pattern"),
-        is("(cn={group}_{appliname})"));
   }
 
   @Test
