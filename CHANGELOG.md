@@ -1,3 +1,19 @@
+# 1.2.1
+
+
+- [TEST] :white_check_mark: fix computing user position in csv header
+- [ENH] :sparkles: better printed exports
+- [ENH] :recycle: refactor address
+- [ENH] :recycle: refactor store mappings
+- [ENH] ✨ Default change password mail template should warn to respect the password (#627)
+- [FIX] :bug: Resource ldap port should be configurable by realm (#573)
+- [BUG] :bug: Fetching a certificate on a user without certificate should return 404 (#524)
+- [ENH] Changelog should only contain last modification (#510)
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 1.1.2
+- [REL] :rocket: release version 1.1.2
+
+
 # 1.1.2
 
 - [REL] :rocket: release version 1.1.2
