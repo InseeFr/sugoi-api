@@ -35,7 +35,7 @@ Realm can be load from different sources.
 | fr.insee.sugoi.config.ldap.profils.pattern | Use only if config type is ldap. String pattern to find realms ('{realm}' is replaced with realm's name). cn={realm} wil search realm config for realm1 |               |             |
 | fr.insee.sugoi.ldap.default.vlv.enabled    |                                                               enable vlv searched on ldap                                                               |         false |             |
 | fr.insee.sugoi.config.ldap.default.sortKey |                                                    attribute on which paging request will be ordered                                                    |               |         uid |
-| fr.insee.sugoi.verify.unique.email         |                                       indicate if a check on user email must be done before each update/creation                                        |               |        true |
+| fr.insee.sugoi.verify-unique-mail         |                                       indicate if a check on user email must be done before each update/creation                                        |               |        true |
 
 ### Reader writer configuration
 
