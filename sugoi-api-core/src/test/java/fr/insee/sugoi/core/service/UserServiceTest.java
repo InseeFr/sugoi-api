@@ -20,7 +20,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.NoCertificateOnUserException;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
+import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
+import fr.insee.sugoi.core.model.ProviderRequest;
+import fr.insee.sugoi.core.model.ProviderResponse;
+import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.impl.UserServiceImpl;
 import fr.insee.sugoi.core.store.ReaderStore;
@@ -41,14 +45,17 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringBootTest(classes = UserServiceImpl.class)
+@ExtendWith(SpringExtension.class)
+@EnableConfigurationProperties(value = UserServiceImpl.class)
 @TestPropertySource(locations = "classpath:/application.properties")
 public class UserServiceTest {
 
@@ -111,7 +118,7 @@ public class UserServiceTest {
 
     Mockito.when(storeProvider.getReaderStore("realm", "us1")).thenReturn(readerStore1);
     Mockito.when(readerStore1.getUser("Toto")).thenReturn(Optional.empty());
-
+    Mockito.when(readerStore1.getUserByMail("mail@insee.fr")).thenReturn(Optional.of(new User()));
     Mockito.when(storeProvider.getReaderStore("realm", "us2")).thenReturn(readerStore2);
     Mockito.when(readerStore2.getUser("Toto")).thenReturn(Optional.of(user1));
     Mockito.when(readerStore2.getUser("donotexist")).thenReturn(Optional.empty());
@@ -122,6 +129,13 @@ public class UserServiceTest {
         .thenThrow(RealmNotFoundException.class);
     Mockito.when(storeProvider.getWriterStore(Mockito.eq("idonotexist"), Mockito.anyString()))
         .thenThrow(RealmNotFoundException.class);
+    User createdUser = new User("createdUser");
+    Mockito.when(readerStore2.getUser("createdUser")).thenReturn(Optional.of(createdUser));
+    ProviderResponse createdProviderResponse =
+        new ProviderResponse(
+            "createdUser", "createdUser", ProviderResponseStatus.OK, createdUser, null);
+    Mockito.when(writerStore.createUser(Mockito.any(), Mockito.any()))
+        .thenReturn(createdProviderResponse);
 
     Mockito.when(storeProvider.getWriterStore("realm", "us2")).thenReturn(writerStore);
     Mockito.when(writerStore.deleteUser(Mockito.eq("donotexist"), Mockito.any()))
@@ -229,5 +243,17 @@ public class UserServiceTest {
     assertThrows(
         RealmNotFoundException.class,
         () -> userService.getCertificate("idonotexist", "us2", "Toto"));
+  }
+
+  @Test
+  @DisplayName(
+      "Given the default setting to verify the unicity of the mail is true and the real has no pre-defined configuration"
+          + "then we verify the mail does not already exist in the userstorage")
+  public void defaultConfigTestVerifyUniqueMail() {
+    User user1 = new User("username");
+    user1.setMail("mail@insee.fr");
+    assertThrows(
+        UserAlreadyExistException.class,
+        () -> userService.create("realm", "us2", user1, new ProviderRequest()));
   }
 }

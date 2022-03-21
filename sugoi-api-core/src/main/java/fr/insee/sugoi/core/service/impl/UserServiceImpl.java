@@ -53,6 +53,8 @@ import org.springframework.stereotype.Service;
 @ConfigurationProperties("fr.insee.sugoi")
 public class UserServiceImpl implements UserService {
 
+  private boolean verifyUniqueMail = false;
+
   /* Size of the ids randomly generated */
   private int idCreateLength = 7;
 
@@ -112,7 +114,8 @@ public class UserServiceImpl implements UserService {
         if (Boolean.parseBoolean(
                 realmLoaded
                     .getProperties()
-                    .getOrDefault(GlobalKeysConfig.VERIFY_MAIL_UNICITY, "false"))
+                    .getOrDefault(
+                        GlobalKeysConfig.VERIFY_MAIL_UNICITY, Boolean.toString(verifyUniqueMail)))
             && user.getMail() != null
             && realmLoaded.getUserStorages().stream()
                 .map(
@@ -544,6 +547,14 @@ public class UserServiceImpl implements UserService {
       characterRules.add(new CharacterRule(SugoiRandomIdCharacterData.UpperCase, 1));
     if (withDigit) characterRules.add(new CharacterRule(SugoiRandomIdCharacterData.Digit, 1));
     return characterRules;
+  }
+
+  public boolean getVerifyUniqueMail() {
+    return verifyUniqueMail;
+  }
+
+  public void setVerifyUniqueMail(boolean verifyUniqueMail) {
+    this.verifyUniqueMail = verifyUniqueMail;
   }
 
   public int getIdCreateLength() {
