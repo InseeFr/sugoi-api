@@ -126,7 +126,8 @@ public class GroupLdapMapperFromObjectTest {
         modifications.stream()
             .anyMatch(
                 mod ->
-                    mod.getModificationType().equals(ModificationType.DELETE)
-                        && mod.getAttributeName().equals("description")));
+                    mod.getModificationType().equals(ModificationType.REPLACE)
+                        && mod.getAttributeName().equals("description")
+                        && mod.getRawValues().length == 0));
   }
 }

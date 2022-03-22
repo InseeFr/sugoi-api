@@ -145,13 +145,12 @@ public class LdapUtils {
             .filter(value -> !value.isBlank())
             .toArray(String[]::new);
 
-    if (newValues.length == 0) {
-      // If there are only blank or empty vales, this should be considered as
-      // delete attribute (no value to set)
-      return new Modification(ModificationType.DELETE, attributeName);
-    } else {
-      // Set new value(s)
-      return new Modification(ModificationType.REPLACE, attributeName, newValues);
-    }
+    // If there are only blank or empty vales, this should be considered as
+    // delete attribute (no value to set)
+    // A replace Operation whith an empty values array is equivalent as a delete if
+    // there are values in current state and is idempotent if already no values in
+    // ldap
+
+    return new Modification(ModificationType.REPLACE, attributeName, newValues);
   }
 }

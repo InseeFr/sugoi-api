@@ -308,10 +308,7 @@ public class FileWriterStore implements WriterStore {
                   () -> new UserNotFoundException(config.get(GlobalKeysConfig.REALM), userId));
       if (user != null) {
         try {
-          if (user.getGroups() == null) {
-            user.setGroups(new ArrayList<>());
-          }
-          user.getGroups().add(new Group(appName, groupName));
+          user.addGroup(new Group(appName, groupName));
           updateUser(user, new ProviderRequest(null, false, null));
           if (group.getUsers() == null) {
             group.setUsers(new ArrayList<>());

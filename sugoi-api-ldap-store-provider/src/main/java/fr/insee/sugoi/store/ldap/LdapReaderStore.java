@@ -89,6 +89,13 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     if (user != null && user.getOrganization() != null) {
       user.setOrganization(getOrganization(user.getOrganization().getIdentifiant()).orElse(null));
     }
+    // Add empty habilitations and groups if not already added
+    if (user != null && user.getHabilitations() == null) {
+      user.setHabilitations(new ArrayList<>());
+    }
+    if (user != null && user.getGroups() == null) {
+      user.setGroups(new ArrayList<>());
+    }
     return Optional.ofNullable(user);
   }
 

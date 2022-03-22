@@ -16,13 +16,11 @@ package fr.insee.sugoi.ldap.utils.mapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.unboundid.ldap.sdk.Attribute;
+import com.unboundid.ldap.sdk.Modification;
+import com.unboundid.ldap.sdk.ModificationType;
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
-import fr.insee.sugoi.model.Habilitation;
-import fr.insee.sugoi.model.Organization;
-import fr.insee.sugoi.model.PostalAddress;
-import fr.insee.sugoi.model.RealmConfigKeys;
-import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.*;
 import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
 import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -172,7 +170,8 @@ public class UserLdapMapperFromObjectTest {
             .anyMatch(
                 attribute ->
                     attribute.getName().equals("inseeGroupeDefaut")
-                        && attribute.getValue().equals("property_role_application")));
+                        && Arrays.asList(attribute.getValues())
+                            .contains("property_role_application")));
 
     assertThat(
         "Should have second habilitation in inseeGroupeDefault",
@@ -180,7 +179,8 @@ public class UserLdapMapperFromObjectTest {
             .anyMatch(
                 attribute ->
                     attribute.getName().equals("inseeGroupeDefaut")
-                        && attribute.getValue().equals("property_role_application2")));
+                        && Arrays.asList(attribute.getValues())
+                            .contains("property_role_application2")));
   }
 
   @Test
@@ -229,13 +229,59 @@ public class UserLdapMapperFromObjectTest {
             .anyMatch(
                 attribute ->
                     attribute.getName().equals("inseeRoleApplicatif")
-                        && attribute.getValue().equals("toto")));
+                        && Arrays.asList(attribute.getValues()).contains("toto")));
     assertThat(
         "Should have attribute inseeRoleApplicatif tata",
         mappedAttributes.stream()
             .anyMatch(
                 attribute ->
                     attribute.getName().equals("inseeRoleApplicatif")
-                        && attribute.getValue().equals("tata")));
+                        && Arrays.asList(attribute.getValues()).contains("tata")));
+  }
+
+  @Test
+  public void removeInseeRoleApplicatifIfEmptyListSet() {
+
+    List<String> inseeRoleApplicatif = new ArrayList<String>();
+    user.addAttributes("insee_roles_applicatifs", inseeRoleApplicatif);
+    List<Modification> modifications = userLdapMapper.createMods(user);
+
+    assertThat(
+        "Should remove attribute inseeRoleApplicatif",
+        modifications.stream()
+            .anyMatch(
+                mod ->
+                    mod.getModificationType().equals(ModificationType.REPLACE)
+                        && mod.getAttributeName().equals("inseeRoleApplicatif")
+                        && mod.getRawValues().length == 0));
+  }
+
+  @Test
+  public void dontRemoveInseeRoleApplicatifIfNoListSet() {
+
+    // when no explicit insee_roles_applicatifs attribute is set
+    List<Modification> modifications = userLdapMapper.createMods(user);
+
+    assertThat(
+        "Should not change attribute inseeRoleApplicatif",
+        modifications.stream()
+            .noneMatch(mod -> mod.getAttributeName().equals("inseeRoleApplicatif")));
+  }
+
+  @Test
+  public void removeAllHabilitationsIfEmptyList() {
+
+    // Default is a null habilitation list and means no changes on habilitation
+    // An explicit empty habilitation list means remove all habilitations
+    user.setHabilitations(new ArrayList<Habilitation>());
+    List<Modification> modifications = userLdapMapper.createMods(user);
+
+    assertThat(
+        "Should not change attribute inseeGroupeDefaut",
+        modifications.stream()
+            .anyMatch(
+                mod ->
+                    mod.getAttributeName().equals("inseeGroupeDefaut")
+                        && mod.getValues().length == 0));
   }
 }
