@@ -29,8 +29,10 @@ public class User implements Serializable {
   private byte[] certificate;
   private Organization organization;
 
-  private List<Group> groups = new ArrayList<>();
-  private List<Habilitation> habilitations = new ArrayList<>();
+  // Don't set a default empty list to distinguish case null (not provided) and empty
+  private List<Group> groups;
+  // Don't set a default empty list to distinguish case null (not provided) and empty
+  private List<Habilitation> habilitations;
 
   private PostalAddress address;
   private Map<String, Object> metadatas = new HashMap<>();
@@ -60,6 +62,9 @@ public class User implements Serializable {
   }
 
   public void addHabilitation(Habilitation habilitation) {
+    if (habilitations == null) {
+      habilitations = new ArrayList<>();
+    }
     this.habilitations.add(habilitation);
   }
 
@@ -111,6 +116,13 @@ public class User implements Serializable {
     return this.groups;
   }
 
+  public void addGroup(Group group) {
+    if (groups == null) {
+      groups = new ArrayList<>();
+    }
+    this.groups.add(group);
+  }
+
   public void setGroups(List<Group> groups) {
     this.groups = groups;
   }
@@ -156,6 +168,9 @@ public class User implements Serializable {
   }
 
   public void addGroups(Group group) {
+    if (this.groups == null) {
+      this.groups = new ArrayList<>();
+    }
     this.groups.add(group);
   }
 }

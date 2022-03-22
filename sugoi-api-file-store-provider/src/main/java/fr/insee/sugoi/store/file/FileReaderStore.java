@@ -69,6 +69,13 @@ public class FileReaderStore implements ReaderStore {
         String nestedOrgaId = user.getOrganization().getIdentifiant();
         user.setOrganization(getOrganization(nestedOrgaId).orElse(null));
       }
+      // Add empty habilitations and groups if not already added
+      if (user != null && user.getHabilitations() == null) {
+        user.setHabilitations(new ArrayList<>());
+      }
+      if (user != null && user.getGroups() == null) {
+        user.setGroups(new ArrayList<>());
+      }
       return Optional.of(user);
     } else {
       return Optional.empty();

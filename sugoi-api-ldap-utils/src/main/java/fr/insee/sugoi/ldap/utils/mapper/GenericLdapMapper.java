@@ -123,12 +123,15 @@ public class GenericLdapMapper {
             if (mapToModify != null && mapToModify.containsKey(keyToModify)) {
               Object sugoiValue = mapToModify.get(keyToModify);
               if (sugoiValue != null) {
-                attributes.addAll(
+                Attribute mappedValue =
                     transformSugoiToAttribute(
                         mappingDefinition.getModelType(),
                         mappingDefinition.getStoreName(),
                         sugoiValue,
-                        config));
+                        config);
+                if (mappedValue != null) {
+                  attributes.add(mappedValue);
+                }
               }
             }
           } else {
@@ -136,12 +139,15 @@ public class GenericLdapMapper {
             sugoiField.setAccessible(true);
             Object sugoiValue = sugoiField.get(entity);
             if (sugoiValue != null) {
-              attributes.addAll(
+              Attribute mappedValue =
                   transformSugoiToAttribute(
                       mappingDefinition.getModelType(),
                       mappingDefinition.getStoreName(),
                       sugoiValue,
-                      config));
+                      config);
+              if (mappedValue != null) {
+                attributes.add(mappedValue);
+              }
             }
           }
         }
@@ -219,70 +225,76 @@ public class GenericLdapMapper {
   }
 
   @SuppressWarnings("unchecked")
-  private static List<Attribute> transformSugoiToAttribute(
+  private static Attribute transformSugoiToAttribute(
       ModelType type,
       String ldapAttributeName,
       Object sugoiValue,
       Map<RealmConfigKeys, String> config) {
     switch (type) {
       case STRING:
-        return List.of(new Attribute(ldapAttributeName, (String) sugoiValue));
+        return new Attribute(ldapAttributeName, (String) sugoiValue);
       case ORGANIZATION:
-        return List.of(
-            new Attribute(
-                ldapAttributeName,
-                String.format(
-                    "%s=%s,%s",
-                    // TODO should be a param
-                    "uid",
-                    //
-                    ((Organization) sugoiValue).getIdentifiant(),
-                    config.get(GlobalKeysConfig.ORGANIZATION_SOURCE))));
+        return new Attribute(
+            ldapAttributeName,
+            String.format(
+                "%s=%s,%s",
+                // TODO should be a param
+                "uid",
+                //
+                ((Organization) sugoiValue).getIdentifiant(),
+                config.get(GlobalKeysConfig.ORGANIZATION_SOURCE)));
       case ADDRESS:
         if (((PostalAddress) sugoiValue).getId() != null
             && config.get(GlobalKeysConfig.ADDRESS_SOURCE) != null) {
-          return List.of(
-              new Attribute(
-                  ldapAttributeName,
-                  String.format(
-                      "%s=%s,%s",
-                      // TODO should be a param
-                      "l",
-                      //
-                      ((PostalAddress) sugoiValue).getId(),
-                      config.get(GlobalKeysConfig.ADDRESS_SOURCE))));
-        } else return List.of();
+          return new Attribute(
+              ldapAttributeName,
+              String.format(
+                  "%s=%s,%s",
+                  // TODO should be a param
+                  "l",
+                  //
+                  ((PostalAddress) sugoiValue).getId(),
+                  config.get(GlobalKeysConfig.ADDRESS_SOURCE)));
+        } else return null;
       case LIST_HABILITATION:
-        return ((List<Habilitation>) sugoiValue)
-            .stream()
-                // Dont check contents (application nor role) for searching purpose
-                .filter(habilitation -> habilitation.getId() != null)
-                .map(habilitation -> new Attribute(ldapAttributeName, habilitation.getId()))
-                .collect(Collectors.toList());
-      case LIST_USER:
-        return List.of();
+        // Assume that if list is empty it's really to set an empty list (delete all
+        // values)
+        // Habilitations list can be set null if not needed
+        return new Attribute(
+            ldapAttributeName,
+            ((List<Habilitation>) sugoiValue)
+                .stream()
+                    // Dont check contents (application nor role) for searching purpose
+                    .filter(habilitation -> habilitation.getId() != null)
+                    .map(habilitation -> habilitation.getId())
+                    .collect(Collectors.toList()));
       case LIST_GROUP:
-        return ((List<Group>) sugoiValue)
-            .stream()
-                .map(
-                    group ->
-                        new Attribute(
-                            ldapAttributeName,
+        // Assume that if list is empty it's really to set an empty list (delete all
+        // values)
+        // Groups list can be set null if not needed
+        return new Attribute(
+            ldapAttributeName,
+            ((List<Group>) sugoiValue)
+                .stream()
+                    .map(
+                        group ->
                             String.format(
                                 // TODO should be a param
                                 "cn=%s,",
                                 //
-                                group.getName())))
-                .collect(Collectors.toList());
+                                group.getName()))
+                    .collect(Collectors.toList()));
       case LIST_STRING:
-        return ((List<String>) sugoiValue)
-            .stream()
-                .map(value -> new Attribute(ldapAttributeName, value))
-                .collect(Collectors.toList());
+        // Assume that if list is empty it's really to set an empty list (delete all
+        // values)
+        // Lists in attributes map can be set as null if not needed
+        return new Attribute(
+            ldapAttributeName,
+            ((List<String>) sugoiValue).stream().map(value -> value).collect(Collectors.toList()));
+      case LIST_USER:
       default:
-        List.of();
+        return null;
     }
-    return List.of();
   }
 
   private static <ReturnType> void putSugoiAttributeInEntityField(
