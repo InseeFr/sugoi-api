@@ -25,7 +25,7 @@
 		<jacoco.unit-tests.limit.class-complexity>20</jacoco.unit-tests.limit.class-complexity>
 		<jacoco.unit-tests.limit.method-complexity>5</jacoco.unit-tests.limit.method-complexity>
 		<java.version>11</java.version>
-		<spring-boot.version>2.6.3</spring-boot.version>
+		<spring-boot.version>2.6.4</spring-boot.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<tomcat.version>9.0.56</tomcat.version>
 		<commons-io.version>2.11.0</commons-io.version>
@@ -43,7 +43,7 @@
 		<git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
 		<commons-io.version>2.11.0</commons-io.version>
 		<net.sf.ehcache.version>2.10.9.2</net.sf.ehcache.version>
-		<maven.jar.plugin.version>3.2.0</maven.jar.plugin.version>
+		<maven.jar.plugin.version>3.2.2</maven.jar.plugin.version>
 	</properties>
 
 	<dependencies></dependencies>
