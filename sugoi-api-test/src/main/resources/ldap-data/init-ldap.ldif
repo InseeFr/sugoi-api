@@ -531,14 +531,16 @@ uid: appli_sugoi
 userpassword: sugoi
 
 dn: uid=test_password,ou=contacts,ou=clients_domaine1,o=insee,c=fr
-objectclass: top
-objectclass: person
-objectclass: organizationalPerson
-objectclass: inetOrgPerson
-objectclass: inseeApplication
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
 cn: test_password
 sn: test_password
 givenname: test_password
+mail: test_password@gouv.test
 uid: test_password
 memberOf: cn=Utilisateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
 

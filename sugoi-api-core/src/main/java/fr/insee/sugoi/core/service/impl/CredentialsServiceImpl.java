@@ -17,6 +17,7 @@ import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.PasswordPolicyNotMetException;
+import fr.insee.sugoi.core.exceptions.UserNoEmailException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
@@ -28,6 +29,7 @@ import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.PasswordPolicyConstants;
 import fr.insee.sugoi.model.User;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,6 +57,14 @@ public class CredentialsServiceImpl implements CredentialsService {
       ProviderRequest providerRequest) {
     try {
       User user = userService.findById(realm, userStorage, userId);
+
+      if (user == null || StringUtils.isEmpty(user.getUsername())) {
+        throw new UserNotFoundException(realm, userStorage, userId);
+      }
+
+      if (StringUtils.isEmpty(computeReceiverMail(templateProperties, user.getMail()))) {
+        throw new UserNoEmailException(realm, userStorage, userId);
+      }
 
       Map<String, String> realmProperties = configService.getRealm(realm).getProperties();
 
