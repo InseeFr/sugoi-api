@@ -15,7 +15,7 @@ Feature: User scenario
         When the client perform GET request on url /realms/domaine1/users?mail=test&size=20&offset=0&typeRecherche=AND
         And show body received
         Then the client receives status code 200
-        Then The client expect to receive a list of 1 user(s)
+        Then The client expect to receive a list of 2 user(s)
 
     Scenario: Get user
         When the client perform GET request on url /realms/domaine1/users/testc
@@ -215,9 +215,18 @@ Feature: User scenario
         When the client perform PATCH request on url /realms/domaine1/users/testc/inseegroupedefaut/toto' 
         Then the client receives status code 204
 
-        Scenario: Get max output size from ldap configuration
+    Scenario: Get max output size from ldap configuration
             When the client perform GET request on url /realms/maxsize/users
             And show body received
             Then the client receives status code 200
             Then the client expect to receive a list of users
             Then The client expect to receive a list of 2 user(s)
+  
+    Scenario: Perform reinit on a user with a password
+        When the client perform POST request on url /realms/domaine1/users/test_password/reinit-password
+        Then the client receives status code 204
+ 
+     Scenario: Perform reinit on a user without a password
+        When the client perform POST request on url /realms/domaine1/users/nogroup/reinit-password
+        Then the client receives status code 400
+

@@ -38,6 +38,7 @@ import fr.insee.sugoi.core.exceptions.RealmNotCreatedException;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.exceptions.StoragePolicyNotMetException;
 import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
+import fr.insee.sugoi.core.exceptions.UserNoEmailException;
 import fr.insee.sugoi.core.exceptions.UserNotCreatedException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundByMailException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
@@ -289,6 +290,16 @@ public class SugoiAdviceController {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
     return new ResponseEntity<>(errorView, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(UserNoEmailException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(UserNoEmailException e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    final ResponseEntity<ErrorView> response =
+        new ResponseEntity<ErrorView>(errorView, HttpStatus.BAD_REQUEST);
+    return response;
   }
 
   @ExceptionHandler(Exception.class)

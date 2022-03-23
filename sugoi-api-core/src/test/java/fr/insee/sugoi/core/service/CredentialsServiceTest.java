@@ -16,11 +16,13 @@ package fr.insee.sugoi.core.service;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.exceptions.PasswordPolicyNotMetException;
+import fr.insee.sugoi.core.exceptions.UserNoEmailException;
+import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.service.impl.CredentialsServiceImpl;
@@ -63,6 +65,8 @@ public class CredentialsServiceTest {
 
   private User user1;
 
+  private User user2;
+
   private Realm realmUpperCase;
   private Realm realmNoUpperCase;
 
@@ -71,6 +75,9 @@ public class CredentialsServiceTest {
     user1 = new User();
     user1.setUsername("Toto");
     user1.setMail("toto@insee.fr");
+
+    user2 = new User();
+    user2.setUsername("dodo");
 
     realmUpperCase = new Realm();
     realmUpperCase.setName("realmWithUpperCase");
@@ -89,6 +96,8 @@ public class CredentialsServiceTest {
     Mockito.when(writerStore.changePassword(any(), any(), any(), any(), any(), any()))
         .thenReturn(acceptedResponse);
     Mockito.when(userService.findById(any(), any(), any())).thenReturn(new User());
+    Mockito.when(userService.findById("realmWithoutUpperCase", "us1", "test")).thenReturn(user1);
+    Mockito.when(userService.findById("realmWithoutUpperCase", "us2", "test")).thenReturn(user2);
   }
 
   @Test
@@ -130,6 +139,26 @@ public class CredentialsServiceTest {
                 null)
             .getStatus(),
         is(ProviderResponseStatus.ACCEPTED));
+  }
+
+  @Test
+  @DisplayName("a user is needed to reinit a password")
+  public void passwordShouldHaveUser() {
+    assertThrows(
+        UserNotFoundException.class,
+        () ->
+            credentialsService.reinitPassword(
+                "realmWithoutUpperCase", "dodo", "dodo", Map.of(), null, false, null));
+  }
+
+  @Test
+  @DisplayName("an email is needed to reinit a password")
+  public void passwordShouldUserHaveEmail() {
+    assertThrows(
+        UserNoEmailException.class,
+        () ->
+            credentialsService.reinitPassword(
+                "realmWithoutUpperCase", "us2", "test", Map.of(), null, false, null));
   }
 
   @Test
