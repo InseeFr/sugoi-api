@@ -14,7 +14,7 @@
 package fr.insee.sugoi.ldap;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 
 import fr.insee.sugoi.model.MappingType;
 import fr.insee.sugoi.model.Realm;

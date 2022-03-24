@@ -76,16 +76,19 @@ public class LdapStoreBeans {
   @Value("${fr.insee.sugoi.ldap.default.address-object-classes:top,locality}")
   private String defaultAddressObjectClasses;
 
-  @Value("#{'${fr.insee.sugoi.ldap.default.user-mapping}'.split(';')}")
+  @Value(
+      "#{'${fr.insee.sugoi.ldap.default.user-mapping:username:uid,String,rw;groups:memberOf,list_group,ro;habilitations:inseeGroupeDefaut,list_habilitation,rw}'.split(';')}")
   private List<String> defaultUserMapping;
 
-  @Value("#{'${fr.insee.sugoi.ldap.default.organization-mapping}'.split(';')}")
+  @Value(
+      "#{'${fr.insee.sugoi.ldap.default.organization-mapping:identifiant:uid,String,rw;address:inseeAdressePostaleDN,address,rw;organization:inseeOrganisationDN,organization,rw}'.split(';')}")
   private List<String> defaultOrganizationMapping;
 
-  @Value("#{'${fr.insee.sugoi.ldap.default.group-mapping}'.split(';')}")
+  @Value(
+      "#{'${fr.insee.sugoi.ldap.default.group-mapping:name:cn,String,rw;description:description,String,rw;users:uniquemember,list_user,rw}'.split(';')}")
   private List<String> defaultGroupMapping;
 
-  @Value("#{'${fr.insee.sugoi.ldap.default.application-mapping}'.split(';')}")
+  @Value("#{'${fr.insee.sugoi.ldap.default.application-mapping:name:ou,String,rw}'.split(';')}")
   private List<String> defaultApplicationMapping;
 
   @Bean("LdapReaderStore")
