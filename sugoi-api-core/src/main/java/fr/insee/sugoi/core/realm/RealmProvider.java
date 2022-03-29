@@ -14,11 +14,9 @@
 package fr.insee.sugoi.core.realm;
 
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
-import fr.insee.sugoi.core.exceptions.UserStorageNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.model.Realm;
-import fr.insee.sugoi.model.UserStorage;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.cache.annotation.CacheEvict;
@@ -48,25 +46,6 @@ public interface RealmProvider {
    */
   @Cacheable(value = "Realm", key = "#realmName")
   public Optional<Realm> load(String realmName);
-
-  /**
-   * Find an userStorage by name. Default implementation is to call 'load(realmName) and browse
-   * through all user storage.
-   *
-   * @param realmName : the realm to search into (case insensitive)
-   * @param userStorageName : the name of the user storage wanted (case insensitive)
-   * @return the user storage found
-   * @throws UserStorageNotFoundException
-   * @throws RealmNotFoundException
-   */
-  public default UserStorage loadUserStorageByUserStorageName(
-      String realmName, String userStorageName) throws RealmNotFoundException {
-    Realm r = load(realmName).orElseThrow(() -> new RealmNotFoundException(realmName));
-    return r.getUserStorages().stream()
-        .filter(us -> us.getName().equalsIgnoreCase(userStorageName))
-        .findFirst()
-        .orElseThrow(() -> new UserStorageNotFoundException(realmName, userStorageName));
-  }
 
   /**
    * Load all realms. Even if the returned List of object is cached, Implementations should take
