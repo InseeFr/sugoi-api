@@ -15,6 +15,7 @@ package fr.insee.sugoi.core.store.impl;
 
 import fr.insee.sugoi.core.exceptions.InvalidUserStorageException;
 import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
+import fr.insee.sugoi.core.exceptions.UserStorageNotFoundException;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.core.store.Store;
@@ -41,7 +42,7 @@ public class StoreProviderImpl implements StoreProvider {
   public Store getStoreForUserStorage(String realmName, String userStorageName) {
     Realm r =
         realmProvider.load(realmName).orElseThrow(() -> new RealmNotFoundException(realmName));
-    UserStorage us = realmProvider.loadUserStorageByUserStorageName(realmName, userStorageName);
+    UserStorage us = loadUserStorageByUserStorageName(realmName, userStorageName);
     return storeStorage.getStore(r, us);
   }
 
@@ -97,5 +98,25 @@ public class StoreProviderImpl implements StoreProvider {
                 .get(0)
                 .getName())
         .getReader();
+  }
+
+  /**
+   * Find an userStorage by name. Default implementation is to call 'load(realmName) and browse
+   * through all user storage.
+   *
+   * @param realmName : the realm to search into (case insensitive)
+   * @param userStorageName : the name of the user storage wanted (case insensitive)
+   * @return the user storage found
+   * @throws UserStorageNotFoundException
+   * @throws RealmNotFoundException
+   */
+  private UserStorage loadUserStorageByUserStorageName(String realmName, String userStorageName)
+      throws RealmNotFoundException {
+    Realm r =
+        realmProvider.load(realmName).orElseThrow(() -> new RealmNotFoundException(realmName));
+    return r.getUserStorages().stream()
+        .filter(us -> us.getName().equalsIgnoreCase(userStorageName))
+        .findFirst()
+        .orElseThrow(() -> new UserStorageNotFoundException(realmName, userStorageName));
   }
 }
