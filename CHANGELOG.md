@@ -1,3 +1,24 @@
+# 1.3.0
+
+
+- [REL] :rocket: release version 1.2.1.1
+- [UP] :arrow_up: Bump spring version from 2.6.2 to 2.6.6
+- [BUG] :bug: load US causes realm cache to be avoided
+- [UP] :arrow_up: Bump org.springdoc.version from 1.6.5 to 1.6.6
+- [UP] :arrow_up: Bump tomcat.version from 9.0.56 to 9.0.60
+- [UP] :arrow_up: Bump maven-compiler-plugin from 3.8.1 to 3.10.1
+- [UP] :arrow_up: Bump unboundid-ldapsdk from 6.0.3 to 6.0.4
+- [BUG] :heavy_minus_sign: Remove wagon-ftp
+- [UP] :arrow_up: Bump maven-jar-plugin from 3.2.0 to 3.2.2
+- [UP] :arrow_up: Bump org.springdoc.version from 1.6.2 to 1.6.5
+- [UP] :arrow_up: Bump spring-boot.version from 2.6.3 to 2.6.4
+- [UP] :arrow_up: Bump spring-boot.version from 2.6.2 to 2.6.3
+- [ENH] :sparkles: add verifyUniqueMail configuration
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 1.2.1
+- [REL] :rocket: release version 1.2.1
+
+
 # 1.2.1
 
 
