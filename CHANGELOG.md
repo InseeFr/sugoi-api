@@ -1,3 +1,9 @@
+# 1.2.1.1
+
+
+- [UP] :arrow_up: Bump spring version from 2.6.2 to 2.6.6
+
+
 # 1.2.1
 
 
