@@ -13,7 +13,6 @@
 */
 package fr.insee.sugoi.services.controller;
 
-import fr.insee.sugoi.core.model.SugoiUser;
 import fr.insee.sugoi.core.service.PermissionService;
 import fr.insee.sugoi.services.view.WhoamiView;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,14 +59,13 @@ public class WhoAmi {
             .map(GrantedAuthority::getAuthority)
             .map(String::toUpperCase)
             .collect(Collectors.toList());
-    SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
     WhoamiView res = new WhoamiView();
     res.setId(authentication.getName());
-    res.setPasswordRealm(permissionService.getUserRealmPasswordManager(sugoiUser));
-    res.setReaderRealm(permissionService.getUserRealmReader(sugoiUser));
-    res.setWriterRealm(permissionService.getUserRealmWriter(sugoiUser));
-    res.setAppManager(permissionService.getUserRealmAppManager(sugoiUser));
-    res.setIsAdmin(permissionService.isAdmin(sugoiUser));
+    res.setPasswordRealm(permissionService.getPasswordManagerRoles(roles));
+    res.setReaderRealm(permissionService.getReaderRoles(roles));
+    res.setWriterRealm(permissionService.getWriterRoles(roles));
+    res.setAppManager(permissionService.getAppManagerRoles(roles));
+    res.setIsAdmin(permissionService.isAdmin(roles));
     return res;
   }
 }

@@ -95,7 +95,7 @@ public class AppManagedUserAttributeController {
               description = "Name of the realm where the operation will be made",
               required = true)
           @PathVariable("realm")
-          String realm,
+          String realmName,
       @Parameter(
               description = "Name of the userstorage where the operation will be made",
               required = true)
@@ -124,22 +124,21 @@ public class AppManagedUserAttributeController {
             .map(GrantedAuthority::getAuthority)
             .map(String::toUpperCase)
             .collect(Collectors.toList());
-    SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
-    Realm _realm = configService.getRealm(realm);
-    List<String> attributes_allowed =
+    Realm realm = configService.getRealm(realmName);
+    List<String> attributesAllowed =
         Arrays.asList(
-            _realm
+            realm
                 .getProperties()
                 .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST)
                 .toUpperCase()
                 .split(","));
     try {
-      if (attributes_allowed.contains(attributeKey.toUpperCase())) {
+      if (attributesAllowed.contains(attributeKey.toUpperCase())) {
 
-        if (permissionService.isWriter(sugoiUser, realm, storage)) {
+        if (permissionService.isWriter(roles, realmName, storage)) {
           ProviderResponse response =
               userService.addAppManagedAttribute(
-                  realm,
+                  realmName,
                   storage,
                   id,
                   attributeKey,
@@ -159,17 +158,17 @@ public class AppManagedUserAttributeController {
               .header("X-SUGOI-REQUEST-STATUS", response.getStatus().toString())
               .build();
         } else {
-          String pattern_of_attribute =
-              _realm
+          String patternOfAttribute =
+              realm
                   .getProperties()
                   .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST)
                   .toUpperCase()
-                  .split(",")[attributes_allowed.indexOf(attributeKey.toUpperCase())];
+                  .split(",")[attributesAllowed.indexOf(attributeKey.toUpperCase())];
           if (permissionService.isValidAttributeAccordingAttributePattern(
-              sugoiUser, realm, storage, pattern_of_attribute, attributeValue)) {
+              roles, realmName, storage, patternOfAttribute, attributeValue)) {
             ProviderResponse response =
                 userService.addAppManagedAttribute(
-                    realm,
+                    realmName,
                     storage,
                     id,
                     attributeKey,
@@ -238,7 +237,7 @@ public class AppManagedUserAttributeController {
               description = "Name of the realm where the operation will be made",
               required = true)
           @PathVariable("realm")
-          String realm,
+          String realmName,
       @Parameter(
               description = "Name of the userstorage where the operation will be made",
               required = true)
@@ -267,22 +266,21 @@ public class AppManagedUserAttributeController {
             .map(GrantedAuthority::getAuthority)
             .map(String::toUpperCase)
             .collect(Collectors.toList());
-    SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
-    Realm _realm = configService.getRealm(realm);
-    List<String> attributes_allowed =
+    Realm realm = configService.getRealm(realmName);
+    List<String> attributesAllowed =
         Arrays.asList(
-            _realm
+            realm
                 .getProperties()
                 .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST)
                 .toUpperCase()
                 .split(","));
     try {
-      if (attributes_allowed.contains(attributeKey.toUpperCase())) {
+      if (attributesAllowed.contains(attributeKey.toUpperCase())) {
 
-        if (permissionService.isWriter(sugoiUser, realm, storage)) {
+        if (permissionService.isWriter(roles, realmName, storage)) {
           ProviderResponse response =
               userService.deleteAppManagedAttribute(
-                  realm,
+                  realmName,
                   storage,
                   id,
                   attributeKey,
@@ -302,17 +300,17 @@ public class AppManagedUserAttributeController {
               .header("X-SUGOI-TRANSACTION-ID", response.getRequestId())
               .build();
         } else {
-          String pattern_of_attribute =
-              _realm
+          String patternOfAttribute =
+              realm
                   .getProperties()
                   .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST)
                   .toUpperCase()
-                  .split(",")[attributes_allowed.indexOf(attributeKey.toUpperCase())];
+                  .split(",")[attributesAllowed.indexOf(attributeKey.toUpperCase())];
           if (permissionService.isValidAttributeAccordingAttributePattern(
-              sugoiUser, realm, storage, pattern_of_attribute, attributeValue)) {
+              roles, realmName, storage, patternOfAttribute, attributeValue)) {
             ProviderResponse response =
                 userService.deleteAppManagedAttribute(
-                    realm,
+                    realmName,
                     storage,
                     id,
                     attributeKey,
