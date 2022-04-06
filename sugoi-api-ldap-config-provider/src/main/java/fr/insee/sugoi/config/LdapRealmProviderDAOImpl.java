@@ -90,7 +90,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   @Value("${fr.insee.sugoi.store.defaultWriter:}")
   private String defaultWriter;
 
-  @Value("${fr.insee.sugoi.config.ldap.profils.pattern:cn=Profil_{realm}_WebServiceLdap}")
+  @Value("${fr.insee.sugoi.config.ldap.profils.pattern:cn=Profil_{realm}_Sugoi}")
   private String realmEntryPattern;
 
   @Value("${fr.insee.sugoi.default.app_managed_attribute_keys:}")
@@ -126,9 +126,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   public Optional<Realm> load(String realmName) {
     logger.info("Loading configuration from ldap://{}:{}/{}", url, port, baseDn);
     try {
-      SearchResultEntry realmEntry =
-          ldapPoolConnection()
-              .getEntry(realmEntryPattern.replace("{realm}", realmName) + "," + baseDn);
+      SearchResultEntry realmEntry = ldapPoolConnection().getEntry(getRealmDn(realmName));
       if (realmEntry != null) {
         logger.debug("Found entry {}", realmEntry.getDN());
         return Optional.of(generateRealmFromSearchEntry(realmEntry));
@@ -145,8 +143,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
     logger.info("Loading realms configurations from ldap://{}:{}/{}", url, port, baseDn);
     try {
       SearchRequest searchRequest =
-          new SearchRequest(
-              baseDn, SearchScope.ONE, LdapFilter.create("(objectClass=*)"), "*", "+");
+          new SearchRequest(baseDn, SearchScope.ONE, LdapFilter.create(getRealmRDN("*")), "*", "+");
       List<Realm> realms = new ArrayList<>();
       for (SearchResultEntry searchEntry :
           ldapPoolConnection().search(searchRequest).getSearchEntries()) {
@@ -170,7 +167,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
         for (UserStorage userStorage : realm.getUserStorages()) {
           AddRequest userStorageAddRequest =
               new AddRequest(
-                  String.format("cn=%s,%s", userStorage.getName(), getRealmDn(realm.getName())),
+                  getUserStorageDn(userStorage.getName(), realm.getName()),
                   UserStorageLdapMapper.mapToAttributes(userStorage));
           ldapConnectionPoolAuthenticated().add(userStorageAddRequest);
         }
@@ -240,13 +237,10 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
     }
   }
 
-  private List<UserStorage> loadUserStorages(SearchResultEntry realmEntry) throws LDAPException {
-    String baseName = realmEntry.getAttribute("cn").getValue();
+  private List<UserStorage> loadUserStorages(String realmName) throws LDAPException {
     return ldapPoolConnection()
         .search(
-            "cn=" + baseName + "," + baseDn,
-            SearchScope.SUBORDINATE_SUBTREE,
-            Filter.create("objectClass=*"))
+            getRealmDn(realmName), SearchScope.SUBORDINATE_SUBTREE, Filter.create("objectClass=*"))
         .getSearchEntries()
         .stream()
         .map(searchEntry -> UserStorageLdapMapper.mapFromAttributes(searchEntry.getAttributes()))
@@ -255,7 +249,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
 
   private Realm generateRealmFromSearchEntry(SearchResultEntry searchEntry) throws LDAPException {
     Realm realm = RealmLdapMapper.mapFromSearchEntry(searchEntry);
-    realm.setUserStorages(loadUserStorages(searchEntry));
+    realm.setUserStorages(loadUserStorages(realm.getName()));
     addDefaultOnRealm(realm);
     sortUiLists(realm);
     return realm;
@@ -351,7 +345,11 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   }
 
   private String getRealmDn(String realmName) {
-    return realmEntryPattern.replace("{realm}", realmName) + "," + baseDn;
+    return getRealmRDN(realmName) + "," + baseDn;
+  }
+
+  private String getRealmRDN(String realmName) {
+    return realmEntryPattern.replace("{realm}", realmName);
   }
 
   private String getUserStorageDn(String userStorageName, String realmName) {
