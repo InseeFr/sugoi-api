@@ -15,6 +15,7 @@ package fr.insee.sugoi.store.file;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.core.exceptions.GroupAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.UserNotFoundException;
@@ -26,7 +27,6 @@ import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
-import fr.insee.sugoi.store.file.configuration.FileKeysConfig;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -55,11 +55,11 @@ public class FileWriterStore implements WriterStore {
     User user =
         fileReaderStore
             .getUser(id)
-            .orElseThrow(() -> new UserNotFoundException(config.get(FileKeysConfig.REALM), id));
+            .orElseThrow(() -> new UserNotFoundException(config.get(GlobalKeysConfig.REALM), id));
     user.getGroups()
         .forEach(
             group -> deleteUserFromGroup(group.getAppName(), group.getName(), id, providerRequest));
-    deleteResourceFile(config.get(FileKeysConfig.USER_SOURCE), id);
+    deleteResourceFile(config.get(GlobalKeysConfig.USER_SOURCE), id);
     ProviderResponse response = new ProviderResponse();
     response.setEntityId(id);
     response.setStatus(ProviderResponseStatus.OK);
@@ -70,7 +70,7 @@ public class FileWriterStore implements WriterStore {
   public ProviderResponse createUser(User user, ProviderRequest providerRequest) {
     try {
       createResourceFile(
-          config.get(FileKeysConfig.USER_SOURCE),
+          config.get(GlobalKeysConfig.USER_SOURCE),
           user.getUsername(),
           mapper.writeValueAsString(user));
     } catch (JsonProcessingException e) {
@@ -86,7 +86,7 @@ public class FileWriterStore implements WriterStore {
   public ProviderResponse updateUser(User updatedUser, ProviderRequest providerRequest) {
     try {
       updateResourceFile(
-          config.get(FileKeysConfig.USER_SOURCE),
+          config.get(GlobalKeysConfig.USER_SOURCE),
           updatedUser.getUsername(),
           mapper.writeValueAsString(updatedUser));
       ProviderResponse response = new ProviderResponse();
@@ -125,8 +125,8 @@ public class FileWriterStore implements WriterStore {
     if (application.getGroups() == null) {
       application.setGroups(new ArrayList<>());
     }
-    if (!application.getGroups().stream()
-        .anyMatch(group -> group.getName().equalsIgnoreCase(appGroup.getName()))) {
+    if (application.getGroups().stream()
+        .noneMatch(group -> group.getName().equalsIgnoreCase(appGroup.getName()))) {
       appGroup.setAppName(appName);
       application.getGroups().add(appGroup);
       updateApplication(application, providerRequest);
@@ -170,8 +170,8 @@ public class FileWriterStore implements WriterStore {
 
   @Override
   public ProviderResponse deleteOrganization(String name, ProviderRequest providerRequest) {
-    if (config.get(FileKeysConfig.ORGANIZATION_SOURCE) != null) {
-      deleteResourceFile(config.get(FileKeysConfig.ORGANIZATION_SOURCE), name);
+    if (config.get(GlobalKeysConfig.ORGANIZATION_SOURCE) != null) {
+      deleteResourceFile(config.get(GlobalKeysConfig.ORGANIZATION_SOURCE), name);
       ProviderResponse response = new ProviderResponse();
       response.setEntityId(name);
       response.setStatus(ProviderResponseStatus.OK);
@@ -185,10 +185,10 @@ public class FileWriterStore implements WriterStore {
   @Override
   public ProviderResponse createOrganization(
       Organization organization, ProviderRequest providerRequest) {
-    if (config.get(FileKeysConfig.ORGANIZATION_SOURCE) != null) {
+    if (config.get(GlobalKeysConfig.ORGANIZATION_SOURCE) != null) {
       try {
         createResourceFile(
-            config.get(FileKeysConfig.ORGANIZATION_SOURCE),
+            config.get(GlobalKeysConfig.ORGANIZATION_SOURCE),
             organization.getIdentifiant(),
             mapper.writeValueAsString(organization));
       } catch (JsonProcessingException e) {
@@ -208,10 +208,10 @@ public class FileWriterStore implements WriterStore {
   @Override
   public ProviderResponse updateOrganization(
       Organization updatedOrganization, ProviderRequest providerRequest) {
-    if (config.get(FileKeysConfig.ORGANIZATION_SOURCE) != null) {
+    if (config.get(GlobalKeysConfig.ORGANIZATION_SOURCE) != null) {
       try {
         updateResourceFile(
-            config.get(FileKeysConfig.ORGANIZATION_SOURCE),
+            config.get(GlobalKeysConfig.ORGANIZATION_SOURCE),
             updatedOrganization.getIdentifiant(),
             mapper.writeValueAsString(updatedOrganization));
         ProviderResponse response = new ProviderResponse();
@@ -249,7 +249,7 @@ public class FileWriterStore implements WriterStore {
           fileReaderStore
               .getUser(userId)
               .orElseThrow(
-                  () -> new UserNotFoundException(config.get(FileKeysConfig.REALM), userId));
+                  () -> new UserNotFoundException(config.get(GlobalKeysConfig.REALM), userId));
       user.getGroups()
           .removeIf(
               groupFilter ->
@@ -262,7 +262,7 @@ public class FileWriterStore implements WriterStore {
               .getUsers()
               .removeIf(userFilter -> userFilter.getUsername().equalsIgnoreCase(userId));
           updateResourceFile(
-              config.get(FileKeysConfig.APP_SOURCE),
+              config.get(GlobalKeysConfig.APP_SOURCE),
               application.getName(),
               mapper.writeValueAsString(application));
         } catch (JsonProcessingException e) {
@@ -290,7 +290,6 @@ public class FileWriterStore implements WriterStore {
         fileReaderStore
             .getApplication(appName)
             .orElseThrow(() -> new ApplicationNotFoundException(appName));
-    ;
     Group group =
         application.getGroups() != null
             ? application.getGroups().stream()
@@ -303,7 +302,7 @@ public class FileWriterStore implements WriterStore {
           fileReaderStore
               .getUser(userId)
               .orElseThrow(
-                  () -> new UserNotFoundException(config.get(FileKeysConfig.REALM), userId));
+                  () -> new UserNotFoundException(config.get(GlobalKeysConfig.REALM), userId));
       if (user != null) {
         try {
           if (user.getGroups() == null) {
@@ -316,7 +315,7 @@ public class FileWriterStore implements WriterStore {
           }
           group.getUsers().add(user);
           updateResourceFile(
-              config.get(FileKeysConfig.APP_SOURCE),
+              config.get(GlobalKeysConfig.APP_SOURCE),
               application.getName(),
               mapper.writeValueAsString(application));
           ProviderResponse response = new ProviderResponse();
@@ -357,11 +356,11 @@ public class FileWriterStore implements WriterStore {
   @Override
   public ProviderResponse createApplication(
       Application application, ProviderRequest providerRequest) {
-    if (config.get(FileKeysConfig.APP_SOURCE) != null) {
+    if (config.get(GlobalKeysConfig.APP_SOURCE) != null) {
       try {
         application.getGroups().forEach(group -> group.setUsers(null));
         createResourceFile(
-            config.get(FileKeysConfig.APP_SOURCE),
+            config.get(GlobalKeysConfig.APP_SOURCE),
             application.getName(),
             mapper.writeValueAsString(application));
         ProviderResponse response = new ProviderResponse();
@@ -379,7 +378,7 @@ public class FileWriterStore implements WriterStore {
   @Override
   public ProviderResponse updateApplication(
       Application updatedApplication, ProviderRequest providerRequest) {
-    if (config.get(FileKeysConfig.APP_SOURCE) != null) {
+    if (config.get(GlobalKeysConfig.APP_SOURCE) != null) {
       try {
         fileReaderStore.setResourceLoader(resourceLoader);
         for (Group updatedGroup : updatedApplication.getGroups()) {
@@ -388,7 +387,7 @@ public class FileWriterStore implements WriterStore {
               .ifPresent(existingGroup -> updatedGroup.setUsers(existingGroup.getUsers()));
         }
         updateResourceFile(
-            config.get(FileKeysConfig.APP_SOURCE),
+            config.get(GlobalKeysConfig.APP_SOURCE),
             updatedApplication.getName(),
             mapper.writeValueAsString(updatedApplication));
         ProviderResponse response = new ProviderResponse();
@@ -406,8 +405,8 @@ public class FileWriterStore implements WriterStore {
   @Override
   public ProviderResponse deleteApplication(
       String applicationName, ProviderRequest providerRequest) {
-    if (config.get(FileKeysConfig.APP_SOURCE) != null) {
-      deleteResourceFile(config.get(FileKeysConfig.APP_SOURCE), applicationName);
+    if (config.get(GlobalKeysConfig.APP_SOURCE) != null) {
+      deleteResourceFile(config.get(GlobalKeysConfig.APP_SOURCE), applicationName);
       ProviderResponse response = new ProviderResponse();
       response.setEntityId(applicationName);
       response.setStatus(ProviderResponseStatus.OK);
@@ -462,9 +461,9 @@ public class FileWriterStore implements WriterStore {
   private void updateResourceFile(String source, String resourceName, String resourceValue) {
     try {
       File file = resourceLoader.getResource(source + resourceName).getFile();
-      FileWriter fWriter = new FileWriter(file);
-      fWriter.write(resourceValue);
-      fWriter.close();
+      try (FileWriter fWriter = new FileWriter(file)) {
+        fWriter.write(resourceValue);
+      }
     } catch (IOException e) {
       throw new RuntimeException("Error writing in file", e);
     }

@@ -22,7 +22,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 public class SugoiTestService {
@@ -61,11 +60,7 @@ public class SugoiTestService {
           "fr.insee.sugoi.full.env.tomcat2.properties.file",
           "/tomcat-properties/tomcat2.properties");
 
-  /**
-   * Démarrage des services de test.
-   *
-   * @throws JAXBException
-   */
+  /** Démarrage des services de test. */
   public static void main(String[] args) throws InterruptedException, IOException {
 
     if (args.length == 0 || "start".equalsIgnoreCase(args[0])) {
@@ -75,9 +70,9 @@ public class SugoiTestService {
       startServers();
     }
     if (args.length > 0 && "stop".equalsIgnoreCase(args[0])) {
-      Socket socket = new Socket("localhost", 4567);
-      socket.getInputStream();
-      socket.close();
+      try (Socket socket = new Socket("localhost", 4567)) {
+        socket.getInputStream();
+      }
     }
   }
 
@@ -85,14 +80,10 @@ public class SugoiTestService {
     ExecutorService execs =
         Executors.newFixedThreadPool(
             4,
-            new ThreadFactory() {
-
-              @Override
-              public Thread newThread(Runnable runnable) {
-                Thread thread = new Thread(runnable);
-                thread.setDaemon(true);
-                return thread;
-              }
+            runnable -> {
+              Thread thread = new Thread(runnable);
+              thread.setDaemon(true);
+              return thread;
             });
     if (enabledEmbeddedLdap) {
       execs.submit(
