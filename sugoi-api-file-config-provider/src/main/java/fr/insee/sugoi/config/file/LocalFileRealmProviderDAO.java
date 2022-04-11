@@ -72,17 +72,16 @@ public class LocalFileRealmProviderDAO implements RealmProvider {
         throw new IllegalArgumentException("No resources found in " + localFilePath);
       }
       InputStream is = realmsResource.getInputStream();
-      realms = mapper.readValue(is, new TypeReference<List<Realm>>() {});
-      realms.stream()
-          .forEach(
-              realm -> {
-                if (realm.getReaderType() == null) {
-                  realm.setReaderType(defaultReader);
-                }
-                if (realm.getWriterType() == null) {
-                  realm.setWriterType(defaultReader);
-                }
-              });
+      realms = mapper.readValue(is, new TypeReference<>() {});
+      realms.forEach(
+          realm -> {
+            if (realm.getReaderType() == null) {
+              realm.setReaderType(defaultReader);
+            }
+            if (realm.getWriterType() == null) {
+              realm.setWriterType(defaultReader);
+            }
+          });
     } catch (Exception e) {
       throw new IllegalArgumentException("No resources found in " + localFilePath, e);
     }
@@ -137,9 +136,10 @@ public class LocalFileRealmProviderDAO implements RealmProvider {
 
   private void overwriteConfig(List<Realm> realmsToWrite) {
     try {
-      FileWriter fWriter = new FileWriter(resourceLoader.getResource(localFilePath).getFile());
-      fWriter.write(mapper.writeValueAsString(realmsToWrite));
-      fWriter.close();
+      try (FileWriter fWriter =
+          new FileWriter(resourceLoader.getResource(localFilePath).getFile())) {
+        fWriter.write(mapper.writeValueAsString(realmsToWrite));
+      }
       realms = findAll();
     } catch (IOException e) {
       throw new RuntimeException(e);
