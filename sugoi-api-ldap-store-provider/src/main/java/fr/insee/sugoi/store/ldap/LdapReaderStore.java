@@ -14,6 +14,7 @@
 package fr.insee.sugoi.store.ldap;
 
 import com.unboundid.ldap.sdk.*;
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.exceptions.MultipleUserWithSameMailException;
 import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
@@ -28,6 +29,7 @@ import fr.insee.sugoi.model.paging.SearchType;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
 
 public class LdapReaderStore extends LdapStore implements ReaderStore {
 
@@ -35,7 +37,8 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       Map<String, String> config, Map<MappingType, List<StoreMapping>> mappings) {
     logger.debug("Configuring LdapReaderStore with config : {}", config);
     try {
-      if (Boolean.valueOf(config.get(LdapConfigKeys.READ_CONNECTION_AUTHENTICATED))) {
+      if (Boolean.TRUE.equals(
+          Boolean.valueOf(config.get(LdapConfigKeys.READ_CONNECTION_AUTHENTICATED)))) {
         this.ldapPoolConnection = LdapFactory.getConnectionPoolAuthenticated(config);
         this.ldapMonoConnection = LdapFactory.getSingleConnectionAuthenticated(config);
       } else {
@@ -83,7 +86,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
    */
   @Override
   public Optional<Organization> getOrganization(String id) {
-    if (config.get(LdapConfigKeys.ORGANIZATION_SOURCE) != null) {
+    if (StringUtils.isNotBlank(config.get(GlobalKeysConfig.ORGANIZATION_SOURCE))) {
       return getOrganization(id, false);
     } else {
       throw new UnsupportedOperationException(
@@ -97,7 +100,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       User userFilter, PageableResult pageable, String typeRecherche) {
     try {
       return searchOnLdap(
-          config.get(LdapConfigKeys.USER_SOURCE),
+          config.get(GlobalKeysConfig.USER_SOURCE),
           SearchScope.SUBORDINATE_SUBTREE,
           getFilterFromObject(userFilter, userLdapMapper, typeRecherche),
           pageable,
@@ -115,8 +118,8 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       page.setResults(
           Arrays.stream(entry.getAttribute("uniqueMember").getValues())
               .map(uniqueMember -> getUser(LdapUtils.getNodeValueFromDN(uniqueMember)))
-              .filter(optionalUser -> optionalUser.isPresent())
-              .map(optionalUser -> optionalUser.get())
+              .filter(Optional::isPresent)
+              .map(Optional::get)
               .collect(Collectors.toList()));
     } else {
       page.setResults(new ArrayList<>());
@@ -127,10 +130,10 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
   @Override
   public PageResult<Organization> searchOrganizations(
       Organization organizationFilter, PageableResult pageable, String searchOperator) {
-    if (config.get(LdapConfigKeys.ORGANIZATION_SOURCE) != null) {
+    if (StringUtils.isNotBlank(config.get(GlobalKeysConfig.ORGANIZATION_SOURCE))) {
       try {
         return searchOnLdap(
-            config.get(LdapConfigKeys.ORGANIZATION_SOURCE),
+            config.get(GlobalKeysConfig.ORGANIZATION_SOURCE),
             SearchScope.SUBORDINATE_SUBTREE,
             getFilterFromObject(organizationFilter, organizationLdapMapper, searchOperator),
             pageable,
@@ -212,9 +215,9 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
   public PageResult<Application> searchApplications(
       Application applicationFilter, PageableResult pageable, String searchOperator) {
     try {
-      if (config.get(LdapConfigKeys.APP_SOURCE) != null) {
+      if (StringUtils.isNotBlank(config.get(GlobalKeysConfig.APP_SOURCE))) {
         return searchOnLdap(
-            config.get(LdapConfigKeys.APP_SOURCE),
+            config.get(GlobalKeysConfig.APP_SOURCE),
             SearchScope.ONE,
             getFilterFromObject(applicationFilter, applicationLdapMapper, searchOperator),
             pageable,
@@ -261,9 +264,9 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
               .map(attribute -> LdapFilter.contains(attribute.getName(), attribute.getValue()))
               .collect(Collectors.toList());
 
-      if (objectClassListFilter.size() > 0 & attributeListFilter.size() == 0) {
+      if (!objectClassListFilter.isEmpty() && attributeListFilter.isEmpty()) {
         return LdapFilter.and(objectClassListFilter);
-      } else if (objectClassListFilter.size() == 0 & attributeListFilter.size() > 0) {
+      } else if (objectClassListFilter.isEmpty() && !attributeListFilter.isEmpty()) {
         return LdapFilter.or(attributeListFilter);
       } else {
         return LdapFilter.and(
@@ -277,9 +280,8 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
   private SearchResultEntry getEntryByDn(String dn) {
     try {
       logger.debug("Fetching {}", dn);
-      SearchResultEntry entry = ldapPoolConnection.getEntry(dn, "+", "*");
 
-      return entry;
+      return ldapPoolConnection.getEntry(dn, "+", "*");
     } catch (LDAPException e) {
       throw new RuntimeException("Failed to execute " + dn, e);
     }
@@ -310,7 +312,8 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     } catch (LDAPException e) {
       if (e.getResultCode().intValue() == ResultCode.SERVER_DOWN_INT_VALUE) {
         try {
-          if (Boolean.valueOf(config.get(LdapConfigKeys.READ_CONNECTION_AUTHENTICATED))) {
+          if (Boolean.TRUE.equals(
+              Boolean.valueOf(config.get(LdapConfigKeys.READ_CONNECTION_AUTHENTICATED)))) {
             ldapMonoConnection = LdapFactory.getSingleConnectionAuthenticated(config, true);
           } else {
             ldapMonoConnection = LdapFactory.getSingleConnection(config, true);

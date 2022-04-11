@@ -32,6 +32,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
@@ -170,7 +171,7 @@ public class FileWriterStore implements WriterStore {
 
   @Override
   public ProviderResponse deleteOrganization(String name, ProviderRequest providerRequest) {
-    if (config.get(GlobalKeysConfig.ORGANIZATION_SOURCE) != null) {
+    if (StringUtils.isNotBlank(config.get(GlobalKeysConfig.ORGANIZATION_SOURCE))) {
       deleteResourceFile(config.get(GlobalKeysConfig.ORGANIZATION_SOURCE), name);
       ProviderResponse response = new ProviderResponse();
       response.setEntityId(name);
@@ -185,7 +186,7 @@ public class FileWriterStore implements WriterStore {
   @Override
   public ProviderResponse createOrganization(
       Organization organization, ProviderRequest providerRequest) {
-    if (config.get(GlobalKeysConfig.ORGANIZATION_SOURCE) != null) {
+    if (StringUtils.isNotBlank(config.get(GlobalKeysConfig.ORGANIZATION_SOURCE))) {
       try {
         createResourceFile(
             config.get(GlobalKeysConfig.ORGANIZATION_SOURCE),
@@ -208,7 +209,7 @@ public class FileWriterStore implements WriterStore {
   @Override
   public ProviderResponse updateOrganization(
       Organization updatedOrganization, ProviderRequest providerRequest) {
-    if (config.get(GlobalKeysConfig.ORGANIZATION_SOURCE) != null) {
+    if (StringUtils.isNotBlank(config.get(GlobalKeysConfig.ORGANIZATION_SOURCE))) {
       try {
         updateResourceFile(
             config.get(GlobalKeysConfig.ORGANIZATION_SOURCE),
@@ -290,6 +291,7 @@ public class FileWriterStore implements WriterStore {
         fileReaderStore
             .getApplication(appName)
             .orElseThrow(() -> new ApplicationNotFoundException(appName));
+
     Group group =
         application.getGroups() != null
             ? application.getGroups().stream()
@@ -356,7 +358,7 @@ public class FileWriterStore implements WriterStore {
   @Override
   public ProviderResponse createApplication(
       Application application, ProviderRequest providerRequest) {
-    if (config.get(GlobalKeysConfig.APP_SOURCE) != null) {
+    if (StringUtils.isNotBlank(config.get(GlobalKeysConfig.APP_SOURCE))) {
       try {
         application.getGroups().forEach(group -> group.setUsers(null));
         createResourceFile(
@@ -378,7 +380,7 @@ public class FileWriterStore implements WriterStore {
   @Override
   public ProviderResponse updateApplication(
       Application updatedApplication, ProviderRequest providerRequest) {
-    if (config.get(GlobalKeysConfig.APP_SOURCE) != null) {
+    if (StringUtils.isNotBlank(config.get(GlobalKeysConfig.APP_SOURCE))) {
       try {
         fileReaderStore.setResourceLoader(resourceLoader);
         for (Group updatedGroup : updatedApplication.getGroups()) {
@@ -405,7 +407,7 @@ public class FileWriterStore implements WriterStore {
   @Override
   public ProviderResponse deleteApplication(
       String applicationName, ProviderRequest providerRequest) {
-    if (config.get(GlobalKeysConfig.APP_SOURCE) != null) {
+    if (StringUtils.isNotBlank(config.get(GlobalKeysConfig.APP_SOURCE))) {
       deleteResourceFile(config.get(GlobalKeysConfig.APP_SOURCE), applicationName);
       ProviderResponse response = new ProviderResponse();
       response.setEntityId(applicationName);

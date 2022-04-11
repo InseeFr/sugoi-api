@@ -15,6 +15,7 @@ package fr.insee.sugoi.store.ldap;
 
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
@@ -22,6 +23,7 @@ import fr.insee.sugoi.ldap.utils.mapper.GroupLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.OrganizationLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.UserLdapMapper;
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +32,7 @@ public class LdapStore {
   protected LDAPConnectionPool ldapPoolConnection;
   protected LDAPConnection ldapMonoConnection;
 
-  protected static final Logger logger = LoggerFactory.getLogger(LdapReaderStore.class);
+  protected static final Logger logger = LoggerFactory.getLogger(LdapStore.class);
 
   protected UserLdapMapper userLdapMapper;
   protected OrganizationLdapMapper organizationLdapMapper;
@@ -41,7 +43,7 @@ public class LdapStore {
   protected Map<String, String> config;
 
   protected String getGroupSource(String appName) {
-    if (config.get(LdapConfigKeys.GROUP_SOURCE_PATTERN) != null) {
+    if (StringUtils.isNotBlank(config.get(LdapConfigKeys.GROUP_SOURCE_PATTERN))) {
       return config.get(LdapConfigKeys.GROUP_SOURCE_PATTERN).replace("{appliname}", appName);
     } else {
       throw new UnsupportedOperationException("Group feature is not set for this userstorage");
@@ -49,8 +51,7 @@ public class LdapStore {
   }
 
   protected String getGroupManagerSource(String appName) {
-    if (config.get(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN) != null
-        && config.get(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN) != "") {
+    if (StringUtils.isNotBlank(config.get(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN))) {
       return config
           .get(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN)
           .replace("{appliname}", appName);
@@ -61,7 +62,7 @@ public class LdapStore {
   }
 
   protected String getGroupWildcardFilter(String appName) {
-    if (config.get(LdapConfigKeys.GROUP_FILTER_PATTERN) != null) {
+    if (StringUtils.isNotBlank(config.get(LdapConfigKeys.GROUP_FILTER_PATTERN))) {
       return config
           .get(LdapConfigKeys.GROUP_FILTER_PATTERN)
           .replace("{appliname}", appName)
@@ -72,7 +73,7 @@ public class LdapStore {
   }
 
   protected boolean matchGroupWildcardPattern(String appName, String groupName) {
-    if (config.get(LdapConfigKeys.GROUP_FILTER_PATTERN) != null) {
+    if (StringUtils.isNotBlank(config.get(LdapConfigKeys.GROUP_FILTER_PATTERN))) {
       String dnPattern =
           config
               .get(LdapConfigKeys.GROUP_FILTER_PATTERN)
@@ -87,14 +88,14 @@ public class LdapStore {
   }
 
   protected String getApplicationDN(String applicationName) {
-    if (config.get(LdapConfigKeys.APP_SOURCE) != null) {
+    if (StringUtils.isNotBlank(config.get(GlobalKeysConfig.APP_SOURCE))) {
       return String.format(
           "%s=%s,%s",
           // TODO should be a param
           "ou",
           //
           applicationName,
-          config.get(LdapConfigKeys.APP_SOURCE));
+          config.get(GlobalKeysConfig.APP_SOURCE));
     } else {
       throw new UnsupportedOperationException("Applications feature not configured for this realm");
     }
@@ -111,13 +112,13 @@ public class LdapStore {
   }
 
   protected String getOrganizationDN(String organizationId) {
-    if (config.get(LdapConfigKeys.ORGANIZATION_SOURCE) != null) {
+    if (StringUtils.isNotBlank(config.get(GlobalKeysConfig.ORGANIZATION_SOURCE))) {
       return String.format(
           "%s=%s,%s", // TODO should be a param
           "uid",
           //
           organizationId,
-          config.get(LdapConfigKeys.ORGANIZATION_SOURCE));
+          config.get(GlobalKeysConfig.ORGANIZATION_SOURCE));
     } else {
       throw new UnsupportedOperationException(
           "Organizations feature not configured for this storage");
@@ -131,7 +132,7 @@ public class LdapStore {
         "uid",
         //
         username,
-        config.get(LdapConfigKeys.USER_SOURCE));
+        config.get(GlobalKeysConfig.USER_SOURCE));
   }
 
   protected String getAddressDN(String addressId) {
@@ -141,6 +142,6 @@ public class LdapStore {
         "l",
         //
         addressId,
-        config.get(LdapConfigKeys.ADDRESS_SOURCE));
+        config.get(GlobalKeysConfig.ADDRESS_SOURCE));
   }
 }

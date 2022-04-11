@@ -14,6 +14,7 @@
 package fr.insee.sugoi.store.file;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.core.exceptions.MultipleUserWithSameMailException;
 import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
@@ -24,16 +25,18 @@ import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
-import fr.insee.sugoi.store.file.configuration.FileKeysConfig;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +60,7 @@ public class FileReaderStore implements ReaderStore {
   @Override
   public Optional<User> getUser(String id) {
     Resource realmsResource =
-        resourceLoader.getResource(config.get(FileKeysConfig.USER_SOURCE) + id);
+        resourceLoader.getResource(config.get(GlobalKeysConfig.USER_SOURCE) + id);
     if (realmsResource.exists()) {
       User user = loadResourceContent(realmsResource, User.class);
       // suborganization is loaded as an independant resource
@@ -76,7 +79,7 @@ public class FileReaderStore implements ReaderStore {
       User searchUser, PageableResult pageable, String searchOperator) {
     PageResult<User> pageResult = new PageResult<>();
     pageResult.setResults(
-        Arrays.stream(getFilenamesFromSource(config.get(FileKeysConfig.USER_SOURCE)))
+        Arrays.stream(getFilenamesFromSource(config.get(GlobalKeysConfig.USER_SOURCE)))
             .map(resource -> loadResourceContent(resource, User.class))
             .filter(user -> checkIfMatches(user, searchUser))
             .collect(Collectors.toList()));
@@ -85,7 +88,7 @@ public class FileReaderStore implements ReaderStore {
 
   @Override
   public Optional<Organization> getOrganization(String id) {
-    if (config.get(FileKeysConfig.ORGANIZATION_SOURCE) != null) {
+    if (StringUtils.isNotBlank(config.get(GlobalKeysConfig.ORGANIZATION_SOURCE))) {
       return getOrganization(id, false);
     } else {
       throw new UnsupportedOperationException(
@@ -101,8 +104,8 @@ public class FileReaderStore implements ReaderStore {
       pageResult.setResults(
           optionalGroup.get().getUsers().stream()
               .map(simplifiedUser -> getUser(simplifiedUser.getUsername()))
-              .filter(optionalUser -> optionalUser.isPresent())
-              .map(optionalUser -> optionalUser.get())
+              .filter(Optional::isPresent)
+              .map(Optional::get)
               .collect(Collectors.toList()));
     } else {
       pageResult.setResults(List.of());
@@ -113,10 +116,10 @@ public class FileReaderStore implements ReaderStore {
   @Override
   public PageResult<Organization> searchOrganizations(
       Organization organizationFilter, PageableResult pageable, String searchOperator) {
-    if (config.get(FileKeysConfig.ORGANIZATION_SOURCE) != null) {
+    if (StringUtils.isNotBlank(config.get(GlobalKeysConfig.ORGANIZATION_SOURCE))) {
       PageResult<Organization> pageResult = new PageResult<>();
       pageResult.setResults(
-          Arrays.stream(getFilenamesFromSource(config.get(FileKeysConfig.ORGANIZATION_SOURCE)))
+          Arrays.stream(getFilenamesFromSource(config.get(GlobalKeysConfig.ORGANIZATION_SOURCE)))
               .map(resource -> loadResourceContent(resource, Organization.class))
               .filter(org -> checkIfMatches(org, organizationFilter))
               .collect(Collectors.toList()));
@@ -141,13 +144,13 @@ public class FileReaderStore implements ReaderStore {
   @Override
   public PageResult<Group> searchGroups(
       String appName, Group groupFilter, PageableResult pageable, String searchOperator) {
-    if (config.get(FileKeysConfig.APP_SOURCE) != null) {
+    if (StringUtils.isNotBlank(config.get(GlobalKeysConfig.APP_SOURCE))) {
       PageResult<Group> pageResult = new PageResult<>();
       pageResult.setResults(
-          Arrays.stream(getFilenamesFromSource(config.get(FileKeysConfig.APP_SOURCE)))
+          Arrays.stream(getFilenamesFromSource(config.get(GlobalKeysConfig.APP_SOURCE)))
               .map(resource -> loadResourceContent(resource, Application.class).getGroups())
-              .filter(groups -> groups != null)
-              .flatMap(groups -> groups.stream())
+              .filter(Objects::nonNull)
+              .flatMap(Collection::stream)
               .filter(group -> checkIfMatches(group, groupFilter))
               .collect(Collectors.toList()));
       return pageResult;
@@ -163,9 +166,9 @@ public class FileReaderStore implements ReaderStore {
 
   @Override
   public Optional<Application> getApplication(String applicationName) {
-    if (config.get(FileKeysConfig.APP_SOURCE) != null) {
+    if (StringUtils.isNotBlank(config.get(GlobalKeysConfig.APP_SOURCE))) {
       Resource realmsResource =
-          resourceLoader.getResource(config.get(FileKeysConfig.APP_SOURCE) + applicationName);
+          resourceLoader.getResource(config.get(GlobalKeysConfig.APP_SOURCE) + applicationName);
       if (realmsResource.exists()) {
         return Optional.of(loadResourceContent(realmsResource, Application.class));
       } else {
@@ -179,10 +182,10 @@ public class FileReaderStore implements ReaderStore {
   @Override
   public PageResult<Application> searchApplications(
       Application applicationFilter, PageableResult pageable, String searchOperator) {
-    if (config.get(FileKeysConfig.APP_SOURCE) != null) {
+    if (StringUtils.isNotBlank(config.get(GlobalKeysConfig.APP_SOURCE))) {
       PageResult<Application> pageResult = new PageResult<>();
       pageResult.setResults(
-          Arrays.stream(getFilenamesFromSource(config.get(FileKeysConfig.APP_SOURCE)))
+          Arrays.stream(getFilenamesFromSource(config.get(GlobalKeysConfig.APP_SOURCE)))
               .map(resource -> loadResourceContent(resource, Application.class))
               .filter(app -> checkIfMatches(app, applicationFilter))
               .collect(Collectors.toList()));
@@ -213,8 +216,8 @@ public class FileReaderStore implements ReaderStore {
             }
           } else if (object.getClass() == ArrayList.class) {
             for (Object value : (ArrayList<Object>) object) {
-              if (!((ArrayList<Object>) field.get(toTest))
-                  .stream().anyMatch(t -> checkIfMatches(t, value))) {
+              if (((ArrayList<Object>) field.get(toTest))
+                  .stream().noneMatch(t -> checkIfMatches(t, value))) {
                 return false;
               }
             }
@@ -267,7 +270,7 @@ public class FileReaderStore implements ReaderStore {
 
   private Optional<Organization> getOrganization(String id, boolean isSubOrganization) {
     Resource realmsResource =
-        resourceLoader.getResource(config.get(FileKeysConfig.ORGANIZATION_SOURCE) + id);
+        resourceLoader.getResource(config.get(GlobalKeysConfig.ORGANIZATION_SOURCE) + id);
     if (realmsResource.exists()) {
       Organization organization = loadResourceContent(realmsResource, Organization.class);
       // suborganization is loaded as an independant resource
