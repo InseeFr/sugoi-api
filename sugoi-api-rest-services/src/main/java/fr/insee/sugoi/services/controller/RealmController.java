@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.services.controller;
 
+import fr.insee.sugoi.core.exceptions.IdNotMatchingException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.SugoiUser;
@@ -185,7 +186,7 @@ public class RealmController {
                   schema = @Schema(implementation = Realm.class))
             })
       })
-  public ResponseEntity<Realm> updateRealm(
+  public ResponseEntity<?> updateRealm(
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
@@ -197,9 +198,10 @@ public class RealmController {
           String transactionId,
       Authentication authentication,
       @RequestBody Realm realm,
-      @PathVariable("id") String id) {
+      @PathVariable("id") String id)
+      throws IdNotMatchingException {
     if (!realm.getName().equalsIgnoreCase(id)) {
-      return ResponseEntity.badRequest().build();
+      throw new IdNotMatchingException(id, realm.getName());
     }
     ProviderResponse response =
         configService.updateRealm(

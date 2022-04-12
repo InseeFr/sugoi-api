@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.services.controller;
 
+import fr.insee.sugoi.core.exceptions.IdNotMatchingException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -254,7 +255,7 @@ public class GroupController {
           GroupView groupView) {
 
     if (!groupView.getName().equalsIgnoreCase(id)) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+      throw new IdNotMatchingException(id, groupView.getName());
     }
 
     Group group = new Group();

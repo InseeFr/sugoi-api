@@ -14,33 +14,7 @@
 package fr.insee.sugoi.commons.services.controller.technics;
 
 import fr.insee.sugoi.commons.services.view.ErrorView;
-import fr.insee.sugoi.core.exceptions.AppCannotManagedAttributeException;
-import fr.insee.sugoi.core.exceptions.AppManagedAttributeException;
-import fr.insee.sugoi.core.exceptions.ApplicationAlreadyExistException;
-import fr.insee.sugoi.core.exceptions.ApplicationNotCreatedException;
-import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
-import fr.insee.sugoi.core.exceptions.GroupAlreadyExistException;
-import fr.insee.sugoi.core.exceptions.GroupNotCreatedException;
-import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
-import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
-import fr.insee.sugoi.core.exceptions.InvalidTransactionIdException;
-import fr.insee.sugoi.core.exceptions.InvalidUserStorageException;
-import fr.insee.sugoi.core.exceptions.ManagerGroupNotFoundException;
-import fr.insee.sugoi.core.exceptions.NoCertificateOnUserException;
-import fr.insee.sugoi.core.exceptions.NoDomaineMappingException;
-import fr.insee.sugoi.core.exceptions.OrganizationAlreadyExistException;
-import fr.insee.sugoi.core.exceptions.OrganizationNotCreatedException;
-import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
-import fr.insee.sugoi.core.exceptions.PasswordPolicyNotMetException;
-import fr.insee.sugoi.core.exceptions.RealmAlreadyExistException;
-import fr.insee.sugoi.core.exceptions.RealmNotCreatedException;
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
-import fr.insee.sugoi.core.exceptions.StoragePolicyNotMetException;
-import fr.insee.sugoi.core.exceptions.UserAlreadyExistException;
-import fr.insee.sugoi.core.exceptions.UserNotCreatedException;
-import fr.insee.sugoi.core.exceptions.UserNotFoundByMailException;
-import fr.insee.sugoi.core.exceptions.UserNotFoundException;
-import fr.insee.sugoi.core.exceptions.UserStorageNotFoundException;
+import fr.insee.sugoi.core.exceptions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -387,5 +361,21 @@ public class SugoiAdviceController {
     final ResponseEntity<ErrorView> response =
         new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
     return response;
+  }
+
+  @ExceptionHandler(IdNotMatchingException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(IdNotMatchingException e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    return new ResponseEntity<>(errorView, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(ApplicationNameNotMatchingException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(ApplicationNameNotMatchingException e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    return new ResponseEntity<>(errorView, HttpStatus.BAD_REQUEST);
   }
 }

@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.services.controller;
 
+import fr.insee.sugoi.core.exceptions.ApplicationNameNotMatchingException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -211,7 +212,7 @@ public class ApplicationController {
             content = {@Content(mediaType = "application/json")})
       })
   @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#applicationName)")
-  public ResponseEntity<Application> updateApplication(
+  public ResponseEntity<?> updateApplication(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -233,8 +234,8 @@ public class ApplicationController {
       @Parameter(description = "Application to update", required = true) @RequestBody
           Application application) {
 
-    if (!application.getName().equals(applicationName)) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    if (!application.getName().equalsIgnoreCase(applicationName)) {
+      throw new ApplicationNameNotMatchingException(applicationName, application.getName());
     }
 
     ProviderResponse response =
