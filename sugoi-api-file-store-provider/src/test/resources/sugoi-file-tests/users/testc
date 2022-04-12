@@ -8,7 +8,10 @@
          "identifiant":"testi",
          "gpgkey":null,
          "organization":null,
-         "address":["Insee",null,null,"88 AVE VERDIER"],
+         "address":{
+           "line1":"Insee",
+           "line4":"88 AVE VERDIER"
+         },
          "metadatas":{
             
          },
@@ -16,7 +19,10 @@
             
          }
       },
-      "address":["Insee",null,null,"88 AVE VERDIER"],
+      "address":{
+         "line1":"Insee",
+         "line4":"88 AVE VERDIER"
+      },
       "metadatas":{
          
       },
@@ -34,7 +40,7 @@
                "habilitations":[
                   
                ],
-               "address":[],
+               "address":{},
                "metadatas":{
                   
                },
@@ -47,7 +53,7 @@
                "habilitations":[
                   
                ],
-               "address":[],
+               "address":{},
                "metadatas":{
                   
                },
@@ -62,7 +68,10 @@
    "habilitations":[
       
    ],
-   "address":["Insee",null,null,"88 AVE VERDIER"],
+   "address":{
+      "line1":"Insee",
+      "line4":"88 AVE VERDIER"
+   },
    "metadatas":{
       
    },

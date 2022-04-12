@@ -91,7 +91,7 @@ public class ExportControllerTest {
     user.setGroups(List.of(new Group("app1", "group1"), new Group("app2", "group2")));
     PostalAddress address = new PostalAddress("generatedBefore");
     address.setLines(
-        new String[] {"33 rue des Fleurs", "56700 Fleurville", null, "", "Cedex 1234"});
+        new String[] {"33 rue des Fleurs", "56700 Fleurville", null, "", "Cedex 1234", null, null});
     user.setAddress(address);
 
     User user1 = new User("user1");

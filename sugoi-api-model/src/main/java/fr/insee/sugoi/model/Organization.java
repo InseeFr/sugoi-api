@@ -13,7 +13,6 @@
 */
 package fr.insee.sugoi.model;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +22,7 @@ public class Organization implements Serializable {
   private byte[] gpgkey;
   private Organization organization;
 
-  @JsonUnwrapped private PostalAddress address;
+  private PostalAddress address;
   private Map<String, Object> metadatas = new HashMap<>();
   private Map<String, Object> attributes = new HashMap<>();
 

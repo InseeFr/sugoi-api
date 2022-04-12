@@ -120,10 +120,10 @@ public class LdapWriterStoreTest {
     ldapWriterStore = (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
     ldapReaderStore = (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     addressOrga = new PostalAddress();
-    addressOrga.setLines(new String[] {"Orga", "Chez orga"});
+    addressOrga.setLines(new String[] {"Orga", "Chez orga", null, null, null, null, null});
 
     addressToto = new PostalAddress();
-    addressToto.setLines(new String[] {"Toto", "Chez Toto"});
+    addressToto.setLines(new String[] {"Toto", "Chez Toto", null, null, null, null, null});
   }
 
   @Test
