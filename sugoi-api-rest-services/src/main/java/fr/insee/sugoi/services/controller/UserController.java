@@ -14,6 +14,7 @@
 package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
+import fr.insee.sugoi.core.exceptions.IdNotMatchingException;
 import fr.insee.sugoi.core.exceptions.UnableToUpdateCertificateException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
@@ -44,6 +45,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -385,8 +387,8 @@ public class UserController {
       Authentication authentication,
       @Parameter(description = "User to update", required = true) @RequestBody User user) {
 
-    if (!user.getUsername().equals(id)) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    if (StringUtils.isBlank(user.getUsername()) || !user.getUsername().equalsIgnoreCase(id)) {
+      throw new IdNotMatchingException(id, user.getUsername());
     }
 
     ProviderResponse response =
@@ -457,8 +459,8 @@ public class UserController {
       Authentication authentication,
       @Parameter(description = "User to update", required = true) @RequestBody User user) {
 
-    if (!user.getUsername().equals(id)) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    if (StringUtils.isBlank(user.getUsername()) || !user.getUsername().equalsIgnoreCase(id)) {
+      throw new IdNotMatchingException(id, user.getUsername());
     }
     User foundUser = userService.findById(realm, null, id);
     return updateUsers(

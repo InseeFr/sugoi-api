@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.services.controller;
 
+import fr.insee.sugoi.core.exceptions.IdNotMatchingException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.SugoiUser;
@@ -33,6 +34,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -197,9 +199,10 @@ public class RealmController {
           String transactionId,
       Authentication authentication,
       @RequestBody Realm realm,
-      @PathVariable("id") String id) {
-    if (!realm.getName().equalsIgnoreCase(id)) {
-      return ResponseEntity.badRequest().build();
+      @PathVariable("id") String id)
+      throws IdNotMatchingException {
+    if (StringUtils.isBlank(realm.getName()) || !realm.getName().equalsIgnoreCase(id)) {
+      throw new IdNotMatchingException(id, realm.getName());
     }
     ProviderResponse response =
         configService.updateRealm(

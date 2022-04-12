@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.services.controller;
 
+import fr.insee.sugoi.core.exceptions.IdNotMatchingException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -33,6 +34,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -233,8 +235,9 @@ public class ApplicationController {
       @Parameter(description = "Application to update", required = true) @RequestBody
           Application application) {
 
-    if (!application.getName().equals(applicationName)) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    if (StringUtils.isBlank(application.getName())
+        || !application.getName().equalsIgnoreCase(applicationName)) {
+      throw new IdNotMatchingException(applicationName, application.getName());
     }
 
     ProviderResponse response =
