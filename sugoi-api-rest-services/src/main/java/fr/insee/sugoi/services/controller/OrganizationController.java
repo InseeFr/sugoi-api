@@ -14,6 +14,7 @@
 package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
+import fr.insee.sugoi.core.exceptions.IdNotMatchingException;
 import fr.insee.sugoi.core.exceptions.UnabletoUpdateGPGKeyException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
@@ -36,6 +37,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -309,8 +311,9 @@ public class OrganizationController {
       Authentication authentication,
       @Parameter(description = "Organization to update", required = false) @RequestBody
           Organization organization) {
-    if (!organization.getIdentifiant().equals(id)) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    if (StringUtils.isBlank(organization.getIdentifiant())
+        || !organization.getIdentifiant().equalsIgnoreCase(id)) {
+      throw new IdNotMatchingException(id, organization.getIdentifiant());
     }
 
     ProviderResponse response =
@@ -381,8 +384,9 @@ public class OrganizationController {
           @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
           String transactionId,
       Authentication authentication) {
-    if (!organization.getIdentifiant().equals(id)) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    if (StringUtils.isBlank(organization.getIdentifiant())
+        || !organization.getIdentifiant().equalsIgnoreCase(id)) {
+      throw new IdNotMatchingException(id, organization.getIdentifiant());
     }
     Organization org = organizationService.findById(realm, null, id);
     return updateOrganizations(

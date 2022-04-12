@@ -22,6 +22,7 @@ import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.core.exceptions.GroupAlreadyExistException;
 import fr.insee.sugoi.core.exceptions.GroupNotCreatedException;
 import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
+import fr.insee.sugoi.core.exceptions.IdNotMatchingException;
 import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
 import fr.insee.sugoi.core.exceptions.InvalidTransactionIdException;
 import fr.insee.sugoi.core.exceptions.InvalidUserStorageException;
@@ -63,9 +64,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(RealmNotFoundException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(UserNotFoundException.class)
@@ -73,9 +72,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(UserNotFoundException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(UserStorageNotFoundException.class)
@@ -83,9 +80,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(UserStorageNotFoundException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(NoDomaineMappingException.class)
@@ -93,9 +88,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(NoDomaineMappingException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(UserNotFoundByMailException.class)
@@ -103,9 +96,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(UserNotFoundByMailException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(ManagerGroupNotFoundException.class)
@@ -113,9 +104,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(ManagerGroupNotFoundException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(OrganizationNotFoundException.class)
@@ -123,9 +112,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(OrganizationNotFoundException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(ApplicationNotFoundException.class)
@@ -133,9 +120,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(ApplicationNotFoundException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(GroupNotFoundException.class)
@@ -143,9 +128,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(GroupNotFoundException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(NoCertificateOnUserException.class)
@@ -153,9 +136,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(NoCertificateOnUserException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(RealmAlreadyExistException.class)
@@ -163,9 +144,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(RealmAlreadyExistException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.CONFLICT);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.CONFLICT);
   }
 
   @ExceptionHandler(ApplicationAlreadyExistException.class)
@@ -173,9 +152,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(ApplicationAlreadyExistException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.CONFLICT);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.CONFLICT);
   }
 
   @ExceptionHandler(OrganizationAlreadyExistException.class)
@@ -183,9 +160,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(OrganizationAlreadyExistException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.CONFLICT);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.CONFLICT);
   }
 
   @ExceptionHandler(UserAlreadyExistException.class)
@@ -193,9 +168,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(UserAlreadyExistException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.CONFLICT);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.CONFLICT);
   }
 
   @ExceptionHandler(GroupAlreadyExistException.class)
@@ -203,9 +176,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(GroupAlreadyExistException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.CONFLICT);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.CONFLICT);
   }
 
   @ExceptionHandler(AccessDeniedException.class)
@@ -213,9 +184,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(AccessDeniedException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.FORBIDDEN);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.FORBIDDEN);
   }
 
   @ExceptionHandler(InvalidUserStorageException.class)
@@ -223,9 +192,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(InvalidUserStorageException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(RealmNotCreatedException.class)
@@ -233,9 +200,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(RealmNotCreatedException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(ApplicationNotCreatedException.class)
@@ -243,9 +208,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(ApplicationNotCreatedException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(OrganizationNotCreatedException.class)
@@ -253,9 +216,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(OrganizationNotCreatedException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(UserNotCreatedException.class)
@@ -263,9 +224,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(UserNotCreatedException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(GroupNotCreatedException.class)
@@ -273,9 +232,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(GroupNotCreatedException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(StoragePolicyNotMetException.class)
@@ -283,9 +240,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(StoragePolicyNotMetException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.BAD_REQUEST);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler(InvalidPasswordException.class)
@@ -293,9 +248,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(InvalidPasswordException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.FORBIDDEN);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.FORBIDDEN);
   }
 
   @ExceptionHandler(PasswordPolicyNotMetException.class)
@@ -303,9 +256,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(PasswordPolicyNotMetException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.CONFLICT);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.CONFLICT);
   }
 
   @ExceptionHandler(UnsupportedOperationException.class)
@@ -313,9 +264,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(UnsupportedOperationException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_IMPLEMENTED);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.NOT_IMPLEMENTED);
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -323,9 +272,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(HttpMessageNotReadableException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.BAD_REQUEST);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
@@ -333,9 +280,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(HttpMediaTypeNotSupportedException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.BAD_REQUEST);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
@@ -343,9 +288,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(HttpMediaTypeNotAcceptableException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.BAD_REQUEST);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler(Exception.class)
@@ -354,9 +297,7 @@ public class SugoiAdviceController {
     logger.error(e.getMessage(), e);
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.INTERNAL_SERVER_ERROR);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @ExceptionHandler(AppCannotManagedAttributeException.class)
@@ -364,9 +305,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(AppCannotManagedAttributeException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.FORBIDDEN);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.FORBIDDEN);
   }
 
   @ExceptionHandler(AppManagedAttributeException.class)
@@ -374,9 +313,7 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(AppManagedAttributeException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(InvalidTransactionIdException.class)
@@ -384,8 +321,14 @@ public class SugoiAdviceController {
   public ResponseEntity<ErrorView> exception(InvalidTransactionIdException e) {
     ErrorView errorView = new ErrorView();
     errorView.setMessage(e.getMessage());
-    final ResponseEntity<ErrorView> response =
-        new ResponseEntity<ErrorView>(errorView, HttpStatus.NOT_FOUND);
-    return response;
+    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
+  }
+
+  @ExceptionHandler(IdNotMatchingException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorView> exception(IdNotMatchingException e) {
+    ErrorView errorView = new ErrorView();
+    errorView.setMessage(e.getMessage());
+    return new ResponseEntity<>(errorView, HttpStatus.BAD_REQUEST);
   }
 }
