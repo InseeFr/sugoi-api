@@ -15,7 +15,6 @@ package fr.insee.sugoi.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import java.io.Serializable;
 import java.util.*;
 
@@ -33,7 +32,7 @@ public class User implements Serializable {
   private List<Group> groups = new ArrayList<>();
   private List<Habilitation> habilitations = new ArrayList<>();
 
-  @JsonUnwrapped private PostalAddress address;
+  private PostalAddress address;
   private Map<String, Object> metadatas = new HashMap<>();
   private Map<String, Object> attributes = new HashMap<>();
 

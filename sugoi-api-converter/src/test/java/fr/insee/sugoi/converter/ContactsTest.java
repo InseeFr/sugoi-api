@@ -79,7 +79,7 @@ public class ContactsTest {
     user.setUsername("toto");
     Organization organization = new Organization();
     PostalAddress address = new PostalAddress();
-    address.setLines(new String[] {null, "Lentreprise", null, null, "CEDEX"});
+    address.setLines(new String[] {null, "Lentreprise", null, null, "CEDEX", null, null});
     organization.setIdentifiant("Lorganisation");
     organization.setAddress(address);
     user.addAttributes("description", "ce user est trop cool");
@@ -196,7 +196,7 @@ public class ContactsTest {
       OuganextSugoiMapper osm = new OuganextSugoiMapper();
       User user = osm.serializeToSugoi(contact, User.class);
       String expectedJson =
-          "{\"lastName\":\"test\",\"firstName\":\"test\",\"mail\":\"tes.tkmgfdl@jhk.gmail\",\"username\":\"test\",\"organization\":{\"identifiant\":\"lorganisation\",\"gpgkey\":null,\"organization\":null,\"metadatas\":{},\"attributes\":{\"proprietes\":null,\"nomCommun\":null,\"mail\":null,\"domaineDeGestion\":null,\"repertoireDeDistribution\":null,\"description\":null,\"numeroTelephone\":null,\"facSimile\":null}},\"groups\":[],\"habilitations\":[],\"address\":[\"15 rue Gabriel Peri\",\"\",\"\",\"\",\"\",\"\",\"92240 Malakoff\"],\"metadatas\":{\"dateCreation\":null,\"hasPassword\":false},\"attributes\":{\"proprietes\":null,\"insee_roles_applicatifs\":null,\"nomCommun\":\"Test\",\"domaineDeGestion\":\"testDG\",\"repertoireDeDistribution\":null,\"description\":\"description\",\"telephonePortable\":\"061245789636\",\"codePin\":\"AAA=\",\"numeroTelephone\":\"0123456789\",\"identifiantMetier\":\"123456789\",\"civilite\":\"Camarade\",\"facSimile\":\"0123456789\"}}";
+          "{\"lastName\":\"test\",\"firstName\":\"test\",\"mail\":\"tes.tkmgfdl@jhk.gmail\",\"username\":\"test\",\"organization\":{\"identifiant\":\"lorganisation\",\"gpgkey\":null,\"organization\":null,\"address\":null,\"metadatas\":{},\"attributes\":{\"proprietes\":null,\"nomCommun\":null,\"mail\":null,\"domaineDeGestion\":null,\"repertoireDeDistribution\":null,\"description\":null,\"numeroTelephone\":null,\"facSimile\":null}},\"groups\":[],\"habilitations\":[],\"address\":{\"line1\":\"15 rue Gabriel Peri\",\"line2\":\"\",\"line3\":\"\",\"line4\":\"\",\"line5\":\"\",\"line6\":\"\",\"line7\":\"92240 Malakoff\"},\"metadatas\":{\"dateCreation\":null,\"hasPassword\":false},\"attributes\":{\"proprietes\":null,\"insee_roles_applicatifs\":null,\"nomCommun\":\"Test\",\"domaineDeGestion\":\"testDG\",\"repertoireDeDistribution\":null,\"description\":\"description\",\"telephonePortable\":\"061245789636\",\"codePin\":\"AAA=\",\"numeroTelephone\":\"0123456789\",\"identifiantMetier\":\"123456789\",\"civilite\":\"Camarade\",\"facSimile\":\"0123456789\"}}";
       assertEquals(expectedJson, CustomObjectMapper.JsonObjectMapper().writeValueAsString(user));
     } catch (Exception e) {
       fail(e);

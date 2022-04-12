@@ -63,7 +63,7 @@ public class OrganisationTest {
     Organization organization = new Organization();
     organization.setIdentifiant("Toto");
     PostalAddress address = new PostalAddress();
-    address.setLines(new String[] {null, "Lentreprise", null, null, "CEDEX"});
+    address.setLines(new String[] {null, "Lentreprise", null, null, "CEDEX", null, null});
     organization.setAddress(address);
     organization.addAttributes("toto", "tata");
     organization.addAttributes("nomCommun", "Commun");
@@ -127,7 +127,7 @@ public class OrganisationTest {
       OuganextSugoiMapper osm = new OuganextSugoiMapper();
       Organization organization = osm.serializeToSugoi(organisation, Organization.class);
       String expectedJson =
-          "{\"identifiant\":\"XJHFLG4\",\"gpgkey\":null,\"organization\":{\"identifiant\":\"133546546\",\"gpgkey\":null,\"organization\":null,\"metadatas\":{},\"attributes\":{\"proprietes\":null,\"nomCommun\":\"Test Organisation\",\"mail\":null,\"domaineDeGestion\":null,\"repertoireDeDistribution\":null,\"description\":null,\"numeroTelephone\":null,\"facSimile\":null}},\"address\":[\"17 bd adolphe pinard\",\"\",\"\",\"\",\"\",\"\",\"92240 Malakoff\"],\"metadatas\":{},\"attributes\":{\"proprietes\":[\"Test1\",\"Test2\"],\"nomCommun\":\"INSEE-DG\",\"mail\":\"accueil@domain.tld\",\"domaineDeGestion\":\"TEST\",\"repertoireDeDistribution\":null,\"description\":\"INSEE\",\"numeroTelephone\":null,\"facSimile\":\"0123456789\"}}";
+          "{\"identifiant\":\"XJHFLG4\",\"gpgkey\":null,\"organization\":{\"identifiant\":\"133546546\",\"gpgkey\":null,\"organization\":null,\"address\":null,\"metadatas\":{},\"attributes\":{\"proprietes\":null,\"nomCommun\":\"Test Organisation\",\"mail\":null,\"domaineDeGestion\":null,\"repertoireDeDistribution\":null,\"description\":null,\"numeroTelephone\":null,\"facSimile\":null}},\"address\":{\"line1\":\"17 bd adolphe pinard\",\"line2\":\"\",\"line3\":\"\",\"line4\":\"\",\"line5\":\"\",\"line6\":\"\",\"line7\":\"92240 Malakoff\"},\"metadatas\":{},\"attributes\":{\"proprietes\":[\"Test1\",\"Test2\"],\"nomCommun\":\"INSEE-DG\",\"mail\":\"accueil@domain.tld\",\"domaineDeGestion\":\"TEST\",\"repertoireDeDistribution\":null,\"description\":\"INSEE\",\"numeroTelephone\":null,\"facSimile\":\"0123456789\"}}";
       assertEquals(
           expectedJson, CustomObjectMapper.JsonObjectMapper().writeValueAsString(organization));
     } catch (Exception e) {

@@ -74,7 +74,8 @@ public class FileWriterStoreTest {
           (FileWriterStore) context.getBean("FileWriterStore", realm(), userStorage());
 
       PostalAddress testoOrgAdress = new PostalAddress();
-      testoOrgAdress.setLines(new String[] {"Insee", null, null, "88 AVE VERDIER"});
+      testoOrgAdress.setLines(
+          new String[] {"Insee", null, null, "88 AVE VERDIER", null, null, null});
 
       Group utilisateursApplitest = new Group("Applitest", "Utilisateurs_Applitest");
       Group adminApplitest = new Group("Applitest", "Administrateurs_Applitest");
@@ -145,10 +146,10 @@ public class FileWriterStoreTest {
       testiOrgWriter.close();
 
       addressOrga = new PostalAddress();
-      addressOrga.setLines(new String[] {"Orga", "Chez orga"});
+      addressOrga.setLines(new String[] {"Orga", "Chez orga", null, null, null, null, null});
 
       addressToto = new PostalAddress();
-      addressToto.setLines(new String[] {"Toto", "Chez Toto"});
+      addressToto.setLines(new String[] {"Toto", "Chez toto", null, null, null, null, null});
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -225,7 +226,7 @@ public class FileWriterStoreTest {
     fileWriterStore.createUser(user, null);
     User retrievedUser = fileReaderStore.getUser("TitiNoAddress").get();
 
-    assertThat("TitiNoAddress shouldn't have an address", !retrievedUser.getAddress().isNotEmpty());
+    assertThat("TitiNoAddress shouldn't have an address", retrievedUser.getAddress() == null);
   }
 
   @Test

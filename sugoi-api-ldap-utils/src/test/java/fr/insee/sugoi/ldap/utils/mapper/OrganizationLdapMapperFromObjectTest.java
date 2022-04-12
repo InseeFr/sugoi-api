@@ -89,7 +89,8 @@ public class OrganizationLdapMapperFromObjectTest {
   public void getOrganizationAddressAttributesFromJavaObject() {
 
     PostalAddress address = new PostalAddress("generatedBefore");
-    address.setLines(new String[] {"33 rue des Fleurs", "56700 Fleurville"});
+    address.setLines(
+        new String[] {"33 rue des Fleurs", "56700 Fleurville", null, null, null, null, null});
 
     organization.setAddress(address);
     List<Attribute> mappedAttributes =

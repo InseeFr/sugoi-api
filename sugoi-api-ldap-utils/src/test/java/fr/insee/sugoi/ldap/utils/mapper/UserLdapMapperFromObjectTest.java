@@ -136,7 +136,7 @@ public class UserLdapMapperFromObjectTest {
   public void getUserAddressAttributesFromJavaObject() {
 
     PostalAddress postalAddress = new PostalAddress();
-    String[] adresses = {"33 rue des Fleurs", "56700 Fleurville"};
+    String[] adresses = {"33 rue des Fleurs", "56700 Fleurville", null, null, null, null, null};
     postalAddress.setLines(adresses);
     postalAddress.setId("generatedBefore");
     user.setAddress(postalAddress);

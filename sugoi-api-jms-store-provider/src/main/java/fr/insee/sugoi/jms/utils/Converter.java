@@ -158,7 +158,7 @@ public class Converter {
   public PostalAddress toPostalAddress(Object object) {
     ArrayList<String> linkedHashMap = (ArrayList<String>) object;
     if (linkedHashMap != null) {
-      String[] lines = linkedHashMap.toArray(new String[8]);
+      String[] lines = linkedHashMap.toArray(new String[7]);
       PostalAddress postalAddress = new PostalAddress();
       postalAddress.setLines(lines);
       return postalAddress;

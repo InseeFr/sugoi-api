@@ -1,1 +1,1 @@
-{"identifiant":"testi","gpgkey":null,"organization":null,"address":["Insee",null,null,"88 AVE VERDIER"],"metadatas":{},"attributes":{}}
+ {"identifiant":"testi","gpgkey":null,"organization":null,"address":{"line1":"Insee","line4":"88 AVE VERDIER"},"metadatas":{},"attributes":{}} 
