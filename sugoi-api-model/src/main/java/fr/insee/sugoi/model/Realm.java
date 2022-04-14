@@ -123,7 +123,11 @@ public class Realm implements Serializable {
   }
 
   public Optional<UserStorage> getUserStorageByName(String name) {
-    return userStorages.stream().filter(s -> s.getName().equalsIgnoreCase(name)).findFirst();
+    if (userStorages != null) {
+      return userStorages.stream().filter(s -> s.getName().equalsIgnoreCase(name)).findFirst();
+    } else {
+      return Optional.empty();
+    }
   }
 
   @Override
