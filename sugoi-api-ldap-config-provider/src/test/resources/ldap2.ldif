@@ -145,7 +145,6 @@ dn: cn=Profil_domaine1_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We
 cn: Profil_domaine1_WebServiceLdap
 objectclass: inseeOrganizationalRole
 inseepropriete: ldapUrl$localhost
-inseePropriete: create_password_WITHUpperCase$true
 inseepropriete: ldapPort$10389
 inseepropriete: app_managed_attribute_key$inseeGroupeDefaut
 inseepropriete: app_managed_attribute_pattern$(.*)_$(application)
@@ -180,6 +179,8 @@ inseepropriete: uiUserMapping$Groupes;;;groups;groups;true;rights;addTitle=Ajout
 inseepropriete: uiUserMapping$Rôles applicatifs;;;attributes.insee_roles_applicatifs;simpleAppManagedAttributes;true;rights;addTitle=Ajouter un rôle;deleteTitle=Supprimer un rôle;attribute_key=inseeRoleApplicatif
 inseepropriete: uiUserMapping$Propriétés;Propriétés du contact; Ajouter une propriété à saisir en cliquant sur "Ajouter un champ". Supprimer une propriété saisie en vidant le champ ou en cliquant sur la croix rouge à droite du champ. Aucune limite d'ajout.;attributes.properties;list;true;properties;addTitle=Ajouter une propriété;deleteTitle=Supprimer une propriété
 inseepropriete: uiUserMapping$PasswordLastChange;Dernier changement de mdp;;metadatas.passwordLastChange;string;true;authentification;2;
+inseepropriete: validate_password_WITHUpperCase$true
+inseePropriete: create_password_WITHUpperCase$true
 description: domaine1
 
 dn: cn=default,cn=Profil_domaine1_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We

@@ -44,6 +44,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -155,6 +156,13 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
     }
   }
 
+  private void addDefaultProperties(
+      UserStorage userstorage, Map<String, String> defaultRealmProperties) {
+    for (Entry<String, String> entry : defaultRealmProperties.entrySet()) {
+      userstorage.getProperties().putIfAbsent(entry.getKey(), entry.getValue());
+    }
+  }
+
   @Override
   public ProviderResponse createRealm(Realm realm, ProviderRequest providerRequest) {
     if (load(realm.getName()).isEmpty()) {
@@ -237,19 +245,27 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
     }
   }
 
-  private List<UserStorage> loadUserStorages(String realmName) throws LDAPException {
-    return ldapPoolConnection()
-        .search(
-            getRealmDn(realmName), SearchScope.SUBORDINATE_SUBTREE, Filter.create("objectClass=*"))
-        .getSearchEntries()
-        .stream()
-        .map(searchEntry -> UserStorageLdapMapper.mapFromAttributes(searchEntry.getAttributes()))
-        .collect(Collectors.toList());
+  private List<UserStorage> loadUserStorages(
+      String realmName, Map<String, String> defaultRealmProperties) throws LDAPException {
+    List<UserStorage> userstorages =
+        ldapPoolConnection()
+            .search(
+                getRealmDn(realmName),
+                SearchScope.SUBORDINATE_SUBTREE,
+                Filter.create("objectClass=*"))
+            .getSearchEntries()
+            .stream()
+            .map(
+                searchEntry -> UserStorageLdapMapper.mapFromAttributes(searchEntry.getAttributes()))
+            .collect(Collectors.toList());
+    userstorages.stream()
+        .forEach(userStorage -> addDefaultProperties(userStorage, defaultRealmProperties));
+    return userstorages;
   }
 
   private Realm generateRealmFromSearchEntry(SearchResultEntry searchEntry) throws LDAPException {
     Realm realm = RealmLdapMapper.mapFromSearchEntry(searchEntry);
-    realm.setUserStorages(loadUserStorages(realm.getName()));
+    realm.setUserStorages(loadUserStorages(realm.getName(), realm.getProperties()));
     addDefaultOnRealm(realm);
     sortUiLists(realm);
     return realm;

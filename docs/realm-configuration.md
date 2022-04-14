@@ -111,7 +111,7 @@ Realm properties on password generation and validation. See [general configurati
 
 ## UserStorage configuration
 
-A UserStorage is a logical division of a Realm.
+A UserStorage is a logical division of a Realm. 
 These configuration should be set for each UserStorage contained in a Realm :
 
 | Field name                   |                                      Example                                       |                                                                                   Optional |                                                                              Default | Description                                                                                                                                             |
@@ -128,7 +128,8 @@ These configuration should be set for each UserStorage contained in a Realm :
 
 ### Generic UserStorage properties
 
-Those are optional properties to set on a userstorage :
+Those are optional properties to set on a userstorage. If the property is not set at the userstorage level, 
+the corresponding realm property will be used as default if set. 
 
 | Key                                                                          |                                                                                                             Description                                                                                                              |
 | ---------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
