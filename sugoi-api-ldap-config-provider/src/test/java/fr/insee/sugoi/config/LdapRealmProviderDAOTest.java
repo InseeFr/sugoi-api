@@ -20,6 +20,7 @@ import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.configuration.UiMappingService;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.Realm.UIMappingType;
+import fr.insee.sugoi.model.UserStorage;
 import fr.insee.sugoi.model.technics.ModelType;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import fr.insee.sugoi.model.technics.UiField;
@@ -192,6 +193,16 @@ public class LdapRealmProviderDAOTest {
     assertThat(
         "Should have a password length",
         realm.getProperties().get("create_password_WITHUpperCase"),
+        is("true"));
+  }
+
+  @Test
+  public void usShouldContainRealmPropertiesByDefault() {
+    UserStorage userstorage =
+        ldapRealmProviderDAOImpl.load("domaine1").get().getUserStorageByName("default").get();
+    assertThat(
+        "Should get validate password with uppercase from realm",
+        userstorage.getProperties().get("validate_password_WITHUpperCase"),
         is("true"));
   }
 }
