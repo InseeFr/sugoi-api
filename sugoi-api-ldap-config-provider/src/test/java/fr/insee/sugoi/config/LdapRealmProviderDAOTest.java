@@ -192,7 +192,7 @@ public class LdapRealmProviderDAOTest {
     Realm realm = ldapRealmProviderDAOImpl.load("domaine1").get();
     assertThat(
         "Should have a password length",
-        realm.getProperties().get("create_password_WITHUpperCase"),
+        realm.getUserStorages().get(0).getProperties().get("create_password_WITHUpperCase"),
         is("true"));
   }
 
