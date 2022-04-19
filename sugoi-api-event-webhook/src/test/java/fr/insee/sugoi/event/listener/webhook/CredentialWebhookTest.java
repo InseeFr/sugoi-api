@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.is;
 
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.model.ProviderRequest;
-import fr.insee.sugoi.core.service.ConfigService;
+import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.PasswordService;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.core.service.impl.CredentialsServiceImpl;
@@ -28,8 +28,10 @@ import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.event.listener.webhook.service.impl.WebHookServiceImpl;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.UserStorage;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -59,7 +61,7 @@ public class CredentialWebhookTest {
 
   @SpyBean private WebHookServiceImpl webHookServiceImpl;
 
-  @MockBean private ConfigService configService;
+  @MockBean private RealmProvider realmProvider;
 
   @MockBean private UserService userService;
 
@@ -69,7 +71,11 @@ public class CredentialWebhookTest {
 
   @BeforeEach
   public void setUp() {
-    Mockito.when(configService.getRealm("domaine1")).thenReturn(new Realm());
+    UserStorage us1 = new UserStorage();
+    us1.setName("default");
+    Realm realmUserStorage = new Realm();
+    realmUserStorage.setUserStorages(List.of(us1));
+    Mockito.when(realmProvider.load("domaine1")).thenReturn(Optional.of(realmUserStorage));
     Mockito.when(
             passwordService.generatePassword(
                 Mockito.isNull(),

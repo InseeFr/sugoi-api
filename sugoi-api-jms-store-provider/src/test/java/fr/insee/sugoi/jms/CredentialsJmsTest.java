@@ -15,7 +15,7 @@ package fr.insee.sugoi.jms;
 
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.model.ProviderRequest;
-import fr.insee.sugoi.core.service.ConfigService;
+import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.CredentialsService;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.core.service.OrganizationService;
@@ -27,6 +27,7 @@ import fr.insee.sugoi.jms.writer.JmsWriter;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -59,7 +60,7 @@ public class CredentialsJmsTest {
 
   @MockBean private StoreProvider storeProvider;
   @MockBean private PasswordService passwordService;
-  @MockBean private ConfigService configService;
+  @MockBean private RealmProvider realmprovider;
   @MockBean private UserService userService;
   @MockBean private GroupService groupService;
   @MockBean private OrganizationService organizationService;
@@ -88,8 +89,8 @@ public class CredentialsJmsTest {
                 Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any()))
         .thenReturn(null);
 
-    Mockito.when(configService.getRealm("domaine1")).thenReturn(new Realm());
-    Mockito.when(storeProvider.getWriterStore(Mockito.eq("domaine1"), Mockito.eq("default")))
+    Mockito.when(realmprovider.load("domaine1")).thenReturn(Optional.of(realm));
+    Mockito.when(storeProvider.getWriterStore("domaine1", "default"))
         .thenReturn(jmsWriterStore)
         .thenReturn(doNothingWriterStore);
     Mockito.when(

@@ -18,7 +18,7 @@ import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
-import fr.insee.sugoi.core.service.ConfigService;
+import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.CredentialsService;
 import fr.insee.sugoi.core.service.PasswordService;
 import fr.insee.sugoi.core.service.UserService;
@@ -26,8 +26,10 @@ import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.PasswordPolicyConstants;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.exceptions.PasswordPolicyNotMetException;
+import fr.insee.sugoi.model.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.exceptions.UserNoEmailException;
 import fr.insee.sugoi.model.exceptions.UserNotFoundException;
+import fr.insee.sugoi.model.exceptions.UserStorageNotFoundException;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +44,7 @@ public class CredentialsServiceImpl implements CredentialsService {
 
   @Autowired private SugoiEventPublisher sugoiEventPublisher;
 
-  @Autowired private ConfigService configService;
+  @Autowired private RealmProvider realmProvider;
 
   @Autowired private UserService userService;
 
@@ -65,29 +67,40 @@ public class CredentialsServiceImpl implements CredentialsService {
       if (StringUtils.isEmpty(computeReceiverMail(templateProperties, user.getMail()))) {
         throw new UserNoEmailException(realm, userStorage, userId);
       }
-
-      Map<String, String> realmProperties = configService.getRealm(realm).getProperties();
+      Map<String, String> userStorageProperties =
+          realmProvider
+              .load(realm)
+              .orElseThrow(() -> new RealmNotFoundException(realm))
+              .getUserStorageByName(userStorage)
+              .orElseThrow(() -> new UserStorageNotFoundException(realm, userStorage))
+              .getProperties();
 
       String password =
           passwordService.generatePassword(
-              realmProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE) != null
+              userStorageProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE)
+                      != null
                   ? Boolean.parseBoolean(PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE)
                   : null,
-              realmProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_LOWERCASE) != null
+              userStorageProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_LOWERCASE)
+                      != null
                   ? Boolean.parseBoolean(
-                      realmProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_LOWERCASE))
+                      userStorageProperties.get(
+                          PasswordPolicyConstants.CREATE_PASSWORD_WITH_LOWERCASE))
                   : null,
-              realmProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_DIGITS) != null
+              userStorageProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_DIGITS) != null
                   ? Boolean.parseBoolean(
-                      realmProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_DIGITS))
+                      userStorageProperties.get(
+                          PasswordPolicyConstants.CREATE_PASSWORD_WITH_DIGITS))
                   : null,
-              realmProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_SPECIAL) != null
+              userStorageProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_SPECIAL)
+                      != null
                   ? Boolean.parseBoolean(
-                      realmProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_SPECIAL))
+                      userStorageProperties.get(
+                          PasswordPolicyConstants.CREATE_PASSWORD_WITH_SPECIAL))
                   : null,
-              realmProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_SIZE) != null
+              userStorageProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_SIZE) != null
                   ? Integer.parseInt(
-                      realmProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_SIZE))
+                      userStorageProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_SIZE))
                   : null);
 
       ProviderResponse response =
@@ -138,9 +151,15 @@ public class CredentialsServiceImpl implements CredentialsService {
 
       User user = userService.findById(realm, userStorage, userId);
 
-      Map<String, String> realmProperties = configService.getRealm(realm).getProperties();
+      Map<String, String> userStorageProperties =
+          realmProvider
+              .load(realm)
+              .orElseThrow(() -> new RealmNotFoundException(realm))
+              .getUserStorageByName(userStorage)
+              .orElseThrow(() -> new UserStorageNotFoundException(realm, userStorage))
+              .getProperties();
 
-      boolean newPasswordIsValid = validatePassword(newPassword, realmProperties);
+      boolean newPasswordIsValid = validatePassword(newPassword, userStorageProperties);
 
       if (newPasswordIsValid) {
         ProviderResponse providerResponse =
@@ -192,7 +211,13 @@ public class CredentialsServiceImpl implements CredentialsService {
       ProviderRequest providerRequest) {
     try {
 
-      Map<String, String> realmProperties = configService.getRealm(realm).getProperties();
+      Map<String, String> realmProperties =
+          realmProvider
+              .load(realm)
+              .orElseThrow(() -> new RealmNotFoundException(realm))
+              .getUserStorageByName(userStorage)
+              .orElseThrow(() -> new UserStorageNotFoundException(realm, userStorage))
+              .getProperties();
 
       boolean newPasswordIsValid = validatePassword(newPassword, realmProperties);
       if (newPasswordIsValid) {
@@ -287,28 +312,28 @@ public class CredentialsServiceImpl implements CredentialsService {
     }
   }
 
-  private Boolean validatePassword(String password, Map<String, String> realmProperties) {
+  private Boolean validatePassword(String password, Map<String, String> userStorageProperties) {
     return passwordService.validatePassword(
         password,
-        realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE) != null
+        userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE) != null
             ? Boolean.parseBoolean(
-                realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE))
+                userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE))
             : null,
-        realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_LOWERCASE) != null
+        userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_LOWERCASE) != null
             ? Boolean.parseBoolean(
-                realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_LOWERCASE))
+                userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_LOWERCASE))
             : null,
-        realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_DIGITS) != null
+        userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_DIGITS) != null
             ? Boolean.parseBoolean(
-                realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_DIGITS))
+                userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_DIGITS))
             : null,
-        realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_SPECIAL) != null
+        userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_SPECIAL) != null
             ? Boolean.parseBoolean(
-                realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_SPECIAL))
+                userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_SPECIAL))
             : null,
-        realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_MIN_SIZE) != null
+        userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_MIN_SIZE) != null
             ? Integer.parseInt(
-                realmProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_MIN_SIZE))
+                userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_MIN_SIZE))
             : null);
   }
 }

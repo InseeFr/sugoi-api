@@ -15,7 +15,7 @@ package fr.insee.sugoi.event.listener.webhook.service.impl;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
-import fr.insee.sugoi.core.service.ConfigService;
+import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.event.listener.webhook.service.WebHookService;
 import fr.insee.sugoi.model.exceptions.NoReceiverMailException;
 import freemarker.template.Configuration;
@@ -53,7 +53,7 @@ public class WebHookServiceImpl implements WebHookService {
 
   @Autowired private Environment env;
 
-  @Autowired private ConfigService configService;
+  @Autowired private RealmProvider realmProvider;
 
   @Override
   public void resetPassword(String webHookName, Map<String, Object> values) {
@@ -177,7 +177,7 @@ public class WebHookServiceImpl implements WebHookService {
     String template = null;
     try {
       template =
-          configService.getRealm(realmName).getUserStorages().stream()
+          realmProvider.load(realmName).orElseThrow().getUserStorages().stream()
               .filter(us -> us.getName().equalsIgnoreCase(userStorageName))
               .findFirst()
               .orElseThrow()
