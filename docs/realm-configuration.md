@@ -4,9 +4,9 @@
   - [Realm configuration](#realm-configuration)
     - [Ui mapping](#ui-mapping)
     - [Realm configuration properties](#realm-configuration-properties)
-      - [Realm configuration properties on password](#realm-configuration-properties-on-password)
   - [UserStorage configuration](#userstorage-configuration)
     - [Generic UserStorage properties](#generic-userstorage-properties)
+    - [Userstorage configuration properties on password](#userstorage-configuration-properties-on-password)
     - [Userstorage properties with a LDAP Store Provider](#userstorage-properties-with-a-ldap-store-provider)
   - [Realm and Userstorage mappings with a LDAP Store Provider](#realm-and-userstorage-mappings-with-a-ldap-store-provider)
 
@@ -80,34 +80,24 @@ A list of custom key/values can be added at the end.
 
 ### Realm configuration properties
 
-| Field name                          |                      Example                      |                                                                                Optional |                                    Default | Description                                                                                                                                                                                                                |
-|-------------------------------------| :-----------------------------------------------: |----------------------------------------------------------------------------------------:|-------------------------------------------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| seealso_attributes                  |              "seeAlso, otherSeeAlso"              |                                                no, set to enable seealso functionnality |                                            | All values in the corresponding attributes will be parsed as [SeeAlso](concepts.md#SeeAlso) string to add a new attributes to a user. It can be a single attribute name or a list of attribute names separated by a comma. |
-| app-managed-attribute-keys-list     |    "inseeGroupeDefaut, inseeGroupeApplicatif"     | yes, it just allow person with app right to give (or remove) properties on an attribute |                                            | The name of the attribute to modify                                                                                                                                                                                        |
-| app-managed-attribute-patterns-list | "(.\*)\_$(application),$(application)\\$\\$(.\*)" |                                                                                     yes |                                            | The pattern that the attribute value must follow                                                                                                                                                                           |
-| vlv_enabled                         |                   true or false                   |                                                                yes, disabled by default |                                            | Allowed to make vlv search on ldap                                                                                                                                                                                         |
-| sort_key                            |                        uid                        |                                                                                      no |                                            | Attribute on which ordered will be done when making a paging request                                                                                                                                                       |
-| usersMaxOutputSize                  | 100 |                                                                                     yes |         fr.insee.sugoi.users.maxoutputsize | The maximum number of user outputs allowed                                                                                                                                                                                 |
-| groupsMaxOutputSize                 | 100 |                                                                                     yes |        fr.insee.sugoi.groups.maxoutputsize | The maximum number of grouos outputs allowed                                                                                                                                                                               |
-| applicationsMaxOutputSize           | 100 |                                                                                     yes |  fr.insee.sugoi.applications.maxoutputsize | The maximum number of applications outputs allowed                                                                                                                                                                         |  
-| organizationsMaxOutputSize          | 100 |                                                                                     yes | fr.insee.sugoi.organizations.maxoutputsize | The maximum number of organizations outputs allowed                                                                                                                                                                        |  
+| Field name                          |                      Example                      |                                                                                Optional |                                                     Default | Description                                                                                                                                                                                                                |
+|-------------------------------------| :-----------------------------------------------: |----------------------------------------------------------------------------------------:|------------------------------------------------------------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| seealso_attributes                  |              "seeAlso, otherSeeAlso"              |                                                no, set to enable seealso functionnality | | All values in the corresponding attributes will be parsed as [SeeAlso](concepts.md#SeeAlso) string to add a new attributes to a user. It can be a single attribute name or a list of attribute names separated by a comma. |
+| app-managed-attribute-keys-list     |    "inseeGroupeDefaut, inseeGroupeApplicatif"     | yes, it just allow person with app right to give (or remove) properties on an attribute |                                                             | The name of the attribute to modify                                                                                                                                                                                        |
+| app-managed-attribute-patterns-list | "(.\*)\_$(application),$(application)\\$\\$(.\*)" |                                                                                     yes |                                                             | The pattern that the attribute value must follow                                                                                                                                                                           |
+| vlv_enabled                         |                   true or false                   |                                                                yes, disabled by default |                                                             | Allowed to make vlv search on ldap                                                                                                                                                                                         |
+| sort_key                            |                        uid                        |                                                                                      no |                                                             | Attribute on which ordered will be done when making a paging request                                                                                                                                                       |
+| usersMaxOutputSize                  | 100 |                                                                                     yes |                          fr.insee.sugoi.users.maxoutputsize | The maximum number of user outputs allowed                                                                                                                                                                                 |
+| groupsMaxOutputSize                 | 100 |                                                                                     yes |                         fr.insee.sugoi.groups.maxoutputsize | The maximum number of grouos outputs allowed                                                                                                                                                                               |
+| applicationsMaxOutputSize           | 100 |                                                                                     yes |                   fr.insee.sugoi.applications.maxoutputsize | The maximum number of applications outputs allowed                                                                                                                                                                         |  
+| organizationsMaxOutputSize          | 100 |                                                                                     yes |                  fr.insee.sugoi.organizations.maxoutputsize | The maximum number of organizations outputs allowed                                                                                                                                                                        |  
 
-#### Realm configuration properties on password
+ Realm configuration properties can be set as: 
+ 
+- global default properties in the Userstorage configuration properties on password
 
-Realm properties on password generation and validation. See [general configuration](configuration.md#password-configuration) for default values.
-
-| Field name                          |                      Example                      | Default | Description |
-| ----------------------------- | :---------: | :------------: | ------------------------------------ |
-| create_password_WITHUpperCase | true | fr.insee.sugoi.password.create.withUpperCase | Set if a sugoi generated password is generated with uppercase |
-| create_password_WITHLowerCase | false | fr.insee.sugoi.password.create.withLowerCase | Set if a sugoi generated password is generated with lowercase |
-| create_password_WITHDigit | true | fr.insee.sugoi.password.create.withDigits | Set if a sugoi generated password is generated with digit |
-| create_password_WITHSpecial | true | fr.insee.sugoi.password.create.withSpecial | Set if a sugoi generated password is generated with special characters |
-| create_password_size | 20 | fr.insee.sugoi.password.create.length | Set the size of a sugoi generated password |
-| validate_password_WITHUpperCase | false | fr.insee.sugoi.password.validate.withUpperCase | Define if a new password provided by the user is valid if it has no uppercase |
-| validate_password_WITHLowerCase | true | fr.insee.sugoi.password.validate.withLowerCase | Define if a new password provided by the user is valid if it has no lowercase |
-| validate_password_WITHDigit | true | fr.insee.sugoi.password.validate.withDigits | Define if a new password provided by the user is valid if it has no digit |
-| validate_password_WITHSpecial | true | fr.insee.sugoi.password.validate.withSpecial | Define if a new password provided by the user is valid if it has no special characters |
-| validate_password_size | 20 | fr.insee.sugoi.password.validate.minimal.length | Define a minimum size to check if a new password provided by the user is valid |
+  - override by - a value at realm level
+  - override by - a value at Userstorage level
 
 ## UserStorage configuration
 
@@ -136,6 +126,23 @@ the corresponding realm property will be used as default if set.
 | {name}\_send_login_template with name being a configured external webservice |   A template to complete and send to the {name} webservice on /send-login call (see [Notify external webservices](concepts.md#notify-external-webservices) and [Webhooks configuration](configuration.md#webhooks-configuration))    |
 | {name}\_reset_template with name being a configured webservice               | A template to complete and send to the {name} webservice on /reinit-password call (see [Notify external webservices](concepts.md#notify-external-webservices) and [Webhooks configuration](configuration.md#webhooks-configuration)) |
 | {name}\_changepwd_template with name being a configured webservice           | A template to complete and send to the {name} webservice on /change-password call (see [Notify external webservices](concepts.md#notify-external-webservices) and [Webhooks configuration](configuration.md#webhooks-configuration)) |
+
+### Userstorage configuration properties on password
+
+Userstorage properties on password generation and validation. See [general configuration](configuration.md#password-configuration) for default values.
+
+| Field name                          |                      Example                      | Default | Description |
+| ----------------------------- | :---------: | :------------: | ------------------------------------ |
+| create_password_WITHUpperCase | true | fr.insee.sugoi.password.create.withUpperCase | Set if a sugoi generated password is generated with uppercase |
+| create_password_WITHLowerCase | false | fr.insee.sugoi.password.create.withLowerCase | Set if a sugoi generated password is generated with lowercase |
+| create_password_WITHDigit | true | fr.insee.sugoi.password.create.withDigits | Set if a sugoi generated password is generated with digit |
+| create_password_WITHSpecial | true | fr.insee.sugoi.password.create.withSpecial | Set if a sugoi generated password is generated with special characters |
+| create_password_size | 20 | fr.insee.sugoi.password.create.length | Set the size of a sugoi generated password |
+| validate_password_WITHUpperCase | false | fr.insee.sugoi.password.validate.withUpperCase | Define if a new password provided by the user is valid if it has no uppercase |
+| validate_password_WITHLowerCase | true | fr.insee.sugoi.password.validate.withLowerCase | Define if a new password provided by the user is valid if it has no lowercase |
+| validate_password_WITHDigit | true | fr.insee.sugoi.password.validate.withDigits | Define if a new password provided by the user is valid if it has no digit |
+| validate_password_WITHSpecial | true | fr.insee.sugoi.password.validate.withSpecial | Define if a new password provided by the user is valid if it has no special characters |
+| validate_password_size | 20 | fr.insee.sugoi.password.validate.minimal.length | Define a minimum size to check if a new password provided by the user is valid |
 
 ### Userstorage properties with a LDAP Store Provider
 

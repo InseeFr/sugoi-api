@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
+import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.impl.CredentialsServiceImpl;
 import fr.insee.sugoi.core.service.impl.PasswordServiceImpl;
 import fr.insee.sugoi.core.store.StoreProvider;
@@ -29,10 +30,13 @@ import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.model.PasswordPolicyConstants;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.UserStorage;
 import fr.insee.sugoi.model.exceptions.PasswordPolicyNotMetException;
 import fr.insee.sugoi.model.exceptions.UserNoEmailException;
 import fr.insee.sugoi.model.exceptions.UserNotFoundException;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,7 +57,7 @@ public class CredentialsServiceTest {
 
   @MockBean private SugoiEventPublisher sugoiEventPublisher;
 
-  @MockBean private ConfigService configService;
+  @MockBean private RealmProvider realmProvider;
 
   @MockBean private UserService userService;
 
@@ -72,6 +76,15 @@ public class CredentialsServiceTest {
 
   @BeforeEach
   public void setup() {
+    UserStorage us1 = new UserStorage();
+    us1.setName("us1");
+    us1.addProperty(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE, "false");
+    us1.addProperty(PasswordPolicyConstants.CREATE_PASSWORD_SIZE, "40");
+
+    UserStorage usUppercase = new UserStorage();
+    usUppercase.setName("us1");
+    usUppercase.addProperty(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE, "true");
+
     user1 = new User();
     user1.setUsername("Toto");
     user1.setMail("toto@insee.fr");
@@ -80,15 +93,16 @@ public class CredentialsServiceTest {
     user2.setUsername("dodo");
 
     realmUpperCase = new Realm();
+    realmUpperCase.setUserStorages(List.of(usUppercase));
     realmUpperCase.setName("realmWithUpperCase");
     realmUpperCase.addProperty(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE, "true");
-    Mockito.when(configService.getRealm("realmWithUpperCase")).thenReturn(realmUpperCase);
+    Mockito.when(realmProvider.load("realmWithUpperCase")).thenReturn(Optional.of(realmUpperCase));
 
     realmNoUpperCase = new Realm();
+    realmNoUpperCase.setUserStorages(List.of(us1));
     realmNoUpperCase.setName("realmWithoutUpperCase");
-    realmNoUpperCase.addProperty("validate_password_WITHUpperCase", "false");
-    realmNoUpperCase.addProperty(PasswordPolicyConstants.CREATE_PASSWORD_SIZE, "40");
-    Mockito.when(configService.getRealm("realmWithoutUpperCase")).thenReturn(realmNoUpperCase);
+    Mockito.when(realmProvider.load("realmWithoutUpperCase"))
+        .thenReturn(Optional.of(realmNoUpperCase));
     Mockito.when(storeProvider.getWriterStore("realmWithoutUpperCase", "us1"))
         .thenReturn(writerStore);
     ProviderResponse acceptedResponse = new ProviderResponse();
