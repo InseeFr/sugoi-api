@@ -42,14 +42,12 @@ public class SeeAlsoService {
    *
    * @param user which to add attributes
    * @param seeAlso
-   * @return the modified user
    */
-  public User decorateWithSeeAlso(User user, String seeAlso) {
+  public void decorateWithSeeAlso(User user, String seeAlso) {
     Object valueOfNewAttribute = getSeeAlsoFieldValue(seeAlso);
     if (valueOfNewAttribute != null) {
-      user.addAttributes(getSeeAlsoFieldName(seeAlso), getSeeAlsoFieldValue(seeAlso));
+      user.addAttributes(getSeeAlsoFieldName(seeAlso), valueOfNewAttribute);
     }
-    return user;
   }
 
   private Object getSeeAlsoFieldValue(String seeAlso) {
@@ -59,7 +57,10 @@ public class SeeAlsoService {
       String protocol = url.split(":")[0];
       return mapProtocol.getResourceFromUrl(protocol, url, subobject);
     } catch (Exception e) {
-      logger.error("Error while retrieving the seeAlso value from " + seeAlso + " : " + e);
+      logger.error(
+          "Error while retrieving the seeAlso value from {} : {}",
+          seeAlso,
+          e.getLocalizedMessage());
       return null;
     }
   }

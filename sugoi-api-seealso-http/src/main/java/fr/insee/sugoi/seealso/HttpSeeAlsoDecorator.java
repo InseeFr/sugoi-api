@@ -48,12 +48,12 @@ public class HttpSeeAlsoDecorator implements SeeAlsoDecorator {
     try {
       JsonNode rootNode = (new ObjectMapper()).readTree(getHttpResourceBody(url));
       return transformJsonToValue(rootNode, subobject);
-    } catch (IOException | InterruptedException e) {
+    } catch (IOException e) {
       return null;
     }
   }
 
-  private String getHttpResourceBody(String url) throws IOException, InterruptedException {
+  private String getHttpResourceBody(String url) {
     return client
         .get()
         .uri(url)
