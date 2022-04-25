@@ -16,6 +16,7 @@ package fr.insee.sugoi.seealso;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPException;
+import com.unboundid.ldap.sdk.LDAPURL;
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import fr.insee.sugoi.core.seealso.SeeAlsoDecorator;
 import java.util.Arrays;
@@ -42,20 +43,18 @@ public class LdapSeeAlsoDecorator implements SeeAlsoDecorator {
   @Override
   public Object getResourceFromUrl(String url, String subobject) {
     SearchResultEntry searchResultEntry = getResourceFromLdapURL(url);
-    return transformLdapResponseToValue(searchResultEntry, subobject);
+    if (searchResultEntry != null) {
+      return transformLdapResponseToValue(searchResultEntry, subobject);
+    } else {
+      return null;
+    }
   }
 
   private SearchResultEntry getResourceFromLdapURL(String url) {
     try (LDAPConnection ldapConnection = new LDAPConnection()) {
-      String portString = url.substring(url.lastIndexOf(":") + 1, url.lastIndexOf("/"));
-      int ldapPort = portString.matches("-?\\d+") ? Integer.parseInt(portString) : 389;
-      String host =
-          url.substring(
-              url.indexOf("/") + 2,
-              url.lastIndexOf(":") != -1 ? url.lastIndexOf(":") : url.lastIndexOf("/"));
-      String dn = url.substring(url.lastIndexOf("/") + 1);
-      ldapConnection.connect(host, ldapPort, 1000);
-      return ldapConnection.getEntry(dn);
+      LDAPURL ldapUrl = new LDAPURL(url);
+      ldapConnection.connect(ldapUrl.getHost(), ldapUrl.getPort(), 1000);
+      return ldapConnection.searchForEntry(ldapUrl.toSearchRequest());
     } catch (LDAPException e) {
       return null;
     }
