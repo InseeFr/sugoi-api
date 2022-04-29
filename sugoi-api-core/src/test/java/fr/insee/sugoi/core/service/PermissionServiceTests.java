@@ -86,6 +86,19 @@ public class PermissionServiceTests {
   }
 
   @Test
+  public void testPatternAreRemoved() {
+    SugoiUser sugoiUser =
+        new SugoiUser(
+            "toto",
+            List.of("role_$reader_realm2_sugoi", "role_reader_realm1_$(userstorage)_sugoi"));
+    assertThat(
+        "User cannot read realm1 with fake pattern role",
+        !permissions.isReader(sugoiUser, "realm1", null));
+    assertThat(
+        "User can read realm2 even with $ symbol", permissions.isReader(sugoiUser, "realm2", null));
+  }
+
+  @Test
   public void testAppManager() {
     try {
       SugoiUser sugoiUser =
@@ -156,5 +169,26 @@ public class PermissionServiceTests {
     } catch (Exception e) {
       fail();
     }
+  }
+
+  @Test
+  public void testIsValidAttribute() {
+    SugoiUser sugoiUser =
+        new SugoiUser("toto", List.of("role_Asi_appli1", "role_reader_realm1_sugoi"));
+    String attributeValue = "toto_appli1";
+    String pattern_of_attribute = "(.*)_$(APPLICATION)";
+
+    assertThat(
+        "Should be able to write toto_appli1",
+        permissions.isValidAttributeAccordingAttributePattern(
+            sugoiUser, "domaine1", "storage", pattern_of_attribute, attributeValue));
+    assertThat(
+        "Should not be able to write toto_appli2",
+        !permissions.isValidAttributeAccordingAttributePattern(
+            sugoiUser, "domaine1", "storage", pattern_of_attribute, "toto_appli2"));
+    assertThat(
+        "Should not be able to write appli1_toto",
+        !permissions.isValidAttributeAccordingAttributePattern(
+            sugoiUser, "domaine1", "storage", pattern_of_attribute, "appli1_toto"));
   }
 }

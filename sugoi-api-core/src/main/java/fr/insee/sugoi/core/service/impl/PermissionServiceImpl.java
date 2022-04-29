@@ -191,6 +191,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
     return regexpList.stream()
         .map(regexp -> StrSubstitutor.replace(regexp, valueMap, "$(", ")"))
+        .filter(role -> !role.matches(".*\\$\\(.*\\).*"))
         .collect(Collectors.toList());
   }
 
