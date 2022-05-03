@@ -54,7 +54,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
           new ApplicationLdapMapper(config, mappings.get(MappingType.APPLICATIONMAPPING));
       addressLdapMapper = new AddressLdapMapper(config);
     } catch (LDAPException e) {
-      throw new RuntimeException(e);
+      throw new LDAPRuntimeException(e);
     }
   }
 
@@ -160,7 +160,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
           ? Optional.of(groupLdapMapper.mapFromAttributes(entry.getAttributes()))
           : Optional.empty();
     } catch (LDAPException e) {
-      throw new RuntimeException("Fail to get group in ldap", e);
+      throw new LDAPRuntimeException(e);
     }
   }
 
@@ -178,7 +178,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
           pageable,
           groupLdapMapper);
     } catch (LDAPException e) {
-      throw new RuntimeException("Fail to search groups in ldap", e);
+      throw new LDAPRuntimeException(e);
     }
   }
 
@@ -227,7 +227,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
             "Applications feature not configured for this realm");
       }
     } catch (LDAPSearchException e) {
-      throw new RuntimeException("Fail to search applications in ldap", e);
+      throw new LDAPRuntimeException(e);
     }
   }
 
@@ -286,7 +286,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
 
       return ldapPoolConnection.getEntry(dn, "+", "*");
     } catch (LDAPException e) {
-      throw new RuntimeException("Failed to execute " + dn, e);
+      throw new LDAPRuntimeException(e);
     }
   }
 
@@ -322,11 +322,11 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
             ldapMonoConnection = LdapFactory.getSingleConnection(config, true);
           }
         } catch (LDAPException e1) {
-          throw new RuntimeException(e1);
+          throw new LDAPRuntimeException(e1);
         }
         searchResult = ldapMonoConnection.search(searchRequest);
       } else {
-        throw new RuntimeException(e);
+        throw new LDAPRuntimeException(e);
       }
     }
     PageResult<ResultType> pageResult = new PageResult<>();
