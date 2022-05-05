@@ -15,7 +15,6 @@ package fr.insee.sugoi.store.ldap;
 
 import com.unboundid.ldap.sdk.*;
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
-import fr.insee.sugoi.core.exceptions.MultipleUserWithSameMailException;
 import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.LdapFilter;
@@ -23,6 +22,8 @@ import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.ldap.utils.mapper.*;
 import fr.insee.sugoi.model.*;
+import fr.insee.sugoi.model.exceptions.MultipleUserWithSameMailException;
+import fr.insee.sugoi.model.exceptions.StoreException;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;
@@ -54,7 +55,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
           new ApplicationLdapMapper(config, mappings.get(MappingType.APPLICATIONMAPPING));
       addressLdapMapper = new AddressLdapMapper(config);
     } catch (LDAPException e) {
-      throw new RuntimeException(e);
+      throw new StoreException("Failed to create LdapReaderStore", e);
     }
   }
 
@@ -106,7 +107,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
           pageable,
           userLdapMapper);
     } catch (LDAPSearchException e) {
-      throw new RuntimeException("Fail to execute user search", e);
+      throw new StoreException("Fail to execute user search", e);
     }
   }
 
@@ -139,7 +140,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
             pageable,
             organizationLdapMapper);
       } catch (LDAPSearchException e) {
-        throw new RuntimeException("Fail to search organizations in ldap", e);
+        throw new StoreException("Fail to search organizations in ldap", e);
       }
     } else {
       throw new UnsupportedOperationException(
@@ -160,7 +161,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
           ? Optional.of(groupLdapMapper.mapFromAttributes(entry.getAttributes()))
           : Optional.empty();
     } catch (LDAPException e) {
-      throw new RuntimeException("Fail to get group in ldap", e);
+      throw new StoreException("Fail to get group in ldap", e);
     }
   }
 
@@ -178,7 +179,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
           pageable,
           groupLdapMapper);
     } catch (LDAPException e) {
-      throw new RuntimeException("Fail to search groups in ldap", e);
+      throw new StoreException("Fail to search groups in ldap", e);
     }
   }
 
@@ -227,7 +228,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
             "Applications feature not configured for this realm");
       }
     } catch (LDAPSearchException e) {
-      throw new RuntimeException("Fail to search applications in ldap", e);
+      throw new StoreException("Fail to search applications in ldap", e);
     }
   }
 
@@ -322,11 +323,11 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
             ldapMonoConnection = LdapFactory.getSingleConnection(config, true);
           }
         } catch (LDAPException e1) {
-          throw new RuntimeException(e1);
+          throw new StoreException("Search failed", e1);
         }
         searchResult = ldapMonoConnection.search(searchRequest);
       } else {
-        throw new RuntimeException(e);
+        throw new StoreException("Search failed", e);
       }
     }
     PageResult<ResultType> pageResult = new PageResult<>();
@@ -380,7 +381,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
           ? Optional.of(groupLdapMapper.mapFromAttributes(entry.getAttributes()))
           : Optional.empty();
     } catch (Exception e) {
-      throw new RuntimeException("Fail to get group in ldap", e);
+      throw new StoreException("Fail to get group in ldap", e);
     }
   }
 

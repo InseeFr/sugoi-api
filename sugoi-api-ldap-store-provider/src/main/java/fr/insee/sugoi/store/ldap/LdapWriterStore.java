@@ -25,17 +25,7 @@ import com.unboundid.ldap.sdk.ModifyRequest;
 import com.unboundid.ldap.sdk.ResultCode;
 import com.unboundid.ldap.sdk.extensions.PasswordModifyExtendedRequest;
 import com.unboundid.util.SubtreeDeleter;
-import fr.insee.sugoi.core.exceptions.ApplicationAlreadyExistException;
-import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
-import fr.insee.sugoi.core.exceptions.GroupAlreadyExistException;
-import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
-import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
-import fr.insee.sugoi.core.exceptions.OrganizationAlreadyExistException;
-import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
-import fr.insee.sugoi.core.exceptions.StoragePolicyNotMetException;
-import fr.insee.sugoi.core.exceptions.UnableToUpdateCertificateException;
-import fr.insee.sugoi.core.exceptions.UnabletoUpdateGPGKeyException;
-import fr.insee.sugoi.core.exceptions.UserNotFoundException;
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -55,6 +45,18 @@ import fr.insee.sugoi.model.MappingType;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.PostalAddress;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.exceptions.ApplicationAlreadyExistException;
+import fr.insee.sugoi.model.exceptions.ApplicationNotFoundException;
+import fr.insee.sugoi.model.exceptions.GroupAlreadyExistException;
+import fr.insee.sugoi.model.exceptions.GroupNotFoundException;
+import fr.insee.sugoi.model.exceptions.InvalidPasswordException;
+import fr.insee.sugoi.model.exceptions.OrganizationAlreadyExistException;
+import fr.insee.sugoi.model.exceptions.OrganizationNotFoundException;
+import fr.insee.sugoi.model.exceptions.StoragePolicyNotMetException;
+import fr.insee.sugoi.model.exceptions.StoreException;
+import fr.insee.sugoi.model.exceptions.UnableToUpdateCertificateException;
+import fr.insee.sugoi.model.exceptions.UnabletoUpdateGPGKeyException;
+import fr.insee.sugoi.model.exceptions.UserNotFoundException;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -89,7 +91,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       addressLdapMapper = new AddressLdapMapper(config);
       ldapReaderStore = new LdapReaderStore(config, mappings);
     } catch (LDAPException e) {
-      throw new RuntimeException(e);
+      throw new StoreException("Failed to create LdapWriterStore", e);
     }
   }
 
@@ -121,7 +123,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       response.setEntityId(id);
       return response;
     } catch (LDAPException e) {
-      throw new RuntimeException("Failed to delete user " + id, e);
+      throw new StoreException("Failed to delete user " + id, e);
     }
   }
 
@@ -141,7 +143,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
               getUserDN(user.getUsername()), userLdapMapper.mapToAttributesForCreation(user));
       ldapPoolConnection.add(userAddRequest);
     } catch (LDAPException e) {
-      throw new RuntimeException("Failed to create user. Provider message : " + e.getMessage(), e);
+      throw new StoreException("Failed to create user. Provider message : " + e.getMessage(), e);
     }
     ProviderResponse response = new ProviderResponse();
     response.setStatus(ProviderResponseStatus.OK);
@@ -176,7 +178,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
               getUserDN(updatedUser.getUsername()), userLdapMapper.createMods(updatedUser));
       ldapPoolConnection.modify(mr);
     } catch (LDAPException e) {
-      throw new RuntimeException("Failed to update user while writing to LDAP", e);
+      throw new StoreException("Failed to update user while writing to LDAP", e);
     }
     ProviderResponse response = new ProviderResponse();
     response.setStatus(ProviderResponseStatus.OK);
@@ -201,7 +203,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       response.setEntityId(groupName);
       return response;
     } catch (LDAPException e) {
-      throw new RuntimeException("Failed to delete group " + groupName, e);
+      throw new StoreException("Failed to delete group " + groupName, e);
     }
   }
 
@@ -234,7 +236,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
         throw new StoragePolicyNotMetException("Group pattern won't match");
       }
     } catch (LDAPException e) {
-      throw new RuntimeException("Failed to create group " + group.getName(), e);
+      throw new StoreException("Failed to create group " + group.getName(), e);
     }
     ProviderResponse response = new ProviderResponse();
     response.setStatus(ProviderResponseStatus.OK);
@@ -258,7 +260,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
               groupLdapMapper.createMods(updatedGroup));
       ldapPoolConnection.modify(mr);
     } catch (LDAPException e) {
-      throw new RuntimeException(
+      throw new StoreException(
           "Failed to update group " + updatedGroup.getName() + " while writing to LDAP", e);
     }
     ProviderResponse response = new ProviderResponse();
@@ -291,7 +293,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       response.setEntityId(name);
       return response;
     } catch (LDAPException e) {
-      throw new RuntimeException("Failed to delete organisation " + name, e);
+      throw new StoreException("Failed to delete organisation " + name, e);
     }
   }
 
@@ -314,7 +316,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
                 organizationLdapMapper.mapToAttributesForCreation(organization));
         ldapPoolConnection.add(ar);
       } catch (LDAPException e) {
-        throw new RuntimeException(
+        throw new StoreException(
             "Failed to create organization " + organization.getIdentifiant(), e);
       }
       ProviderResponse response = new ProviderResponse();
@@ -365,7 +367,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
               organizationLdapMapper.createMods(updatedOrganization));
       ldapPoolConnection.modify(mr);
     } catch (LDAPException e) {
-      throw new RuntimeException(
+      throw new StoreException(
           "Failed to update organization "
               + updatedOrganization.getIdentifiant()
               + "while writing to LDAP",
@@ -402,7 +404,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       return response;
     } catch (LDAPException e) {
       if (!e.getResultCode().equals(ResultCode.NO_SUCH_ATTRIBUTE)) {
-        throw new RuntimeException("Failed to remove user to group " + groupName, e);
+        throw new StoreException("Failed to remove user to group " + groupName, e);
       }
       ProviderResponse response = new ProviderResponse();
       response.setStatus(ProviderResponseStatus.OK);
@@ -436,7 +438,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       return response;
     } catch (LDAPException e) {
       if (!e.getResultCode().equals(ResultCode.ATTRIBUTE_OR_VALUE_EXISTS)) {
-        throw new RuntimeException("Failed to add user to group " + groupName, e);
+        throw new StoreException("Failed to add user to group " + groupName, e);
       }
       ProviderResponse response = new ProviderResponse();
       response.setStatus(ProviderResponseStatus.OK);
@@ -463,14 +465,14 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
                 () -> new UserNotFoundException(config.get(LdapConfigKeys.REALM_NAME), userId));
     try {
       ldapPoolConnection.modify(
-          "uid=" + user.getUsername() + "," + config.get(LdapConfigKeys.USER_SOURCE), mod);
+          "uid=" + user.getUsername() + "," + config.get(GlobalKeysConfig.USER_SOURCE), mod);
       changePasswordResetStatus(userId, changePasswordResetStatus);
       ProviderResponse response = new ProviderResponse();
       response.setStatus(ProviderResponseStatus.OK);
       response.setEntityId(user.getUsername());
       return response;
     } catch (LDAPException e) {
-      throw new RuntimeException("Failed to reinit password for user " + user.getUsername(), e);
+      throw new StoreException("Failed to reinit password for user " + user.getUsername(), e);
     }
   }
 
@@ -488,14 +490,14 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
                 () -> new UserNotFoundException(config.get(LdapConfigKeys.REALM_NAME), userId));
     try {
       ldapPoolConnection.modify(
-          "uid=" + user.getUsername() + "," + config.get(LdapConfigKeys.USER_SOURCE), mod);
+          "uid=" + user.getUsername() + "," + config.get(GlobalKeysConfig.USER_SOURCE), mod);
       changePasswordResetStatus(userId, changePasswordResetStatus);
       ProviderResponse response = new ProviderResponse();
       response.setStatus(ProviderResponseStatus.OK);
       response.setEntityId(user.getUsername());
       return response;
     } catch (LDAPException e) {
-      throw new RuntimeException("Failed to init password for user " + user.getUsername(), e);
+      throw new StoreException("Failed to init password for user " + user.getUsername(), e);
     }
   }
 
@@ -515,7 +517,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     try {
       PasswordModifyExtendedRequest pmer =
           new PasswordModifyExtendedRequest(
-              "uid=" + user.getUsername() + "," + config.get(LdapConfigKeys.USER_SOURCE),
+              "uid=" + user.getUsername() + "," + config.get(GlobalKeysConfig.USER_SOURCE),
               oldPassword,
               newPassword);
       ExtendedResult result = ldapPoolConnection.processExtendedOperation(pmer);
@@ -523,7 +525,8 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       if (result.getResultCode().intValue() == ResultCode.INVALID_CREDENTIALS_INT_VALUE) {
         throw new InvalidPasswordException("Old password is not correct");
       } else if (result.getResultCode().intValue() != 0) {
-        throw new RuntimeException("Unexpected error when changing password");
+        throw new StoreException(
+            "Unexpected error when changing password", new LDAPException(result.getResultCode()));
       }
     } catch (NumberFormatException | LDAPException e) {
       e.printStackTrace();
@@ -545,13 +548,13 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
                 () -> new UserNotFoundException(config.get(LdapConfigKeys.REALM_NAME), userId));
     try {
       ldapPoolConnection.modify(
-          "uid=" + user.getUsername() + "," + config.get(LdapConfigKeys.USER_SOURCE), mod);
+          "uid=" + user.getUsername() + "," + config.get(GlobalKeysConfig.USER_SOURCE), mod);
       ProviderResponse response = new ProviderResponse();
       response.setStatus(ProviderResponseStatus.OK);
       response.setEntityId(user.getUsername());
       return response;
     } catch (LDAPException e) {
-      throw new RuntimeException(e.getMessage());
+      throw new StoreException("Failed to change password reset setting", e);
     }
   }
 
@@ -571,7 +574,8 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
                 getGroupSource(application.getName()),
                 new Attribute("objectClass", "top", "organizationalUnit"));
         ldapPoolConnection.add(groupsAR);
-        application.getGroups().stream()
+        application
+            .getGroups()
             .forEach(group -> createGroup(application.getName(), group, providerRequest));
         // Create group of app manager
         AddRequest groupManagerAR =
@@ -580,7 +584,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
                 new Attribute("objectClass", "top", "groupOfUniqueNames"));
         ldapPoolConnection.add(groupManagerAR);
       } catch (LDAPException e) {
-        throw new RuntimeException("Failed to create application" + application.getName(), e);
+        throw new StoreException("Failed to create application" + application.getName(), e);
       }
       ProviderResponse response = new ProviderResponse();
       response.setStatus(ProviderResponseStatus.OK);
@@ -630,12 +634,12 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       }
       for (Group updatedGroup : updatedApplication.getGroups()) {
         if (alreadyExistingGroups.stream()
-            .allMatch(group -> !group.getName().equalsIgnoreCase(updatedGroup.getName())))
+            .noneMatch(group -> group.getName().equalsIgnoreCase(updatedGroup.getName())))
           createGroup(updatedApplication.getName(), updatedGroup, providerRequest);
       }
 
     } catch (LDAPException e) {
-      throw new RuntimeException(
+      throw new StoreException(
           "Failed to update application " + updatedApplication.getName() + "while writing to LDAP",
           e);
     }
@@ -684,7 +688,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       response.setEntityId(userId);
     } catch (LDAPException e) {
       if (!e.getResultCode().equals(ResultCode.ATTRIBUTE_OR_VALUE_EXISTS)) {
-        throw new RuntimeException(
+        throw new StoreException(
             "Failed to update user attribute "
                 + attributeKey
                 + " with value "
@@ -716,7 +720,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       response.setEntityId(userId);
     } catch (LDAPException e) {
       if (!e.getResultCode().equals(ResultCode.NO_SUCH_ATTRIBUTE)) {
-        throw new RuntimeException(
+        throw new StoreException(
             "Failed to update user attribute "
                 + attributeKey
                 + " with value "
@@ -795,9 +799,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       response.setStatus(ProviderResponseStatus.OK);
       response.setEntityId(user.getUsername());
       return response;
-    } catch (CertificateException e) {
-      throw new UnableToUpdateCertificateException(e.toString(), e);
-    } catch (LDAPException e) {
+    } catch (CertificateException | LDAPException e) {
       throw new UnableToUpdateCertificateException(e.toString(), e);
     }
   }
@@ -897,7 +899,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       return response;
     } catch (LDAPException e) {
       if (!e.getResultCode().equals(ResultCode.ATTRIBUTE_OR_VALUE_EXISTS)) {
-        throw new RuntimeException("Failed to add user to manager group ", e);
+        throw new StoreException("Failed to add user to manager group ", e);
       }
       ProviderResponse response = new ProviderResponse();
       response.setStatus(ProviderResponseStatus.OK);
@@ -925,7 +927,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       return response;
     } catch (LDAPException e) {
       if (!e.getResultCode().equals(ResultCode.NO_SUCH_ATTRIBUTE)) {
-        throw new RuntimeException("Failed to add user to manager group ", e);
+        throw new StoreException("Failed to add user to manager group ", e);
       }
       ProviderResponse response = new ProviderResponse();
       response.setStatus(ProviderResponseStatus.OK);
