@@ -13,12 +13,12 @@
 */
 package fr.insee.sugoi.core.service;
 
-import fr.insee.sugoi.core.exceptions.OrganizationAlreadyExistException;
-import fr.insee.sugoi.core.exceptions.OrganizationNotCreatedException;
-import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.exceptions.OrganizationAlreadyExistException;
+import fr.insee.sugoi.model.exceptions.OrganizationNotCreatedException;
+import fr.insee.sugoi.model.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;

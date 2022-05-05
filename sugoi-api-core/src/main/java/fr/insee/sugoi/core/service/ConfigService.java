@@ -13,12 +13,12 @@
 */
 package fr.insee.sugoi.core.service;
 
-import fr.insee.sugoi.core.exceptions.RealmAlreadyExistException;
-import fr.insee.sugoi.core.exceptions.RealmNotCreatedException;
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.exceptions.RealmAlreadyExistException;
+import fr.insee.sugoi.model.exceptions.RealmNotCreatedException;
+import fr.insee.sugoi.model.exceptions.RealmNotFoundException;
 import java.util.List;
 
 /** Managing realm configuration */

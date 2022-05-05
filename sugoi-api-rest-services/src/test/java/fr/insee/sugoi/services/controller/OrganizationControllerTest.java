@@ -22,12 +22,12 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
-import fr.insee.sugoi.core.exceptions.OrganizationAlreadyExistException;
-import fr.insee.sugoi.core.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.service.OrganizationService;
 import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.exceptions.OrganizationAlreadyExistException;
+import fr.insee.sugoi.model.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.model.paging.PageResult;
 import java.util.ArrayList;
 import java.util.List;

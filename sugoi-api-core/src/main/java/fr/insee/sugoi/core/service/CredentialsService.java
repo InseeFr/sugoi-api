@@ -13,11 +13,11 @@
 */
 package fr.insee.sugoi.core.service;
 
-import fr.insee.sugoi.core.exceptions.PasswordPolicyNotMetException;
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
-import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
+import fr.insee.sugoi.model.exceptions.PasswordPolicyNotMetException;
+import fr.insee.sugoi.model.exceptions.RealmNotFoundException;
+import fr.insee.sugoi.model.exceptions.UserNotFoundException;
 import java.util.Map;
 
 public interface CredentialsService {

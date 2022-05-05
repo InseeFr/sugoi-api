@@ -16,8 +16,6 @@ package fr.insee.sugoi.core.service;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
-import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.impl.GroupServiceImpl;
 import fr.insee.sugoi.core.service.impl.UserServiceImpl;
@@ -28,6 +26,8 @@ import fr.insee.sugoi.core.store.impl.StoreProviderImpl;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.UserStorage;
+import fr.insee.sugoi.model.exceptions.GroupNotFoundException;
+import fr.insee.sugoi.model.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.paging.PageableResult;
 import java.util.List;
 import java.util.Optional;

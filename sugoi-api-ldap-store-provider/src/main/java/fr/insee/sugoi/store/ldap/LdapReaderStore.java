@@ -15,7 +15,6 @@ package fr.insee.sugoi.store.ldap;
 
 import com.unboundid.ldap.sdk.*;
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
-import fr.insee.sugoi.core.exceptions.MultipleUserWithSameMailException;
 import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.LdapFilter;
@@ -23,6 +22,7 @@ import fr.insee.sugoi.ldap.utils.LdapUtils;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.ldap.utils.mapper.*;
 import fr.insee.sugoi.model.*;
+import fr.insee.sugoi.model.exceptions.MultipleUserWithSameMailException;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;

@@ -13,9 +13,9 @@
 */
 package fr.insee.sugoi.core.service.impl;
 
-import fr.insee.sugoi.core.exceptions.PasswordPolicyNotMetException;
 import fr.insee.sugoi.core.model.SugoiRandomPasswordCharacterData;
 import fr.insee.sugoi.core.service.PasswordService;
+import fr.insee.sugoi.model.exceptions.PasswordPolicyNotMetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

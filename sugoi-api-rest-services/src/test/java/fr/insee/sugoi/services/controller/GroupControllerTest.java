@@ -22,12 +22,12 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
-import fr.insee.sugoi.core.exceptions.GroupAlreadyExistException;
-import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.exceptions.GroupAlreadyExistException;
+import fr.insee.sugoi.model.exceptions.GroupNotFoundException;
 import fr.insee.sugoi.model.paging.PageResult;
 import java.util.ArrayList;
 import java.util.List;

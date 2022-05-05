@@ -13,12 +13,12 @@
 */
 package fr.insee.sugoi.core.service;
 
-import fr.insee.sugoi.core.exceptions.ApplicationAlreadyExistException;
-import fr.insee.sugoi.core.exceptions.ApplicationNotCreatedException;
-import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.model.Application;
+import fr.insee.sugoi.model.exceptions.ApplicationAlreadyExistException;
+import fr.insee.sugoi.model.exceptions.ApplicationNotCreatedException;
+import fr.insee.sugoi.model.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 

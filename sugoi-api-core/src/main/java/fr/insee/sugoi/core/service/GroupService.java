@@ -13,13 +13,13 @@
 */
 package fr.insee.sugoi.core.service;
 
-import fr.insee.sugoi.core.exceptions.GroupAlreadyExistException;
-import fr.insee.sugoi.core.exceptions.GroupNotCreatedException;
-import fr.insee.sugoi.core.exceptions.GroupNotFoundException;
-import fr.insee.sugoi.core.exceptions.UserNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.exceptions.GroupAlreadyExistException;
+import fr.insee.sugoi.model.exceptions.GroupNotCreatedException;
+import fr.insee.sugoi.model.exceptions.GroupNotFoundException;
+import fr.insee.sugoi.model.exceptions.UserNotFoundException;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 
