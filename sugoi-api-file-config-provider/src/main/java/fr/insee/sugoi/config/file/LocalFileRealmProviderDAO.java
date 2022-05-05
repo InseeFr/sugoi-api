@@ -15,13 +15,13 @@ package fr.insee.sugoi.config.file;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insee.sugoi.core.exceptions.RealmAlreadyExistException;
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.exceptions.RealmAlreadyExistException;
+import fr.insee.sugoi.model.exceptions.RealmNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;

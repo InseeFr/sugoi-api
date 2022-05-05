@@ -16,14 +16,14 @@ package fr.insee.sugoi.core.service;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
-import fr.insee.sugoi.core.exceptions.ApplicationNotFoundException;
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.impl.ApplicationServiceImpl;
 import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.core.store.WriterStore;
 import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.exceptions.ApplicationNotFoundException;
+import fr.insee.sugoi.model.exceptions.RealmNotFoundException;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -15,9 +15,9 @@ package fr.insee.sugoi.event.listener.webhook.service.impl;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
-import fr.insee.sugoi.core.exceptions.NoReceiverMailException;
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.event.listener.webhook.service.WebHookService;
+import fr.insee.sugoi.model.exceptions.NoReceiverMailException;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;

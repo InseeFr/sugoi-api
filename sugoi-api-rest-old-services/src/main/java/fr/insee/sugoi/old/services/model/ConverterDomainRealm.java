@@ -13,7 +13,7 @@
 */
 package fr.insee.sugoi.old.services.model;
 
-import fr.insee.sugoi.core.exceptions.NoDomaineMappingException;
+import fr.insee.sugoi.model.exceptions.NoDomaineMappingException;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;

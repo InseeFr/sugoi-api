@@ -13,12 +13,12 @@
 */
 package fr.insee.sugoi.services.controller;
 
-import fr.insee.sugoi.core.exceptions.IdNotMatchingException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.SugoiUser;
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.exceptions.IdNotMatchingException;
 import fr.insee.sugoi.services.Utils;
 import fr.insee.sugoi.services.decider.AuthorizeMethodDecider;
 import io.swagger.v3.oas.annotations.Operation;

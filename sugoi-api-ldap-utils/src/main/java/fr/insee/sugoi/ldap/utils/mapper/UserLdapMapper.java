@@ -14,9 +14,9 @@
 package fr.insee.sugoi.ldap.utils.mapper;
 
 import com.unboundid.ldap.sdk.Attribute;
-import fr.insee.sugoi.core.exceptions.InvalidCertificateException;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.exceptions.InvalidCertificateException;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateException;

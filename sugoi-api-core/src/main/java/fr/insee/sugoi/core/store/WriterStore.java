@@ -13,13 +13,13 @@
 */
 package fr.insee.sugoi.core.store;
 
-import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.model.Application;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.exceptions.InvalidPasswordException;
 import java.util.Map;
 
 /** Writer stores are responsible for all operations modifying the underlying store. */
