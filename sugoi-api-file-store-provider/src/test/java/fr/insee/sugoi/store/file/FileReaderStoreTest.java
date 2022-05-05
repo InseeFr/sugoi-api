@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.is;
 import fr.insee.sugoi.model.*;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,17 +42,19 @@ public class FileReaderStoreTest {
 
   @Bean
   public UserStorage userStorage() {
+    String resourceUrl = getResourceUrl();
     UserStorage us = new UserStorage();
-    us.setOrganizationSource("classpath:/sugoi-file-tests/orgs/");
-    us.setUserSource("classpath:/sugoi-file-tests/users/");
+    us.setOrganizationSource(resourceUrl + "orgs/");
+    us.setUserSource(resourceUrl + "users/");
     us.setName("default");
     return us;
   }
 
   @Bean(name = "Realm")
   public Realm realm() {
+    String resourceUrl = getResourceUrl();
     Realm realm = new Realm();
-    realm.setAppSource("classpath:/sugoi-file-tests/apps/");
+    realm.setAppSource(resourceUrl + "apps/");
     realm.setName("domaine1");
     realm.setUrl("localhost");
     return realm;
@@ -288,5 +291,15 @@ public class FileReaderStoreTest {
         fileReaderStore.getUsersInGroup("Applitest", "FalseGroup_Applitest");
     assertThat(
         "PageResult should exist but without users", usersPageResult.getResults().size(), is(0));
+  }
+
+  private String getResourceUrl() {
+    try {
+      String markUrl =
+          resourceLoader.getResource("classpath:/sugoi-file-tests/test").getURL().getPath();
+      return "file:" + markUrl.substring(0, markUrl.lastIndexOf("/") + 1);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
