@@ -13,11 +13,11 @@
 */
 package fr.insee.sugoi.jms.writer;
 
-import fr.insee.sugoi.core.exceptions.GroupAlreadyExistException;
-import fr.insee.sugoi.core.exceptions.InvalidTransactionIdException;
 import fr.insee.sugoi.jms.exception.BrokerException;
 import fr.insee.sugoi.jms.model.BrokerRequest;
 import fr.insee.sugoi.jms.model.BrokerResponse;
+import fr.insee.sugoi.model.exceptions.GroupAlreadyExistException;
+import fr.insee.sugoi.model.exceptions.InvalidTransactionIdException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;

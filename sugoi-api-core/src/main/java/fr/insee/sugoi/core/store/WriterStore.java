@@ -13,7 +13,6 @@
 */
 package fr.insee.sugoi.core.store;
 
-import fr.insee.sugoi.core.exceptions.InvalidPasswordException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.model.Application;

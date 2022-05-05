@@ -14,7 +14,6 @@
 package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
-import fr.insee.sugoi.core.exceptions.AppCannotManagedAttributeException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.SugoiUser;
@@ -23,6 +22,7 @@ import fr.insee.sugoi.core.service.PermissionService;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.exceptions.AppCannotManagedAttributeException;
 import fr.insee.sugoi.services.Utils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

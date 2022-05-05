@@ -13,10 +13,10 @@
 */
 package fr.insee.sugoi.core.realm;
 
-import fr.insee.sugoi.core.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.exceptions.RealmNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.cache.annotation.CacheEvict;
