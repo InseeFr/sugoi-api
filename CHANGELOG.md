@@ -1,3 +1,32 @@
+# 1.4.0
+
+
+- [ENH] :sparkles: Have a configuration property for default roles to give to all authenticated users (#586)
+- [BC] :boom: Address should appear as an object instead of Array
+- [TEST] :white_check_mark: Fix groups properties are at realm level in integration tests
+- [ENH] :sparkles: Realms are searched for according to their pattern
+- [BC] :boom: Remove compatibility with realm being its own userstorage
+- [BUG] controle de l'email et de l'user en cas de reinit password
+- [UP] :arrow_up: Bump org.springdoc.version from 1.6.6 to 1.6.8
+- [UP] :arrow_up: Bump spotless-maven-plugin from 2.22.1 to 2.22.2
+- [UP] :arrow_up: Bump tomcat.version from 9.0.60 to 9.0.62
+- [UP] :arrow_up: Bump maven-surefire-plugin from 3.0.0-M5 to 3.0.0-M6
+- [UP] :arrow_up: Bump spring-boot.version from 2.6.6 to 2.6.7
+- [BUG] :bug: checking id match on PUT should be case insensitive (#657)
+- [BUG] :bug: ldap attribute for filter can be multivalued, filter must implement it
+- [BUG] :bug: application and groups config must be at realm level not at userstorage
+- [BUG] :bug: UnsupportedOperationException not thrown when it should (#486)
+- [UP] :arrow_up: Bump spotless-maven-plugin from 2.19.2 to 2.22.1
+- [UP] :arrow_up: Bump jacoco-maven-plugin from 0.8.7 to 0.8.8
+- [BUG] :bug: Resources should be closed (#656)
+- [ENH] :sparkles: Add an option to limit the number of object a user can fetch in one time (#618)
+- [FIX] :bug: remove empty attributes values when adding on ldap
+- [UP] :arrow_up: Bump spingboot.version from 2.6.4 to 2.6.6
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 1.3.0
+- [REL] :rocket: release version 1.3.0
+
+
 # 1.3.0
 
 
