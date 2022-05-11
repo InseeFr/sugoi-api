@@ -151,6 +151,28 @@ public class LdapRealmProviderWriteTest {
     UiField uiField = new UiField();
     uiField.setName("Identifiant");
     uiField.setTag("main");
+    realmToModify.getUiMapping().get(Realm.UIMappingType.UI_ORGANIZATION_MAPPING).add(uiField);
+    ldapRealmProviderDAOImpl.updateRealm(realmToModify, null);
+    assertThat(
+        "Should have a uiUserMapping Identifiant",
+        ldapRealmProviderDAOImpl
+            .load("tomodify")
+            .get()
+            .getUiMapping()
+            .get(Realm.UIMappingType.UI_ORGANIZATION_MAPPING)
+            .stream()
+            .anyMatch(
+                uf ->
+                    uf.getName().equalsIgnoreCase("Identifiant")
+                        && uf.getTag().equalsIgnoreCase("main")));
+  }
+
+  @Test
+  public void addUiOrganizationMapping() {
+    Realm realmToModify = ldapRealmProviderDAOImpl.load("tomodify").get();
+    UiField uiField = new UiField();
+    uiField.setName("Identifiant");
+    uiField.setTag("main");
     realmToModify.getUiMapping().get(Realm.UIMappingType.UI_USER_MAPPING).add(uiField);
     ldapRealmProviderDAOImpl.updateRealm(realmToModify, null);
     assertThat(

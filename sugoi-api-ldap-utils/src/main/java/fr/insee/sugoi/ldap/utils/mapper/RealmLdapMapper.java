@@ -23,11 +23,17 @@ import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.Realm.UIMappingType;
 import fr.insee.sugoi.model.technics.StoreMapping;
+import fr.insee.sugoi.model.technics.UiField;
+import fr.insee.sugoi.model.technics.exceptions.EntryIsNotUIFieldException;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** ProfilContextMapper */
 public class RealmLdapMapper {
+
+  private static final Logger logger = LoggerFactory.getLogger(RealmLdapMapper.class);
 
   static UiMappingService uiMappingService = new UiMappingService();
 
@@ -87,16 +93,23 @@ public class RealmLdapMapper {
           }
           realm.getGroupMappings().add(new StoreMapping(property[1]));
         } else if (property[0].equalsIgnoreCase("uiOrganizationMapping")) {
-
-          realm
-              .getUiMapping()
-              .computeIfAbsent(UIMappingType.UI_ORGANIZATION_MAPPING, l -> new ArrayList<>())
-              .add(uiMappingService.convertStringToUIField(property[1]));
+          try {
+            realm
+                .getUiMapping()
+                .computeIfAbsent(UIMappingType.UI_ORGANIZATION_MAPPING, l -> new ArrayList<>())
+                .add(new UiField(property[1]));
+          } catch (EntryIsNotUIFieldException e) {
+            logger.debug(e.getLocalizedMessage());
+          }
         } else if (property[0].equalsIgnoreCase("uiUserMapping")) {
-          realm
-              .getUiMapping()
-              .computeIfAbsent(UIMappingType.UI_USER_MAPPING, l -> new ArrayList<>())
-              .add(uiMappingService.convertStringToUIField(property[1]));
+          try {
+            realm
+                .getUiMapping()
+                .computeIfAbsent(UIMappingType.UI_USER_MAPPING, l -> new ArrayList<>())
+                .add(new UiField(property[1]));
+          } catch (EntryIsNotUIFieldException e) {
+            logger.debug(e.getLocalizedMessage());
+          }
         } else if (property[0].equalsIgnoreCase("usersMaxOutputSize")) {
           realm.addProperty(GlobalKeysConfig.USERS_MAX_OUTPUT_SIZE, property[1]);
         } else if (property[0].equalsIgnoreCase("applicationsMaxOutputSize")) {
@@ -146,10 +159,7 @@ public class RealmLdapMapper {
           .forEach(
               uf ->
                   attributes.add(
-                      new Attribute(
-                          "inseepropriete",
-                          String.format(
-                              "uiUserMapping$%s", uiMappingService.convertUIFieldToString(uf)))));
+                      new Attribute("inseepropriete", String.format("uiUserMapping$%s", uf))));
     }
     if (realm.getUiMapping().containsKey(Realm.UIMappingType.UI_ORGANIZATION_MAPPING)
         && realm.getUiMapping().get(Realm.UIMappingType.UI_ORGANIZATION_MAPPING) != null) {
