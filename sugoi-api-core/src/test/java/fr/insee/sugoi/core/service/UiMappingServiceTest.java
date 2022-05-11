@@ -16,17 +16,11 @@ package fr.insee.sugoi.core.service;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
-import fr.insee.sugoi.core.configuration.UiMappingService;
 import fr.insee.sugoi.model.technics.UiField;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(classes = {UiMappingService.class})
 public class UiMappingServiceTest {
-
-  @Autowired UiMappingService uiMappingService;
 
   @Test
   public void createStringFromUiMappingNoOptions() {
@@ -41,7 +35,7 @@ public class UiMappingServiceTest {
     uiFieldWithoutOptions.setOrder(3);
     assertThat(
         "Should have all parameters in a string",
-        uiMappingService.convertUIFieldToString(uiFieldWithoutOptions),
+        uiFieldWithoutOptions.toString(),
         is("name;help text title;help text;toto.titi;string;true;main;3"));
   }
 
@@ -55,7 +49,7 @@ public class UiMappingServiceTest {
     uiFieldWithMissingProps.setTag("main");
     assertThat(
         "Order should be max value, null string should be nothing and boolean should be false",
-        uiMappingService.convertUIFieldToString(uiFieldWithMissingProps),
+        uiFieldWithMissingProps.toString(),
         is("name;help text title;;toto.titi;string;false;main;2147483647"));
   }
 
@@ -73,7 +67,7 @@ public class UiMappingServiceTest {
     uiFieldWithOptions.setOptions(Map.of("option1", "value1", "option2", "value2"));
     assertThat(
         "Should also have options",
-        uiMappingService.convertUIFieldToString(uiFieldWithOptions),
+        uiFieldWithOptions.toString(),
         anyOf(
             is(
                 "name;help text title;help text;toto.titi;string;true;main;3;option1=value1;option2=value2"),
@@ -96,7 +90,7 @@ public class UiMappingServiceTest {
     uiFieldWithRequired.setOptions(Map.of("option1", "value1", "option2", "value2"));
     assertThat(
         "Should also have options",
-        uiMappingService.convertUIFieldToString(uiFieldWithRequired),
+        uiFieldWithRequired.toString(),
         anyOf(
             is(
                 "name;help text title;help text;toto.titi;string;true;main;3;required;option1=value1;option2=value2"),
