@@ -210,7 +210,12 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
   @Override
   public ProviderResponse createGroup(
       String appName, Group group, ProviderRequest providerRequest) {
+
     try {
+      if (ldapReaderStore.getApplication(appName).isEmpty()) {
+        throw new ApplicationNotFoundException(appName);
+      }
+
       if (ldapReaderStore.getGroup(appName, group.getName()).isPresent()) {
         throw new GroupAlreadyExistException(
             String.format(

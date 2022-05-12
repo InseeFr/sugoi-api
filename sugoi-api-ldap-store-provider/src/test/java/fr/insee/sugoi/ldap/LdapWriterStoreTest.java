@@ -23,6 +23,7 @@ import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.*;
+import fr.insee.sugoi.model.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.model.exceptions.InvalidPasswordException;
 import fr.insee.sugoi.model.exceptions.StoragePolicyNotMetException;
 import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
@@ -375,6 +376,17 @@ public class LdapWriterStoreTest {
         "Should retrieve Groupy",
         ldapReaderStore.getGroup("Applitest", "Groupy_Applitest").get().getName(),
         is("Groupy_Applitest"));
+  }
+
+  @Test
+  void testCreateGroupApplicationNotFound() {
+    Group group = new Group();
+    assertThrows(
+        ApplicationNotFoundException.class,
+        () -> {
+          ldapWriterStore.createGroup("Donotexist", group, null);
+        },
+        "Should throw ApplicationNotFoundException");
   }
 
   @Test
