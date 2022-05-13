@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -90,7 +91,7 @@ public class AppManagedUserAttributeController {
             description = "Invalid combinaison of id between body and path",
             content = {@Content(mediaType = "application/json")})
       })
-  public ResponseEntity<?> addUserAttributesManagedByApp(
+  public ResponseEntity<ProviderResponse> addUserAttributesManagedByApp(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -125,85 +126,30 @@ public class AppManagedUserAttributeController {
             .map(String::toUpperCase)
             .collect(Collectors.toList());
     Realm realm = configService.getRealm(realmName);
-    List<String> attributesAllowed =
-        Arrays.asList(
-            realm
-                .getProperties()
-                .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST)
-                .toUpperCase()
-                .split(","));
-    try {
-      if (attributesAllowed.contains(attributeKey.toUpperCase())) {
-
-        if (permissionService.isWriter(roles, realmName, storage)) {
-          ProviderResponse response =
-              userService.addAppManagedAttribute(
-                  realmName,
-                  storage,
-                  id,
-                  attributeKey,
-                  attributeValue,
-                  new ProviderRequest(
-                      new SugoiUser(
-                          authentication.getName(),
-                          authentication.getAuthorities().stream()
-                              .map(GrantedAuthority::getAuthority)
-                              .map(String::toUpperCase)
-                              .collect(Collectors.toList())),
-                      isAsynchronous,
-                      null,
-                      isUrgent));
-          return ResponseEntity.status(Utils.convertStatusTHttpStatus(response, false, true))
-              .header("X-SUGOI-TRANSACTION-ID", response.getRequestId())
-              .header("X-SUGOI-REQUEST-STATUS", response.getStatus().toString())
-              .build();
-        } else {
-          String patternOfAttribute =
-              realm
-                  .getProperties()
-                  .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST)
-                  .toUpperCase()
-                  .split(",")[attributesAllowed.indexOf(attributeKey.toUpperCase())];
-          if (permissionService.isValidAttributeAccordingAttributePattern(
-              roles, realmName, storage, patternOfAttribute, attributeValue)) {
-            ProviderResponse response =
-                userService.addAppManagedAttribute(
-                    realmName,
-                    storage,
-                    id,
-                    attributeKey,
-                    attributeValue,
-                    new ProviderRequest(
-                        new SugoiUser(
-                            authentication.getName(),
-                            authentication.getAuthorities().stream()
-                                .map(GrantedAuthority::getAuthority)
-                                .map(String::toUpperCase)
-                                .collect(Collectors.toList())),
-                        isAsynchronous,
-                        null,
-                        isUrgent));
-            return ResponseEntity.status(Utils.convertStatusTHttpStatus(response, false, true))
-                .header("X-SUGOI-REQUEST-STATUS", response.getStatus().toString())
-                .header("X-SUGOI-TRANSACTION-ID", response.getRequestId())
-                .build();
-          }
-
-          // If no match found then app cannot managed attribute or attribute doesn't math
-          // with allowed pattern
-          throw new AppCannotManagedAttributeException(
-              "Cannot add attribute to user: attribute doesn't match with pattern");
-        }
-      }
-    } catch (Exception e) {
-      if (e instanceof AppCannotManagedAttributeException) {
-        throw e;
-      }
-      throw new AppCannotManagedAttributeException(
-          "Cannot add attribute to user: app cannot managed attributes " + attributeKey);
+    String patternOfAttribute = getPatternOfAttribute(realm, attributeKey);
+    if (permissionService.isWriter(roles, realmName, storage)
+        || permissionService.isValidAttributeAccordingAttributePattern(
+            roles, realmName, storage, patternOfAttribute, attributeValue)) {
+      ProviderResponse response =
+          userService.addAppManagedAttribute(
+              realmName,
+              storage,
+              id,
+              attributeKey,
+              attributeValue,
+              new ProviderRequest(
+                  new SugoiUser(authentication.getName(), roles), isAsynchronous, null, isUrgent));
+      return ResponseEntity.status(Utils.convertStatusTHttpStatus(response, false, true))
+          .header("X-SUGOI-TRANSACTION-ID", response.getRequestId())
+          .header("X-SUGOI-REQUEST-STATUS", response.getStatus().toString())
+          .build();
+    } else {
+      throw new AccessDeniedException(
+          "Not allowed to add appmanagedattribute "
+              + attributeKey
+              + " . Attribute should match pattern : "
+              + patternOfAttribute);
     }
-    throw new AppCannotManagedAttributeException(
-        "Cannot add attribute to user: app cannot managed attributes " + attributeKey);
   }
 
   @DeleteMapping(
@@ -232,7 +178,7 @@ public class AppManagedUserAttributeController {
             description = "Invalid combinaison of id between body and path",
             content = {@Content(mediaType = "application/json")})
       })
-  public ResponseEntity<?> deleteUserAttributesManagedByApp(
+  public ResponseEntity<ProviderResponse> deleteUserAttributesManagedByApp(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -267,85 +213,33 @@ public class AppManagedUserAttributeController {
             .map(String::toUpperCase)
             .collect(Collectors.toList());
     Realm realm = configService.getRealm(realmName);
-    List<String> attributesAllowed =
-        Arrays.asList(
-            realm
-                .getProperties()
-                .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST)
-                .toUpperCase()
-                .split(","));
-    try {
-      if (attributesAllowed.contains(attributeKey.toUpperCase())) {
-
-        if (permissionService.isWriter(roles, realmName, storage)) {
-          ProviderResponse response =
-              userService.deleteAppManagedAttribute(
-                  realmName,
-                  storage,
-                  id,
-                  attributeKey,
-                  attributeValue,
-                  new ProviderRequest(
-                      new SugoiUser(
-                          authentication.getName(),
-                          authentication.getAuthorities().stream()
-                              .map(GrantedAuthority::getAuthority)
-                              .map(String::toUpperCase)
-                              .collect(Collectors.toList())),
-                      isAsynchronous,
-                      transactionId,
-                      isUrgent));
-          return ResponseEntity.status(Utils.convertStatusTHttpStatus(response, false, true))
-              .header("X-SUGOI-REQUEST-STATUS", response.getStatus().toString())
-              .header("X-SUGOI-TRANSACTION-ID", response.getRequestId())
-              .build();
-        } else {
-          String patternOfAttribute =
-              realm
-                  .getProperties()
-                  .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST)
-                  .toUpperCase()
-                  .split(",")[attributesAllowed.indexOf(attributeKey.toUpperCase())];
-          if (permissionService.isValidAttributeAccordingAttributePattern(
-              roles, realmName, storage, patternOfAttribute, attributeValue)) {
-            ProviderResponse response =
-                userService.deleteAppManagedAttribute(
-                    realmName,
-                    storage,
-                    id,
-                    attributeKey,
-                    attributeValue,
-                    new ProviderRequest(
-                        new SugoiUser(
-                            authentication.getName(),
-                            authentication.getAuthorities().stream()
-                                .map(GrantedAuthority::getAuthority)
-                                .map(String::toUpperCase)
-                                .collect(Collectors.toList())),
-                        isAsynchronous,
-                        transactionId,
-                        isUrgent));
-            return ResponseEntity.status(Utils.convertStatusTHttpStatus(response, false, true))
-                .header("X-SUGOI-REQUEST-STATUS", response.getStatus().toString())
-                .header("X-SUGOI-TRANSACTION-ID", response.getRequestId())
-                .build();
-          }
-
-          // If no match found then app cannot managed attribute or attribute doesn't math
-          // with allowed pattern
-          throw new AppCannotManagedAttributeException(
-              "Cannot delete attribute to user: attribute doesn't match with pattern");
-        }
-      }
-    } catch (Exception e) {
-      if (e instanceof AppCannotManagedAttributeException) {
-        throw e;
-      }
-      throw new AppCannotManagedAttributeException(
-          "Cannot add delete to user: app cannot managed attributes " + attributeKey);
+    String patternOfAttribute = getPatternOfAttribute(realm, attributeKey);
+    if (permissionService.isWriter(roles, realmName, storage)
+        || permissionService.isValidAttributeAccordingAttributePattern(
+            roles, realmName, storage, patternOfAttribute, attributeValue)) {
+      ProviderResponse response =
+          userService.deleteAppManagedAttribute(
+              realmName,
+              storage,
+              id,
+              attributeKey,
+              attributeValue,
+              new ProviderRequest(
+                  new SugoiUser(authentication.getName(), roles),
+                  isAsynchronous,
+                  transactionId,
+                  isUrgent));
+      return ResponseEntity.status(Utils.convertStatusTHttpStatus(response, false, true))
+          .header("X-SUGOI-REQUEST-STATUS", response.getStatus().toString())
+          .header("X-SUGOI-TRANSACTION-ID", response.getRequestId())
+          .build();
+    } else {
+      throw new AccessDeniedException(
+          "Not allowed to delete appmanagedattribute "
+              + attributeKey
+              + " . Attribute should match pattern : "
+              + patternOfAttribute);
     }
-    throw new AppCannotManagedAttributeException(
-        "Cannot add delete to user: app cannot managed attributes " + attributeKey);
   }
 
   @PatchMapping(
@@ -374,7 +268,7 @@ public class AppManagedUserAttributeController {
             description = "Invalid combinaison of id between body and path",
             content = {@Content(mediaType = "application/json")})
       })
-  public ResponseEntity<?> addUserAttributesManagedByApp(
+  public ResponseEntity<ProviderResponse> addUserAttributesManagedByApp(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -399,10 +293,13 @@ public class AppManagedUserAttributeController {
           String transactionId,
       Authentication authentication) {
 
-    User foundUser = userService.findById(realm, null, id);
     return addUserAttributesManagedByApp(
         realm,
-        (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
+        (String)
+            userService
+                .findById(realm, null, id)
+                .getMetadatas()
+                .get(GlobalKeysConfig.USERSTORAGE.getName()),
         id,
         attributeKey,
         attributeValue,
@@ -463,10 +360,13 @@ public class AppManagedUserAttributeController {
           String transactionId,
       Authentication authentication) {
 
-    User foundUser = userService.findById(realm, null, id);
     return deleteUserAttributesManagedByApp(
         realm,
-        (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
+        (String)
+            userService
+                .findById(realm, null, id)
+                .getMetadatas()
+                .get(GlobalKeysConfig.USERSTORAGE.getName()),
         id,
         attributeKey,
         attributeValue,
@@ -474,5 +374,38 @@ public class AppManagedUserAttributeController {
         isUrgent,
         transactionId,
         authentication);
+  }
+
+  /**
+   * Each attributes allowed have an authorized pattern in the pattern config at the same place
+   * there are in the attribute managed config. If the attribute exists, return this pattern to be
+   * checked for user permissions.
+   *
+   * @param realm where the config will be fetched
+   * @param attributeKey attribute the user wants to update
+   * @throws AppCannotManagedAttributeException if the attribute is not an app managed attribute
+   * @return the authorized pattern for the attribute
+   */
+  private String getPatternOfAttribute(Realm realm, String attributeKey) {
+    List<String> attributesAllowed = getAttributesAllowed(realm);
+    if (attributesAllowed.contains(attributeKey.toUpperCase())) {
+      return realm
+          .getProperties()
+          .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST)
+          .toUpperCase()
+          .split(",")[attributesAllowed.indexOf(attributeKey.toUpperCase())];
+    } else {
+      throw new AppCannotManagedAttributeException(
+          "Cannot add delete to user: " + attributeKey + " is not an app managed attribute");
+    }
+  }
+
+  private List<String> getAttributesAllowed(Realm realm) {
+    return Arrays.asList(
+        realm
+            .getProperties()
+            .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST)
+            .toUpperCase()
+            .split(","));
   }
 }
