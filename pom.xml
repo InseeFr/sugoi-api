@@ -32,7 +32,7 @@
 		<com.unboundid.version>6.0.5</com.unboundid.version>
 		<org.xmlunit.version>2.9.0</org.xmlunit.version>
 		<commons-lang.version>2.6</commons-lang.version>
-		<org.springdoc.version>1.6.8</org.springdoc.version>
+		<org.springdoc.version>1.6.9</org.springdoc.version>
 		<cucumber.version>7.3.4</cucumber.version>
 		<cucumber-reporting-plugin.version>7.3.0</cucumber-reporting-plugin.version>
 		<httpclient.version>4.5.13</httpclient.version>
