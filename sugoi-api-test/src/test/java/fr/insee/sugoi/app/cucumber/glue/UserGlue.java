@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.app.cucumber.utils.StepData;
@@ -28,6 +29,7 @@ import fr.insee.sugoi.model.paging.PageResult;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Then;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,8 +96,10 @@ public class UserGlue {
   }
 
   @Then("the client expect the username of user to be {}")
-  public void expect_username_of_user_to_be(String username) {
-    assertThat(stepData.getUser().getUsername(), is(username));
+  public void expect_username_of_user_to_be(String username) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    List<User> users = mapper.convertValue(stepData.getUsers(), new TypeReference<List<User>>() {});
+    assertThat(users.get(0).getUsername(), is(username));
   }
 
   @Then("the client expect the mail of user not to be null")
@@ -123,9 +127,16 @@ public class UserGlue {
     assertThat(stepData.getUser().getUsername(), not("null"));
   }
 
-  @Then("the client want to see the users list")
+  @Then("the client wants to see the users list")
   public void show_list() {
     scenario.log(stepData.getUsers().toString());
     System.out.println(stepData.getUsers());
+  }
+
+  @Then("the client expects the username {} not to be in the list of users")
+  public void theClientExpectTheUsernameTestcNotToBeInTheListOfUsers(String username) {
+    ObjectMapper mapper = new ObjectMapper();
+    List<User> users = mapper.convertValue(stepData.getUsers(), new TypeReference<List<User>>() {});
+    assertThat(users.stream().noneMatch(v -> v.getUsername().equalsIgnoreCase(username)), is(true));
   }
 }

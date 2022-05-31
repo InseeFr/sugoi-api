@@ -15,7 +15,7 @@ Feature: User scenario
         When the client perform GET request on url /realms/domaine1/users?mail=test&size=20&offset=0&typeRecherche=AND
         And show body received
         Then the client receives status code 200
-        Then The client expect to receive a list of 2 user(s)
+        Then The client expect to receive a list of 3 user(s)
 
     Scenario: Get user
         When the client perform GET request on url /realms/domaine1/users/testc
@@ -229,4 +229,13 @@ Feature: User scenario
      Scenario: Perform reinit on a user without a password
         When the client perform POST request on url /realms/domaine1/users/nogroup/reinit-password
         Then the client receives status code 400
+
+    Scenario: Get user with group filter
+        When the client perform GET request on url /realms/domaine1/storages/default/users?groups=Managers_Applitest
+        And show body received
+        Then the client receives status code 200
+        Then the client expect to receive a list of users
+        Then the client expect the username of user to be testgroups
+        Then the client expects the username testc not to be in the list of users
+
 

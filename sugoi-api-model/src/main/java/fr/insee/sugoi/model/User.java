@@ -154,4 +154,8 @@ public class User implements Serializable {
   public void setMetadatas(Map<String, Object> metadatas) {
     this.metadatas = metadatas;
   }
+
+  public void addGroups(Group group) {
+    this.groups.add(group);
+  }
 }
