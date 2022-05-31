@@ -54,6 +54,12 @@ uniquemember: uid=Testd,ou=SSM,o=insee,c=fr
 uniquemember: uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr
 uniqueMember: uid=test_password,ou=contacts,ou=clients_domaine1,o=insee,c=fr
 uniqueMember: uid=test_password,ou=contacts,ou=clients_maxsize,o=insee,c=fr
+uniqueMember: uid=testgroups,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+
+dn: cn=Managers_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
+cn: Managers_Applitest
+objectclass: groupOfUniqueNames
+uniqueMember: uid=testgroups,ou=contacts,ou=clients_domaine1,o=insee,c=fr
 
 # BRANCHE APPLICATIVE WEB SERVICE
 dn: ou=WebServicesLdap,ou=Applications,o=insee,c=fr
@@ -410,6 +416,22 @@ objectClass: top
 objectClass: inseeOrganisation
 uid: testo
 description: Insee
+
+dn: uid=testgroups,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+cn: testgroups
+sn: testgroups
+givenname: testgroups
+mail: testgroups@gouv.test
+uid: testgroups
+memberOf: cn=Utilisateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
+memberOf: cn=Managers_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
+
 
 dn: uid=testomaxsize,ou=organisations,ou=clients_domaine1,o=insee,c=fr
 objectClass: top

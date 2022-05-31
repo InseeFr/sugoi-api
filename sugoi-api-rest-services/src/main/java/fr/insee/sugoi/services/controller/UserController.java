@@ -21,6 +21,7 @@ import fr.insee.sugoi.core.model.SugoiUser;
 import fr.insee.sugoi.core.service.CertificateService;
 import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.core.service.UserService;
+import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
@@ -144,7 +145,10 @@ public class UserController {
           SearchType typeRecherche,
       @Parameter(description = "User's habilitations of user to search ", required = false)
           @RequestParam(name = "habilitation", required = false)
-          List<String> habilitations) {
+          List<String> habilitations,
+      @Parameter(description = "User's groups to search", required = false)
+          @RequestParam(name = "groups", required = false)
+          List<String> groups) {
 
     // set the user which will serve as a model to retrieve the matching users
     User searchUser = new User();
@@ -166,6 +170,9 @@ public class UserController {
     if (habilitations != null) {
       habilitations.forEach(
           habilitationName -> searchUser.addHabilitation(new Habilitation(habilitationName)));
+    }
+    if (groups != null) {
+      groups.forEach(groupName -> searchUser.addGroups(new Group(groupName)));
     }
 
     // set the page to maintain the search request pagination
@@ -244,7 +251,10 @@ public class UserController {
           SearchType typeRecherche,
       @Parameter(description = "User's habilitations of user to search ", required = false)
           @RequestParam(name = "habilitation", required = false)
-          List<String> habilitations) {
+          List<String> habilitations,
+      @Parameter(description = "User's groups to search", required = false)
+          @RequestParam(name = "groups", required = false)
+          List<String> groups) {
     return getUsers(
         realm,
         null,
@@ -259,7 +269,8 @@ public class UserController {
         offset,
         searchCookie,
         typeRecherche,
-        habilitations);
+        habilitations,
+        groups);
   }
 
   @PostMapping(
