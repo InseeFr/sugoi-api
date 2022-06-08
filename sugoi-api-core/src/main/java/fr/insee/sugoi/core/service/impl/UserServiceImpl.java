@@ -461,7 +461,7 @@ public class UserServiceImpl implements UserService {
               .getUserByMail(mail)
               .orElseThrow(() -> new UserNotFoundByMailException(realmName, nonNullStorage, mail));
       user.addMetadatas(GlobalKeysConfig.REALM.getName(), realmName.toLowerCase());
-      user.addMetadatas(GlobalKeysConfig.USERSTORAGE.getName(), storageName.toLowerCase());
+      user.addMetadatas(GlobalKeysConfig.USERSTORAGE.getName(), nonNullStorage.toLowerCase());
       if (seeAlsoService != null
           && realm.getProperties().containsKey(GlobalKeysConfig.SEEALSO_ATTRIBUTES)) {
         for (String seeAlso : findUserSeeAlsos(realm, user)) {
