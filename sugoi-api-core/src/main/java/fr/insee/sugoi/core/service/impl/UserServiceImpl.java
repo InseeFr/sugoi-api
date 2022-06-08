@@ -24,7 +24,6 @@ import fr.insee.sugoi.core.model.SugoiRandomIdCharacterData;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.seealso.SeeAlsoService;
 import fr.insee.sugoi.core.service.UserService;
-import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
@@ -298,6 +297,7 @@ public class UserServiceImpl implements UserService {
     Realm r = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
     pageable.setSizeWithMax(
         Integer.parseInt(r.getProperties().get(GlobalKeysConfig.USERS_MAX_OUTPUT_SIZE)));
+    result.setPageSize(pageable.getSize());
 
     try {
       if (storage != null) {
@@ -314,10 +314,10 @@ public class UserServiceImpl implements UserService {
                 });
       } else {
         for (UserStorage us : r.getUserStorages()) {
-          ReaderStore readerStore =
-              storeProvider.getStoreForUserStorage(realm, us.getName()).getReader();
           PageResult<User> temResult =
-              readerStore.searchUsers(userProperties, pageable, typeRecherche.name());
+              storeProvider
+                  .getReaderStore(realm, us.getName())
+                  .searchUsers(userProperties, pageable, typeRecherche.name());
           temResult
               .getResults()
               .forEach(

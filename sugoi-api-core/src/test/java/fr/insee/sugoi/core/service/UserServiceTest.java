@@ -17,6 +17,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
+import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
@@ -33,6 +35,7 @@ import fr.insee.sugoi.model.exceptions.NoCertificateOnUserException;
 import fr.insee.sugoi.model.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.exceptions.UserAlreadyExistException;
 import fr.insee.sugoi.model.exceptions.UserNotFoundException;
+import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;
 import java.io.ByteArrayInputStream;
@@ -42,12 +45,15 @@ import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -109,6 +115,7 @@ public class UserServiceTest {
 
     realm = new Realm();
     realm.setName("realm");
+    realm.addProperty(GlobalKeysConfig.USERS_MAX_OUTPUT_SIZE, "100000");
     UserStorage us1 = new UserStorage();
     us1.setName("us1");
     UserStorage us2 = new UserStorage();
@@ -124,6 +131,11 @@ public class UserServiceTest {
     Mockito.when(readerStore2.getUser("donotexist")).thenReturn(Optional.empty());
     Mockito.when(readerStore2.getUser("UserWithCertificate"))
         .thenReturn(Optional.of(userWithCertificate));
+
+    Mockito.when(readerStore1.searchUsers(Mockito.any(), Mockito.any(), Mockito.eq("AND")))
+        .thenAnswer(invocation -> mockPageResultFromNUsersUs(invocation, 20000));
+    Mockito.when(readerStore2.searchUsers(Mockito.any(), Mockito.any(), Mockito.eq("AND")))
+        .thenAnswer(invocation -> mockPageResultFromNUsersUs(invocation, 20000));
 
     Mockito.when(storeProvider.getReaderStore(Mockito.eq("idonotexist"), Mockito.anyString()))
         .thenThrow(RealmNotFoundException.class);
@@ -255,5 +267,39 @@ public class UserServiceTest {
     assertThrows(
         UserAlreadyExistException.class,
         () -> userService.create("realm", "us2", user1, new ProviderRequest()));
+  }
+
+  @Test
+  @DisplayName(
+      "Given we ask for 30000 users on a realm with two storages each containing 20000 users, "
+          + "with a limitation of the maximum requested users on the realm of 100000, "
+          + "then we should get 30000 users from both userstorages")
+  public void getUsersWithPageableSizeShouldReturnEnoughUsers() {
+    PageableResult pageable = new PageableResult(30000, 0, null);
+    List<User> results =
+        userService
+            .findByProperties(realm.getName(), null, new User(), pageable, SearchType.AND)
+            .getResults();
+    assertThat("30000 users are retrieved", results.size(), is(30000));
+    assertThat(
+        "Should contain users from userstorage1",
+        results.stream()
+            .anyMatch(u -> u.getMetadatas().get(EventKeysConfig.USERSTORAGE).equals("us1")));
+    assertThat(
+        "Should contain users from userstorage2",
+        results.stream()
+            .anyMatch(u -> u.getMetadatas().get(EventKeysConfig.USERSTORAGE).equals("us2")));
+  }
+
+  private PageResult<User> mockPageResultFromNUsersUs(
+      InvocationOnMock invocation, int nbUsersInUs) {
+    PageResult<User> pageResult = new PageResult<>();
+    int minOfRequestedOrAllUsers =
+        Math.min(((PageableResult) invocation.getArgument(1)).getSize(), nbUsersInUs);
+    pageResult.setResults(
+        Stream.generate(User::new).limit(minOfRequestedOrAllUsers).collect(Collectors.toList()));
+    pageResult.setPageSize(nbUsersInUs);
+    pageResult.setTotalElements(minOfRequestedOrAllUsers);
+    return pageResult;
   }
 }
