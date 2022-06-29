@@ -15,18 +15,34 @@ package fr.insee.sugoi.seealso;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.sugoi.core.seealso.SeeAlsoCredentialsConfiguration.SeeAlsoCredential;
 import fr.insee.sugoi.core.seealso.SeeAlsoDecorator;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 public class HttpSeeAlsoDecorator implements SeeAlsoDecorator {
 
-  private WebClient client = WebClient.create();
+  @Autowired Map<String, SeeAlsoCredential> credentialsByDomain;
+
+  @Value("${fr.insee.sugoi.seealso.http.timeout:1}")
+  private int secondsBeforeTimeout;
+
+  private Map<String, WebClient> clientsByDomain = new HashMap<>();
+  private static final Logger logger = LoggerFactory.getLogger(HttpSeeAlsoDecorator.class);
 
   @Override
   public List<String> getProtocols() {
@@ -48,19 +64,43 @@ public class HttpSeeAlsoDecorator implements SeeAlsoDecorator {
     try {
       JsonNode rootNode = (new ObjectMapper()).readTree(getHttpResourceBody(url));
       return transformJsonToValue(rootNode, subobject);
+    } catch (MalformedURLException e) {
+      logger.error("{} is malformed : {}", url, e.getLocalizedMessage());
+      return null;
     } catch (IOException e) {
+      logger.error("Failed to retrieve object from {} : {}", url, e.getLocalizedMessage());
       return null;
     }
   }
 
-  private String getHttpResourceBody(String url) {
-    return client
+  private String getHttpResourceBody(String url) throws MalformedURLException {
+    return getClientByDomain(url)
         .get()
-        .uri(url)
         .retrieve()
         .bodyToMono(String.class)
-        .timeout(Duration.ofSeconds(1))
+        .timeout(Duration.ofSeconds(secondsBeforeTimeout))
         .block();
+  }
+
+  private WebClient getClientByDomain(String stringUrl) throws MalformedURLException {
+    URL url = new URL(stringUrl);
+    URL baseUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(), "");
+    clientsByDomain.putIfAbsent(baseUrl.toString(), createWebClient(baseUrl));
+    return clientsByDomain.get(baseUrl.toString());
+  }
+
+  private WebClient createWebClient(URL baseUrl) {
+    return WebClient.builder()
+        .baseUrl(baseUrl.toString())
+        .defaultHeaders(httpHeaders -> addBasicAuthFromUrl(httpHeaders, baseUrl.getHost()))
+        .build();
+  }
+
+  private void addBasicAuthFromUrl(HttpHeaders httpHeaders, String host) {
+    if (credentialsByDomain != null && credentialsByDomain.containsKey(host)) {
+      httpHeaders.setBasicAuth(
+          credentialsByDomain.get(host).getUsername(), credentialsByDomain.get(host).getPassword());
+    }
   }
 
   private Object transformJsonToValue(JsonNode rootNode, String subobject) {

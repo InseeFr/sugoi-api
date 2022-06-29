@@ -15,21 +15,33 @@ package fr.insee.sugoi.seealso;
 
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.LDAPConnection;
+import com.unboundid.ldap.sdk.LDAPConnectionPool;
 import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldap.sdk.LDAPURL;
 import com.unboundid.ldap.sdk.SearchResultEntry;
+import fr.insee.sugoi.core.seealso.SeeAlsoCredentialsConfiguration.SeeAlsoCredential;
 import fr.insee.sugoi.core.seealso.SeeAlsoDecorator;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class LdapSeeAlsoDecorator implements SeeAlsoDecorator {
 
+  private static final Map<String, LDAPConnectionPool> ldapConnectionByHost = new HashMap<>();
+  private static final Logger logger = LoggerFactory.getLogger(LdapSeeAlsoDecorator.class);
+
+  @Autowired Map<String, SeeAlsoCredential> credentialsByDomain;
+
   @Override
   public List<String> getProtocols() {
-    return List.of("ldap");
+    return List.of("ldap", "ldaps");
   }
 
   /**
@@ -51,11 +63,12 @@ public class LdapSeeAlsoDecorator implements SeeAlsoDecorator {
   }
 
   private SearchResultEntry getResourceFromLdapURL(String url) {
-    try (LDAPConnection ldapConnection = new LDAPConnection()) {
+    try {
       LDAPURL ldapUrl = new LDAPURL(url);
-      ldapConnection.connect(ldapUrl.getHost(), ldapUrl.getPort(), 1000);
-      return ldapConnection.searchForEntry(ldapUrl.toSearchRequest());
+      return getConnectionByHost(ldapUrl.getHost(), ldapUrl.getPort())
+          .searchForEntry(ldapUrl.toSearchRequest());
     } catch (LDAPException e) {
+      logger.error("Ldap request for seealso failed with : {}", e.getLocalizedMessage());
       return null;
     }
   }
@@ -67,6 +80,28 @@ public class LdapSeeAlsoDecorator implements SeeAlsoDecorator {
       return Arrays.stream(attribute.getValues()).collect(Collectors.toList());
     } else {
       return attribute.getValue();
+    }
+  }
+
+  private LDAPConnectionPool getConnectionByHost(String host, int port) throws LDAPException {
+    ldapConnectionByHost.putIfAbsent(host + "_" + port, createHostConnection(host, port));
+    return ldapConnectionByHost.get(host + "_" + port);
+  }
+
+  private LDAPConnectionPool createHostConnection(String host, int port) throws LDAPException {
+    if (credentialsByDomain != null && credentialsByDomain.containsKey(host)) {
+      try (LDAPConnection initialConnection =
+          new LDAPConnection(
+              host,
+              port,
+              credentialsByDomain.get(host).getUsername(),
+              credentialsByDomain.get(host).getPassword())) {
+        return new LDAPConnectionPool(initialConnection, 10);
+      }
+    } else {
+      try (LDAPConnection initialConnection = new LDAPConnection(host, port)) {
+        return new LDAPConnectionPool(initialConnection, 10);
+      }
     }
   }
 }

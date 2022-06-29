@@ -15,7 +15,6 @@ package fr.insee.sugoi.core.service;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
 import fr.insee.sugoi.core.seealso.MapProtocolSeeAlsoDecorator;
@@ -35,7 +34,11 @@ public class SeeAlsoServiceTest {
 
   @BeforeEach
   public void setup() {
-    when(mapProtocolSeeAlsoDecorator.getResourceFromUrl(any(), any(), any())).thenReturn("toto");
+    when(mapProtocolSeeAlsoDecorator.getResourceFromUrl(
+            "ldap",
+            "ldap://localhost:10389/uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr",
+            "cn"))
+        .thenReturn("toto");
   }
 
   @Test
