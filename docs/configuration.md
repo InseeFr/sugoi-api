@@ -11,6 +11,7 @@
       - [Password configuration](#password-configuration)
     - [WebHooks configuration](#webhooks-configuration)
     - [Spring actuator configuration](#spring-actuator-configuration)
+    - [SeeAlso configuration](#seealso-configuration)
     - [Other info configuration](#other-info-configuration)
     - [Old endpoints configuration](#old-endpoints-configuration)
 
@@ -197,6 +198,14 @@ fr.insee.sugoi.security.monitor-user-password=monitor
 ```
 
 This user only has rights on `/actuator` endpoints.
+
+### SeeAlso configuration
+
+| Properties                                   | Description | Default value | example |
+| -------------------------------------------- | :---------: | ------------: | ------: |
+| fr.insee.sugoi.seealso.username-by-domain.[domain] |  Set username used to resolve seealsos that are on [domain]. |  By default, no seealso request is authenticated. Each domain on which an authentication is required should have this property and the password property set or the request will not be authenticated. | fr.insee.sugoi.seealso.username-by-domain.domain1.insee.fr=user : if the seealso as to be resolved on domain1.insee.fr the user user will be used if the password property is also set. |
+| fr.insee.sugoi.seealso.password-by-domain.[domain] |  Set username used to resolve seealsos that are on [domain]. |  By default, no seealso request is authenticated. Each domain on which an authentication is required should have this property and the username property set or the request will not be authenticated. | fr.insee.sugoi.seealso.password-by-domain.domain1.insee.fr=mypass : if the seealso as to be resolved on domain1.insee.fr the password user will be used if the username property is also set. |
+| fr.insee.sugoi.seealso.http.timeout          | A timeout in second for http seealso resolution. |   1    |  5  |
 
 ### Other info configuration
 

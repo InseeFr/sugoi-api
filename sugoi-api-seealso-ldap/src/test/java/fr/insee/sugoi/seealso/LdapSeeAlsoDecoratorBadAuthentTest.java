@@ -18,7 +18,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import fr.insee.sugoi.core.seealso.SeeAlsoCredentialsConfiguration;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ldap.embedded.EmbeddedLdapAutoConfiguration;
@@ -31,48 +30,16 @@ import org.springframework.test.context.TestPropertySource;
       LdapSeeAlsoDecorator.class,
       SeeAlsoCredentialsConfiguration.class
     })
-@TestPropertySource(locations = "classpath:/application.properties")
-public class LdapSeeAlsoDecoratorTest {
+@TestPropertySource(locations = "classpath:/application-badauthent.properties")
+public class LdapSeeAlsoDecoratorBadAuthentTest {
 
   @Autowired LdapSeeAlsoDecorator ldapSeeAlsoDecorator;
 
   @Test
-  public void testGetStringResourceFromLdapUrl() {
+  public void requestWithBadCredentialsShouldFail() {
     Object res =
         ldapSeeAlsoDecorator.getResourceFromUrl(
             "ldap://localhost:10389/uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr", "cn");
-    assertThat("Resource should be Testy Test", res, is("Testy Test"));
-  }
-
-  @Test
-  public void testGetStringResourceFromLdapUrlAtScopeOne() {
-    Object res =
-        ldapSeeAlsoDecorator.getResourceFromUrl(
-            "ldap://localhost:10389/ou=contacts,ou=clients_domaine1,o=insee,c=fr??one?(uid=testc)",
-            "cn");
-    assertThat("Resource should be Testy Test", res, is("Testy Test"));
-  }
-
-  @Test
-  public void testFailToGetResourceFromLdapUrlReturnsNull() {
-    Object res =
-        ldapSeeAlsoDecorator.getResourceFromUrl(
-            "ldap://localhost:10389/ou=contacts,ou=clients_domaine1,o=insee,c=fr??one?(nothing=testc)",
-            "cn");
-    assertThat("Resource should be Testy Test", res, is(nullValue()));
-  }
-
-  @Test
-  public void testGetListResourceFromLdapUrl() {
-    Object res =
-        ldapSeeAlsoDecorator.getResourceFromUrl(
-            "ldap://localhost:10389/uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr",
-            "inseeGroupeDefaut");
-    assertThat("Should have 4 habilitations", ((List<?>) res).size(), is(4));
-    assertThat(
-        "Should have habilitations prop_role_application",
-        ((List<?>) res)
-            .stream()
-                .anyMatch(property -> ((String) property).equalsIgnoreCase("prop_role_applitest")));
+    assertThat("Resource should be null", res, is(nullValue()));
   }
 }

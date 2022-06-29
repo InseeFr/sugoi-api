@@ -15,81 +15,90 @@ package fr.insee.sugoi.seealso;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.sugoi.core.seealso.SeeAlsoCredentialsConfiguration;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.User;
-import java.lang.reflect.InaccessibleObjectException;
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
+import okhttp3.mockwebserver.Dispatcher;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.stubbing.OngoingStubbing;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClient.RequestHeadersSpec;
-import org.springframework.web.reactive.function.client.WebClient.RequestHeadersUriSpec;
-import org.springframework.web.reactive.function.client.WebClient.ResponseSpec;
-import reactor.core.publisher.Mono;
+import org.springframework.test.context.TestPropertySource;
 
-@SpringBootTest(classes = HttpSeeAlsoDecorator.class)
+@SpringBootTest(classes = {HttpSeeAlsoDecorator.class, SeeAlsoCredentialsConfiguration.class})
+@TestPropertySource(locations = "classpath:/application.properties")
+@EnableConfigurationProperties(value = SeeAlsoCredentialsConfiguration.class)
 public class HttpSeeAlsoDecoratorTest {
 
-  private ObjectMapper mapper = new ObjectMapper();
-  @Mock private WebClient webClient;
-  @Mock private RequestHeadersUriSpec<?> requestHeadersUriSpec;
-  @Mock private RequestHeadersSpec<?> requestHeadersSpec;
-  @Mock private ResponseSpec responseSpec;
-  @InjectMocks HttpSeeAlsoDecorator httpSeeAlsoDecorator;
+  private static ObjectMapper mapper = new ObjectMapper();
+  @Autowired HttpSeeAlsoDecorator httpSeeAlsoDecorator;
+  static MockWebServer mockWebServer;
+  static SeeAlsoServerDispatcher dispatcher = new SeeAlsoServerDispatcher();
+  static final MockResponse response403 = new MockResponse().setResponseCode(403);
+  static final MockResponse response401 = new MockResponse().setResponseCode(401);
+  static final MockResponse response500 = new MockResponse().setResponseCode(500);
 
-  @BeforeEach
-  public void init() {
+  static class SeeAlsoServerDispatcher extends Dispatcher {
 
-    try {
-      User toto = new User();
-      toto.setUsername("toto");
-      Group group1 = new Group("group1", "app");
-      Group group2 = new Group("group2", "app");
-      toto.setGroups(List.of(group1, group2));
-      toto.addAttributes("listOfStuff", List.of("something", "else"));
-
-      OngoingStubbing<RequestHeadersUriSpec<?>> stubWebClient = when(webClient.get());
-      stubWebClient.thenReturn(requestHeadersUriSpec);
-      OngoingStubbing<RequestHeadersSpec<?>> stubRequestHeaderSpec =
-          when(requestHeadersUriSpec.uri("https://test.this.url/user/toto"));
-      stubRequestHeaderSpec.thenReturn(requestHeadersSpec);
-      when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-      when(responseSpec.bodyToMono(String.class))
-          .thenReturn(Mono.just(mapper.writeValueAsString(toto)));
-    } catch (JsonProcessingException e) {
-      e.printStackTrace();
+    @Override
+    public MockResponse dispatch(RecordedRequest request) throws InterruptedException {
+      try {
+        User toto = new User();
+        toto.setUsername("toto");
+        Group group1 = new Group("group1", "app");
+        Group group2 = new Group("group2", "app");
+        toto.setGroups(List.of(group1, group2));
+        toto.addAttributes("listOfStuff", List.of("something", "else"));
+        if (request.getHeader("Authorization") != null) {
+          if (request
+              .getHeader("Authorization")
+              .equals("Basic " + Base64.getEncoder().encodeToString("user:pa;ssword".getBytes()))) {
+            return new MockResponse().setResponseCode(200).setBody(mapper.writeValueAsString(toto));
+          } else return response403;
+        } else return response401;
+      } catch (JsonProcessingException e) {
+        return response500;
+      }
     }
   }
 
-  @Test
-  public void testGetStringResourceFromHttpUrl() {
-    try {
-      Object res =
-          httpSeeAlsoDecorator.getResourceFromUrl(
-              "https://test.this.url/user/toto", "groups[0].name");
-      assertThat("Group name should be group1", res, is("group1"));
-    } catch (SecurityException | InaccessibleObjectException e) {
-      fail(e);
-      e.printStackTrace();
-    }
+  @BeforeAll
+  static void init() throws IOException {
+    mockWebServer = new MockWebServer();
+    mockWebServer.setDispatcher(new SeeAlsoServerDispatcher());
+    mockWebServer.start();
   }
 
   @Test
-  @SuppressWarnings("unchecked")
+  public void testGetStringResourceFromHttpUrl() throws InterruptedException {
+    Object res =
+        httpSeeAlsoDecorator.getResourceFromUrl(
+            "http://localhost:" + mockWebServer.getPort() + "/user/toto", "groups[0].name");
+    assertThat("Group name should be group1", res, is("group1"));
+  }
+
+  @Test
   public void testGetListResourceFromHttpUrl() {
     Object res =
         httpSeeAlsoDecorator.getResourceFromUrl(
-            "https://test.this.url/user/toto", "attributes.listOfStuff");
-    assertThat("Should have habilitation something", ((List<String>) res).get(0), is("something"));
-    assertThat("Should have habilitation else", ((List<String>) res).get(1), is("else"));
+            "http://localhost:" + mockWebServer.getPort() + "/user/toto", "attributes.listOfStuff");
+    assertThat("Should have habilitation something", ((List<?>) res).get(0), is("something"));
+    assertThat("Should have habilitation else", ((List<?>) res).get(1), is("else"));
+  }
+
+  @AfterAll
+  public static void end() throws IOException {
+    mockWebServer.shutdown();
   }
 }
