@@ -1,3 +1,29 @@
+# 1.5.0
+
+
+- [ENH] ✨ Add filter users by group (#418)
+- [UP] :arrow_up: Bump tomcat.version from 9.0.62 to 9.0.64
+- [UP] :arrow_up: Bump org.springdoc.version from 1.6.8 to 1.6.9
+- [BUG]  Default is not set on realm mappings #625
+- [ENH] :sparkles: LdapSeeAlso can now read any Ldap URL (rfc4516)
+- [BUG] :heavy_check_mark: Fix FileReaderStoreTest (#630)
+- [BUG] 🐛 Creating a group on a non existing application should return 404 instead of 500 (#630)
+- [ENH] :sparkles: Password configuration can be customized at a userstorage level (#626)
+- [FIX] :bug: fix NPE on realm without userstorage
+- [ENH] :sparkles: Userstorages take default properties from realm
+- [BUG] :bug: Fix write Organization UiField in Ldap Config (#695)
+- [BUG] Fix FileStoreReaderTest
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 1.4.0
+- [UP] :arrow_up: Bump unboundid-ldapsdk from 6.0.4 to 6.0.5
+- [BUG] 🐛 Ldap error code should be logged (#670)
+- [REF] ♻️ Move exceptions to model (#670)
+- [UP] :arrow_up: Bump spotless-maven-plugin from 2.22.3 to 2.22.4
+- [UP] :arrow_up: Bump cucumber.version from 7.2.3 to 7.3.4 AND Bump reporting-plugin from 7.2.0 to 7.3.0 (simultaneous required)
+- [UP] :arrow_up: Bump spotless-maven-plugin from 2.22.2 to 2.22.3
+- [REL] :rocket: release version 1.4.0
+
+
 # 1.4.0
 
 
