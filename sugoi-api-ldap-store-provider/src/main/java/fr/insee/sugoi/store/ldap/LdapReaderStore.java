@@ -211,9 +211,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     if (application != null) {
       List<Group> groups = new ArrayList<>();
       try {
-        groups =
-            searchGroups(applicationName, new Group(), new PageableResult(200, 0, null), "AND")
-                .getResults();
+        groups = searchGroups(applicationName, new Group(), null, "AND").getResults();
       } catch (Exception e) {
         logger.error(e.getMessage());
       }
@@ -320,7 +318,9 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       LdapMapper<ResultType> mapper)
       throws LDAPSearchException {
     SearchRequest searchRequest = new SearchRequest(baseDn, scope, filter, "*", "+");
-    LdapUtils.setRequestControls(searchRequest, pageableResult, config);
+    if (pageableResult != null) {
+      LdapUtils.setRequestControls(searchRequest, pageableResult, config);
+    }
     SearchResult searchResult = null;
     try {
       searchResult = ldapMonoConnection.search(searchRequest);
@@ -347,7 +347,8 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
             .map(e -> mapper.mapFromAttributes(e.getAttributes()))
             .collect(Collectors.toList()));
     LdapUtils.setResponseControls(pageResult, searchResult);
-    pageResult.setNextStart(pageableResult.getFirst() + pageResult.getPageSize());
+    int first = pageableResult != null ? pageableResult.getFirst() : 0;
+    pageResult.setNextStart(first + pageResult.getPageSize());
     return pageResult;
   }
 
