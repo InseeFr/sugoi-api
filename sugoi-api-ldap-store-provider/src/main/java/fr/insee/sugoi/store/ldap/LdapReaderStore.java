@@ -201,7 +201,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       List<Group> groups = new ArrayList<>();
       try {
         groups =
-            searchGroups(applicationName, new Group(), new PageableResult(200, 0, null), "AND")
+            searchGroups(applicationName, new Group(), new PageableResult(1000, 0, null), "AND")
                 .getResults();
       } catch (Exception e) {
         logger.error(e.getMessage());
