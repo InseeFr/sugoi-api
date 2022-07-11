@@ -1,3 +1,9 @@
+# 1.5.1
+
+
+- [BUG] :bug: Quick fix application comes with 1000 groups
+
+
 # 1.5.0
 
 
