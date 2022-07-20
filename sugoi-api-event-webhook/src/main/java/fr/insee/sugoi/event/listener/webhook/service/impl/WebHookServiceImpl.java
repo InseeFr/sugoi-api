@@ -13,7 +13,6 @@
 */
 package fr.insee.sugoi.event.listener.webhook.service.impl;
 
-import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.event.listener.webhook.service.WebHookService;
@@ -94,8 +93,8 @@ public class WebHookServiceImpl implements WebHookService {
         loadTemplate(
             webHookName + realmTemplateSuffix,
             WEBHOOK_PROPERTY_PREFIX + webHookName + propertyTemplateSuffix,
-            (String) templateProperties.get(GlobalKeysConfig.REALM),
-            (String) templateProperties.get(GlobalKeysConfig.USERSTORAGE));
+            (String) templateProperties.get(EventKeysConfig.REALM),
+            (String) templateProperties.get(EventKeysConfig.USERSTORAGE));
     if (template != null) {
       String content = injectValueInTemplate(template, templateProperties);
       String target = env.getProperty(WEBHOOK_PROPERTY_PREFIX + webHookName + ".target");
