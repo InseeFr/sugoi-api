@@ -16,7 +16,8 @@ package fr.insee.sugoi.ldap.utils.mapper;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Modification;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
-import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
+import fr.insee.sugoi.model.RealmConfigKeys;
+import fr.insee.sugoi.model.RealmConfigKeysFinder;
 import fr.insee.sugoi.model.UserStorage;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import java.util.ArrayList;
@@ -25,6 +26,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserStorageLdapMapper {
+
+  private UserStorageLdapMapper() {}
+
+  private static RealmConfigKeysFinder realmConfigKeysConfiguration = new RealmConfigKeysFinder();
 
   public static UserStorage mapFromAttributes(Collection<Attribute> attributes) {
     UserStorage userStorage = new UserStorage();
@@ -35,10 +40,11 @@ public class UserStorageLdapMapper {
               for (String value : attribute.getValues()) {
                 String[] property = value.split("\\$");
                 if (property.length == 2) {
-                  LdapConfigKeys.getLdapConfigKeys(property[0])
-                      .ifPresent(
-                          configKey -> userStorage.getProperties().put(configKey, property[1]));
-                  if (property[0].equalsIgnoreCase("brancheContact")) {
+                  RealmConfigKeys configKey =
+                      realmConfigKeysConfiguration.getRealmConfigKey(property[0]);
+                  if (configKey != null) {
+                    userStorage.getProperties().put(configKey, property[1]);
+                  } else if (property[0].equalsIgnoreCase("brancheContact")) {
                     userStorage.setUserSource(property[1]);
                   } else if (property[0].equalsIgnoreCase("brancheOrganisation")) {
                     userStorage.setOrganizationSource(property[1]);
