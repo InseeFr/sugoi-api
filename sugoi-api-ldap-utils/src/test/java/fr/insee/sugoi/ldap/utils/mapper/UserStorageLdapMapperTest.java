@@ -32,8 +32,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(classes = UserStorageLdapMapper.class)
 public class UserStorageLdapMapperTest {
 
-  UserStorageLdapMapper userStorageLdapMapper = new UserStorageLdapMapper();
-
   @BeforeEach
   public void setup() {}
 
