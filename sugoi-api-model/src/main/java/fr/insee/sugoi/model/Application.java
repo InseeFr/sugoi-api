@@ -14,14 +14,15 @@
 package fr.insee.sugoi.model;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Application implements Serializable {
   private String name;
-  private String owner;
   private List<Group> groups;
 
-  public Application() {}
+  private Map<String, Object> attributes = new HashMap<>();
 
   public List<Group> getGroups() {
     return this.groups;
@@ -39,11 +40,11 @@ public class Application implements Serializable {
     this.name = name;
   }
 
-  public String getOwner() {
-    return this.owner;
+  public Map<String, Object> getAttributes() {
+    return this.attributes;
   }
 
-  public void setOwner(String owner) {
-    this.owner = owner;
+  public void setAttributes(Map<String, Object> attributes) {
+    this.attributes = attributes;
   }
 }

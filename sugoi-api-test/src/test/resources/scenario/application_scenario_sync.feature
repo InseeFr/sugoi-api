@@ -27,7 +27,6 @@ Feature: Applications scenario
             """
             {
                 "name": "MyApp",
-                "owner": "toto",
                 "groups": []
             }
             """
@@ -40,7 +39,6 @@ Feature: Applications scenario
             """
             {
                 "name": "MyApp",
-                "owner": "toto",
                 "groups": []
             }
             """
@@ -52,7 +50,6 @@ Feature: Applications scenario
             """
             {
                 "name": "MyApp",
-                "owner": "tata",
                 "groups": []
             }
             """
@@ -65,7 +62,6 @@ Feature: Applications scenario
             """
             {
                 "name": "MyApp2",
-                "owner": "tata",
                 "groups": []
             }
             """

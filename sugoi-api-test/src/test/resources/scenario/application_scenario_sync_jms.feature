@@ -27,7 +27,6 @@ Feature: Applications scenario synchronous jms
             """
             {
                 "name": "MyAppJMS",
-                "owner": "toto",
                 "groups": []
             }
             """
@@ -41,7 +40,6 @@ Feature: Applications scenario synchronous jms
             """
             {
                 "name": "MyAppJMS",
-                "owner": "toto",
                 "groups": []
             }
             """
@@ -53,7 +51,6 @@ Feature: Applications scenario synchronous jms
             """
             {
                 "name": "MyAppJMS",
-                "owner": "tata",
                 "groups": []
             }
             """
@@ -67,7 +64,6 @@ Feature: Applications scenario synchronous jms
             """
             {
                 "name": "MyApp2JMS",
-                "owner": "tata",
                 "groups": []
             }
             """

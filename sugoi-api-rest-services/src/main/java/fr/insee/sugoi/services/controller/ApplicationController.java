@@ -99,13 +99,9 @@ public class ApplicationController {
           int offset,
       @Parameter(description = "Name of the app searched", required = false)
           @RequestParam(value = "name", required = false)
-          String name,
-      @Parameter(description = "Name of the owner of the app searched", required = false)
-          @RequestParam(value = "owner", required = false)
-          String owner) {
+          String name) {
     Application applicationFilter = new Application();
     applicationFilter.setName(name);
-    applicationFilter.setOwner(owner);
 
     PageableResult pageableResult = new PageableResult(size, offset, searchCookie);
 

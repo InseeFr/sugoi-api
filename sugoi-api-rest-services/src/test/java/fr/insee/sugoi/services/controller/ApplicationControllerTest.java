@@ -31,6 +31,7 @@ import fr.insee.sugoi.model.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.model.paging.PageResult;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -66,15 +67,18 @@ public class ApplicationControllerTest {
   public void setup() {
     application1 = new Application();
     application1.setName("SuperAppli");
-    application1.setOwner("Amoi");
+    application1.setAttributes(
+        Map.of("contacts", List.of("mycontact1", "mycontact2"), "owner", "myowner1"));
 
     application2 = new Application();
     application2.setName("SuperAppli2");
-    application2.setOwner("Amoi2");
+    application2.setAttributes(
+        Map.of("contacts", List.of("mycontact1", "mycontact2"), "owner", "myowner2"));
 
     application1Updated = new Application();
     application1Updated.setName("SuperAppli");
-    application1Updated.setOwner("NewOwner");
+    application1Updated.setAttributes(
+        Map.of("contacts", List.of("mycontact1", "mycontact2"), "owner", "newowner"));
 
     List<Application> applications = new ArrayList<>();
     applications.add(application1);
@@ -110,15 +114,17 @@ public class ApplicationControllerTest {
           appRes.getResults().get(0).getName(),
           is("SuperAppli"));
       assertThat(
-          "SuperAppli should have owner Amoi", appRes.getResults().get(0).getOwner(), is("Amoi"));
+          "SuperAppli should have owner myowner1",
+          appRes.getResults().get(0).getAttributes().get("owner"),
+          is("myowner1"));
       assertThat(
           "Second element should be SuperAppli2",
           appRes.getResults().get(1).getName(),
           is("SuperAppli2"));
       assertThat(
-          "SuperAppli2 should have owner Amoi2",
-          appRes.getResults().get(1).getOwner(),
-          is("Amoi2"));
+          "SuperAppli2 should have owner myowner2",
+          appRes.getResults().get(1).getAttributes().get("owner"),
+          is("myowner2"));
       assertThat("Response code should be 200", response.getStatus(), is(200));
 
     } catch (Exception e) {
@@ -148,7 +154,14 @@ public class ApplicationControllerTest {
 
       verify(applicationService).findById("domaine1", "SuperAppli");
       assertThat("Application returned should be SuperAppli", res.getName(), is("SuperAppli"));
-      assertThat("Application returned should be owned by Amoi", res.getOwner(), is("Amoi"));
+      assertThat(
+          "Application returned should be owned by Amoi",
+          res.getAttributes().get("owner"),
+          is("myowner1"));
+      assertThat(
+          "Application should have a contact",
+          ((List<?>) res.getAttributes().get("contacts")).get(1),
+          is("mycontact2"));
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -203,8 +216,11 @@ public class ApplicationControllerTest {
       verify(applicationService).update(Mockito.anyString(), Mockito.any(), Mockito.any());
       assertThat(
           "Should get updated application",
-          objectMapper.readValue(response.getContentAsString(), Application.class).getOwner(),
-          is("NewOwner"));
+          objectMapper
+              .readValue(response.getContentAsString(), Application.class)
+              .getAttributes()
+              .get("owner"),
+          is("newowner"));
 
       assertThat(
           "Should get location",

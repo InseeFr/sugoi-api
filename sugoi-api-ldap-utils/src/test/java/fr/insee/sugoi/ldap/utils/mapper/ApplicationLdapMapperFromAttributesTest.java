@@ -24,6 +24,7 @@ import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,5 +55,31 @@ public class ApplicationLdapMapperFromAttributesTest {
     Application mappedApplication = applicationLdapMapper.mapFromAttributes(attributes);
 
     assertThat("Should have a name", mappedApplication.getName(), is("appli"));
+  }
+
+  @Test
+  public void getStringInAttributesFromAttributes() {
+
+    Attribute ownerAttribute = new Attribute("description", "myowner");
+    Collection<Attribute> attributes = new ArrayList<>();
+    attributes.add(ownerAttribute);
+    Application mappedApplication = applicationLdapMapper.mapFromAttributes(attributes);
+
+    assertThat(
+        "Should have an owner", mappedApplication.getAttributes().get("owner"), is("myowner"));
+  }
+
+  @Test
+  public void getListStringInAttributesFromAttributes() {
+
+    Attribute contact1 = new Attribute("postalAddress", "contact1");
+    Attribute contact2 = new Attribute("postalAddress", "contact2");
+    Application mappedApplication =
+        applicationLdapMapper.mapFromAttributes(List.of(contact1, contact2));
+
+    assertThat(
+        "Should have contacts",
+        ((List<?>) mappedApplication.getAttributes().get("contacts")).get(1),
+        is("contact2"));
   }
 }

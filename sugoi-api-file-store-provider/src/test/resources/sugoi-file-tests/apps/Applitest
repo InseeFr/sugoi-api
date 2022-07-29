@@ -1,6 +1,5 @@
 {
    "name":"Applitest",
-   "owner":null,
    "groups":[
       {
          "name":"Utilisateurs_Applitest",

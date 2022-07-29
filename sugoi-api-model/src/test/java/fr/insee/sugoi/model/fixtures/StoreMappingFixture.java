@@ -69,7 +69,12 @@ public class StoreMappingFixture {
   }
 
   public static List<StoreMapping> getApplicationStoreMappings() {
-    return List.of(new StoreMapping("name", "ou", ModelType.STRING, true));
+    List<StoreMapping> mappings = new ArrayList<>();
+    mappings.add(new StoreMapping("name", "ou", ModelType.STRING, true));
+    mappings.add(new StoreMapping("attributes.owner", "description", ModelType.STRING, true));
+    mappings.add(
+        new StoreMapping("attributes.contacts", "postalAddress", ModelType.LIST_STRING, true));
+    return mappings;
   }
 
   public static List<StoreMapping> getOrganizationStoreMappings() {
