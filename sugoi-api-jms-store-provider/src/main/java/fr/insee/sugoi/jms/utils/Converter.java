@@ -73,16 +73,12 @@ public class Converter {
     if (linkedHashMap != null) {
       Application application = new Application();
       application.setName((String) linkedHashMap.get("name"));
-      application.setOwner((String) linkedHashMap.get("owner"));
+      application.getAttributes().put("owner", (String) linkedHashMap.get("owner"));
       List<Object> listGroup =
           (linkedHashMap.get("groups") != null
               ? (List<Object>) linkedHashMap.get("groups")
               : new ArrayList<>());
-      application.setGroups(
-          (List<Group>)
-              listGroup.stream()
-                  .map(groupObject -> toGroup(groupObject))
-                  .collect(Collectors.toList()));
+      application.setGroups(listGroup.stream().map(this::toGroup).collect(Collectors.toList()));
       return application;
     }
     return null;

@@ -28,7 +28,6 @@ Feature: Applications scenario asynchrone
             """
             {
                 "name": "MyApp",
-                "owner": "toto",
                 "groups": []
             }
             """
@@ -40,7 +39,6 @@ Feature: Applications scenario asynchrone
             """
             {
                 "name": "MyApp",
-                "owner": "toto",
                 "groups": []
             }
             """
@@ -52,7 +50,6 @@ Feature: Applications scenario asynchrone
             """
             {
                 "name": "MyApp",
-                "owner": "tata",
                 "groups": []
             }
             """
@@ -64,7 +61,6 @@ Feature: Applications scenario asynchrone
             """
             {
                 "name": "MyApp2",
-                "owner": "tata",
                 "groups": []
             }
             """
