@@ -85,7 +85,7 @@ public class ExportController {
           String realm,
       @Parameter(
               description = "Name of the userStorage where the operation will be made",
-              required = false)
+              required = true)
           @PathVariable(name = "storage", required = false)
           String storage,
       @Parameter(description = "User's identifiant of user to search ")
@@ -239,7 +239,6 @@ public class ExportController {
         }
 
         if (foundUsers.isHasMoreResult()) {
-          csvPrinter.close();
           pageable = new PageableResult(pageSize, 0, foundUsers.getSearchToken());
         } else {
           break;
