@@ -31,11 +31,7 @@ import fr.insee.sugoi.model.technics.StoreMapping;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -193,25 +189,36 @@ public class GenericLdapMapper {
             .map(attributeValue -> new User(LdapUtils.getNodeValueFromDN(attributeValue)))
             .collect(Collectors.toList());
       case LIST_GROUP:
-        values = new ArrayList<>();
-        attrs.stream().forEach(attribute -> values.addAll(Arrays.asList(attribute.getValues())));
-        return values.stream()
+        Pattern patternSuffixGroup =
+            Pattern.compile(
+                config.get(LdapConfigKeys.GROUP_SOURCE_PATTERN).replace("{appliname}", "(.*)"));
+        Pattern patternGroupManager =
+            Pattern.compile(
+                config
+                    .get(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN)
+                    .replace("{appliname}", "(.*)"));
+        return attrs.stream()
+            .flatMap(attribute -> Arrays.stream(attribute.getValues()))
             .map(
                 attributeValue -> {
-                  Pattern pattern =
-                      Pattern.compile(
-                          config
-                              .get(LdapConfigKeys.GROUP_SOURCE_PATTERN)
-                              .replace("{appliname}", "(.*)"));
-                  Matcher matcher =
-                      pattern.matcher(attributeValue.substring(attributeValue.indexOf(",") + 1));
-                  if (matcher.matches()) {
+                  // Match only suffix from application group
+                  // TODO : Match real value of GROUP_SOURCE_PATTERN and not with substring(),
+                  // without breaking other tests
+                  String suffixGroup = attributeValue.substring(attributeValue.indexOf(",") + 1);
+                  Matcher matcherSuffixGroup = patternSuffixGroup.matcher(suffixGroup);
+                  // Match exact group pattern
+                  Matcher matcherGroupManager = patternGroupManager.matcher(attributeValue);
+                  if (matcherSuffixGroup.matches()) {
                     return new Group(
-                        LdapUtils.getNodeValueFromDN(attributeValue), matcher.group(1));
+                        LdapUtils.getNodeValueFromDN(attributeValue), matcherSuffixGroup.group(1));
+                  } else if (matcherGroupManager.matches()) {
+                    return new Group(
+                        LdapUtils.getNodeValueFromDN(attributeValue), matcherGroupManager.group(1));
                   } else {
                     return null;
                   }
                 })
+            .filter(Objects::nonNull)
             .collect(Collectors.toList());
       case LIST_STRING:
         values = new ArrayList<>();

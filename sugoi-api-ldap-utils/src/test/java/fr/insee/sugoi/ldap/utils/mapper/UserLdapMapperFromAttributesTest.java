@@ -28,13 +28,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -53,6 +47,9 @@ public class UserLdapMapperFromAttributesTest {
     config.put(
         LdapConfigKeys.GROUP_SOURCE_PATTERN,
         "ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr");
+    config.put(
+        LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN,
+        "cn=ASI_{appliname},ou={appliname},ou=Applications,o=insee,c=fr");
 
     userLdapMapper = new UserLdapMapper(config, StoreMappingFixture.getUserStoreMappings());
   }
@@ -171,21 +168,39 @@ public class UserLdapMapperFromAttributesTest {
             "memberOf", "cn=admin,ou=monappli_Objets,ou=monappli,ou=Applications,o=insee,c=fr");
     Attribute groupAttributes2 =
         new Attribute(
-            "memberOf", "cn=reader,ou=monappli_Objets,ou=monappli,ou=Applications,o=insee,c=fr");
-    Collection<Attribute> attributes = new ArrayList<>();
-    attributes.add(groupAttributes1);
-    attributes.add(groupAttributes2);
+            "memberOf", "cn=reader,ou=monappli2_Objets,ou=monappli2,ou=Applications,o=insee,c=fr");
+
+    Collection<Attribute> attributes = List.of(groupAttributes1, groupAttributes2);
     User mappedUser = userLdapMapper.mapFromAttributes(attributes);
 
     assertThat(
-        "Should have admin group",
+        "monappli App should have admin name",
         mappedUser.getGroups().stream().anyMatch(group -> group.getName().equals("admin")));
     assertThat(
-        "Admin group should have monappli app name",
-        mappedUser.getGroups().stream().anyMatch(group -> group.getAppName().equals("monappli")));
+        "Reader group should have monappli2 app name",
+        mappedUser.getGroups().stream().anyMatch(group -> group.getAppName().equals("monappli2")));
+  }
+
+  @Test
+  public void getUserManagerGroupFromAttribute() {
+    Attribute groupAttributesASI =
+        new Attribute("memberOf", "cn=ASI_toto,ou=toto,ou=Applications,o=insee,c=fr");
+
+    Attribute groupAttributes =
+        new Attribute(
+            "memberOf", "cn=admin,ou=monappli_Objets,ou=monappli,ou=Applications,o=insee,c=fr");
+    Collection<Attribute> attributes = List.of(groupAttributesASI, groupAttributes);
+    User mappedUser = userLdapMapper.mapFromAttributes(attributes);
+
     assertThat(
-        "Should have admin group",
-        mappedUser.getGroups().stream().anyMatch(group -> group.getName().equals("reader")));
+        "Manager group should have group ASI_toto name",
+        mappedUser.getGroups().stream().anyMatch(group -> group.getName().equals("ASI_toto")));
+    assertThat(
+        "Admin group should display admin name",
+        mappedUser.getGroups().stream().anyMatch(group -> group.getName().equals("admin")));
+    assertThat(
+        "Manager group should have toto app name",
+        mappedUser.getGroups().stream().anyMatch(group -> group.getAppName().equals("toto")));
   }
 
   @Test

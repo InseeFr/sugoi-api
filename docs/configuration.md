@@ -92,28 +92,28 @@ Sugoi-api implements springdoc with full customization allowed
 
 Sugoi-api implements spring security with full customization allowed
 
-| Properties                                                 | Description | Default value | example |
-| ---------------------------------------------------------- | :---------: | ------------: | ------: |
-| fr.insee.sugoi.cors.allowed-origins                        |             |               |         |
-| fr.insee.sugoi.cors.allowed-methods                        |             |               |         |
-| fr.insee.sugoi.security.basic-authentication-enabled       |             |               |         |
-| fr.insee.sugoi.security.ldap-account-managment-enabled     |             |               |         |
-| fr.insee.sugoi.security.ldap-account-managment-url         |             |               |         |
-| fr.insee.sugoi.security.ldap-account-managment-user-base   |             |               |         |
-| fr.insee.sugoi.security.ldap-account-managment-groupe-base |             |               |         |
-| fr.insee.sugoi.security.bearer-authentication-enabled      |             |               |         |
-| spring.security.oauth2.resourceserver.jwt.jwk-set-uri      |             |               |         |
-| fr.insee.sugoi.api.old.regexp.role.consultant              |             |               |         |
-| fr.insee.sugoi.api.old.regexp.role.gestionnaire            |             |               |         |
-| fr.insee.sugoi.api.old.regexp.role.admin                   |             |               |         |
-| fr.insee.sugoi.api.old.enable.preauthorize                 |             |               |         |
-| fr.insee.sugoi.api.regexp.role.reader                      |             |               |         |
-| fr.insee.sugoi.api.regexp.role.writer                      |             |               |         |
-| fr.insee.sugoi.api.regexp.role.admin                       |             |               |         |
-| fr.insee.sugoi.api.regexp.role.app.manager                 |             |               |         |
-| fr.insee.sugoi.api.regexp.role.password.manager            |             |               |         |
-| fr.insee.sugoi.api.enable.preauthorize                     |             |               |         |
-| fr.insee.sugoi.security.default-roles-for-users            | default role to add to each connected user |               |         |
+| Properties                                                 |                                                      Description                                                       | Default value | example |
+| ---------------------------------------------------------- |:----------------------------------------------------------------------------------------------------------------------:| ------------: | ------: |
+| fr.insee.sugoi.cors.allowed-origins                        |                                                                                                                        |               |         |
+| fr.insee.sugoi.cors.allowed-methods                        |                                                                                                                        |               |         |
+| fr.insee.sugoi.security.basic-authentication-enabled       |                                                                                                                        |               |         |
+| fr.insee.sugoi.security.ldap-account-managment-enabled     |                                                                                                                        |               |         |
+| fr.insee.sugoi.security.ldap-account-managment-url         |                                                                                                                        |               |         |
+| fr.insee.sugoi.security.ldap-account-managment-user-base   |                                                                                                                        |               |         |
+| fr.insee.sugoi.security.ldap-account-managment-groupe-base |                                                                                                                        |               |         |
+| fr.insee.sugoi.security.bearer-authentication-enabled      |                                                                                                                        |               |         |
+| spring.security.oauth2.resourceserver.jwt.jwk-set-uri      |                                                                                                                        |               |         |
+| fr.insee.sugoi.api.old.regexp.role.consultant              |                                                                                                                        |               |         |
+| fr.insee.sugoi.api.old.regexp.role.gestionnaire            |                                                                                                                        |               |         |
+| fr.insee.sugoi.api.old.regexp.role.admin                   |                                                                                                                        |               |         |
+| fr.insee.sugoi.api.old.enable.preauthorize                 |                                                                                                                        |               |         |
+| fr.insee.sugoi.api.regexp.role.reader                      |                                                                                                                        |               |         |
+| fr.insee.sugoi.api.regexp.role.writer                      |                                                                                                                        |               |         |
+| fr.insee.sugoi.api.regexp.role.admin                       |                                                                                                                        |               |         |
+| fr.insee.sugoi.ldap.default.group_manager_source_pattern                | Default pattern to use when searching manager group for application. Application name should be passed via {appliname} |               |         |
+| fr.insee.sugoi.api.regexp.role.password.manager            |                                                                                                                        |               |         |
+| fr.insee.sugoi.api.enable.preauthorize                     |                                                                                                                        |               |         |
+| fr.insee.sugoi.security.default-roles-for-users            |                                       default role to add to each connected user                                       |               |         |
 #### Password configuration
 
   Passwords follows rules when there are passed by a user or randomly generated by Sugoi. A default for these rules which will apply to all realm that do not have its own configuration can be set by properties. For configuration at the realm level see [Realm configuration properties on password](realm-configuration.md#realm-configuration-properties-on-password).
