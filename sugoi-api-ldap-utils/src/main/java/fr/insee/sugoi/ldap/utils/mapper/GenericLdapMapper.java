@@ -207,7 +207,7 @@ public class GenericLdapMapper {
                       pattern.matcher(attributeValue.substring(attributeValue.indexOf(",") + 1));
                   if (matcher.matches()) {
                     return new Group(
-                        matcher.group(1), LdapUtils.getNodeValueFromDN(attributeValue));
+                        LdapUtils.getNodeValueFromDN(attributeValue), matcher.group(1));
                   } else {
                     return null;
                   }
@@ -272,17 +272,17 @@ public class GenericLdapMapper {
         // Assume that if list is empty it's really to set an empty list (delete all
         // values)
         // Groups list can be set null if not needed
+        String genericGroup = "cn={group}" + "," + config.get(LdapConfigKeys.GROUP_SOURCE_PATTERN);
+
         return new Attribute(
             ldapAttributeName,
             ((List<Group>) sugoiValue)
                 .stream()
                     .map(
                         group ->
-                            String.format(
-                                // TODO should be a param
-                                "cn=%s,",
-                                //
-                                group.getName()))
+                            genericGroup
+                                .replace("{appliname}", group.getAppName())
+                                .replace("{group}", group.getName()))
                     .collect(Collectors.toList()));
       case LIST_STRING:
         // Assume that if list is empty it's really to set an empty list (delete all

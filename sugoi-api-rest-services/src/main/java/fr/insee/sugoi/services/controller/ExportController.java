@@ -36,6 +36,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.csv.CSVFormat;
@@ -114,9 +115,12 @@ public class ExportController {
       @Parameter(description = "User's habilitations of user to search ")
           @RequestParam(name = "habilitation", required = false)
           List<String> habilitations,
-      @Parameter(description = "Filter on group")
+      @Parameter(description = "Filter on group. applicationFilter parameter is required")
           @RequestParam(name = "groupFilter", required = false)
           String groupFilter,
+      @Parameter(description = "Filter on application. groupFilter parameter is required")
+          @RequestParam(name = "applicationFilter", required = false)
+          String applicationFilter,
       HttpServletResponse response) {
 
     // set the user which will serve as a model to retrieve the matching users
@@ -125,7 +129,9 @@ public class ExportController {
     searchUser.setFirstName(firstName);
     searchUser.setLastName(lastName);
     searchUser.setMail(mail);
-    if (groupFilter != null) searchUser.setGroups(List.of(new Group(groupFilter)));
+    if (groupFilter != null && applicationFilter != null) {
+      searchUser.setGroups(List.of(new Group(groupFilter, applicationFilter)));
+    }
     if (commonName != null) {
       searchUser.getAttributes().put("common_name", commonName);
     }
@@ -211,7 +217,10 @@ public class ExportController {
                 newAttribute =
                     ((List<?>)
                             foundUser.get(headerMapping.getSugoiName()).orElse(new ArrayList<>()))
-                        .stream().map(Object::toString).collect(Collectors.joining(",", "", ""));
+                        .stream()
+                            .filter(Objects::nonNull)
+                            .map(Object::toString)
+                            .collect(Collectors.joining(",", "", ""));
                 break;
               case ORGANIZATION:
                 newAttribute =
@@ -289,9 +298,12 @@ public class ExportController {
       @Parameter(description = "User's habilitations of user to search ", required = false)
           @RequestParam(name = "habilitation", required = false)
           List<String> habilitations,
-      @Parameter(description = "Filter on group")
+      @Parameter(description = "Filter on group. applicationFilter parameter is required")
           @RequestParam(name = "groupFilter", required = false)
           String groupFilter,
+      @Parameter(description = "Filter on application. groupFilter parameter is required")
+          @RequestParam(name = "applicationFilter", required = false)
+          String applicationFilter,
       HttpServletResponse response) {
     getAllUsers(
         realm,
@@ -306,6 +318,7 @@ public class ExportController {
         typeRecherche,
         habilitations,
         groupFilter,
+        applicationFilter,
         response);
   }
 }

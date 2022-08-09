@@ -33,7 +33,6 @@ public class User implements Serializable {
   private List<Group> groups;
   // Don't set a default empty list to distinguish case null (not provided) and empty
   private List<Habilitation> habilitations;
-
   private PostalAddress address;
   private Map<String, Object> metadatas = new HashMap<>();
   private Map<String, Object> attributes = new HashMap<>();

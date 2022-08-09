@@ -231,7 +231,7 @@ Feature: User scenario
         Then the client receives status code 400
 
     Scenario: Get user with group filter
-        When the client perform GET request on url /realms/domaine1/storages/default/users?groups=Managers_Applitest
+        When the client perform GET request on url /realms/domaine1/storages/default/users?groupFilter=Managers_Applitest&applicationFilter=Applitest
         And show body received
         Then the client receives status code 200
         Then the client expect to receive a list of users

@@ -52,8 +52,8 @@ public class HttpSeeAlsoDecoratorTest {
     try {
       User toto = new User();
       toto.setUsername("toto");
-      Group group1 = new Group("app", "group1");
-      Group group2 = new Group("app", "group2");
+      Group group1 = new Group("group1", "app");
+      Group group2 = new Group("group2", "app");
       toto.setGroups(List.of(group1, group2));
       toto.addAttributes("listOfStuff", List.of("something", "else"));
 

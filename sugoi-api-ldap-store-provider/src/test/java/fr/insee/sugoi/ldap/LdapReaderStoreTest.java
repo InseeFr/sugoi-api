@@ -208,9 +208,9 @@ public class LdapReaderStoreTest {
   }
 
   @Test
-  public void testSearchUsersWithMatchingGroup() {
+  void testSearchUsersWithMatchingGroup() {
     User testUser = new User();
-    testUser.setGroups(List.of(new Group("Utilisateurs_Applitest")));
+    testUser.setGroups(List.of(new Group("Utilisateurs_Applitest", "Applitest")));
     List<User> users =
         ldapReaderStore.searchUsers(testUser, new PageableResult(), "AND").getResults();
     assertThat(

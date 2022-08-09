@@ -264,7 +264,7 @@ objectClass: inseeAttributsAuthentification
 objectClass: inseeAttributsHabilitation
 objectClass: inseeAttributsCommunication
 inseeOrganisationDN: uid=testo,ou=organisations,ou=clients_domaine1,o=insee,c=fr
-memberOf: cn=Administrateur_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
+memberOf: cn=Administrateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
 uid: nogroup
 
 dn: uid=byebye,ou=contacts,ou=clients_domaine1,o=insee,c=fr
