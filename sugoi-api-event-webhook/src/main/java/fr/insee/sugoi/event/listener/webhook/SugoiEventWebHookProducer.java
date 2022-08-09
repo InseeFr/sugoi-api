@@ -18,7 +18,6 @@ import fr.insee.sugoi.core.event.model.SugoiEvent;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.event.listener.webhook.service.WebHookService;
 import fr.insee.sugoi.model.User;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +42,6 @@ public class SugoiEventWebHookProducer {
   @Value(
       "#{'${sugoi.api.event.webhook.enabled.events:SEND_LOGIN,CHANGE_PASSWORD,REINIT_PASSWORD}'.split(',')}")
   private List<String> webhookEnabledEvents;
-
-  @Value("${sugoi.api.event.webhook.mail.secondaryMailAttribute}")
-  private String secondaryMailAttribute;
 
   @Autowired private Environment env;
 
@@ -95,9 +91,7 @@ public class SugoiEventWebHookProducer {
 
     values.put(EventKeysConfig.REALM, realm);
     values.put(EventKeysConfig.USERSTORAGE, userStorage);
-    values.put(
-        EventKeysConfig.MAILS,
-        determineUserMails((String) event.getProperties().get(EventKeysConfig.MAIL), user));
+    values.put(EventKeysConfig.MAILS, event.getProperties().get(EventKeysConfig.MAILS));
     values.put(EventKeysConfig.PASSWORD, password);
     values.put(EventKeysConfig.PROPERTIES, event.getProperties().get(EventKeysConfig.PROPERTIES));
     return values;
@@ -113,18 +107,5 @@ public class SugoiEventWebHookProducer {
 
   private String getTagWithDefaultMail(String maybeNullTag) {
     return maybeNullTag != null && !maybeNullTag.isBlank() ? maybeNullTag : "MAIL";
-  }
-
-  private List<String> determineUserMails(String emailProvided, User user) {
-    List<String> mails = new ArrayList<>();
-    if (emailProvided != null) {
-      mails.add(emailProvided);
-      return mails;
-    }
-    if (user != null) {
-      mails.add(user.getMail());
-      mails.addAll((List<String>) user.getAttributes().get(secondaryMailAttribute));
-    }
-    return mails;
   }
 }
