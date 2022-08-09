@@ -300,6 +300,7 @@ inseepropriete: brancheOrganisation$ou=organisations,ou=clients_domaine1,o=in
 inseepropriete: user_object_classes$top,inseeCompte,inseeContact,inseeAttributsAuthentification,inseeAttributsHabilitation,inseeAttributsCommunication
 inseepropriete: organization_object_classes$top,inseeOrganisation
 inseepropriete: userMapping$username:uid,String,rw
+inseepropriete: userMapping$attributes.secondaryMail:postalAddress,list_string,rw
 inseepropriete: userMapping$lastName:sn,String,rw
 inseepropriete: userMapping$mail:mail,String,rw
 inseepropriete: userMapping$certificate:userCertificate,byte_array,ro

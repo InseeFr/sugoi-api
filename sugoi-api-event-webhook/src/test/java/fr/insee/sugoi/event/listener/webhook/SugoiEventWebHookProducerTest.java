@@ -17,6 +17,7 @@ import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.event.model.SugoiEvent;
 import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
 import fr.insee.sugoi.event.listener.webhook.service.impl.WebHookServiceImpl;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,8 +45,8 @@ class SugoiEventWebHookProducerTest {
             "toto",
             EventKeysConfig.WEBSERVICE_TAG,
             "SPOOC",
-            EventKeysConfig.MAIL,
-            "toto@titi.fr");
+            EventKeysConfig.MAILS,
+            List.of("toto@titi.fr"));
     sugoiEventSendLogin =
         new SugoiEvent("domaine1", "storage1", SugoiEventTypeEnum.SEND_LOGIN, eventProperties);
     sugoiEventChangePasswd =

@@ -31,13 +31,19 @@ import fr.insee.sugoi.model.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.exceptions.UserNoEmailException;
 import fr.insee.sugoi.model.exceptions.UserNotFoundException;
 import fr.insee.sugoi.model.exceptions.UserStorageNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CredentialsServiceImpl implements CredentialsService {
+
+  @Value("${sugoi.api.event.webhook.mail.secondaryMailAttribute}")
+  private String secondaryMailAttribute;
 
   @Autowired private StoreProvider storeProvider;
 
@@ -65,7 +71,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         throw new UserNotFoundException(realm, userStorage, userId);
       }
 
-      if (StringUtils.isEmpty(computeReceiverMail(templateProperties, user.getMail()))) {
+      if (computeReceiverMails(templateProperties, user).isEmpty()) {
         throw new UserNoEmailException(realm, userStorage, userId);
       }
 
@@ -122,8 +128,7 @@ public class CredentialsServiceImpl implements CredentialsService {
           SugoiEventTypeEnum.REINIT_PASSWORD,
           Map.ofEntries(
               Map.entry(EventKeysConfig.PROPERTIES, templateProperties),
-              Map.entry(
-                  EventKeysConfig.MAIL, computeReceiverMail(templateProperties, user.getMail())),
+              Map.entry(EventKeysConfig.MAILS, computeReceiverMails(templateProperties, user)),
               Map.entry(EventKeysConfig.USER, user),
               Map.entry(EventKeysConfig.WEBSERVICE_TAG, webserviceTag != null ? webserviceTag : ""),
               Map.entry(EventKeysConfig.PASSWORD, password)));
@@ -184,8 +189,7 @@ public class CredentialsServiceImpl implements CredentialsService {
                 Map.entry(EventKeysConfig.OLD_PASSWORD, newPassword),
                 Map.entry(EventKeysConfig.USER_ID, userId),
                 Map.entry(EventKeysConfig.PROPERTIES, templateProperties),
-                Map.entry(
-                    EventKeysConfig.MAIL, computeReceiverMail(templateProperties, user.getMail())),
+                Map.entry(EventKeysConfig.MAILS, computeReceiverMails(templateProperties, user)),
                 Map.entry(
                     EventKeysConfig.WEBSERVICE_TAG, webserviceTag != null ? webserviceTag : "")));
         return providerResponse;
@@ -292,8 +296,7 @@ public class CredentialsServiceImpl implements CredentialsService {
           userStorage,
           SugoiEventTypeEnum.SEND_LOGIN,
           Map.ofEntries(
-              Map.entry(
-                  EventKeysConfig.MAIL, computeReceiverMail(templateProperties, user.getMail())),
+              Map.entry(EventKeysConfig.MAILS, computeReceiverMails(templateProperties, user)),
               Map.entry(EventKeysConfig.WEBSERVICE_TAG, webhookTag != null ? webhookTag : ""),
               Map.entry(EventKeysConfig.USER, user),
               Map.entry(EventKeysConfig.PROPERTIES, templateProperties)));
@@ -303,16 +306,19 @@ public class CredentialsServiceImpl implements CredentialsService {
     }
   }
 
-  private String computeReceiverMail(Map<String, String> templateProperties, String userMail) {
+  private List<String> computeReceiverMails(Map<String, String> templateProperties, User user) {
     if (templateProperties.containsKey("mail")
-        && templateProperties.get("mail") != null
-        && !templateProperties.get("mail").isBlank()) {
-      return templateProperties.get("mail");
-    } else if (userMail != null) {
-      return userMail;
-    } else {
-      return "";
+        && StringUtils.isNotBlank(templateProperties.get("mail"))) {
+      return List.of(templateProperties.get("mail"));
     }
+    List<String> mails = new ArrayList<>();
+    if (StringUtils.isNotBlank(user.getMail())) mails.add(user.getMail());
+    if (StringUtils.isNotBlank(secondaryMailAttribute)
+        && user.getAttributes().containsKey(secondaryMailAttribute)) {
+      ((List<?>) user.getAttributes().get(secondaryMailAttribute))
+          .forEach(mail -> mails.add((String) mail));
+    }
+    return mails;
   }
 
   private Boolean validatePassword(
