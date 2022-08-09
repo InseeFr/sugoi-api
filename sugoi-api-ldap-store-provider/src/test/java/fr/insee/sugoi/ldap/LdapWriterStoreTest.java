@@ -267,10 +267,8 @@ public class LdapWriterStoreTest {
     Application application = new Application();
     application.setName("MyApplication");
     List<Group> groups = new ArrayList<>();
-    Group group1 = new Group();
-    group1.setName("Group1_MyApplication");
-    Group group2 = new Group();
-    group2.setName("Group2_MyApplication");
+    Group group1 = new Group("Group1_MyApplication", "MyApplication");
+    Group group2 = new Group("Group2_MyApplication", "MyApplication");
     groups.add(group1);
     groups.add(group2);
     application.setGroups(groups);
@@ -286,8 +284,7 @@ public class LdapWriterStoreTest {
   @Test
   public void testUpdateApplicationWithGroupAdding() {
     Application application = ldapReaderStore.getApplication("Applitest").get();
-    Group group1 = new Group();
-    group1.setName("Group1_Applitest");
+    Group group1 = new Group("Group1_Applitest", "Applitest");
     application.getGroups().add(group1);
     ldapWriterStore.updateApplication(application, null);
     Application retrievedApplication = ldapReaderStore.getApplication("Applitest").get();
@@ -346,8 +343,7 @@ public class LdapWriterStoreTest {
     Application application = new Application();
     application.setName("NotEmptyApplication");
     List<Group> groups = new ArrayList<>();
-    Group group1 = new Group();
-    group1.setName("Group1_NotEmptyApplication");
+    Group group1 = new Group("Group1_NotEmptyApplication", "NotEmptyApplication");
     application.setGroups(groups);
     ldapWriterStore.createApplication(application, null);
     ldapWriterStore.deleteApplication("NotEmptyApplication", null);
@@ -361,8 +357,7 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testCreateGroup() {
-    Group group = new Group();
-    group.setName("Groupy_Applitest");
+    Group group = new Group("Groupy_Applitest", "Applitest");
     group.setDescription("Super groupy de test");
     User user = new User();
     user.setUsername("usery");
@@ -389,8 +384,7 @@ public class LdapWriterStoreTest {
 
   @Test
   public void testDeleteGroup() {
-    Group group = new Group();
-    group.setName("Asupprimer_WebServicesLdap");
+    Group group = new Group("Asupprimer_WebServicesLdap", "WebServicesLdap");
     group.setDescription("supprime ce groupe");
     ldapWriterStore.createGroup("WebServicesLdap", group, null);
     ldapWriterStore.deleteGroup("WebServicesLdap", "Asupprimer_WebServicesLdap", null);

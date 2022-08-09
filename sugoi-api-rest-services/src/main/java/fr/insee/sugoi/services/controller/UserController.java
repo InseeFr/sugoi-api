@@ -146,9 +146,14 @@ public class UserController {
       @Parameter(description = "User's habilitations of user to search ", required = false)
           @RequestParam(name = "habilitation", required = false)
           List<String> habilitations,
-      @Parameter(description = "User's groups to search", required = false)
-          @RequestParam(name = "groups", required = false)
-          List<String> groups) {
+      @Parameter(
+              description = "User's groups to search. applicationFilter parameter is required.",
+              required = false)
+          @RequestParam(name = "groupFilter", required = false)
+          List<String> groups,
+      @Parameter(description = "Filter on application. groupFilter parameter is required")
+          @RequestParam(name = "applicationFilter", required = false)
+          String applicationFilter) {
 
     // set the user which will serve as a model to retrieve the matching users
     User searchUser = new User();
@@ -171,8 +176,8 @@ public class UserController {
       habilitations.forEach(
           habilitationName -> searchUser.addHabilitation(new Habilitation(habilitationName)));
     }
-    if (groups != null) {
-      groups.forEach(groupName -> searchUser.addGroups(new Group(groupName)));
+    if (groups != null && applicationFilter != null) {
+      groups.forEach(groupName -> searchUser.addGroups(new Group(groupName, applicationFilter)));
     }
 
     // set the page to maintain the search request pagination
@@ -254,7 +259,10 @@ public class UserController {
           List<String> habilitations,
       @Parameter(description = "User's groups to search", required = false)
           @RequestParam(name = "groups", required = false)
-          List<String> groups) {
+          List<String> groups,
+      @Parameter(description = "Filter on application")
+          @RequestParam(name = "applicationFilter", required = false)
+          String applicationFilter) {
     return getUsers(
         realm,
         null,
@@ -270,7 +278,8 @@ public class UserController {
         searchCookie,
         typeRecherche,
         habilitations,
-        groups);
+        groups,
+        applicationFilter);
   }
 
   @PostMapping(

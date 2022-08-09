@@ -77,8 +77,8 @@ public class FileWriterStoreTest {
       testoOrgAdress.setLines(
           new String[] {"Insee", null, null, "88 AVE VERDIER", null, null, null});
 
-      Group utilisateursApplitest = new Group("Applitest", "Utilisateurs_Applitest");
-      Group adminApplitest = new Group("Applitest", "Administrateurs_Applitest");
+      Group utilisateursApplitest = new Group("Utilisateurs_Applitest", "Applitest");
+      Group adminApplitest = new Group("Administrateurs_Applitest", "Applitest");
       adminApplitest.setDescription("toto");
       User simpleTestcUser = new User();
       simpleTestcUser.setUsername("testc");
@@ -254,22 +254,19 @@ public class FileWriterStoreTest {
         fileReaderStore.getGroup("Applitest", "Utilisateurs_Applitest").get().getUsers().stream()
             .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
     assertThat(
-        "byebye is in Utilisateurs_Applitest",
+        "byebye is in Utilisateurs",
         fileReaderStore.getUsersInGroup("Applitest", "Utilisateurs_Applitest").getResults().stream()
             .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
     fileWriterStore.deleteUser("byebye", null);
     assertThat("byebye should have been deleted", fileReaderStore.getUser("byebye").isEmpty());
     assertThat(
-        "byebye should no more be in Utilisateurs_Applitest",
-        !fileReaderStore.getGroup("Applitest", "Utilisateurs_Applitest").get().getUsers().stream()
-            .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
+        "byebye should no more be in Utilisateurs",
+        fileReaderStore.getGroup("Applitest", "Utilisateurs_Applitest").get().getUsers().stream()
+            .noneMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
     assertThat(
-        "byebye is in Utilisateurs_Applitest",
-        !fileReaderStore
-            .getUsersInGroup("Applitest", "Utilisateurs_Applitest")
-            .getResults()
-            .stream()
-            .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
+        "byebye is in Utilisateurs",
+        fileReaderStore.getUsersInGroup("Applitest", "Utilisateurs_Applitest").getResults().stream()
+            .noneMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
   }
 
   @Test
@@ -277,10 +274,8 @@ public class FileWriterStoreTest {
     Application application = new Application();
     application.setName("MyApplication");
     List<Group> groups = new ArrayList<>();
-    Group group1 = new Group();
-    group1.setName("Group1_MyApplication");
-    Group group2 = new Group();
-    group2.setName("Group2_MyApplication");
+    Group group1 = new Group("Group1_MyApplication", "MyApplication");
+    Group group2 = new Group("Group2_MyApplication", "MyApplication");
     group2.setUsers(List.of(new User("toto")));
     groups.add(group1);
     groups.add(group2);
@@ -300,8 +295,7 @@ public class FileWriterStoreTest {
   @Test
   public void testUpdateApplication() {
     Application application = fileReaderStore.getApplication("Applitest").get();
-    Group group1 = new Group();
-    group1.setName("Group1_Applitest");
+    Group group1 = new Group("Group1_Applitest", "Applitest");
     application.getGroups().add(group1);
     application.getGroups().get(0).setDescription("new description");
     application.getGroups().stream()
@@ -322,8 +316,8 @@ public class FileWriterStoreTest {
             .anyMatch(group -> group.getDescription().equals("new description")));
     assertThat(
         "Users should not have been modified",
-        !retrievedApplication.getGroups().stream()
-            .anyMatch(
+        retrievedApplication.getGroups().stream()
+            .noneMatch(
                 group ->
                     group.getName().equals("Utilisateurs_Applitest")
                         && group.getUsers().size() != 3));
@@ -334,8 +328,8 @@ public class FileWriterStoreTest {
     Application application = new Application();
     application.setName("NotEmptyApplication");
     List<Group> groups = new ArrayList<>();
-    Group group1 = new Group();
-    group1.setName("Group1_NotEmptyApplication");
+    Group group1 = new Group("Group1_NotEmptyApplication", "NotEmptyApplication");
+    groups.add(group1);
     application.setGroups(groups);
     fileWriterStore.createApplication(application, null);
     assertThat(
@@ -350,8 +344,7 @@ public class FileWriterStoreTest {
 
   @Test
   public void testCreateGroup() {
-    Group group = new Group();
-    group.setName("Groupy_Applitest");
+    Group group = new Group("Groupy_Applitest", "Applitest");
     group.setDescription("Super groupy de test");
     User user = new User();
     user.setUsername("usery");
@@ -367,13 +360,12 @@ public class FileWriterStoreTest {
 
   @Test
   public void testDeleteGroup() {
-    Group group = new Group();
-    group.setName("Asupprimer_WebServicesLdap");
+    Group group = new Group("Asupprimer_WebServicesLdap", "WebServicesLdap");
     group.setDescription("supprime ce groupe");
     fileWriterStore.createGroup("WebServicesLdap", group, null);
     fileWriterStore.deleteGroup("WebServicesLdap", "Asupprimer_WebServicesLdap", null);
     assertThat(
-        "Should have been deleted",
+        "Asupprimer Should have been deleted",
         fileReaderStore.getGroup("WebServicesLdap", "Asupprimer_WebServicesLdap").isEmpty());
   }
 

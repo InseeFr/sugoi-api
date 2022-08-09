@@ -25,13 +25,14 @@ public class LdapFilter {
     return Filter.createPresenceFilter(property);
   }
 
-  public static Filter contains(String property, String[] values) {
+  public static Filter createFilter(String property, String[] values) {
     return LdapFilter.and(
-        Arrays.asList(values).stream()
+        Arrays.stream(values)
             .map(
                 value ->
                     property.equalsIgnoreCase("objectclass")
-                        ? Filter.createEqualityFilter("objectclass", value)
+                            || property.equalsIgnoreCase("memberOf")
+                        ? Filter.createEqualityFilter(property, value)
                         : Filter.createSubAnyFilter(property, value))
             .collect(Collectors.toList()));
   }

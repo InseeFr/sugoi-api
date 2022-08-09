@@ -88,7 +88,7 @@ public class ExportControllerTest {
     Organization organization = new Organization();
     organization.setIdentifiant("organisation1");
     user.setOrganization(organization);
-    user.setGroups(List.of(new Group("app1", "group1"), new Group("app2", "group2")));
+    user.setGroups(List.of(new Group("group1", "app1"), new Group("group2", "app2")));
     PostalAddress address = new PostalAddress("generatedBefore");
     address.setLines(
         new String[] {"33 rue des Fleurs", "56700 Fleurville", null, "", "Cedex 1234", null, null});

@@ -28,9 +28,9 @@ public class Group implements Serializable {
     this.name = name;
   }
 
-  public Group(String appName, String name) {
-    this.appName = appName;
+  public Group(String name, String appName) {
     this.name = name;
+    this.appName = appName;
   }
 
   public String getName() {
