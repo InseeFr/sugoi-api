@@ -198,6 +198,18 @@ public class LdapReaderStoreTest {
   }
 
   @Test
+  @DisplayName(
+      "When the size of the pagerequest is less than the total result, the pageresult should have isHasMoreResult")
+  public void testAllUsersHasMoreResult() {
+    PageableResult pageableResult = new PageableResult();
+    pageableResult.setSize(1);
+    PageResult<User> result = ldapReaderStore.searchUsers(new User(), pageableResult, "AND");
+    assertThat("Should get one result", 1, is(result.getResults().size()));
+    assertThat("Page size should still be 1", 1, is(result.getResults().size()));
+    assertThat("Should be tagged with more results", result.isHasMoreResult());
+  }
+
+  @Test
   public void testSearchUserWithMatchingMail() {
     PageableResult pageableResult = new PageableResult();
     User testUser = new User();

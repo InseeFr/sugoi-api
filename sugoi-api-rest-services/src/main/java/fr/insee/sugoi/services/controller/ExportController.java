@@ -34,7 +34,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
@@ -193,6 +195,7 @@ public class ExportController {
       String realm,
       SearchType typeRecherche,
       CSVPrinter csvPrinter) {
+    int allResultsSize = 0;
     try {
 
       // set the page to maintain the search request pagination
@@ -230,7 +233,10 @@ public class ExportController {
         }
 
         if (foundUsers.isHasMoreResult()) {
-          csvPrinter.close();
+          if (allResultsSize + pageSize >= maxSizeOutput) {
+            break;
+          }
+          allResultsSize += foundUsers.getResults().size();
           pageable = new PageableResult(pageSize, 0, foundUsers.getSearchToken());
         } else {
           break;
