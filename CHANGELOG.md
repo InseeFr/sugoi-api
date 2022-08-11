@@ -1,3 +1,35 @@
+# 1.6.0
+
+
+- [BUG] :bug: Fix retrieve realm and userstorage on webhook call
+- [BUG] :bug: All realm config keys can be read on UserStorage
+- [BUG] :bug: Fix secondaryEmail is never used
+- [ENH] :sparkles: Add attributes to Application (#721)
+- [BUG] :bug: last element of a list can't be removed
+- [BUG] :bug: Fix searching users from several userstorages should give more results
+- [BUG] :bug: Fix NPE on find user by mail
+- [UP] :arrow_up: Bump spotless-maven-plugin from 2.22.5 to 2.24.0
+- [UP] :arrow_up: Bump exec-maven-plugin from 3.0.0 to 3.1.0
+- [BUG] :bug: Get all groups from an application
+- [UP] :arrow_up: Bump maven-surefire-plugin from 3.0.0-M6 to 3.0.0-M7
+- [REF] :recycle: Refactor exception controller
+- [UP] :arrow_up: Bump tomcat.version from 9.0.64 to 9.0.65
+- [UP] :arrow_up: Bump spotless-maven-plugin from 2.22.4 to 2.22.5
+- [UP] :arrow_up: Bump spring-boot.version from 2.6.7 to 2.7.2
+- [UP] :arrow_up: Bump cucumber.version from 7.4.1 to 7.5.0
+- [UP] :arrow_up: Bump maven-assembly-plugin from 3.3.0 to 3.4.2
+- [UP] :arrow_up: Bump cucumber.version from 7.3.4 to 7.4.1
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 1.5.0
+- [REL] :rocket: release version 1.5.1
+- [BUG] :bug: Quick fix application comes with 1000 groups
+- [REF] :recycle: Config maps are maps of RealmConfigKeys
+- [REF] :recycle: Configuration keys are refered via ref instead of string name
+- [REF] :recycle: EventKeysConfig is independant from Realm configurations
+- [REF] :recycle: Remove void or unused Key files
+- [REL] :rocket: release version 1.5.0
+
+
 # 1.5.0
 
 
