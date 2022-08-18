@@ -15,11 +15,10 @@ package fr.insee.sugoi.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import java.io.Serializable;
 import java.util.*;
 
 @JsonInclude(Include.NON_NULL)
-public class User implements Serializable {
+public class User implements SugoiObject {
 
   private String lastName;
 
@@ -29,9 +28,11 @@ public class User implements Serializable {
   private byte[] certificate;
   private Organization organization;
 
-  // Don't set a default empty list to distinguish case null (not provided) and empty
+  // Don't set a default empty list to distinguish case null (not provided) and
+  // empty
   private List<Group> groups;
-  // Don't set a default empty list to distinguish case null (not provided) and empty
+  // Don't set a default empty list to distinguish case null (not provided) and
+  // empty
   private List<Habilitation> habilitations;
   private PostalAddress address;
   private Map<String, Object> metadatas = new HashMap<>();
@@ -41,19 +42,6 @@ public class User implements Serializable {
 
   public User(String username) {
     this.username = username;
-  }
-
-  public Optional<Object> get(String attributeName) throws NoSuchFieldException {
-    try {
-      if (attributeName.contains(".")) {
-        String[] s = attributeName.split("\\.");
-        Map<?, ?> mapOfAttributes = (Map<?, ?>) this.getClass().getDeclaredField(s[0]).get(this);
-        return Optional.ofNullable(mapOfAttributes.getOrDefault(s[1], null));
-      }
-      return Optional.ofNullable(this.getClass().getDeclaredField(attributeName).get(this));
-    } catch (IllegalAccessException e) {
-      return Optional.empty();
-    }
   }
 
   public List<Habilitation> getHabilitations() {

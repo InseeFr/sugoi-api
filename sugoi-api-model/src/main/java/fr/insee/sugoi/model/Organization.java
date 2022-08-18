@@ -13,11 +13,10 @@
 */
 package fr.insee.sugoi.model;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Organization implements Serializable {
+public class Organization implements SugoiObject {
   private String identifiant;
   private byte[] gpgkey;
   private Organization organization;

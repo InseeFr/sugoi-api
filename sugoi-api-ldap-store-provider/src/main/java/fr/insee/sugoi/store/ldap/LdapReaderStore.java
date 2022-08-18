@@ -32,6 +32,7 @@ import fr.insee.sugoi.model.MappingType;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.PostalAddress;
 import fr.insee.sugoi.model.RealmConfigKeys;
+import fr.insee.sugoi.model.SugoiObject;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.exceptions.MultipleUserWithSameMailException;
 import fr.insee.sugoi.model.exceptions.StoreException;
@@ -252,13 +253,13 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
    * Create a filter from an object using a mapper class. Each set field of the object is
    * transformed to a filter.
    *
-   * @param <MapperType> the type of object we need to create a filter from
+   * @param <M> the type of object we need to create a filter from
    * @param object the object to create a filter from, only set properties are taken into account
    * @param mapper a mapper used to transform object to filter
    * @return a filter corresponding to the properties of object
    */
-  private <MapperType> Filter getFilterFromObject(
-      MapperType object, LdapMapper<MapperType> mapper, String searchType) {
+  private <M extends SugoiObject> Filter getFilterFromObject(
+      M object, LdapMapper<M> mapper, String searchType) {
     if (searchType.equalsIgnoreCase("AND")) {
       return LdapFilter.and(
           mapper.createAttributesForFilter(object).stream()
@@ -305,7 +306,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
   }
 
   /**
-   * @param <ResultType> the type of the resource searched
+   * @param <R> the type of the resource searched
    * @param baseDn DN where to make the search
    * @param scope search scope value
    * @param filter filter to apply on the search
@@ -314,12 +315,12 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
    * @return
    * @throws LDAPSearchException
    */
-  private <ResultType> PageResult<ResultType> searchOnLdap(
+  private <R extends SugoiObject> PageResult<R> searchOnLdap(
       String baseDn,
       SearchScope scope,
       Filter filter,
       PageableResult pageableResult,
-      LdapMapper<ResultType> mapper)
+      LdapMapper<R> mapper)
       throws LDAPSearchException {
     SearchRequest searchRequest = new SearchRequest(baseDn, scope, filter, "*", "+");
     if (pageableResult != null) {
@@ -345,7 +346,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
         throw new StoreException("search failed", e);
       }
     }
-    PageResult<ResultType> pageResult = new PageResult<>();
+    PageResult<R> pageResult = new PageResult<>();
     pageResult.setResults(
         searchResult.getSearchEntries().stream()
             .map(e -> mapper.mapFromAttributes(e.getAttributes()))

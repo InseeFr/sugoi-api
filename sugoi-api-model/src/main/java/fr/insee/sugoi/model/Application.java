@@ -13,12 +13,11 @@
 */
 package fr.insee.sugoi.model;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Application implements Serializable {
+public class Application implements SugoiObject {
   private String name;
   private List<Group> groups;
 

@@ -17,11 +17,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import fr.insee.sugoi.model.technics.UiField;
-import java.io.Serializable;
 import java.util.*;
 import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
 
-public class Realm implements Serializable {
+public class Realm implements SugoiObject {
 
   private String name;
   private String url;

@@ -25,26 +25,35 @@ import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.PostalAddress;
 import fr.insee.sugoi.model.RealmConfigKeys;
+import fr.insee.sugoi.model.SugoiObject;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.technics.ModelType;
 import fr.insee.sugoi.model.technics.StoreMapping;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.security.cert.CertificateException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class GenericLdapMapper {
 
-  public static <ReturnType> ReturnType mapLdapAttributesToObject(
+  private GenericLdapMapper() throws IllegalAccessException {
+    throw new IllegalAccessException("Utility class");
+  }
+
+  public static <R extends SugoiObject> R mapLdapAttributesToObject(
       Collection<Attribute> attributes,
-      Class<ReturnType> returnClazz,
+      Class<R> returnClazz,
       Map<RealmConfigKeys, String> config,
       List<StoreMapping> mappings) {
     try {
-      ReturnType mappedEntity = returnClazz.getDeclaredConstructor().newInstance();
+      R mappedEntity = returnClazz.getDeclaredConstructor().newInstance();
       for (StoreMapping mappingDefinition : mappings) {
         try {
 
@@ -55,23 +64,12 @@ public class GenericLdapMapper {
                           mappingDefinition.getStoreName().equalsIgnoreCase(attribute.getName()))
                   .collect(Collectors.toList());
           if (!correspondingAttributes.isEmpty()) {
-            Object sugoiAttribute =
+            mappedEntity.set(
+                mappingDefinition.getSugoiName(),
                 transformLdapAttributeToSugoiAttribute(
-                    mappingDefinition.getModelType(), correspondingAttributes, config);
-            if (mappingDefinition.getSugoiName().contains(".")) {
-              putSugoiAttributeInEntityMapField(
-                  sugoiAttribute, mappingDefinition.getSugoiName(), mappedEntity);
-            } else {
-              putSugoiAttributeInEntityField(
-                  sugoiAttribute, mappingDefinition.getSugoiName(), mappedEntity);
-            }
+                    mappingDefinition.getModelType(), correspondingAttributes, config));
           } else if (mappingDefinition.getModelType() == ModelType.EXISTS) {
-            if (mappingDefinition.getSugoiName().contains(".")) {
-              putSugoiAttributeInEntityMapField(
-                  false, mappingDefinition.getSugoiName(), mappedEntity);
-            } else {
-              putSugoiAttributeInEntityField(false, mappingDefinition.getSugoiName(), mappedEntity);
-            }
+            mappedEntity.set(mappingDefinition.getSugoiName(), false);
           }
         } catch (Exception e) {
           throw new LdapMappingConfigurationException(
@@ -89,13 +87,13 @@ public class GenericLdapMapper {
         | InvocationTargetException
         | NoSuchMethodException
         | SecurityException e) {
-      throw new RuntimeException("Exception while getting the entity " + returnClazz.getName(), e);
+      throw new LdapMappingConfigurationException(
+          "Exception while getting the entity " + returnClazz.getName(), e);
     }
   }
 
-  @SuppressWarnings("unchecked")
-  private static <SugoiType> List<Attribute> mapObjectToLdapAttributes(
-      SugoiType entity,
+  private static <S extends SugoiObject> List<Attribute> mapObjectToLdapAttributes(
+      S entity,
       Map<RealmConfigKeys, String> config,
       List<StoreMapping> mappings,
       List<String> objectClasses,
@@ -104,64 +102,36 @@ public class GenericLdapMapper {
     if (objectClasses != null && !objectClasses.isEmpty()) {
       attributes.add(new Attribute("objectClass", objectClasses));
     }
-
     for (StoreMapping mappingDefinition : mappings) {
-      try {
-
-        if (mappingDefinition.isWritable() || !isToWrite) {
-          if (mappingDefinition.getSugoiName().contains(".")) {
-            String[] splitedFieldName = mappingDefinition.getSugoiName().split("\\.");
-            String mapToModifyName = splitedFieldName[0];
-            String keyToModify = splitedFieldName[1];
-            Field modelField = entity.getClass().getDeclaredField(mapToModifyName);
-            modelField.setAccessible(true);
-            Map<String, Object> mapToModify = (Map<String, Object>) modelField.get(entity);
-            if (mapToModify != null && mapToModify.containsKey(keyToModify)) {
-              Object sugoiValue = mapToModify.get(keyToModify);
-              if (sugoiValue != null) {
-                Attribute mappedValue =
-                    transformSugoiToAttribute(
-                        mappingDefinition.getModelType(),
-                        mappingDefinition.getStoreName(),
-                        sugoiValue,
-                        config);
-                if (mappedValue != null) {
-                  attributes.add(mappedValue);
-                }
-              }
-            }
-          } else {
-            Field sugoiField = entity.getClass().getDeclaredField(mappingDefinition.getSugoiName());
-            sugoiField.setAccessible(true);
-            Object sugoiValue = sugoiField.get(entity);
-            if (sugoiValue != null) {
-              Attribute mappedValue =
-                  transformSugoiToAttribute(
-                      mappingDefinition.getModelType(),
-                      mappingDefinition.getStoreName(),
-                      sugoiValue,
-                      config);
-              if (mappedValue != null) {
-                attributes.add(mappedValue);
-              }
+      if (mappingDefinition.isWritable() || !isToWrite) {
+        try {
+          Optional<Object> sugoiValue = entity.get(mappingDefinition.getSugoiName());
+          if (sugoiValue.isPresent()) {
+            Attribute mappedValue =
+                transformSugoiToAttribute(
+                    mappingDefinition.getModelType(),
+                    mappingDefinition.getStoreName(),
+                    sugoiValue.get(),
+                    config);
+            if (mappedValue != null) {
+              attributes.add(mappedValue);
             }
           }
+        } catch (Exception e) {
+          throw new LdapMappingConfigurationException(
+              "Error occured while mapping attribute to Ldap. Must be caused by the configuration "
+                  + mappingDefinition
+                  + " for entity "
+                  + entity.getClass().getName(),
+              e);
         }
-      } catch (Exception e) {
-        throw new LdapMappingConfigurationException(
-            "Error occured while mapping attribute to Ldap. Must be caused by the configuration "
-                + mappingDefinition
-                + " for entity "
-                + entity.getClass().getName(),
-            e);
       }
     }
     return attributes;
   }
 
   private static Object transformLdapAttributeToSugoiAttribute(
-      ModelType type, List<Attribute> attrs, Map<RealmConfigKeys, String> config)
-      throws CertificateException {
+      ModelType type, List<Attribute> attrs, Map<RealmConfigKeys, String> config) {
     switch (type) {
       case STRING:
         return attrs.get(0).getValue();
@@ -304,32 +274,8 @@ public class GenericLdapMapper {
     }
   }
 
-  private static <ReturnType> void putSugoiAttributeInEntityField(
-      Object sugoiAttribute, String fieldToSetName, ReturnType sugoiEntity)
-      throws NoSuchFieldException, IllegalAccessException {
-    Field modelField = sugoiEntity.getClass().getDeclaredField(fieldToSetName);
-    modelField.setAccessible(true);
-    modelField.set(sugoiEntity, sugoiAttribute);
-  }
-
-  private static <ReturnType> void putSugoiAttributeInEntityMapField(
-      Object sugoiAttribute, String fieldToSetName, ReturnType sugoiEntity)
-      throws NoSuchFieldException, IllegalAccessException {
-    String[] splitedFieldName = fieldToSetName.split("\\.");
-    String mapToModifyName = splitedFieldName[0];
-    String keyToModify = splitedFieldName[1];
-    Field modelField = sugoiEntity.getClass().getDeclaredField(mapToModifyName);
-    modelField.setAccessible(true);
-    Map<String, Object> map =
-        ((Map<?, ?>) modelField.get(sugoiEntity))
-            .entrySet().stream()
-                .collect(Collectors.toMap(e -> e.getKey().toString(), e -> (Object) e.getValue()));
-    map.put(keyToModify, sugoiAttribute);
-    modelField.set(sugoiEntity, map);
-  }
-
-  public static <SugoiType> List<Attribute> mapObjectToLdapAttributesForCreation(
-      SugoiType entity,
+  public static <S extends SugoiObject> List<Attribute> mapObjectToLdapAttributesForCreation(
+      S entity,
       Map<RealmConfigKeys, String> config,
       List<StoreMapping> mappings,
       List<String> objectClasses) {
@@ -337,8 +283,8 @@ public class GenericLdapMapper {
         mapObjectToLdapAttributes(entity, config, mappings, objectClasses, true));
   }
 
-  public static <SugoiType> List<Attribute> mapObjectToLdapAttributesForFilter(
-      SugoiType entity,
+  public static <S extends SugoiObject> List<Attribute> mapObjectToLdapAttributesForFilter(
+      S entity,
       Map<RealmConfigKeys, String> config,
       List<StoreMapping> mappings,
       List<String> objectClasses) {
@@ -346,7 +292,7 @@ public class GenericLdapMapper {
         mapObjectToLdapAttributes(entity, config, mappings, objectClasses, false));
   }
 
-  public static <O> List<Modification> createMods(
+  public static <O extends SugoiObject> List<Modification> createMods(
       O entity, Map<RealmConfigKeys, String> config, List<StoreMapping> mappings) {
     return LdapUtils.convertAttributesToModifications(
         // Modification => no need to specify object classes

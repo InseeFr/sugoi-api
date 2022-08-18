@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -48,8 +49,7 @@ public class OuganextSugoiMapper {
    * @throws NoSuchMethodException
    * @throws InstantiationException
    */
-  @SuppressWarnings("unchecked")
-  public <O, N> N serializeToSugoi(O ouganextObject, Class<N> clazz) {
+  public <O, N extends SugoiObject> N serializeToSugoi(O ouganextObject, Class<N> clazz) {
     try {
       N sugoiObject = clazz.getDeclaredConstructor().newInstance();
       Class<? extends Object> ouganextObjectClass = ouganextObject.getClass();
@@ -60,42 +60,27 @@ public class OuganextSugoiMapper {
           Object ouganextFieldObject = ouganextObjectField.get(ouganextObject);
 
           if (ouganextObjectField.getDeclaredAnnotationsByType(MapFromAttribute.class).length > 0) {
-            Field sugoiField =
-                sugoiObject
-                    .getClass()
-                    .getDeclaredField(getAnnotationAttributeName(ouganextObjectField));
-            sugoiField.setAccessible(true);
-            sugoiField.set(sugoiObject, ouganextFieldObject);
+            sugoiObject.set(getAnnotationAttributeName(ouganextObjectField), ouganextFieldObject);
           }
 
           if (ouganextObjectField.getDeclaredAnnotationsByType(MapFromHashmapElement.class).length
               > 0) {
             Map<String, String> fieldInfo = getHashMapAnnotationInfo(ouganextObjectField);
-            Field sugoiField = sugoiObject.getClass().getDeclaredField(fieldInfo.get("name"));
-            sugoiField.setAccessible(true);
-            Map<String, Object> sugoiFieldObject =
-                (Map<String, Object>) sugoiField.get(sugoiObject);
-            sugoiFieldObject.put(fieldInfo.get("key"), ouganextFieldObject);
-            sugoiField.set(sugoiObject, sugoiFieldObject);
+            sugoiObject.set(
+                fieldInfo.get("name") + "." + fieldInfo.get("key"), ouganextFieldObject);
           }
 
-          if (ouganextObjectField.getName().equalsIgnoreCase("adresse")) {
-            Field sugoiField = sugoiObject.getClass().getDeclaredField("address");
-            sugoiField.setAccessible(true);
-            if (ouganextFieldObject != null) {
-              PostalAddress address =
-                  createSugoiAddressFromOuganextAddress((AdresseOuganext) ouganextFieldObject);
-              sugoiField.set(sugoiObject, address);
-            }
+          if (ouganextObjectField.getName().equalsIgnoreCase("adresse")
+              && ouganextFieldObject != null) {
+            sugoiObject.set(
+                "address",
+                createSugoiAddressFromOuganextAddress((AdresseOuganext) ouganextFieldObject));
           }
 
-          if (ouganextObjectField.getName().contains("organisationDeRattachement")) {
-            Field sugoiField = sugoiObject.getClass().getDeclaredField("organization");
-            sugoiField.setAccessible(true);
-            if (ouganextFieldObject != null) {
-              Organization organization = serializeToSugoi(ouganextFieldObject, Organization.class);
-              sugoiField.set(sugoiObject, organization);
-            }
+          if (ouganextObjectField.getName().contains("organisationDeRattachement")
+              && ouganextFieldObject != null) {
+            sugoiObject.set(
+                "organization", serializeToSugoi(ouganextFieldObject, Organization.class));
           }
 
         } catch (Exception e) {
@@ -124,8 +109,7 @@ public class OuganextSugoiMapper {
    * @throws IllegalArgumentException
    * @throws SecurityException
    */
-  @SuppressWarnings("unchecked")
-  public <O, N> N serializeToOuganext(O sugoiObject, Class<N> clazz) {
+  public <O extends SugoiObject, N> N serializeToOuganext(O sugoiObject, Class<N> clazz) {
     try {
       N ouganextObject = clazz.getDeclaredConstructor().newInstance();
       Field[] ouganextObjectFields = clazz.getDeclaredFields();
@@ -133,45 +117,38 @@ public class OuganextSugoiMapper {
         try {
           ouganextObjectField.setAccessible(true);
           if (ouganextObjectField.getDeclaredAnnotationsByType(MapFromAttribute.class).length > 0) {
-            Field sugoiField =
-                sugoiObject
-                    .getClass()
-                    .getDeclaredField(getAnnotationAttributeName(ouganextObjectField));
-            sugoiField.setAccessible(true);
-            Object sugoiFieldObject = sugoiField.get(sugoiObject);
-            if (sugoiFieldObject != null) {
-              ouganextObjectField.set(ouganextObject, sugoiFieldObject);
+            Optional<Object> sugoiFieldObject =
+                sugoiObject.get(getAnnotationAttributeName(ouganextObjectField));
+            if (sugoiFieldObject.isPresent()) {
+              ouganextObjectField.set(ouganextObject, sugoiFieldObject.get());
             }
           }
           if (ouganextObjectField.getDeclaredAnnotationsByType(MapFromHashmapElement.class).length
               > 0) {
             Map<String, String> fieldInfo = getHashMapAnnotationInfo(ouganextObjectField);
-            Field sugoiField = sugoiObject.getClass().getDeclaredField(fieldInfo.get("name"));
-            sugoiField.setAccessible(true);
-            Object sugoiFieldObject = sugoiField.get(sugoiObject);
-            Map<String, Object> value = (Map<String, Object>) sugoiFieldObject;
-            if (value.get(fieldInfo.get("key")) != null) {
-              ouganextObjectField.set(ouganextObject, value.get(fieldInfo.get("key")));
+            Optional<Object> sugoiFieldObject =
+                sugoiObject.get(fieldInfo.get("name") + "." + fieldInfo.get("key"));
+            if (sugoiFieldObject.isPresent()) {
+              ouganextObjectField.set(ouganextObject, sugoiFieldObject.get());
             }
           }
           // cas ou le field correspond a l'adresse
           if (ouganextObjectField.getName().equalsIgnoreCase("adresse")) {
-            Field sugoiField = sugoiObject.getClass().getDeclaredField("address");
-            sugoiField.setAccessible(true);
-            Object sugoiFieldObject = sugoiField.get(sugoiObject);
-            AdresseOuganext adresse =
-                createOuganextAddressFromSugoiAddress((PostalAddress) sugoiFieldObject);
-            ouganextObjectField.set(ouganextObject, adresse);
+            Optional<Object> address = sugoiObject.get("address");
+            if (address.isPresent()) {
+              ouganextObjectField.set(
+                  ouganextObject,
+                  createOuganextAddressFromSugoiAddress((PostalAddress) address.get()));
+            }
           }
 
           // cas ou le field est une organisation
           if (ouganextObjectField.getName().contains("organisationDeRattachement")) {
-            Field sugoiField = sugoiObject.getClass().getDeclaredField("organization");
-            sugoiField.setAccessible(true);
-            Organization organization = (Organization) sugoiField.get(sugoiObject);
-            if (organization != null) {
+            Optional<Object> organization = sugoiObject.get("organization");
+            if (organization.isPresent()) {
               OrganisationOuganext organisation =
-                  serializeToOuganext(organization, OrganisationOuganext.class);
+                  serializeToOuganext(
+                      (Organization) organization.get(), OrganisationOuganext.class);
               ouganextObjectField.set(ouganextObject, organisation);
             }
           }
@@ -243,22 +220,6 @@ public class OuganextSugoiMapper {
     result.put("key", field.getAnnotation(MapFromHashmapElement.class).hashMapKey());
     return result;
   }
-
-  // public List<Habilitation> convertApplicationToHabilitationsList(Application
-  // application) {
-  // List<Habilitation> habilitations = new ArrayList<>();
-  // String appName = application.getName();
-  // for (Role role : application.getRole()) {
-  // for (String propriete : role.getPropriete()) {
-  // Habilitation hab = new Habilitation();
-  // hab.setApplication(appName);
-  // hab.setRole(role.getName());
-  // hab.setProperty(propriete);
-  // habilitations.add(hab);
-  // }
-  // }
-  // return habilitations;
-  // }
 
   public static HabilitationsOuganext convertHabilitationToHabilitations(
       List<Habilitation> habilitations) {

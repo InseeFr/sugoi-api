@@ -19,6 +19,7 @@ import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.exceptions.StoreException;
 import fr.insee.sugoi.model.exceptions.UserStorageNotFoundException;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
@@ -245,7 +246,10 @@ public class ExportController {
         }
       }
       csvPrinter.flush();
-    } catch (IOException | NoSuchFieldException e) {
+    } catch (NoSuchFieldException e) {
+      throw new StoreException(
+          "A configured field has not been found during export. Check store configuration.", e);
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
