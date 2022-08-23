@@ -114,10 +114,8 @@ public class LdapWriterStoreTest {
   PostalAddress addressOrga;
   PostalAddress addressToto;
 
-  @Bean(name = "Realm")
   @BeforeEach
   public void setup() {
-
     ldapWriterStore = (LdapWriterStore) context.getBean("LdapWriterStore", realm(), userStorage());
     ldapReaderStore = (LdapReaderStore) context.getBean("LdapReaderStore", realm(), userStorage());
     addressOrga = new PostalAddress();
@@ -257,8 +255,11 @@ public class LdapWriterStoreTest {
             .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
     assertThat(
         "byebye is in Utilisateurs_Applitest",
-        ldapReaderStore.getUsersInGroup("Applitest", "Utilisateurs_Applitest").getResults().stream()
-            .noneMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
+        !ldapReaderStore
+            .getUsersInGroup("Applitest", "Utilisateurs_Applitest")
+            .getResults()
+            .stream()
+            .anyMatch(user -> user.getUsername().equalsIgnoreCase("byebye")));
   }
 
   @Test

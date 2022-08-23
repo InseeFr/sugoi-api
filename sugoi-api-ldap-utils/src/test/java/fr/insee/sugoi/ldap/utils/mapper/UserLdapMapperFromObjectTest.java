@@ -158,9 +158,7 @@ public class UserLdapMapperFromObjectTest {
 
     Habilitation habilitation1 = new Habilitation("property_role_application");
     Habilitation habilitation2 = new Habilitation("property_role_application2");
-    List<Habilitation> habilitations = new ArrayList<>();
-    habilitations.add(habilitation1);
-    habilitations.add(habilitation2);
+    List<Habilitation> habilitations = List.of(habilitation1, habilitation2);
     user.setHabilitations(habilitations);
     List<Attribute> mappedAttributes = userLdapMapper.mapToAttributesForCreation(user);
 

@@ -61,11 +61,8 @@ public class UserLdapMapperFromAttributesTest {
     Attribute firstNameAttribute = new Attribute("givenName", "Tata");
     Attribute mailAttribute = new Attribute("mail", "toto@tata.insee.fr");
     Attribute usernameAttribute = new Attribute("uid", "totoid");
-    Collection<Attribute> attributes = new ArrayList<>();
-    attributes.add(lastNameAttribute);
-    attributes.add(firstNameAttribute);
-    attributes.add(mailAttribute);
-    attributes.add(usernameAttribute);
+    Collection<Attribute> attributes =
+        List.of(lastNameAttribute, firstNameAttribute, mailAttribute, usernameAttribute);
     User mappedUser = userLdapMapper.mapFromAttributes(attributes);
 
     assertThat("Should have a username", mappedUser.getUsername(), is("totoid"));
@@ -81,11 +78,8 @@ public class UserLdapMapperFromAttributesTest {
     Attribute personalTitleAttribute = new Attribute("personalTitle", "Camarade");
     Attribute descriptionAttribute = new Attribute("description", "ma description");
     Attribute telAttribute = new Attribute("telephoneNumber", "012345678");
-    Collection<Attribute> attributes = new ArrayList<>();
-    attributes.add(commonNameAttribute);
-    attributes.add(personalTitleAttribute);
-    attributes.add(descriptionAttribute);
-    attributes.add(telAttribute);
+    Collection<Attribute> attributes =
+        List.of(commonNameAttribute, personalTitleAttribute, descriptionAttribute, telAttribute);
     User mappedUser = userLdapMapper.mapFromAttributes(attributes);
 
     assertThat("Should hava a cn", mappedUser.getAttributes().get("common_name"), is("Toto Tata"));
@@ -111,10 +105,8 @@ public class UserLdapMapperFromAttributesTest {
     Attribute habilitationWithoutPropAttribute =
         new Attribute("inseeGroupeDefaut", "role_application2");
     Attribute malformedHabilitation = new Attribute("inseeGroupeDefaut", "toto");
-    Collection<Attribute> attributes = new ArrayList<>();
-    attributes.add(habilitationAttribute1);
-    attributes.add(habilitationWithoutPropAttribute);
-    attributes.add(malformedHabilitation);
+    Collection<Attribute> attributes =
+        List.of(habilitationAttribute1, habilitationWithoutPropAttribute, malformedHabilitation);
     User mappedUser = userLdapMapper.mapFromAttributes(attributes);
 
     assertThat(
@@ -140,8 +132,7 @@ public class UserLdapMapperFromAttributesTest {
     Attribute organizationAttribute =
         new Attribute(
             "inseeOrganisationDN", "uid=monOrga,ou=organisations,ou=clients_domaine1,o=insee,c=fr");
-    Collection<Attribute> attributes = new ArrayList<>();
-    attributes.add(organizationAttribute);
+    Collection<Attribute> attributes = List.of(organizationAttribute);
     User mappedUser = userLdapMapper.mapFromAttributes(attributes);
 
     assertThat(
@@ -153,8 +144,7 @@ public class UserLdapMapperFromAttributesTest {
 
     Attribute addressAttribute =
         new Attribute("inseeAdressePostaleDN", "l=generatedBefore,ou=address,o=insee,c=fr");
-    Collection<Attribute> attributes = new ArrayList<>();
-    attributes.add(addressAttribute);
+    Collection<Attribute> attributes = List.of(addressAttribute);
     User mappedUser = userLdapMapper.mapFromAttributes(attributes);
 
     assertThat("Should have address id", mappedUser.getAddress().getId(), is("generatedBefore"));
@@ -174,10 +164,10 @@ public class UserLdapMapperFromAttributesTest {
     User mappedUser = userLdapMapper.mapFromAttributes(attributes);
 
     assertThat(
-        "monappli App should have admin name",
+        "User should have admin group",
         mappedUser.getGroups().stream().anyMatch(group -> group.getName().equals("admin")));
     assertThat(
-        "Reader group should have monappli2 app name",
+        "User should have at least a group of monappli2 app",
         mappedUser.getGroups().stream().anyMatch(group -> group.getAppName().equals("monappli2")));
   }
 
@@ -193,13 +183,13 @@ public class UserLdapMapperFromAttributesTest {
     User mappedUser = userLdapMapper.mapFromAttributes(attributes);
 
     assertThat(
-        "Manager group should have group ASI_toto name",
+        "User should have ASI_toto group",
         mappedUser.getGroups().stream().anyMatch(group -> group.getName().equals("ASI_toto")));
     assertThat(
-        "Admin group should display admin name",
+        "User should have admin name",
         mappedUser.getGroups().stream().anyMatch(group -> group.getName().equals("admin")));
     assertThat(
-        "Manager group should have toto app name",
+        "User should have toto application name",
         mappedUser.getGroups().stream().anyMatch(group -> group.getAppName().equals("toto")));
   }
 
@@ -208,9 +198,7 @@ public class UserLdapMapperFromAttributesTest {
 
     Attribute inseeRoleAppAttribute1 = new Attribute("inseeRoleApplicatif", "toto");
     Attribute inseeRoleAppAttribute2 = new Attribute("inseeRoleApplicatif", "tata");
-    Collection<Attribute> attributes = new ArrayList<>();
-    attributes.add(inseeRoleAppAttribute1);
-    attributes.add(inseeRoleAppAttribute2);
+    Collection<Attribute> attributes = List.of(inseeRoleAppAttribute1, inseeRoleAppAttribute2);
     User mappedUser = userLdapMapper.mapFromAttributes(attributes);
     @SuppressWarnings("unchecked")
     List<String> inseeRoleApplicatifs =
