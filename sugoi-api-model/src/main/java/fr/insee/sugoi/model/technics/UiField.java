@@ -79,7 +79,7 @@ public class UiField implements Serializable, Comparable<UiField> {
       if (fieldProperties.length >= 8) {
         order = getIntOrInfty(fieldProperties[7]);
       }
-      if (fieldProperties.length >= 9 && !fieldProperties[8].isEmpty()) {
+      if (fieldProperties.length > 8 && !fieldProperties[8].isEmpty()) {
         String[] optionsProperties = fieldProperties[8].split(";");
         options = new HashMap<>();
         for (String optionProperty : optionsProperties) {
