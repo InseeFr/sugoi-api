@@ -82,7 +82,7 @@ public class GroupController {
                   schema = @Schema(implementation = PageResult.class))
             })
       })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#applicationName)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
   public ResponseEntity<PageResult<Group>> getGroups(
       @Parameter(
               description = "Name of the realm where the operation will be made",
@@ -473,7 +473,7 @@ public class GroupController {
       value = {"/realms/{realm}/applications/{application}/group_manager"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Get users from manager group")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#applicationName)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
   public ResponseEntity<?> getUserFromManagerGroup(
       @PathVariable("realm") String realm, @PathVariable("application") String applicationName) {
     Group managerGroup = groupService.getManagerGroup(realm, applicationName);
