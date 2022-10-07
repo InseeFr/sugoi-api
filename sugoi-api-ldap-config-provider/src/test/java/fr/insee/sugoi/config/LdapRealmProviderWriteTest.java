@@ -233,4 +233,20 @@ public class LdapRealmProviderWriteTest {
                         new StoreMapping(
                             "address", "inseeAdressePostaleDN", ModelType.ADDRESS, true))));
   }
+
+  @Test
+  public void addOrganizationMappingTest_shouldkeepappsource() {
+    Realm realmToModify = ldapRealmProviderDAOImpl.load("tomodify").get();
+
+    realmToModify
+        .getUserStorages()
+        .get(0)
+        .setOrganizationMappings(StoreMappingFixture.getOrganizationStoreMappings());
+
+    ldapRealmProviderDAOImpl.updateRealm(realmToModify, null);
+    assertThat(
+        "Organization mapping should have an address",
+        ldapRealmProviderDAOImpl.load("tomodify").get().getAppSource(),
+        is("ou=Applications,o=insee,c=fr"));
+  }
 }

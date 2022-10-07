@@ -126,7 +126,7 @@ public class RealmLdapMapper {
       attributes.add(
           new Attribute(
               "inseepropriete",
-              String.format("%s$%s", GlobalKeysConfig.APP_SOURCE, realm.getAppSource())));
+              String.format("%s$%s", GlobalKeysConfig.APP_SOURCE.getName(), realm.getAppSource())));
     }
     if (realm.getUiMapping().containsKey(Realm.UIMappingType.UI_USER_MAPPING)
         && realm.getUiMapping().get(Realm.UIMappingType.UI_USER_MAPPING) != null) {
