@@ -1,3 +1,17 @@
+# 1.7.0
+
+
+- [ENH] :sparkles: Clean unnecessary lines in Ldap-utils
+- [ENH] :sparkles: LIST_GROUP of GenericLdapMapper should take ASI_GROUPS
+- [BUG] :bug: Fix Export csv number of results too low
+- [UP] :arrow_up: Bump passay from 1.6.1 to 1.6.2
+- [UP] :arrow_up: Bump spotless-maven-plugin from 2.24.0 to 2.24.1
+- [BUG] :bug: Fixed filter users by group (#418)
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 1.6.0
+- [REL] :rocket: release version 1.6.0
+
+
 # 1.6.0
 
 
