@@ -22,6 +22,8 @@ public interface PermissionService {
 
   public boolean isPasswordManager(SugoiUser sugoiUser, String realm, String userStorage);
 
+  public boolean isPasswordValidator(SugoiUser sugoiUser, String realm, String userStorage);
+
   public boolean isApplicationManager(
       SugoiUser sugoiUser, String realm, String userStorage, String application);
 
