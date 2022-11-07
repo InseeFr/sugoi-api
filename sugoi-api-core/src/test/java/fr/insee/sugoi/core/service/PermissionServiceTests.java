@@ -67,6 +67,21 @@ public class PermissionServiceTests {
   }
 
   @Test
+  public void testPasswordValidatorRegexp() {
+    SugoiUser sugoiUser =
+        new SugoiUser("password_validator_realm1", List.of("role_PASSWORD_VALIDATOR_realm1_us1"));
+
+    assertThat(
+        "User can be password validator on realm1",
+        permissions.isPasswordValidator(sugoiUser, "realm1", "us1"),
+        is(true));
+    assertThat(
+        "User cannot be password validator on realm2",
+        permissions.isReader(sugoiUser, "realm2", "us1"),
+        is(false));
+  }
+
+  @Test
   public void testWriterRegexp() {
     SugoiUser sugoiUser = new SugoiUser("writer_realm1", List.of("role_Writer_realm1_sugoi"));
     assertThat("User can read realm1", permissions.isReader(sugoiUser, "realm1", ""), is(true));

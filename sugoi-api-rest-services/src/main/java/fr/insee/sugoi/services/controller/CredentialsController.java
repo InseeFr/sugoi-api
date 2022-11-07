@@ -409,7 +409,7 @@ public class CredentialsController {
   @PostMapping(
       path = {"/realms/{realm}/storages/{storage}/users/{id}/validate-password"},
       consumes = {MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordValidator(#realm,#userStorage)")
   @Operation(summary = "Check if provided password is the user's one")
   @ApiResponses(
       value = {
@@ -448,7 +448,7 @@ public class CredentialsController {
   @PostMapping(
       path = {"/realms/{realm}/users/{id}/validate-password"},
       consumes = {MediaType.APPLICATION_JSON_VALUE})
-  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordManager(#realm,#userStorage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isPasswordValidator(#realm,#userStorage)")
   @Operation(summary = "Check if provided password is the user's one")
   @ApiResponses(
       value = {

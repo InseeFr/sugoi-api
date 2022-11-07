@@ -44,6 +44,9 @@ public class PermissionServiceImpl implements PermissionService {
   @Value("${fr.insee.sugoi.api.regexp.role.password.manager:}")
   private List<String> passwordManagerRoleList;
 
+  @Value("${fr.insee.sugoi.api.regexp.role.password.validator:}")
+  private List<String> passwordValidatorRoleList;
+
   @Value("${fr.insee.sugoi.api.regexp.role.application.manager:}")
   private List<String> applicationManagerRoleList;
 
@@ -61,6 +64,13 @@ public class PermissionServiceImpl implements PermissionService {
   public boolean isPasswordManager(SugoiUser sugoiUser, String realm, String userStorage) {
     List<String> searchRoleList =
         getSearchRoleList(sugoiUser, realm, userStorage, null, passwordManagerRoleList);
+    return checkIfUserGetRoles(sugoiUser, searchRoleList);
+  }
+
+  @Override
+  public boolean isPasswordValidator(SugoiUser sugoiUser, String realm, String userStorage) {
+    List<String> searchRoleList =
+        getSearchRoleList(sugoiUser, realm, userStorage, null, passwordValidatorRoleList);
     return checkIfUserGetRoles(sugoiUser, searchRoleList);
   }
 

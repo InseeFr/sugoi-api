@@ -93,6 +93,11 @@ The password manager role is defined via the regexp.role.password.manager proper
 
 Password manager can initialize passwords, update password (with a given password or not) or validate a password on its realm.
 
+### Password validator
+
+The password validator role is defined via the fr.insee.sugoi.api.regexp.role.password.validator property. It is scoped to one realm or userstorage.
+Password validator can validate a user password on its realm and userstorage.
+
 ### Application manager
 
 The application manager role is defined via the regexp.role.application.manager property. 
