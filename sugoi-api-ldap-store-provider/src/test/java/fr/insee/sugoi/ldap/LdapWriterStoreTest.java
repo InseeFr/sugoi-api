@@ -312,6 +312,18 @@ public class LdapWriterStoreTest {
   }
 
   @Test
+  public void testUpdateApplicationWithNoGroup() {
+    Application application = ldapReaderStore.getApplication("Applitest").get();
+    application.setGroups(null);
+    ldapWriterStore.updateApplication(application, null);
+    Application retrievedApplication = ldapReaderStore.getApplication("Applitest").get();
+    assertThat(
+        "Applitest should have Administrateurs_Applitest",
+        retrievedApplication.getGroups().stream()
+            .anyMatch(group -> group.getName().equals("Administrateurs_Applitest")));
+  }
+
+  @Test
   public void testUpdateApplicationWithGroupModifying() {
     Application application = ldapReaderStore.getApplication("Applitest").get();
     Group adminApplitestGroup =
