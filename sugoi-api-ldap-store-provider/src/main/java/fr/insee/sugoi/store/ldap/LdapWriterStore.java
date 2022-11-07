@@ -627,23 +627,24 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
                       new ApplicationNotFoundException(
                           config.get(LdapConfigKeys.REALM_NAME), updatedApplication.getName()))
               .getGroups();
-      for (Group existingGroup : alreadyExistingGroups) {
-        Optional<Group> optionalGroup =
-            updatedApplication.getGroups().stream()
-                .filter(group -> group.getName().equalsIgnoreCase(existingGroup.getName()))
-                .findFirst();
-        if (optionalGroup.isPresent()) {
-          updateGroup(updatedApplication.getName(), optionalGroup.get(), providerRequest);
-        } else {
-          deleteGroup(updatedApplication.getName(), existingGroup.getName(), providerRequest);
+      if (updatedApplication.getGroups() != null) {
+        for (Group existingGroup : alreadyExistingGroups) {
+          Optional<Group> optionalGroup =
+              updatedApplication.getGroups().stream()
+                  .filter(group -> group.getName().equalsIgnoreCase(existingGroup.getName()))
+                  .findFirst();
+          if (optionalGroup.isPresent()) {
+            updateGroup(updatedApplication.getName(), optionalGroup.get(), providerRequest);
+          } else {
+            deleteGroup(updatedApplication.getName(), existingGroup.getName(), providerRequest);
+          }
+        }
+        for (Group updatedGroup : updatedApplication.getGroups()) {
+          if (alreadyExistingGroups.stream()
+              .noneMatch(group -> group.getName().equalsIgnoreCase(updatedGroup.getName())))
+            createGroup(updatedApplication.getName(), updatedGroup, providerRequest);
         }
       }
-      for (Group updatedGroup : updatedApplication.getGroups()) {
-        if (alreadyExistingGroups.stream()
-            .noneMatch(group -> group.getName().equalsIgnoreCase(updatedGroup.getName())))
-          createGroup(updatedApplication.getName(), updatedGroup, providerRequest);
-      }
-
     } catch (LDAPException e) {
       throw new StoreException(
           "Failed to update application " + updatedApplication.getName() + "while writing to LDAP",
