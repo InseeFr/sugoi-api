@@ -36,7 +36,7 @@
 		<cucumber.version>7.5.0</cucumber.version>
 		<cucumber-reporting-plugin.version>7.3.0</cucumber-reporting-plugin.version>
 		<httpclient.version>4.5.13</httpclient.version>
-		<apache.commons.version>1.9</apache.commons.version>
+		<apache.commons.version>1.10.0</apache.commons.version>
 		<apache.commons.csv.version>1.9.0</apache.commons.csv.version>
 		<wiremock-standalone.version>2.27.2</wiremock-standalone.version>
 		<freemarker.version>2.3.31</freemarker.version>
