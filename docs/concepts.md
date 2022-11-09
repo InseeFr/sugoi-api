@@ -5,6 +5,7 @@
   - [Terminology](#terminology)
   - [Access control and permissions](#access-control-and-permissions)
     - [Administrator](#administrator)
+    - [Realm Administrator](#realm-administrator)
     - [Writer](#writer)
     - [Reader](#reader)
     - [Password manager](#password-manager)
@@ -67,6 +68,18 @@ An administrator can :
 - read, create, modify or delete userstorages.
 - do whatever the writer can do on all realms.
 - request all actuator endpoints.
+
+### Realm Administrator
+
+The realm administrator group is defined via the fr.insee.sugoi.api.regexp.role.admin.realm property. It is scoped to one realm or one userstorage.
+
+A realm writer can :
+
+- modify and create application and groups on the realms they manage
+- do whatever an application manager can do on any application of the realm
+- do whatever a password manager can do on the realms they manage
+- do whatever a writer can do on the realms they manage. 
+
 
 ### Writer
 

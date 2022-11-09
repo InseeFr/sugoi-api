@@ -101,50 +101,72 @@ public class PermissionServiceTests {
   }
 
   @Test
+  public void testAdminRealm() {
+    SugoiUser sugoiUser = new SugoiUser("admin_realm1", List.of("ROLE_SUGOI_realm1_ADMIN"));
+    assertThat(
+        "user is admin realm for realm1",
+        permissions.isAdminRealm(sugoiUser, "realm1", null),
+        is(true));
+  }
+
+  @Test
+  public void testAdminRealm2() {
+    SugoiUser sugoiUser = new SugoiUser("admin_realm1", List.of("ROLE_SUGOI_realm1_ADMIN"));
+    assertThat(
+        "user is not admin realm for realm2",
+        permissions.isAdminRealm(sugoiUser, "realm2", null),
+        is(false));
+  }
+
+  @Test
   public void testAppManager() {
-    try {
-      SugoiUser sugoiUser =
-          new SugoiUser(
-              "appmanager_realm1_appli1",
-              List.of("role_Asi_realm1_appli1", "role_reader_realm1_sugoi"));
-      assertThat(
-          "user is app manager for appli1 in realm1",
-          permissions.isApplicationManager(sugoiUser, "realm1", null, "appli1"),
-          is(true));
-      assertThat(
-          "user is reader in realm1", permissions.isReader(sugoiUser, "realm1", null), is(true));
-    } catch (Exception e) {
-      fail();
-    }
+    SugoiUser sugoiUser =
+        new SugoiUser("appmanager_realm1_appli1", List.of("role_Asi_realm1_appli1"));
+    assertThat(
+        "user is app manager for appli1 in realm1",
+        permissions.isApplicationManager(sugoiUser, "realm1", "appli1"),
+        is(true));
+    assertThat(
+        "user is reader in realm1", permissions.isReader(sugoiUser, "realm1", null), is(true));
+  }
+
+  @Test
+  public void testAnyAppManager() {
+    SugoiUser sugoiUser =
+        new SugoiUser(
+            "appmanager_realm1", List.of("role_Asi_realm1_appli1", "role_reader_realm1_sugoi"));
+    assertThat(
+        "user is app manager for at least one application",
+        permissions.isAtLeastOneApplicationManager(sugoiUser, "realm1"),
+        is(true));
   }
 
   @Test
   public void testAppManagerWithoutRealmInRoleName() {
-    try {
-      SugoiUser sugoiUser =
-          new SugoiUser(
-              "appmanager_appli1", List.of("role_Asi_appli1", "role_reader_realm1_sugoi"));
-      assertThat(
-          "user is app manager for appli1 in realm1",
-          permissions.isApplicationManager(sugoiUser, "realm1", null, "appli1"),
-          is(true));
-      assertThat(
-          "user is reader in realm1", permissions.isReader(sugoiUser, "realm1", null), is(true));
-      assertThat(
-          "user is app manager for appli1 in realm2",
-          permissions.isApplicationManager(sugoiUser, "realm2", null, "appli1"),
-          is(false));
-      assertThat(
-          "user is reader in realm2", permissions.isReader(sugoiUser, "realm2", null), is(false));
+    SugoiUser sugoiUser = new SugoiUser("appmanager_appli1", List.of("role_Asi_realm1_appli1"));
+    assertThat(
+        "user is app manager for appli1 in realm1",
+        permissions.isApplicationManager(sugoiUser, "realm1", "appli1"),
+        is(true));
+    assertThat(
+        "user is reader in realm1", permissions.isReader(sugoiUser, "realm1", null), is(true));
+    assertThat(
+        "user is app manager for appli1 in realm2",
+        permissions.isApplicationManager(sugoiUser, "realm2", "appli1"),
+        is(false));
+  }
 
-    } catch (Exception e) {
-      fail();
-    }
+  @Test
+  public void testAppManagerWithoutRealmInRoleName2() {
+    SugoiUser sugoiUser = new SugoiUser("appmanager_appli1", List.of("role_Asi_realm1_appli1"));
+    assertThat(
+        "user is reader in realm2", permissions.isReader(sugoiUser, "realm2", null), is(false));
   }
 
   @Test
   public void testAdminWildcard() {
-    SugoiUser sugoiUser = new SugoiUser("admin_wildcard", List.of("role_nimportequoi_admin"));
+    SugoiUser sugoiUser =
+        new SugoiUser("admin_wildcard", List.of("role_nimportequoi_adminwildcard"));
     try {
       assertThat("user is admin sugoi", permissions.isAdmin(sugoiUser), is(true));
     } catch (Exception e) {
@@ -157,7 +179,7 @@ public class PermissionServiceTests {
     try {
       Mockito.when(realmProvider.load(Mockito.any())).thenReturn(Optional.of(realm));
       SugoiUser sugoiUser =
-          new SugoiUser("admin_wildcard", List.of("role_ASI_realm1_app1", "role_ASI_app2"));
+          new SugoiUser("admin_wildcard", List.of("role_ASI_realm1_app1", "role_ASI_REALM_app1"));
       List<String> allowedAttributesPattern =
           permissions.getAllowedAttributePattern(
               sugoiUser,

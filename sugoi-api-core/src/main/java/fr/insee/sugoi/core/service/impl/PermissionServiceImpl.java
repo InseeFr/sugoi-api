@@ -38,6 +38,9 @@ public class PermissionServiceImpl implements PermissionService {
   @Value("${fr.insee.sugoi.api.regexp.role.writer:}")
   private List<String> regexpWriterList;
 
+  @Value("${fr.insee.sugoi.api.regexp.role.admin.realm:}")
+  private List<String> regexpAdminRealmList;
+
   @Value("${fr.insee.sugoi.api.regexp.role.admin:}")
   private List<String> adminRoleList;
 
@@ -56,7 +59,8 @@ public class PermissionServiceImpl implements PermissionService {
   public boolean isReader(SugoiUser sugoiUser, String realm, String userStorage) {
     List<String> searchRoleList =
         getSearchRoleList(sugoiUser, realm, userStorage, null, regexpReaderList);
-    return checkIfUserGetRoles(sugoiUser, searchRoleList)
+    return this.checkIfUserGetRoles(sugoiUser, searchRoleList)
+        || this.isAtLeastOneApplicationManager(sugoiUser, realm)
         || isWriter(sugoiUser, realm, userStorage);
   }
 
@@ -75,17 +79,29 @@ public class PermissionServiceImpl implements PermissionService {
   }
 
   @Override
-  public boolean isApplicationManager(
-      SugoiUser sugoiUser, String realm, String userStorage, String application) {
+  public boolean isApplicationManager(SugoiUser sugoiUser, String realm, String application) {
     List<String> searchRoleList =
-        getSearchRoleList(sugoiUser, realm, userStorage, application, applicationManagerRoleList);
-    return checkIfUserGetRoles(sugoiUser, searchRoleList) && isReader(sugoiUser, realm, null);
+        getSearchRoleList(sugoiUser, realm, null, application, applicationManagerRoleList);
+    return checkIfUserGetRoles(sugoiUser, searchRoleList);
+  }
+
+  @Override
+  public boolean isAtLeastOneApplicationManager(SugoiUser sugoiUser, String realm) {
+    return this.isApplicationManager(sugoiUser, realm, "*");
   }
 
   @Override
   public boolean isWriter(SugoiUser sugoiUser, String realm, String userStorage) {
     List<String> searchRoleList =
         getSearchRoleList(sugoiUser, realm, userStorage, null, regexpWriterList);
+    return checkIfUserGetRoles(sugoiUser, searchRoleList)
+        || this.isAdminRealm(sugoiUser, realm, userStorage);
+  }
+
+  @Override
+  public boolean isAdminRealm(SugoiUser sugoiUser, String realm, String userStorage) {
+    List<String> searchRoleList =
+        getSearchRoleList(sugoiUser, realm, userStorage, null, regexpAdminRealmList);
     return checkIfUserGetRoles(sugoiUser, searchRoleList) || isAdmin(sugoiUser);
   }
 
