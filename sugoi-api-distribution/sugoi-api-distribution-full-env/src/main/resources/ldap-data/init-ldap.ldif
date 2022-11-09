@@ -30,17 +30,18 @@ sn: appli_applitest
 givenname: appli_applitest
 uid: appli_applitest
 userpassword: applitest
+memberOf: cn=ASI_domaine1_Applitest,ou=Applitest,ou=Applications,o=insee,c=fr
 
 dn: ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
 objectclass: top
 objectclass: organizationalUnit
 ou: Applitest_Objets
 
-dn: cn=ASI_Applitest,ou=Applitest,ou=Applications,o=insee,c=fr
-cn: ASI_Applitest
+dn: cn=ASI_domaine1_Applitest,ou=Applitest,ou=Applications,o=insee,c=fr
+cn: ASI_domaine1_Applitest
 objectclass: groupOfUniqueNames
 uniqueMember: uid=appli_applitest,ou=Applitest,ou=Applications,o=insee,c=fr
-
+uniquemember: uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr
 
 
 dn: cn=Administrateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
@@ -401,6 +402,7 @@ inseegroupedefaut: role2_applitest
 inseegroupedefaut: prop1_TestIgnoreCase_applitest
 inseegroupedefaut: Prop2_TestIgnoreCase_applitest
 memberOf: cn=Utilisateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
+memberOf: cn=ASI_domaine1_Applitest,ou=Applitest,ou=Applications,o=insee,c=fr
 
 dn: uid=nogroup,ou=contacts,ou=clients_domaine1,o=insee,c=fr
 objectClass: top

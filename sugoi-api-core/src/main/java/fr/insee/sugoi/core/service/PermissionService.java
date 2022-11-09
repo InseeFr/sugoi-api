@@ -22,12 +22,15 @@ public interface PermissionService {
 
   public boolean isPasswordManager(SugoiUser sugoiUser, String realm, String userStorage);
 
+  public boolean isApplicationManager(SugoiUser sugoiUser, String realm, String application);
+
+  public boolean isAtLeastOneApplicationManager(SugoiUser sugoiUser, String realm);
+
   public boolean isPasswordValidator(SugoiUser sugoiUser, String realm, String userStorage);
 
-  public boolean isApplicationManager(
-      SugoiUser sugoiUser, String realm, String userStorage, String application);
-
   public boolean isWriter(SugoiUser sugoiUser, String realm, String userStorage);
+
+  public boolean isAdminRealm(SugoiUser sugoiUser, String realm, String userStorage);
 
   public boolean isAdmin(SugoiUser sugoiUser);
 
