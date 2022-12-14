@@ -25,6 +25,8 @@ public interface PermissionService {
   public boolean isApplicationManager(
       SugoiUser sugoiUser, String realm, String userStorage, String application);
 
+  public boolean isApplicationCreator(SugoiUser sugoiUser, String realm, String userStorage);
+
   public boolean isWriter(SugoiUser sugoiUser, String realm, String userStorage);
 
   public boolean isAdmin(SugoiUser sugoiUser);

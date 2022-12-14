@@ -152,6 +152,10 @@ To learn more about this feature see : [Notify external webservices](concepts.md
 | sugoi.api.event.webhook.mail.secondaryMailAttribute        |                                    Define the attribute where alternative mail for an user will be found                                    |                                            |                                                                                  secondaryMail |
 | sugoi.api.event.webhook.enabled.events                     |  List of events that will be sent by webhook event listener. The only accepted values are SEND_LOGIN, REINIT_PASSWORD and CHANGE_PASSWORD   | SEND_LOGIN,REINIT_PASSWORD,CHANGE_PASSWORD |                                                                     SEND_LOGIN,REINIT_PASSWORD |
 
+### Application manager configuration
+
+| fr.insee.sugoi.api.regexp.role.application.creator | Default pattern to use when searching an application creator in a realm. Realm should be passed as$(realm). | no default | ROLE_SUGOI_$(realm)_APPLICATION_CREATOR |
+
 ### Spring actuator configuration
 
 Sugoi-api implements spring actuator documentation available here : [link](https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-features.html)

@@ -45,6 +45,7 @@ public class ApplicationServiceImpl implements ApplicationService {
   public ProviderResponse create(
       String realm, Application application, ProviderRequest providerRequest) {
     try {
+
       ProviderResponse response =
           storeProvider.getWriterStore(realm).createApplication(application, providerRequest);
       sugoiEventPublisher.publishCustomEvent(
@@ -56,6 +57,7 @@ public class ApplicationServiceImpl implements ApplicationService {
           && response.getStatus().equals(ProviderResponseStatus.OK)) {
         response.setEntity(findById(realm, application.getName()));
       }
+
       return response;
     } catch (Exception e) {
       sugoiEventPublisher.publishCustomEvent(

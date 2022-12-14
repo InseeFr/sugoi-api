@@ -235,6 +235,37 @@ public class ApplicationControllerTest {
 
   @Test
   @WithMockUser
+  public void postShouldCallPostServiceAndReturnNewAppTrue() {
+
+    try {
+      Mockito.doReturn(
+              new ProviderResponse("", "requestId", ProviderResponseStatus.OK, application1, null))
+          .when(applicationService)
+          .create(Mockito.any(), Mockito.any(), Mockito.any());
+
+      RequestBuilder requestBuilder =
+          MockMvcRequestBuilders.post("/realms/domaine1/applications")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(application1))
+              .param("addUser", "true")
+              .accept(MediaType.APPLICATION_JSON)
+              .with(csrf());
+
+      MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+      verify(applicationService).create(Mockito.any(), Mockito.any(), Mockito.any());
+      assertThat(
+          "Should get new application",
+          objectMapper.readValue(response.getContentAsString(), Application.class).getName(),
+          is("SuperAppli"));
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail();
+    }
+  }
+
+  @Test
+  @WithMockUser
   public void postShouldCallPostServiceAndReturnNewApp() {
 
     try {

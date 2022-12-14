@@ -101,6 +101,13 @@ Application manager can update an application and the associated groups (add or 
 
 Creating or deleting an application requires writer privileges.
 
+### Application creator
+
+The application manager role is defined via the fr.insee.sugoi.api.regexp.role.application.creator property.
+
+Application creator are allowed to create a non existing application."
+
+
 ## Providers
 
 ### Realm config provider
