@@ -45,6 +45,11 @@ public class Converter {
       user.setMetadatas((Map<String, Object>) linkedHashMap.get("metadatas"));
       user.setAddress(toPostalAddress(linkedHashMap.get("address")));
       user.setAttributes((Map<String, Object>) linkedHashMap.get("attributes"));
+      user.setHabilitations(
+          linkedHashMap.get("habilitations") != null
+              ? ((List<Object>) linkedHashMap.get("habilitations"))
+                  .stream().map(this::toHabilitation).collect(Collectors.toList())
+              : null);
       return user;
     }
     return null;
@@ -158,6 +163,23 @@ public class Converter {
       PostalAddress postalAddress = new PostalAddress();
       postalAddress.setLines(lines);
       return postalAddress;
+    }
+    return null;
+  }
+
+  private Habilitation toHabilitation(Object object) {
+    LinkedHashMap linkedHashMap = (LinkedHashMap) object;
+    if (linkedHashMap != null) {
+      Habilitation habilitation = new Habilitation();
+      habilitation.setApplication(
+          linkedHashMap.get("application") != null
+              ? (String) linkedHashMap.get("application")
+              : null);
+      habilitation.setProperty(
+          linkedHashMap.get("property") != null ? (String) linkedHashMap.get("property") : null);
+      habilitation.setRole(
+          linkedHashMap.get("role") != null ? (String) linkedHashMap.get("role") : null);
+      return habilitation;
     }
     return null;
   }
