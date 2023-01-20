@@ -23,7 +23,7 @@ jobs:
           git config --global user.email "dg75-dsi-domaine-outils-transverses@insee.fr"  
           git clone https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{github.repository}}.git
           cd sugoi-api/
-          git checkout ${{ github.ref_name }}
+          git checkout test-gh
           git fetch --tags
           git checkout -b release-${{ github.event.inputs.version }}
           mvn -B versions:set -DnewVersion=${{ github.event.inputs.version }}  -DgenerateBackupPoms=false
@@ -37,7 +37,7 @@ jobs:
           git commit -sm "[REL] :rocket: release version ${{ github.event.inputs.version }}"
           git push origin release-${{ github.event.inputs.version }} -f
           echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
-          gh pr create --title "[REL] :rocket: Release version ${{ github.event.inputs.version }}" --body "[REL] :rocket: prepare new version ${{ github.event.inputs.version }}"
+          echo "PR_URL=$(gh pr create --fill --base test-gh)" >> $GITHUB_ENV
 
   release:
     name: release
@@ -104,3 +104,7 @@ jobs:
           git add .
           git commit -sm "[REL] :rocket: prepare next version"
           git push origin release-${{ github.event.inputs.version }}
+          echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
+          git fetch origin release-${{ github.event.inputs.version }}
+          git fetch origin test-gh
+          gh pr merge --admin --rebase "${{env.PR_URL}}"
