@@ -1,3 +1,20 @@
+# 1.8.0
+
+
+- [BUG] :bug: Fix User Habilitations not passed through JMS (#770)
+- [UP] :arrow_up: Bump maven-jar-plugin from 3.2.2 to 3.3.0
+- [UP] :arrow_up: Bump httpclient from 4.5.13 to 4.5.14
+- [UP] :arrow_up: Bump org.springdoc.version from 1.6.9 to 1.6.14
+- [UP] :arrow_up: Bump commons-text from 1.9 to 1.10.0
+- [BUG] :bug: Fix issue: appSource is lost when realm update issue ref : https://github.com/InseeFr/sugoi-api/issues/749
+- [UP] :arrow_up: Bump unboundid-ldapsdk from 6.0.5 to 6.0.7
+- [UP] :arrow_up: Bump spotless-maven-plugin from 2.24.1 to 2.28.0
+- [BUG] 755 bug npe is thrown when modifying an application without a groups-list
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 1.7.0
+- [REL] :rocket: release version 1.7.0
+
+
 # 1.7.0
 
 
