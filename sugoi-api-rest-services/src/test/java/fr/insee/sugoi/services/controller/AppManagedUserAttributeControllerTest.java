@@ -15,20 +15,18 @@ package fr.insee.sugoi.services.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
+import fr.insee.sugoi.commons.services.view.ErrorView;
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.service.ConfigService;
-import fr.insee.sugoi.core.service.PermissionService;
 import fr.insee.sugoi.core.service.UserService;
+import fr.insee.sugoi.core.service.impl.PermissionServiceImpl;
 import fr.insee.sugoi.model.Realm;
-import fr.insee.sugoi.model.User;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -45,7 +43,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @SpringBootTest(
-    classes = {AppManagedUserAttributeController.class, SugoiAdviceController.class},
+    classes = {
+      AppManagedUserAttributeController.class,
+      SugoiAdviceController.class,
+      PermissionServiceImpl.class
+    },
     properties = "spring.config.location=classpath:/permissions/test-regexp-permissions.properties")
 @AutoConfigureMockMvc
 @EnableWebMvc
@@ -54,189 +56,97 @@ public class AppManagedUserAttributeControllerTest {
 
   @MockBean private UserService userService;
 
-  @MockBean private PermissionService permissionService;
-
   @MockBean private ConfigService configService;
 
   ObjectMapper objectMapper = new ObjectMapper();
-  Realm realm;
-  User user;
 
   @BeforeEach
   public void setup() {
-    realm = new Realm();
+    Realm realm = new Realm();
     realm.setName("test");
     realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, "(.*)_$(application)");
     realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, "my-attribute-key");
+    Mockito.when(configService.getRealm(Mockito.anyString())).thenReturn(realm);
+    Mockito.doReturn(new ProviderResponse("", "requestId", ProviderResponseStatus.OK, null, null))
+        .when(userService)
+        .addAppManagedAttribute(
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any());
   }
 
   @Test
-  @WithMockUser(username = "reader_realm1", roles = "ADMIN_SUGOI")
-  public void get200WhenAddCorrectAttributes() {
-    try {
-
-      Mockito.when(configService.getRealm(Mockito.anyString())).thenReturn(realm);
-      Mockito.when(permissionService.getUserRealmAppManager(Mockito.any()))
-          .thenReturn(List.of("*\\appA", "*\\appB"));
-      Mockito.doReturn(true)
-          .when(permissionService)
-          .isWriter(Mockito.any(), Mockito.anyString(), Mockito.anyString());
-      Mockito.doReturn(new ProviderResponse("", "requestId", ProviderResponseStatus.OK, null, null))
-          .when(userService)
-          .addAppManagedAttribute(
-              Mockito.any(),
-              Mockito.any(),
-              Mockito.any(),
-              Mockito.any(),
-              Mockito.any(),
-              Mockito.any());
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.patch(
-                  "/realms/domaine1/storages/test/users/Toto/my-attribute-key/prop_role_appA")
-              .contentType(MediaType.APPLICATION_JSON)
-              .accept(MediaType.APPLICATION_JSON)
-              .with(csrf());
-      MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-
-      assertThat("Response must be 200 OK", response.getStatus(), is(204));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+  @WithMockUser(roles = "ADMIN_SUGOI")
+  public void get200WhenAddCorrectAttributesWhenAdminOrWriter() throws Exception {
+    MockHttpServletResponse response =
+        createPatchRequestFromUrl(
+            "/realms/domaine1/storages/test/users/Toto/my-attribute-key/prop_role_appA");
+    assertThat("Response must be 204 ACCEPTED", response.getStatus(), is(204));
   }
 
   @Test
-  @WithMockUser
-  public void get200WhenAddCorrectAttributesWhenAdminOrWriter() {
-    try {
-
-      Mockito.when(configService.getRealm(Mockito.anyString())).thenReturn(realm);
-      Mockito.doReturn(true)
-          .when(permissionService)
-          .isWriter(Mockito.any(), Mockito.anyString(), Mockito.anyString());
-      Mockito.doReturn(new ProviderResponse("", "requestId", ProviderResponseStatus.OK, null, null))
-          .when(userService)
-          .addAppManagedAttribute(
-              Mockito.any(),
-              Mockito.any(),
-              Mockito.any(),
-              Mockito.any(),
-              Mockito.any(),
-              Mockito.any());
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.patch(
-                  "/realms/domaine1/storages/test/users/Toto/my-attribute-key/prop_role_appA")
-              .contentType(MediaType.APPLICATION_JSON)
-              .accept(MediaType.APPLICATION_JSON)
-              .with(csrf());
-      MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-
-      assertThat("Response must be 200 OK", response.getStatus(), is(204));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+  @WithMockUser(roles = "ASI_appA")
+  public void get200WhenAddCorrectAttributesWhenAppManager() throws Exception {
+    MockHttpServletResponse response =
+        createPatchRequestFromUrl(
+            "/realms/domaine1/storages/test/users/Toto/my-attribute-key/prop_role_appA");
+    assertThat("Response must be 204 ACCEPTED", response.getStatus(), is(204));
   }
 
   @Test
-  @WithMockUser(username = "reader_realm1", roles = "ASI_SUGOI")
-  public void get200WhenAddCorrectAttributesWhenAppManager() {
-    try {
-
-      Mockito.when(
-              permissionService.isWriter(Mockito.any(), Mockito.anyString(), Mockito.anyString()))
-          .thenReturn(false);
-      Mockito.doReturn(true)
-          .when(permissionService)
-          .isValidAttributeAccordingAttributePattern(
-              Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
-      Mockito.doReturn(new ProviderResponse("", "requestId", ProviderResponseStatus.OK, null, null))
-          .when(userService)
-          .addAppManagedAttribute(
-              Mockito.any(),
-              Mockito.any(),
-              Mockito.any(),
-              Mockito.any(),
-              Mockito.any(),
-              Mockito.any());
-      Mockito.when(configService.getRealm(Mockito.anyString())).thenReturn(realm);
-      Mockito.when(
-              permissionService.getAllowedAttributePattern(
-                  Mockito.any(), Mockito.anyString(), Mockito.any(), Mockito.anyString()))
-          .thenReturn(List.of("(.*)_appA", "(.*)_appB"));
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.patch(
-                  "/realms/domaine1/storages/test/users/Toto/my-attribute-key/prop_role_appA")
-              .contentType(MediaType.APPLICATION_JSON)
-              .accept(MediaType.APPLICATION_JSON)
-              .with(csrf());
-      MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-
-      assertThat("Response must be 200 OK", response.getStatus(), is(204));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+  @WithMockUser(roles = "ASI_appA")
+  public void get403WhenTryToAddValidAttributeWithBadPattern() throws Exception {
+    MockHttpServletResponse response =
+        createPatchRequestFromUrl(
+            "/realms/domaine1/storages/test/users/Toto/my-attribute-key/appA_toto");
+    assertThat("Response must be 403", response.getStatus(), is(403));
+    assertThat(
+        "Message should be access denied and give the pattern",
+        getMessageFromErrorView(response),
+        is(
+            "Not allowed to add appmanagedattribute my-attribute-key . Attribute should match pattern : (.*)_$(APPLICATION)"));
   }
 
   @Test
-  @WithMockUser(username = "reader_realm1", roles = "ASI_SUGOI")
-  public void get403WhenAddIncorrectAttributes() {
-    try {
-
-      Mockito.when(
-              permissionService.isWriter(Mockito.any(), Mockito.anyString(), Mockito.anyString()))
-          .thenReturn(false);
-      Mockito.when(configService.getRealm(Mockito.anyString())).thenReturn(realm);
-      Mockito.when(
-              permissionService.getAllowedAttributePattern(
-                  Mockito.any(), Mockito.anyString(), Mockito.any(), Mockito.anyString()))
-          .thenReturn(List.of("(.*)_appA", "(.*)_appB"));
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.patch(
-                  "/realms/domaine1/storages/test/users/Toto/my-attribute-key2/prop_role_appA")
-              .contentType(MediaType.APPLICATION_JSON)
-              .accept(MediaType.APPLICATION_JSON)
-              .with(csrf());
-      MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-
-      assertThat("Response must be 403", response.getStatus(), is(403));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+  @WithMockUser(roles = "ASI_SUGOI")
+  public void get403WhenAddIncorrectAttributes() throws Exception {
+    MockHttpServletResponse response =
+        createPatchRequestFromUrl(
+            "/realms/domaine1/storages/test/users/Toto/my-attribute-key2/prop_role_appA");
+    assertThat("Response must be 403", response.getStatus(), is(403));
+    assertThat(
+        "Message should be not an app managed attribute",
+        getMessageFromErrorView(response),
+        is("Cannot add delete to user: my-attribute-key2 is not an app managed attribute"));
   }
 
   @Test
-  @WithMockUser(username = "reader_realm1", roles = "ASI_SUGOI")
-  public void get403WhenNoRightIncorrectAttributes() {
-    try {
+  @WithMockUser(roles = "ASI_SUGOI")
+  public void get403WhenNoRightIncorrectAttributes() throws Exception {
+    MockHttpServletResponse response =
+        createPatchRequestFromUrl(
+            "/realms/domaine1/storages/test/users/Toto/my-attribute-key/prop_role_appA");
+    assertThat("Response must be 403", response.getStatus(), is(403));
+    assertThat(
+        "Message should be access denied and give the pattern",
+        getMessageFromErrorView(response),
+        is(
+            "Not allowed to add appmanagedattribute my-attribute-key . Attribute should match pattern : (.*)_$(APPLICATION)"));
+  }
 
-      Mockito.when(
-              permissionService.isWriter(Mockito.any(), Mockito.anyString(), Mockito.anyString()))
-          .thenReturn(false);
-      Mockito.when(configService.getRealm(Mockito.anyString())).thenReturn(realm);
-      Mockito.when(
-              permissionService.getAllowedAttributePattern(
-                  Mockito.any(), Mockito.anyString(), Mockito.any(), Mockito.anyString()))
-          .thenReturn(List.of("(.*)_sugoi"));
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.patch(
-                  "/realms/domaine1/storages/test/users/Toto/my-attribute-key/prop_role_appA")
-              .contentType(MediaType.APPLICATION_JSON)
-              .accept(MediaType.APPLICATION_JSON)
-              .with(csrf());
-      MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+  private MockHttpServletResponse createPatchRequestFromUrl(String url) throws Exception {
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.patch(url)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(csrf());
+    return mockMvc.perform(requestBuilder).andReturn().getResponse();
+  }
 
-      assertThat("Response must be 403", response.getStatus(), is(403));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+  private String getMessageFromErrorView(MockHttpServletResponse response) throws Exception {
+    return objectMapper.readValue(response.getContentAsString(), ErrorView.class).getMessage();
   }
 }

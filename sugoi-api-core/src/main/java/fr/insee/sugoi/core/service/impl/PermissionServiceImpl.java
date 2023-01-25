@@ -13,12 +13,11 @@
 */
 package fr.insee.sugoi.core.service.impl;
 
-import fr.insee.sugoi.core.model.SugoiUser;
+import fr.insee.sugoi.core.model.Right;
 import fr.insee.sugoi.core.service.PermissionService;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,182 +48,141 @@ public class PermissionServiceImpl implements PermissionService {
 
   public static final Logger logger = LoggerFactory.getLogger(PermissionServiceImpl.class);
 
-  @Override
-  public boolean isReader(SugoiUser sugoiUser, String realm, String userStorage) {
-    List<String> searchRoleList =
-        getSearchRoleList(sugoiUser, realm, userStorage, null, regexpReaderList);
-    return checkIfUserGetRoles(sugoiUser, searchRoleList)
-        || isWriter(sugoiUser, realm, userStorage);
+  public boolean isReader(List<String> roles, String realmName, String usName) {
+    return areUserRolesInValidRoles(regexpReaderList, roles, realmName, usName, null)
+        || isPasswordManager(roles, realmName, usName)
+        || isWriter(roles, realmName, usName);
   }
 
-  @Override
-  public boolean isPasswordManager(SugoiUser sugoiUser, String realm, String userStorage) {
-    List<String> searchRoleList =
-        getSearchRoleList(sugoiUser, realm, userStorage, null, passwordManagerRoleList);
-    return checkIfUserGetRoles(sugoiUser, searchRoleList);
+  public boolean isPasswordManager(List<String> roles, String realmName, String usName) {
+    return areUserRolesInValidRoles(passwordManagerRoleList, roles, realmName, usName, null)
+        || isWriter(roles, realmName, usName);
   }
 
-  @Override
-  public boolean isApplicationManager(
-      SugoiUser sugoiUser, String realm, String userStorage, String application) {
-    List<String> searchRoleList =
-        getSearchRoleList(sugoiUser, realm, userStorage, application, applicationManagerRoleList);
-    return checkIfUserGetRoles(sugoiUser, searchRoleList) && isReader(sugoiUser, realm, null);
+  public boolean isApplicationManager(List<String> roles, String realmName, String appName) {
+    return (areUserRolesInValidRoles(applicationManagerRoleList, roles, realmName, null, appName)
+            && isReader(roles, realmName, null))
+        || isWriter(roles, realmName, null);
   }
 
-  @Override
-  public boolean isWriter(SugoiUser sugoiUser, String realm, String userStorage) {
-    List<String> searchRoleList =
-        getSearchRoleList(sugoiUser, realm, userStorage, null, regexpWriterList);
-    return checkIfUserGetRoles(sugoiUser, searchRoleList) || isAdmin(sugoiUser);
+  public boolean isWriter(List<String> roles, String realmName, String usName) {
+    return areUserRolesInValidRoles(regexpWriterList, roles, realmName, usName, null)
+        || isAdmin(roles);
   }
 
-  @Override
-  public boolean isAdmin(SugoiUser sugoiUser) {
-    return checkIfUserGetRoles(sugoiUser, adminRoleList);
+  public boolean isAdmin(List<String> roles) {
+    return areUserRolesInValidRoles(adminRoleList, roles, null, null, null);
   }
 
-  private boolean checkIfUserGetRoles(SugoiUser sugoiUser, List<String> rolesSearch) {
-    logger.debug("Checking if user {} is in : {}", sugoiUser.getName(), rolesSearch);
-    List<String> roles =
-        sugoiUser.getRoles().stream().map(String::toUpperCase).collect(Collectors.toList());
-    logger.debug("User roles: {}", roles);
-    for (String roleSearch : rolesSearch) {
-      logger.trace(roleSearch);
-      if (roles.contains(roleSearch.toUpperCase())) {
-        return true;
-      }
-      for (String role : roles) {
-        if (role.toUpperCase().matches(roleSearch.replace("*", ".*").toUpperCase())) {
-          return true;
-        }
-      }
-    }
-    return false;
+  public boolean isValidAttributeAccordingAttributePattern(
+      List<String> roles, String realm, String storage, String pattern, String attribute) {
+    return getAllowedAttributePattern(roles, realm, storage, pattern).stream()
+        .anyMatch(allowedPattern -> attribute.toUpperCase().matches(allowedPattern));
   }
 
-  @Override
-  public List<String> getUserRealmReader(SugoiUser sugoiUser) {
-    return getUserRightList(sugoiUser, regexpReaderList);
+  public List<String> getReaderRoles(List<String> roles) {
+    return getStringRightsFromRegexList(roles, regexpReaderList);
   }
 
-  @Override
-  public List<String> getUserRealmWriter(SugoiUser sugoiUser) {
-    return getUserRightList(sugoiUser, regexpWriterList);
+  public List<String> getWriterRoles(List<String> roles) {
+    return getStringRightsFromRegexList(roles, regexpWriterList);
   }
 
-  @Override
-  public List<String> getUserRealmPasswordManager(SugoiUser sugoiUser) {
-    return getUserRightList(sugoiUser, passwordManagerRoleList);
+  public List<String> getPasswordManagerRoles(List<String> roles) {
+    return getStringRightsFromRegexList(roles, passwordManagerRoleList);
   }
 
-  @Override
-  public List<String> getUserRealmAppManager(SugoiUser sugoiUser) {
-    return getUserRightList(sugoiUser, applicationManagerRoleList);
+  public List<String> getAppManagerRoles(List<String> roles) {
+    return getStringRightsFromRegexList(roles, applicationManagerRoleList);
   }
 
-  private List<String> getUserRightList(SugoiUser sugoiUser, List<String> regexpListToSearch) {
-    List<String> searchRoleList =
-        getSearchRoleList(
-                sugoiUser,
-                "(?<realm>.*)",
-                "(?<userStorage>.*)",
-                "(?<application>.*)",
-                regexpListToSearch)
-            .stream()
-            .map(String::toUpperCase)
-            .collect(Collectors.toList());
-    List<String> roles =
-        sugoiUser.getRoles().stream()
-            .map(String::toUpperCase)
-            .map(
-                role -> {
-                  for (String searchRole : searchRoleList) {
-                    Pattern p = Pattern.compile(searchRole);
-                    Matcher m = p.matcher(role);
-                    if (m.matches()) {
-                      String realm = "";
-                      String userStorage = "";
-                      String application = "";
-                      try {
-                        realm = m.group("REALM");
-                      } catch (Exception e) {
-                      }
-                      try {
-                        userStorage = "_" + m.group("USERSTORAGE");
-                      } catch (Exception e) {
-                      }
-                      try {
-                        if (m.group("APPLICATION") != null) {
-                          if (realm.equals("")) {
-                            realm = "*";
-                            userStorage = "_*";
-                          }
-                          application = "\\" + m.group("APPLICATION");
-                        }
-                      } catch (Exception e) {
-                      }
-                      String res = realm + userStorage + application;
-                      return res;
-                    }
-                  }
-                  return null;
-                })
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
-    return roles;
-  }
-
-  private List<String> getSearchRoleList(
-      SugoiUser sugoiUser,
-      String realm,
-      String userStorage,
-      String application,
-      List<String> regexpList) {
-    Map<String, String> valueMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-    valueMap.put("realm", realm.toUpperCase());
-    if (userStorage != null) {
-      valueMap.put("userStorage", userStorage.toUpperCase());
-    }
-    if (application != null) {
-      valueMap.put("application", application);
-    }
-    return regexpList.stream()
-        .map(regexp -> StrSubstitutor.replace(regexp, valueMap, "$(", ")"))
+  private List<String> getAllowedAttributePattern(
+      List<String> roles, String realm, String storage, String pattern) {
+    return getRightsFromRegexList(roles, applicationManagerRoleList).stream()
+        .map(appRight -> getPatternFromRegex(pattern, realm, storage, appRight.getApplication()))
+        .map(Pattern::pattern)
         .collect(Collectors.toList());
   }
 
-  @Override
-  public List<String> getAllowedAttributePattern(
-      SugoiUser sugoiUser, String realm, String storage, String pattern) {
-    List<String> appRightsOfUser =
-        getUserRealmAppManager(sugoiUser).stream()
-            .map(app -> app.split("\\\\")[1])
-            .collect(Collectors.toList());
-    // Look for regexp of attribute value allowed
-    List<String> regexpAttributesAllowed = new ArrayList<>();
-    for (String appRight : appRightsOfUser) {
-      Map<String, String> valueMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-      valueMap.put("application", appRight);
-      valueMap.put("realm", realm);
-      valueMap.put("storage", storage);
-      regexpAttributesAllowed.add(
-          StrSubstitutor.replace(pattern, valueMap, "$(", ")").toUpperCase());
-    }
-    return regexpAttributesAllowed;
+  private static List<String> getStringRightsFromRegexList(
+      List<String> roles, List<String> applicationManagerRoleList) {
+    return getRightsFromRegexList(roles, applicationManagerRoleList).stream()
+        .map(Right::toString)
+        .collect(Collectors.toList());
   }
 
-  @Override
-  public boolean isValidAttributeAccordingAttributePattern(
-      SugoiUser sugoiUser, String realm, String storage, String pattern, String attribute) {
-    List<String> regexpAttributesAllowed =
-        getAllowedAttributePattern(sugoiUser, realm, storage, pattern);
-    // Check if attribute match with allowed pattern
-    for (String regexpAttributeAllowed : regexpAttributesAllowed) {
-      if (attribute.toUpperCase().matches(regexpAttributeAllowed)) {
-        return true;
+  private static List<Right> getRightsFromRegexList(List<String> roles, List<String> regexpList) {
+    List<Pattern> validPatterns =
+        regexpList.stream()
+            .map(PermissionServiceImpl::createCatchingPattern)
+            .collect(Collectors.toList());
+    return roles.stream()
+        .map(role -> transformRoleToRight(role, validPatterns))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Create a pattern from the regexp used to retrieve realm, userstorage and application from any
+   * roles matching it via transformRoleToRight.
+   *
+   * @param regexp a String defining the form of a valid role (ex: READER_$(realm)_$(userstorage))
+   * @return the catching pattern form this regexp (ex : READER_(?<realm>.*_(?<userStorage>.*)))
+   */
+  private static Pattern createCatchingPattern(String regexp) {
+    return getPatternFromRegex(regexp, "(?<realm>.*)", "(?<userStorage>.*)", "(?<application>.*)");
+  }
+
+  private static boolean areUserRolesInValidRoles(
+      List<String> regexpList,
+      List<String> userRoles,
+      String realmName,
+      String usName,
+      String appName) {
+    logger.debug("Checking if user is in : {}", regexpList);
+    return regexpList.stream()
+        .map(regexp -> getPatternFromRegex(regexp, realmName, usName, appName))
+        .anyMatch(
+            validPattern ->
+                userRoles.stream()
+                    .anyMatch(userRole -> validPattern.matcher(userRole.toUpperCase()).matches()));
+  }
+
+  private static Pattern getPatternFromRegex(
+      String regexp, String realmName, String usName, String appName) {
+    Map<String, String> valueMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    if (realmName != null) {
+      valueMap.put("realm", realmName.toUpperCase());
+    }
+    if (usName != null) {
+      valueMap.put("userStorage", usName.toUpperCase());
+    }
+    if (appName != null) {
+      valueMap.put("application", appName.toUpperCase());
+    }
+    return Pattern.compile(
+        StrSubstitutor.replace(regexp, valueMap, "$(", ")").replace("*", ".*"),
+        Pattern.CASE_INSENSITIVE);
+  }
+
+  private static Optional<Right> transformRoleToRight(String role, List<Pattern> patterns) {
+    for (Pattern p : patterns) {
+      Matcher m = p.matcher(role);
+      if (m.matches()) {
+        Right right = new Right();
+        if (p.pattern().contains("?<REALM>")) {
+          right.setRealm(m.group("REALM"));
+        }
+        if (p.pattern().contains("?<USERSTORAGE>")) {
+          right.setUserStorage(m.group("USERSTORAGE"));
+        }
+        if (p.pattern().contains("?<APPLICATION>")) {
+          right.setApplication(m.group("APPLICATION"));
+        }
+        return Optional.of(right);
       }
     }
-    return false;
+    return Optional.empty();
   }
 }

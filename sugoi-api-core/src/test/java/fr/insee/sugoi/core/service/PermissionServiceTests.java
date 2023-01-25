@@ -15,18 +15,11 @@ package fr.insee.sugoi.core.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
 
-import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
-import fr.insee.sugoi.core.model.SugoiUser;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.impl.PermissionServiceImpl;
-import fr.insee.sugoi.model.Realm;
 import java.util.List;
-import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -40,121 +33,160 @@ public class PermissionServiceTests {
 
   @Autowired PermissionService permissions;
 
-  private Realm realm;
-
-  @BeforeEach
-  public void setup() {
-    realm = new Realm();
-    realm.setName("test");
-    realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, "(.*)_$(application)");
-    realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, "my-attribute-key");
-  }
-
   @Test
   public void testAdminRegexp() {
-    SugoiUser sugoiUser = new SugoiUser("admin", List.of("role_Admin_Sugoi"));
-    assertThat("User is admin", permissions.isAdmin(sugoiUser), is(true));
+    assertThat("User is admin", permissions.isAdmin(List.of("role_Admin_Sugoi")));
+    assertThat("User on sugoii is not admin", !permissions.isAdmin(List.of("role_Admin_Sugoii")));
   }
 
   @Test
   public void testReaderRegexp() {
-    SugoiUser sugoiUser = new SugoiUser("reader_realm1", List.of("role_Reader_realm1_sugoi"));
+    List<String> readerRoles = List.of("role_Reader_realm1_sugoi");
 
-    assertThat("User can read realm1", permissions.isReader(sugoiUser, "realm1", ""), is(true));
+    assertThat("User can read realm1", permissions.isReader(readerRoles, "realm1", ""), is(true));
     assertThat(
-        "User cannot write realm1", permissions.isWriter(sugoiUser, "realm1", ""), is(false));
-    assertThat("User cannot read realm2", permissions.isReader(sugoiUser, "realm2", ""), is(false));
+        "User cannot write realm1", permissions.isWriter(readerRoles, "realm1", ""), is(false));
+    assertThat(
+        "User cannot read realm2", permissions.isReader(readerRoles, "realm2", ""), is(false));
   }
 
   @Test
   public void testWriterRegexp() {
-    SugoiUser sugoiUser = new SugoiUser("writer_realm1", List.of("role_Writer_realm1_sugoi"));
-    assertThat("User can read realm1", permissions.isReader(sugoiUser, "realm1", ""), is(true));
-    assertThat("User can write realm1", permissions.isWriter(sugoiUser, "realm1", ""), is(true));
-    assertThat("User cannot read realm2", permissions.isReader(sugoiUser, "realm2", ""), is(false));
+    List<String> writerRoles = List.of("role_Writer_realm1_sugoi");
+    assertThat("User can read realm1", permissions.isReader(writerRoles, "realm1", ""), is(true));
+    assertThat("User can write realm1", permissions.isWriter(writerRoles, "realm1", ""), is(true));
+    assertThat(
+        "User cannot read realm2", permissions.isReader(writerRoles, "realm2", ""), is(false));
   }
 
   @Test
   public void testUserStorageNull() {
-    try {
-      SugoiUser sugoiUser = new SugoiUser("writer_realm1", List.of("role_Writer_realm1_sugoi"));
-      assertThat(
-          "No nullPointerException", permissions.isReader(sugoiUser, "realm1", null), is(true));
-    } catch (Exception e) {
-      fail();
-    }
+    List<String> writerRoles = List.of("role_Writer_realm1_sugoi");
+    assertThat(
+        "No nullPointerException", permissions.isReader(writerRoles, "realm1", null), is(true));
   }
 
   @Test
   public void testAppManager() {
-    try {
-      SugoiUser sugoiUser =
-          new SugoiUser(
-              "appmanager_realm1_appli1",
-              List.of("role_Asi_realm1_appli1", "role_reader_realm1_sugoi"));
-      assertThat(
-          "user is app manager for appli1 in realm1",
-          permissions.isApplicationManager(sugoiUser, "realm1", null, "appli1"),
-          is(true));
-      assertThat(
-          "user is reader in realm1", permissions.isReader(sugoiUser, "realm1", null), is(true));
-    } catch (Exception e) {
-      fail();
-    }
+    List<String> appRoles = List.of("role_Asi_realm1_appli1", "role_reader_realm1_sugoi");
+    assertThat(
+        "user is app manager for appli1 in realm1",
+        permissions.isApplicationManager(appRoles, "realm1", "appli1"),
+        is(true));
+    assertThat(
+        "user is reader in realm1", permissions.isReader(appRoles, "realm1", null), is(true));
   }
 
   @Test
   public void testAppManagerWithoutRealmInRoleName() {
-    try {
-      SugoiUser sugoiUser =
-          new SugoiUser(
-              "appmanager_appli1", List.of("role_Asi_appli1", "role_reader_realm1_sugoi"));
-      assertThat(
-          "user is app manager for appli1 in realm1",
-          permissions.isApplicationManager(sugoiUser, "realm1", null, "appli1"),
-          is(true));
-      assertThat(
-          "user is reader in realm1", permissions.isReader(sugoiUser, "realm1", null), is(true));
-      assertThat(
-          "user is app manager for appli1 in realm2",
-          permissions.isApplicationManager(sugoiUser, "realm2", null, "appli1"),
-          is(false));
-      assertThat(
-          "user is reader in realm2", permissions.isReader(sugoiUser, "realm2", null), is(false));
-
-    } catch (Exception e) {
-      fail();
-    }
+    List<String> withoutRealmRoles = List.of("role_Asi_appli1", "role_reader_realm1_sugoi");
+    assertThat(
+        "user is app manager for appli1 in realm1",
+        permissions.isApplicationManager(withoutRealmRoles, "realm1", "appli1"),
+        is(true));
+    assertThat(
+        "user is reader in realm1",
+        permissions.isReader(withoutRealmRoles, "realm1", null),
+        is(true));
+    assertThat(
+        "user is app manager for appli1 in realm2",
+        permissions.isApplicationManager(withoutRealmRoles, "realm2", "appli1"),
+        is(false));
+    assertThat(
+        "user is reader in realm2",
+        permissions.isReader(withoutRealmRoles, "realm2", null),
+        is(false));
   }
 
   @Test
   public void testAdminWildcard() {
-    SugoiUser sugoiUser = new SugoiUser("admin_wildcard", List.of("role_nimportequoi_admin"));
-    try {
-      assertThat("user is admin sugoi", permissions.isAdmin(sugoiUser), is(true));
-    } catch (Exception e) {
-      fail();
-    }
+    List<String> adminWildcardRole = List.of("role_nimportequoi_admin");
+    assertThat("user is admin sugoi", permissions.isAdmin(adminWildcardRole), is(true));
   }
 
   @Test
   public void testgetAllowedAttributePattern() {
-    try {
-      Mockito.when(realmProvider.load(Mockito.any())).thenReturn(Optional.of(realm));
-      SugoiUser sugoiUser =
-          new SugoiUser("admin_wildcard", List.of("role_ASI_realm1_app1", "role_ASI_app2"));
-      List<String> allowedAttributesPattern =
-          permissions.getAllowedAttributePattern(
-              sugoiUser,
-              "toto",
-              "tata",
-              realm
-                  .getProperties()
-                  .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST)
-                  .split(",")[0]);
-      assertThat("allowed Attributes Pattern", allowedAttributesPattern.size(), is(2));
-    } catch (Exception e) {
-      fail();
-    }
+    List<String> roles = List.of("role_ASI_realm1_app1", "role_ASI_app2");
+    assertThat(
+        "Toto_app1 should be accepted according to the pattern",
+        permissions.isValidAttributeAccordingAttributePattern(
+            roles, "realm1", null, "(.*)_$(application)", "toto_app1"));
+    assertThat(
+        "Toto_app2 should be denied",
+        !permissions.isValidAttributeAccordingAttributePattern(
+            roles, "realm1", null, "(.*)_$(application)", "toto_app3"));
+  }
+
+  @Test
+  public void testGetReaderRole() {
+    List<String> roles =
+        List.of(
+            "role_toto_titi",
+            "role_Reader_realm2",
+            "role_Reader_realm1_sugoi",
+            "role_Reader_realm3_sugoi");
+    List<String> readableRealm = permissions.getReaderRoles(roles);
+    assertThat("There should only be 2 valid reader roles", 2, is(readableRealm.size()));
+    assertThat("should contain realm1", readableRealm.contains("REALM1"));
+    assertThat("should contain realm3", readableRealm.contains("REALM3"));
+  }
+
+  @Test
+  public void testGetWriterRole() {
+    List<String> roles =
+        List.of(
+            "role_toto_titi",
+            "role_Reader_realm2",
+            "role_Writer_realm1_sugoi",
+            "role_Reader_realm3_sugoi");
+    List<String> writableRealm = permissions.getWriterRoles(roles);
+    assertThat("There should only be 1 valid writer role", 1, is(writableRealm.size()));
+    assertThat("should contain realm1", writableRealm.contains("REALM1"));
+  }
+
+  @Test
+  public void testGetAppManagerRole() {
+    List<String> roles = List.of("role_ASI_realm1_appli", "role_ASI_appli2");
+    List<String> appManagerRealms = permissions.getAppManagerRoles(roles);
+    assertThat("There should only be 2 valid appmanager roles", 2, is(appManagerRealms.size()));
+    assertThat(
+        "should contain realm and appli when application scoped",
+        appManagerRealms.contains("REALM1\\APPLI"));
+    assertThat("can contain only application", appManagerRealms.contains("*_*\\APPLI2"));
+  }
+
+  @Test
+  public void testGetPasswordManagerRole() {
+    List<String> roles =
+        List.of(
+            "role_passwordmanager_toto_sugoi",
+            "role_passwordmanager_realm1_tata_sugoi",
+            "role_Writer_realm2_sugoi");
+    List<String> passwordManagerRealms = permissions.getPasswordManagerRoles(roles);
+    assertThat(
+        "There should only be 2 valid passwordmanager role", 2, is(passwordManagerRealms.size()));
+    assertThat("should contain realm1 us tata", passwordManagerRealms.contains("REALM1_TATA"));
+    assertThat("should contain toto", passwordManagerRealms.contains("TOTO"));
+  }
+
+  @Test
+  public void testIsPasswordManager() {
+    List<String> roles =
+        List.of(
+            "role_passwordmanager_toto_sugoi",
+            "role_passwordmanager_realm1_tata_sugoi",
+            "role_Writer_realm2_sugoi");
+    assertThat(
+        "Should have the password manager permission with null us",
+        permissions.isPasswordManager(roles, "toto", null));
+    assertThat(
+        "Should have the password manager permission with tata us",
+        permissions.isPasswordManager(roles, "realm1", "tata"));
+    assertThat(
+        "Should not have the password manager permission with null us",
+        !permissions.isPasswordManager(roles, "realm1", null));
+    assertThat(
+        "Should not have the password manager permission with default us",
+        !permissions.isPasswordManager(roles, "realm1", "default"));
   }
 }

@@ -13,33 +13,28 @@
 */
 package fr.insee.sugoi.core.service;
 
-import fr.insee.sugoi.core.model.SugoiUser;
 import java.util.List;
 
 public interface PermissionService {
 
-  public boolean isReader(SugoiUser sugoiUser, String realm, String userStorage);
+  public boolean isReader(List<String> roles, String realmName, String usName);
 
-  public boolean isPasswordManager(SugoiUser sugoiUser, String realm, String userStorage);
+  public boolean isPasswordManager(List<String> roles, String realmName, String usName);
 
-  public boolean isApplicationManager(
-      SugoiUser sugoiUser, String realm, String userStorage, String application);
+  public boolean isApplicationManager(List<String> roles, String realmName, String appName);
 
-  public boolean isWriter(SugoiUser sugoiUser, String realm, String userStorage);
+  public boolean isWriter(List<String> roles, String realmName, String usName);
 
-  public boolean isAdmin(SugoiUser sugoiUser);
+  public boolean isAdmin(List<String> roles);
 
   public boolean isValidAttributeAccordingAttributePattern(
-      SugoiUser sugoiUser, String realm, String storage, String pattern, String attribute);
+      List<String> roles, String realm, String storage, String pattern, String attribute);
 
-  public List<String> getUserRealmReader(SugoiUser sugoiUser);
+  public List<String> getReaderRoles(List<String> roles);
 
-  public List<String> getUserRealmWriter(SugoiUser sugoiUser);
+  public List<String> getWriterRoles(List<String> roles);
 
-  public List<String> getUserRealmPasswordManager(SugoiUser sugoiUser);
+  public List<String> getPasswordManagerRoles(List<String> roles);
 
-  public List<String> getUserRealmAppManager(SugoiUser sugoiUser);
-
-  public List<String> getAllowedAttributePattern(
-      SugoiUser sugoiUser, String realm, String storage, String pattern);
+  public List<String> getAppManagerRoles(List<String> roles);
 }

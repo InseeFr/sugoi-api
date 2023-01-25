@@ -15,7 +15,6 @@ package fr.insee.sugoi.services.decider;
 
 import fr.insee.sugoi.core.model.SugoiUser;
 import fr.insee.sugoi.core.service.PermissionService;
-import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,17 +37,13 @@ public class AuthorizeMethodDecider {
 
   public boolean isReader(String realm, String userStorage) {
     if (enable) {
-      logger.info("Check if user is reader on realm {} and userStorage {}", realm, userStorage);
-      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-      List<String> roles =
-          authentication.getAuthorities().stream()
-              .map(GrantedAuthority::getAuthority)
-              .map(String::toUpperCase)
-              .collect(Collectors.toList());
-      SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
-      return permissionService.isReader(sugoiUser, realm, userStorage)
-          || permissionService.isWriter(sugoiUser, realm, userStorage)
-          || permissionService.isPasswordManager(sugoiUser, realm, userStorage);
+      SugoiUser user = getCurrentSugoiUser();
+      logger.info(
+          "Check if user {} is reader on realm {} and userStorage {}",
+          user.getName(),
+          realm,
+          userStorage);
+      return permissionService.isReader(user.getRoles(), realm, userStorage);
     }
     logger.warn("PreAuthorize on request is disabled, can cause security problem");
     return true;
@@ -56,16 +51,9 @@ public class AuthorizeMethodDecider {
 
   public boolean isAppManager(String realm, String application) {
     if (enable) {
-      logger.info("Check if user is at least reader on realm {}", realm);
-      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-      List<String> roles =
-          authentication.getAuthorities().stream()
-              .map(GrantedAuthority::getAuthority)
-              .map(String::toUpperCase)
-              .collect(Collectors.toList());
-      SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
-      return permissionService.isApplicationManager(sugoiUser, realm, null, application)
-          || permissionService.isWriter(sugoiUser, realm, null);
+      SugoiUser user = getCurrentSugoiUser();
+      logger.info("Check if {} user is at least reader on realm {}", user.getName(), realm);
+      return permissionService.isApplicationManager(user.getRoles(), realm, application);
     }
     logger.warn("PreAuthorize on request is disabled, can cause security problem");
     return true;
@@ -73,17 +61,13 @@ public class AuthorizeMethodDecider {
 
   public boolean isPasswordManager(String realm, String userStorage) {
     if (enable) {
+      SugoiUser user = getCurrentSugoiUser();
       logger.info(
-          "Check if user is at least reader on realm {} and userStorage {}", realm, userStorage);
-      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-      List<String> roles =
-          authentication.getAuthorities().stream()
-              .map(GrantedAuthority::getAuthority)
-              .map(String::toUpperCase)
-              .collect(Collectors.toList());
-      SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
-      return permissionService.isPasswordManager(sugoiUser, realm, userStorage)
-          || permissionService.isWriter(sugoiUser, realm, userStorage);
+          "Check if user {} is at least reader on realm {} and userStorage {}",
+          user.getName(),
+          realm,
+          userStorage);
+      return permissionService.isPasswordManager(user.getRoles(), realm, userStorage);
     }
     logger.warn("PreAuthorize on request is disabled, can cause security problem");
     return true;
@@ -91,16 +75,13 @@ public class AuthorizeMethodDecider {
 
   public boolean isWriter(String realm, String userStorage) {
     if (enable) {
+      SugoiUser user = getCurrentSugoiUser();
       logger.info(
-          "Check if user is at least writer on realm {} and userStorage {}", realm, userStorage);
-      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-      List<String> roles =
-          authentication.getAuthorities().stream()
-              .map(GrantedAuthority::getAuthority)
-              .map(String::toUpperCase)
-              .collect(Collectors.toList());
-      SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
-      return permissionService.isWriter(sugoiUser, realm, userStorage);
+          "Check if user {} is at least writer on realm {} and userStorage {}",
+          user.getName(),
+          realm,
+          userStorage);
+      return permissionService.isWriter(user.getRoles(), realm, userStorage);
     }
     logger.warn("PreAuthorize on request is disabled, can cause security problem");
     return true;
@@ -108,17 +89,21 @@ public class AuthorizeMethodDecider {
 
   public boolean isAdmin() {
     if (enable) {
-      logger.info("Check if user is admin");
-      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-      List<String> roles =
-          authentication.getAuthorities().stream()
-              .map(GrantedAuthority::getAuthority)
-              .map(String::toUpperCase)
-              .collect(Collectors.toList());
-      SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
-      return permissionService.isAdmin(sugoiUser);
+      SugoiUser user = getCurrentSugoiUser();
+      logger.info("Check if user {} is admin", user.getName());
+      return permissionService.isAdmin(user.getRoles());
     }
     logger.warn("PreAuthorize on request is disabled, can cause security problem");
     return true;
+  }
+
+  private SugoiUser getCurrentSugoiUser() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    return new SugoiUser(
+        authentication.getName(),
+        authentication.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .map(String::toUpperCase)
+            .collect(Collectors.toList()));
   }
 }
