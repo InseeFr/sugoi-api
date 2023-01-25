@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.insee.sugoi</groupId>
 		<artifactId>sugoi-api-parent</artifactId>
-		<version>1.8.0-SNAPSHOT</version>
+		<version>test2</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>sugoi-api-seealso-http</artifactId>
