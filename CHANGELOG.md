@@ -1,3 +1,11 @@
+# test
+
+
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 1.8.0
+- [REL] :rocket: release version 1.8.0
+
+
 # 1.8.0
 
 
