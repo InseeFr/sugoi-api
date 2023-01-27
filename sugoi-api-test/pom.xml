@@ -6,7 +6,7 @@
     <parent>
         <groupId>fr.insee.sugoi</groupId>
         <artifactId>sugoi-api-parent</artifactId>
-        <version>test3</version>
+        <version>test3.1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>sugoi-api-test</artifactId>
