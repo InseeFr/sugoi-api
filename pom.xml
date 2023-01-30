@@ -30,7 +30,7 @@
 		<tomcat.version>9.0.71</tomcat.version>
 		<commons-io.version>2.11.0</commons-io.version>
 		<com.unboundid.version>6.0.7</com.unboundid.version>
-		<org.xmlunit.version>2.9.0</org.xmlunit.version>
+		<org.xmlunit.version>2.9.1</org.xmlunit.version>
 		<commons-lang.version>2.6</commons-lang.version>
 		<org.springdoc.version>1.6.14</org.springdoc.version>
 		<cucumber.version>7.5.0</cucumber.version>
