@@ -69,7 +69,7 @@ public class ConfigServiceTest {
   @Test
   public void shouldUpdateExistingRealm() {
     ProviderRequest providerRequest =
-        new ProviderRequest(new SugoiUser("toto", List.of("toto")), false, null, false);
+        new ProviderRequest(new SugoiUser("toto", List.of("toto")), false, null);
     ProviderResponse mockedResponse =
         new ProviderResponse("1", "1", ProviderResponseStatus.OK, realm, null);
     Mockito.when(realmProvider.updateRealm(realm, providerRequest)).thenReturn(mockedResponse);

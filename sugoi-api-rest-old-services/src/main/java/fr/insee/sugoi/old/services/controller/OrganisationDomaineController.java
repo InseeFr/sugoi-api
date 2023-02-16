@@ -146,8 +146,7 @@ public class OrganisationDomaineController {
                           .map(String::toUpperCase)
                           .collect(Collectors.toList())),
                   false,
-                  null,
-                  false));
+                  null));
       return ResponseEntity.status(HttpStatus.OK)
           .body(
               ouganextSugoiMapper.serializeToOuganext(
@@ -171,8 +170,7 @@ public class OrganisationDomaineController {
                         .map(String::toUpperCase)
                         .collect(Collectors.toList())),
                 false,
-                null,
-                false));
+                null));
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             ouganextSugoiMapper.serializeToOuganext(
@@ -281,8 +279,7 @@ public class OrganisationDomaineController {
                     .map(String::toUpperCase)
                     .collect(Collectors.toList())),
             false,
-            null,
-            false));
+            null));
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -351,8 +348,7 @@ public class OrganisationDomaineController {
                     .map(String::toUpperCase)
                     .collect(Collectors.toList())),
             false,
-            null,
-            false));
+            null));
     String request = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toString();
     String location =
         request.substring(0, request.lastIndexOf("/"))

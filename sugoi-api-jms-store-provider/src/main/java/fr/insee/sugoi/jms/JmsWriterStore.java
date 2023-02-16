@@ -37,8 +37,6 @@ public class JmsWriterStore implements WriterStore {
 
   private String queueRequestName;
   private String queueResponseName;
-  private String queueUrgentRequestName;
-  private String queueUrgentResponseName;
 
   private Realm realm;
 
@@ -48,8 +46,6 @@ public class JmsWriterStore implements WriterStore {
       JmsWriter jmsWriter,
       String queueRequestName,
       String queueResponseName,
-      String queueUrgentRequestName,
-      String queueUrgentResponseName,
       Realm realm,
       UserStorage userStorage) {
     this.realm = realm;
@@ -57,8 +53,6 @@ public class JmsWriterStore implements WriterStore {
     this.jmsWriter = jmsWriter;
     this.queueRequestName = queueRequestName;
     this.queueResponseName = queueResponseName;
-    this.queueUrgentRequestName = queueUrgentRequestName;
-    this.queueUrgentResponseName = queueUrgentResponseName;
   }
 
   @Override
@@ -369,8 +363,7 @@ public class JmsWriterStore implements WriterStore {
         // about the queue name
         BrokerResponse br =
             jmsWriter.checkResponseInQueueSynchronous(
-                providerRequest.isUrgent() ? queueUrgentResponseName : queueResponseName,
-                providerRequest.getTransactionId());
+                queueResponseName, providerRequest.getTransactionId());
         if (br == null) {
           response.setStatus(ProviderResponseStatus.PENDING);
           response.setRequestId(providerRequest.getTransactionId());
@@ -391,14 +384,8 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.PROVIDER_REQUEST, providerRequest);
     String correlationId =
         providerRequest.isAsynchronousAllowed()
-            ? jmsWriter.writeRequestInQueueAsynchronous(
-                providerRequest.isUrgent() ? queueUrgentRequestName : queueRequestName,
-                method,
-                params)
-            : jmsWriter.writeRequestInQueueSynchronous(
-                providerRequest.isUrgent() ? queueUrgentRequestName : queueRequestName,
-                method,
-                params);
+            ? jmsWriter.writeRequestInQueueAsynchronous(queueRequestName, method, params)
+            : jmsWriter.writeRequestInQueueSynchronous(queueRequestName, method, params);
 
     // IF asynchronous : status must be requested in another request
     if (providerRequest.isAsynchronousAllowed()) {
@@ -410,9 +397,7 @@ public class JmsWriterStore implements WriterStore {
     else {
       try {
         BrokerResponse br =
-            jmsWriter.checkResponseInQueueSynchronous(
-                providerRequest.isUrgent() ? queueUrgentResponseName : queueResponseName,
-                correlationId);
+            jmsWriter.checkResponseInQueueSynchronous(queueResponseName, correlationId);
         // warn : br is null if no response in time
 
         if (br == null) {

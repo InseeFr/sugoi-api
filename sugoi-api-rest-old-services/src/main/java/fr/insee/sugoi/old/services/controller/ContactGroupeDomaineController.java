@@ -184,8 +184,7 @@ public class ContactGroupeDomaineController {
                       .map(String::toUpperCase)
                       .collect(Collectors.toList())),
               false,
-              null,
-              false));
+              null));
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
   }
@@ -268,8 +267,7 @@ public class ContactGroupeDomaineController {
                       .map(String::toUpperCase)
                       .collect(Collectors.toList())),
               false,
-              null,
-              false));
+              null));
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     } else {
       return new ResponseEntity<>("Contact doesn't belong to group", HttpStatus.CONFLICT);

@@ -87,11 +87,6 @@ public class GenericGlue {
     headers.put("X-SUGOI-TRANSACTION-ID", String.valueOf(id));
   }
 
-  @Given("the client want to use the urgent queue")
-  public void urgent_queue() {
-    headers.put("X-SUGOI-URGENT-REQUEST", "true");
-  }
-
   @When("the client perform {} request with body on url {} body:")
   public void the_client_perform_request_on_url(String MethodType, String url, String body)
       throws Throwable {
