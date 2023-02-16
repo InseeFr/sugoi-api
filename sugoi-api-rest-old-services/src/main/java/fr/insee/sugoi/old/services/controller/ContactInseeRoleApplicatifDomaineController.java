@@ -164,7 +164,7 @@ public class ContactInseeRoleApplicatifDomaineController {
         realmUserStorage.getRealm(),
         realmUserStorage.getUserStorage(),
         user,
-        new ProviderRequest(new SugoiUser(authentication.getName(), roles), false, null, false));
+        new ProviderRequest(new SugoiUser(authentication.getName(), roles), false, null));
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -230,7 +230,7 @@ public class ContactInseeRoleApplicatifDomaineController {
         realmUserStorage.getRealm(),
         realmUserStorage.getUserStorage(),
         user,
-        new ProviderRequest(new SugoiUser(authentication.getName(), roles), false, null, false));
+        new ProviderRequest(new SugoiUser(authentication.getName(), roles), false, null));
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }

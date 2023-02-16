@@ -136,8 +136,7 @@ public class ContactsDomaineController {
                     .map(String::toUpperCase)
                     .collect(Collectors.toList())),
             false,
-            null,
-            false));
+            null));
     String request = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toString();
     String location =
         request.substring(0, request.lastIndexOf("/")) + "/contact/" + sugoiUser.getUsername();

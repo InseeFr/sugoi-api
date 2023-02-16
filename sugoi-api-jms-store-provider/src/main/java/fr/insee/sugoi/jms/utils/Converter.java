@@ -112,7 +112,6 @@ public class Converter {
       ProviderRequest pr = new ProviderRequest();
       pr.setAsynchronousAllowed((boolean) linkedHashMap.get("asynchronousAllowed"));
       pr.setSugoiUser(toSugoiUser(linkedHashMap.get("sugoiUser")));
-      pr.setIsUrgent((boolean) linkedHashMap.get("urgent"));
       pr.setTransactionId((String) linkedHashMap.get("transactionId"));
       return pr;
     }

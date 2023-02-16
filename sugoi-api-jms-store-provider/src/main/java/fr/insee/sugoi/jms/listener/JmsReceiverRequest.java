@@ -40,14 +40,8 @@ public class JmsReceiverRequest {
   @Value("${fr.insee.sugoi.jms.queue.requests.name:}")
   private String queueRequestName;
 
-  @Value("${fr.insee.sugoi.jms.queue.requests.name:}")
-  private String queueUrgentRequestName;
-
   @Value("${fr.insee.sugoi.jms.queue.response.name:}")
   private String queueResponseName;
-
-  @Value("${fr.insee.sugoi.jms.queue.response.name:}")
-  private String queueUrgentResponseName;
 
   @Autowired
   @Qualifier("asynchronous")
@@ -57,25 +51,6 @@ public class JmsReceiverRequest {
       destination = "${fr.insee.sugoi.jms.queue.requests.name:}",
       containerFactory = "myFactory")
   public void onRequest(BrokerRequest request) throws Exception {
-    logger.debug(
-        "New message with correlactionId {} on queue {} message: {}",
-        request.getCorrelationId(),
-        queueRequestName,
-        request);
-    ProviderResponse response = router.exec(request);
-    BrokerResponse br = new BrokerResponse();
-    br.setProviderResponse(response);
-    jmsTemplate.convertAndSend(
-        queueResponseName,
-        br,
-        m -> {
-          m.setJMSCorrelationID(request.getCorrelationId());
-          return m;
-        });
-  }
-
-  @JmsListener(destination = "${fr.insee.sugoi.jms.priority.queue.request.name:}")
-  public void onUrgentRequest(BrokerRequest request) throws Exception {
     logger.debug(
         "New message with correlactionId {} on queue {} message: {}",
         request.getCorrelationId(),

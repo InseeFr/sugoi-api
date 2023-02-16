@@ -167,7 +167,7 @@ public class ContactHabilitationDomaineController {
         realmUserStorage.getRealm(),
         realmUserStorage.getUserStorage(),
         user,
-        new ProviderRequest(new SugoiUser(authentication.getName(), roles), false, null, false));
+        new ProviderRequest(new SugoiUser(authentication.getName(), roles), false, null));
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -238,7 +238,7 @@ public class ContactHabilitationDomaineController {
         realmUserStorage.getRealm(),
         realmUserStorage.getUserStorage(),
         user,
-        new ProviderRequest(new SugoiUser(authentication.getName(), roles), false, null, false));
+        new ProviderRequest(new SugoiUser(authentication.getName(), roles), false, null));
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -301,7 +301,7 @@ public class ContactHabilitationDomaineController {
         realmUserStorage.getRealm(),
         realmUserStorage.getUserStorage(),
         user,
-        new ProviderRequest(new SugoiUser(authentication.getName(), roles), false, null, false));
+        new ProviderRequest(new SugoiUser(authentication.getName(), roles), false, null));
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -371,7 +371,7 @@ public class ContactHabilitationDomaineController {
         domaine,
         null,
         user,
-        new ProviderRequest(new SugoiUser(authentication.getName(), roles), false, null, false));
+        new ProviderRequest(new SugoiUser(authentication.getName(), roles), false, null));
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }

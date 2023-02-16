@@ -34,23 +34,10 @@ public class JmsStoreBeans {
   @Value("${fr.insee.sugoi.jms.queue.response.name:}")
   private String queueResponseName;
 
-  @Value("${fr.insee.sugoi.jms.queue.requests.name:}")
-  private String queueUrgentRequestName;
-
-  @Value("${fr.insee.sugoi.jms.queue.response.name:}")
-  private String queueUrgentResponseName;
-
   @Bean("JMSWriterStore")
   @Lazy
   @Scope("prototype")
   public JmsWriterStore JmsWriterStore(Realm realm, UserStorage userStorage) {
-    return new JmsWriterStore(
-        jmsWriter,
-        queueRequestName,
-        queueResponseName,
-        queueUrgentRequestName,
-        queueUrgentResponseName,
-        realm,
-        userStorage);
+    return new JmsWriterStore(jmsWriter, queueRequestName, queueResponseName, realm, userStorage);
   }
 }

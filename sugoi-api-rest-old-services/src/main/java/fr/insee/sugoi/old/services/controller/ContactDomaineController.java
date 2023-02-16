@@ -132,8 +132,7 @@ public class ContactDomaineController {
                       .map(String::toUpperCase)
                       .collect(Collectors.toList())),
               false,
-              null,
-              false));
+              null));
       return ResponseEntity.status(HttpStatus.OK)
           .body(
               ouganextSugoiMapper.serializeToOuganext(
@@ -154,8 +153,7 @@ public class ContactDomaineController {
                     .map(String::toUpperCase)
                     .collect(Collectors.toList())),
             false,
-            null,
-            false));
+            null));
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             ouganextSugoiMapper.serializeToOuganext(
@@ -261,8 +259,7 @@ public class ContactDomaineController {
                     .map(String::toUpperCase)
                     .collect(Collectors.toList())),
             false,
-            null,
-            false));
+            null));
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 

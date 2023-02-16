@@ -75,14 +75,7 @@ public class CredentialsJmsTest {
     realm.setUserStorages(List.of(userStorage));
 
     jmsWriterStore =
-        new JmsWriterStore(
-            jmsWriter,
-            "queue.request",
-            "queue.response",
-            "queue.urgent.request",
-            "queue.urgent.response",
-            realm,
-            userStorage);
+        new JmsWriterStore(jmsWriter, "queue.request", "queue.response", realm, userStorage);
 
     Mockito.when(
             doNothingWriterStore.initPassword(

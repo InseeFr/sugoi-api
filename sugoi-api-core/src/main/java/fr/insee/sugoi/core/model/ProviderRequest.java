@@ -20,7 +20,6 @@ public class ProviderRequest implements Serializable {
   private SugoiUser sugoiUser;
   private boolean asynchronousAllowed;
   private String transactionId;
-  private boolean urgent;
 
   public ProviderRequest() {}
 
@@ -28,14 +27,6 @@ public class ProviderRequest implements Serializable {
     this.sugoiUser = sugoiUser;
     this.asynchronousAllowed = asynchronousAllowed;
     this.transactionId = transactionId;
-  }
-
-  public ProviderRequest(
-      SugoiUser sugoiUser, boolean asynchronousAllowed, String transactionId, boolean isUrgent) {
-    this.sugoiUser = sugoiUser;
-    this.asynchronousAllowed = asynchronousAllowed;
-    this.transactionId = transactionId;
-    this.urgent = isUrgent;
   }
 
   public SugoiUser getSugoiUser() {
@@ -60,13 +51,5 @@ public class ProviderRequest implements Serializable {
 
   public void setTransactionId(String transactionId) {
     this.transactionId = transactionId;
-  }
-
-  public boolean isUrgent() {
-    return this.urgent;
-  }
-
-  public void setIsUrgent(boolean isUrgent) {
-    this.urgent = isUrgent;
   }
 }

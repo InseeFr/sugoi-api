@@ -321,9 +321,6 @@ public class UserController {
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
-      @Parameter(description = "Make request prioritary", required = false)
-          @RequestHeader(name = "X-SUGOI-URGENT-REQUEST", defaultValue = "false")
-          boolean isUrgent,
       @Parameter(description = "Transaction Id", required = false)
           @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
           String transactionId,
@@ -343,8 +340,7 @@ public class UserController {
                         .map(String::toUpperCase)
                         .collect(Collectors.toList())),
                 isAsynchronous,
-                transactionId,
-                isUrgent));
+                transactionId));
     URI location =
         ServletUriComponentsBuilder.fromCurrentRequest()
             .path("/" + user.getUsername())
@@ -398,9 +394,6 @@ public class UserController {
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
-      @Parameter(description = "Make request prioritary", required = false)
-          @RequestHeader(name = "X-SUGOI-URGENT-REQUEST", defaultValue = "false")
-          boolean isUrgent,
       @Parameter(description = "Transaction Id", required = false)
           @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
           String transactionId,
@@ -424,8 +417,7 @@ public class UserController {
                         .map(String::toUpperCase)
                         .collect(Collectors.toList())),
                 isAsynchronous,
-                null,
-                isUrgent));
+                null));
     URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
     return ResponseEntity.status(Utils.convertStatusTHttpStatus(response, false, false))
         .header(HttpHeaders.LOCATION, location.toString())
@@ -470,9 +462,6 @@ public class UserController {
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
-      @Parameter(description = "Make request prioritary", required = false)
-          @RequestHeader(name = "X-SUGOI-URGENT-REQUEST", defaultValue = "false")
-          boolean isUrgent,
       @Parameter(description = "Transaction Id", required = false)
           @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
           String transactionId,
@@ -488,7 +477,6 @@ public class UserController {
         (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
         id,
         isAsynchronous,
-        isUrgent,
         transactionId,
         authentication,
         user);
@@ -530,9 +518,6 @@ public class UserController {
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
-      @Parameter(description = "Make request prioritary", required = false)
-          @RequestHeader(name = "X-SUGOI-URGENT-REQUEST", defaultValue = "false")
-          boolean isUrgent,
       @Parameter(description = "Transaction Id", required = false)
           @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
           String transactionId,
@@ -551,8 +536,7 @@ public class UserController {
                         .map(String::toUpperCase)
                         .collect(Collectors.toList())),
                 isAsynchronous,
-                transactionId,
-                isUrgent));
+                transactionId));
     return ResponseEntity.status(Utils.convertStatusTHttpStatus(response, false, true))
         .header("X-SUGOI-TRANSACTION-ID", response.getRequestId())
         .header("X-SUGOI-REQUEST-STATUS", response.getStatus().toString())
@@ -590,9 +574,6 @@ public class UserController {
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
-      @Parameter(description = "Make request prioritary", required = false)
-          @RequestHeader(name = "X-SUGOI-URGENT-REQUEST", defaultValue = "false")
-          boolean isUrgent,
       @Parameter(description = "Transaction Id", required = false)
           @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
           String transactionId,
@@ -604,7 +585,6 @@ public class UserController {
         (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
         id,
         isAsynchronous,
-        isUrgent,
         transactionId,
         authentication);
   }
@@ -820,9 +800,6 @@ public class UserController {
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
-      @Parameter(description = "Make request prioritary", required = false)
-          @RequestHeader(name = "X-SUGOI-URGENT-REQUEST", defaultValue = "false")
-          boolean isUrgent,
       @Parameter(description = "Transaction Id", required = false)
           @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
           String transactionId,
@@ -844,8 +821,7 @@ public class UserController {
                           .map(String::toUpperCase)
                           .collect(Collectors.toList())),
                   isAsynchronous,
-                  transactionId,
-                  isUrgent));
+                  transactionId));
       return ResponseEntity.status(Utils.convertStatusTHttpStatus(response, false, true))
           .header("X-SUGOI-TRANSACTION-ID", response.getRequestId())
           .header("X-SUGOI-REQUEST-STATUS", response.getStatus().toString())
@@ -872,9 +848,6 @@ public class UserController {
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
-      @Parameter(description = "Make request prioritary", required = false)
-          @RequestHeader(name = "X-SUGOI-URGENT-REQUEST", defaultValue = "false")
-          boolean isUrgent,
       @Parameter(description = "Transaction Id", required = false)
           @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
           String transactionId,
@@ -888,7 +861,6 @@ public class UserController {
         id,
         file,
         isAsynchronous,
-        isUrgent,
         transactionId,
         authentication);
   }
@@ -922,9 +894,6 @@ public class UserController {
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
-      @Parameter(description = "Make request prioritary", required = false)
-          @RequestHeader(name = "X-SUGOI-URGENT-REQUEST", defaultValue = "false")
-          boolean isUrgent,
       @Parameter(description = "Transaction Id", required = false)
           @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
           String transactionId,
@@ -942,8 +911,7 @@ public class UserController {
                         .map(String::toUpperCase)
                         .collect(Collectors.toList())),
                 isAsynchronous,
-                transactionId,
-                isUrgent));
+                transactionId));
     return ResponseEntity.status(Utils.convertStatusTHttpStatus(response, false, true))
         .header("X-SUGOI-TRANSACTION-ID", response.getRequestId())
         .header("X-SUGOI-REQUEST-STATUS", response.getStatus().toString())
@@ -974,9 +942,6 @@ public class UserController {
       @Parameter(description = "Allowed asynchronous request", required = false)
           @RequestHeader(name = "X-SUGOI-ASYNCHRONOUS-ALLOWED-REQUEST", defaultValue = "false")
           boolean isAsynchronous,
-      @Parameter(description = "Make request prioritary", required = false)
-          @RequestHeader(name = "X-SUGOI-URGENT-REQUEST", defaultValue = "false")
-          boolean isUrgent,
       @Parameter(description = "Transaction Id", required = false)
           @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
           String transactionId,
@@ -988,7 +953,6 @@ public class UserController {
         (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
         id,
         isAsynchronous,
-        isUrgent,
         transactionId,
         authentication);
   }

@@ -129,8 +129,7 @@ public class ContactPasswordDomaineController {
                     .map(String::toUpperCase)
                     .collect(Collectors.toList())),
             false,
-            null,
-            false));
+            null));
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -195,8 +194,7 @@ public class ContactPasswordDomaineController {
                     .map(String::toUpperCase)
                     .collect(Collectors.toList())),
             false,
-            null,
-            false));
+            null));
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -271,8 +269,7 @@ public class ContactPasswordDomaineController {
                     .map(String::toUpperCase)
                     .collect(Collectors.toList())),
             false,
-            null,
-            false));
+            null));
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
