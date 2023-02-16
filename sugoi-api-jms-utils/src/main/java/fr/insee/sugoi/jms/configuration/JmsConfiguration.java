@@ -52,6 +52,12 @@ public class JmsConfiguration {
   @Value("${fr.insee.sugoi.jms.broker.timeout:5000}")
   private Integer timeout;
 
+  @Value("${fr.insee.sugoi.jms.broker.expiration.synchronous:60000}")
+  private Integer synchronousExpiration;
+
+  @Value("${fr.insee.sugoi.jms.broker.expiration.asynchronous:3600000}")
+  private Integer asynchronousExpiration;
+
   @Bean
   public ActiveMQConnectionFactory connectionFactory() {
     ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
@@ -71,6 +77,8 @@ public class JmsConfiguration {
   @Qualifier("asynchronous")
   public JmsTemplate getJmsTemplate() {
     JmsTemplate template = new JmsTemplate();
+    template.setExplicitQosEnabled(true);
+    template.setTimeToLive(asynchronousExpiration);
     template.setConnectionFactory(connectionFactory());
     template.setMessageConverter(messageConverter());
     return template;
@@ -80,6 +88,8 @@ public class JmsConfiguration {
   @Qualifier("synchronous")
   public JmsTemplate JmsTemplateWithTimeout() {
     JmsTemplate template = new JmsTemplate();
+    template.setExplicitQosEnabled(true);
+    template.setTimeToLive(synchronousExpiration);
     template.setConnectionFactory(connectionFactory());
     template.setMessageConverter(messageConverter());
     template.setReceiveTimeout(timeout);
