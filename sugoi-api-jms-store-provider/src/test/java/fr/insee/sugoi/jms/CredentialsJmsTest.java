@@ -75,7 +75,8 @@ public class CredentialsJmsTest {
     realm.setUserStorages(List.of(userStorage));
 
     jmsWriterStore =
-        new JmsWriterStore(jmsWriter, "queue.request", "queue.response", realm, userStorage);
+        new JmsWriterStore(
+            jmsWriter, "queue.request", "queue.response", null, null, realm, userStorage);
 
     Mockito.when(
             doNothingWriterStore.initPassword(
@@ -99,8 +100,8 @@ public class CredentialsJmsTest {
 
   @Test
   @DisplayName(
-      "When using the initpassowrd service threw a JMS, the message is written in JMS queue"
-          + "then read and pass threw credentialsService a second time")
+      "When using the initpassowrd service through a JMS, the message is written in JMS queue"
+          + "then read and pass through credentialsService a second time")
   public void newPasswordIsSentThrewJmsTest() {
 
     ProviderRequest providerRequest = new ProviderRequest();

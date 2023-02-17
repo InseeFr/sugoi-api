@@ -16,7 +16,6 @@ package fr.insee.sugoi.jms.writer;
 import fr.insee.sugoi.jms.exception.BrokerException;
 import fr.insee.sugoi.jms.model.BrokerRequest;
 import fr.insee.sugoi.jms.model.BrokerResponse;
-import fr.insee.sugoi.model.exceptions.GroupAlreadyExistException;
 import fr.insee.sugoi.model.exceptions.InvalidTransactionIdException;
 import java.util.ArrayList;
 import java.util.Map;
@@ -71,7 +70,7 @@ public class JmsWriter {
     }
   }
 
-  public BrokerResponse checkResponseInQueueSynchronous(String queueName, String correlationId) {
+  public BrokerResponse checkResponseInQueue(String queueName, String correlationId) {
     try {
       Message message =
           jmsTemplateSynchronous.receiveSelected(
@@ -84,20 +83,8 @@ public class JmsWriter {
                 + queueName
                 + " of the broker, maybe it doesn't exit or the response have already been consulted");
       }
-      BrokerResponse response = (BrokerResponse) messageConverter.fromMessage(message);
-      // Must determine manually the exception type because the broker loose the type
-      if (response.getProviderResponse().getException() instanceof GroupAlreadyExistException) {
-        response
-            .getProviderResponse()
-            .setException(
-                new GroupAlreadyExistException(
-                    response.getProviderResponse().getException().getMessage()));
-      }
-      // How to get the broker response object from message !!
-      return response;
-    } catch (JmsException e) {
-      throw new RuntimeException(e);
-    } catch (JMSException e) {
+      return (BrokerResponse) messageConverter.fromMessage(message);
+    } catch (JmsException | JMSException e) {
       throw new RuntimeException(e);
     }
   }
@@ -123,31 +110,6 @@ public class JmsWriter {
       logger.debug(
           "Error when sending asynchronous message {} to broker in queue {}", request, queueName);
       throw new BrokerException(e.getMessage());
-    }
-  }
-
-  public BrokerResponse checkResponseInQueueAsynchronous(String queueName, String correlationId) {
-
-    try {
-      Message message =
-          jmsTemplateAsynchronous.receiveSelected(
-              queueName, "JMSCorrelationID= '" + correlationId + "'");
-      if (message == null) {
-        throw new InvalidTransactionIdException(
-            "The correlationId "
-                + correlationId
-                + " was not found on the queue "
-                + queueName
-                + " of the broker, maybe it doesn't exit or the response have already been consulted");
-      }
-      BrokerResponse response = (BrokerResponse) messageConverter.fromMessage(message);
-      // How to get the broker response object from message !!
-      return response;
-    } catch (JmsException e) {
-      throw new RuntimeException(e);
-    } catch (JMSException e) {
-      // TODO Auto-generated catch block
-      throw new RuntimeException(e);
     }
   }
 }
