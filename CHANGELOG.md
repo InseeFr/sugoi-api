@@ -1,3 +1,16 @@
+# v1.9.0
+
+
+- [ENH] :sparkles: Asynchronous messages can have their own queue
+- [ENH] :fire: Remove urgent queue for JmsWriter
+- [ENH] :sparkles: Messages on broker can expire
+- [UP] :arrow_up: Bump xmlunit-core from 2.9.0 to 2.9.1
+- [REL] :rocket: release version test3
+- [UP] :arrow_up: Bump maven-surefire-plugin from 3.0.0-M7 to 3.0.0-M8
+- [UP] :arrow_up: Bump tomcat.version from 9.0.65 to 9.0.71
+- [UP] :arrow_up: Bump spotless-maven-plugin from 2.28.0 to 2.30.0
+
+
 # 1.8.0
 
 
