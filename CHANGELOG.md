@@ -1,3 +1,9 @@
+# 1.9.0
+
+
+- [REL] :rocket: release version v1.9.0
+
+
 # 1.8.0
 
 
