@@ -16,6 +16,7 @@ package fr.insee.sugoi.jms.listener;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.jms.model.BrokerRequest;
 import fr.insee.sugoi.jms.model.BrokerResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,30 +38,51 @@ public class JmsReceiverRequest {
 
   private static final Logger logger = LoggerFactory.getLogger(JmsReceiverRequest.class);
 
-  @Value("${fr.insee.sugoi.jms.queue.requests.name:}")
-  private String queueRequestName;
-
   @Value("${fr.insee.sugoi.jms.queue.response.name:}")
   private String queueResponseName;
 
+  @Value("${fr.insee.sugoi.jms.queue.response.asynchronous.name:}")
+  private String queueResponseAsynchronousName;
+
+  @Autowired
+  @Qualifier("synchronous")
+  JmsTemplate jmsTemplateSynchronous;
+
   @Autowired
   @Qualifier("asynchronous")
-  JmsTemplate jmsTemplate;
+  JmsTemplate jmsTemplateAsynchronous;
 
   @JmsListener(
       destination = "${fr.insee.sugoi.jms.queue.requests.name:}",
       containerFactory = "myFactory")
-  public void onRequest(BrokerRequest request) throws Exception {
+  public void onQueueSynchronousRequest(BrokerRequest request) throws Exception {
+    onRequest(request, jmsTemplateSynchronous);
+  }
+
+  @JmsListener(
+      destination = "${fr.insee.sugoi.jms.queue.requests.asynchronous.name:}",
+      containerFactory = "myFactory")
+  public void onQueueAsynchronousRequest(BrokerRequest request) throws Exception {
+    onRequest(request, jmsTemplateAsynchronous);
+  }
+
+  private void onRequest(BrokerRequest request, JmsTemplate jmsTemplate) throws Exception {
     logger.debug(
-        "New message with correlactionId {} on queue {} message: {}",
-        request.getCorrelationId(),
-        queueRequestName,
-        request);
+        "New message with correlactionId {} message: {}", request.getCorrelationId(), request);
     ProviderResponse response = router.exec(request);
     BrokerResponse br = new BrokerResponse();
     br.setProviderResponse(response);
+    boolean isAsync =
+        (boolean)
+            ((java.util.LinkedHashMap<String, Object>)
+                    request
+                        .getmethodParams()
+                        .get(fr.insee.sugoi.jms.utils.JmsAtttributes.PROVIDER_REQUEST))
+                .get("asynchronousAllowed");
     jmsTemplate.convertAndSend(
-        queueResponseName,
+        isAsync && StringUtils.isNotEmpty(queueResponseAsynchronousName)
+            ? queueResponseAsynchronousName
+            : queueResponseName,
         br,
         m -> {
           m.setJMSCorrelationID(request.getCorrelationId());

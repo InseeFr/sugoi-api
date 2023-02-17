@@ -29,6 +29,7 @@ import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jms.JmsException;
 
 public class JmsWriterStore implements WriterStore {
@@ -37,7 +38,8 @@ public class JmsWriterStore implements WriterStore {
 
   private String queueRequestName;
   private String queueResponseName;
-
+  private String queueAsyncRequestName;
+  private String queueAsyncResponseName;
   private Realm realm;
 
   private UserStorage userStorage;
@@ -46,6 +48,8 @@ public class JmsWriterStore implements WriterStore {
       JmsWriter jmsWriter,
       String queueRequestName,
       String queueResponseName,
+      String queueAsyncRequestName,
+      String queueAsyncResponseName,
       Realm realm,
       UserStorage userStorage) {
     this.realm = realm;
@@ -53,6 +57,10 @@ public class JmsWriterStore implements WriterStore {
     this.jmsWriter = jmsWriter;
     this.queueRequestName = queueRequestName;
     this.queueResponseName = queueResponseName;
+    this.queueAsyncRequestName =
+        StringUtils.isNotEmpty(queueAsyncRequestName) ? queueAsyncRequestName : queueRequestName;
+    this.queueAsyncResponseName =
+        StringUtils.isNotEmpty(queueAsyncResponseName) ? queueAsyncResponseName : queueResponseName;
   }
 
   @Override
@@ -349,21 +357,12 @@ public class JmsWriterStore implements WriterStore {
       String method, Map<String, Object> params, String entityId, ProviderRequest providerRequest) {
     ProviderResponse response = new ProviderResponse();
 
-    // Perhaps use 2 jms template, one with a "reasonable" timeout for synchronous
-    // requeste,
-    // one without any timout, for ckeing status
-    // => the timeout is defined only at jmsTemplate level, not at the receive
-    // method
-
-    // Check status
-    if (providerRequest.getTransactionId() != null
-        && !providerRequest.getTransactionId().isEmpty()) {
+    if (StringUtils.isNotEmpty(providerRequest.getTransactionId())) {
       try {
-        // We dont't care of the jmstemplate when checking for response we just care
-        // about the queue name
+        // having an id only makes sense for asynchronous
         BrokerResponse br =
-            jmsWriter.checkResponseInQueueSynchronous(
-                queueResponseName, providerRequest.getTransactionId());
+            jmsWriter.checkResponseInQueue(
+                queueAsyncResponseName, providerRequest.getTransactionId());
         if (br == null) {
           response.setStatus(ProviderResponseStatus.PENDING);
           response.setRequestId(providerRequest.getTransactionId());
@@ -384,7 +383,7 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.PROVIDER_REQUEST, providerRequest);
     String correlationId =
         providerRequest.isAsynchronousAllowed()
-            ? jmsWriter.writeRequestInQueueAsynchronous(queueRequestName, method, params)
+            ? jmsWriter.writeRequestInQueueAsynchronous(queueAsyncRequestName, method, params)
             : jmsWriter.writeRequestInQueueSynchronous(queueRequestName, method, params);
 
     // IF asynchronous : status must be requested in another request
@@ -396,8 +395,7 @@ public class JmsWriterStore implements WriterStore {
     // IF synchronous
     else {
       try {
-        BrokerResponse br =
-            jmsWriter.checkResponseInQueueSynchronous(queueResponseName, correlationId);
+        BrokerResponse br = jmsWriter.checkResponseInQueue(queueResponseName, correlationId);
         // warn : br is null if no response in time
 
         if (br == null) {

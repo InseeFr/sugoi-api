@@ -50,7 +50,8 @@ public class JmsWriterStoreTest {
     realm.setUserStorages(List.of(userStorage));
 
     jmsWriterStore =
-        new JmsWriterStore(jmsWriter, "queue.request", "queue.response", realm, userStorage);
+        new JmsWriterStore(
+            jmsWriter, "queue.request", "queue.response", null, null, realm, userStorage);
   }
 
   @Test
@@ -66,10 +67,10 @@ public class JmsWriterStoreTest {
 
     Mockito.when(jmsWriter.writeRequestInQueueSynchronous(anyString(), anyString(), any()))
         .thenReturn("myid");
-    Mockito.when(jmsWriter.checkResponseInQueueSynchronous(anyString(), anyString()))
+    Mockito.when(jmsWriter.checkResponseInQueue(anyString(), anyString()))
         .thenReturn(mockedBrokerResponse);
 
-    ProviderRequest providerRequest = new ProviderRequest(new SugoiUser(), false, "id");
+    ProviderRequest providerRequest = new ProviderRequest(new SugoiUser(), false, null);
     ProviderResponse providerResponse = jmsWriterStore.createUser(user, providerRequest);
 
     assertThat(
