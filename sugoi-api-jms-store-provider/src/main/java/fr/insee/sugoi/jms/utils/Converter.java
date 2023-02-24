@@ -155,10 +155,19 @@ public class Converter {
     }
   }
 
-  public PostalAddress toPostalAddress(Object object) {
-    ArrayList<String> linkedHashMap = (ArrayList<String>) object;
+  private PostalAddress toPostalAddress(Object object) {
+    LinkedHashMap<String, String> linkedHashMap = (LinkedHashMap) object;
     if (linkedHashMap != null) {
-      String[] lines = linkedHashMap.toArray(new String[7]);
+      String[] lines =
+          new String[] {
+            linkedHashMap.get("line1"),
+            linkedHashMap.get("line2"),
+            linkedHashMap.get("line3"),
+            linkedHashMap.get("line4"),
+            linkedHashMap.get("line5"),
+            linkedHashMap.get("line6"),
+            linkedHashMap.get("line7")
+          };
       PostalAddress postalAddress = new PostalAddress();
       postalAddress.setLines(lines);
       return postalAddress;
