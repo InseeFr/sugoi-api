@@ -1,3 +1,14 @@
+# 1.9.1
+
+
+- [BUG] :bug: Fix addresses fail to be converted through JMS
+- [UP] :arrow_up: Bump commons-csv from 1.9.0 to 1.10.0
+- [UP] :arrow_up: Bump spotless-maven-plugin from 2.30.0 to 2.33.0
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 1.9.0
+- [REL] :rocket: release version 1.9.0
+
+
 # 1.9.0
 
 
