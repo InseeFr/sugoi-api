@@ -33,7 +33,7 @@
 		<org.xmlunit.version>2.9.1</org.xmlunit.version>
 		<commons-lang.version>2.6</commons-lang.version>
 		<org.springdoc.version>1.6.14</org.springdoc.version>
-		<cucumber.version>7.5.0</cucumber.version>
+		<cucumber.version>7.11.1</cucumber.version>
 		<cucumber-reporting-plugin.version>7.3.0</cucumber-reporting-plugin.version>
 		<httpclient.version>4.5.14</httpclient.version>
 		<apache.commons.version>1.10.0</apache.commons.version>
