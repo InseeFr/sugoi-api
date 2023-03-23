@@ -65,8 +65,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LdapWriterStore extends LdapStore implements WriterStore {
+
+  private static final Logger logger = LoggerFactory.getLogger(LdapWriterStore.class);
 
   private final LDAPConnectionPool ldapPoolConnection;
 
@@ -528,14 +532,20 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
               newPassword);
       ExtendedResult result = ldapPoolConnection.processExtendedOperation(pmer);
 
-      if (result.getResultCode().intValue() == ResultCode.INVALID_CREDENTIALS_INT_VALUE) {
+      if (result.getResultCode().intValue() == ResultCode.INVALID_CREDENTIALS_INT_VALUE
+          || result.getResultCode().intValue() == ResultCode.UNWILLING_TO_PERFORM_INT_VALUE) {
         throw new InvalidPasswordException("Old password is not correct");
       } else if (result.getResultCode().intValue() != 0) {
+        logger.error(
+            "erreur lors du changement du mot de passe de l'utilisateur "
+                + userId
+                + " code renvoyé : "
+                + result.getResultCode());
         throw new StoreException(
             "Unexpected error when changing password", new LDAPException(result.getResultCode()));
       }
     } catch (NumberFormatException | LDAPException e) {
-      e.printStackTrace();
+      logger.error("problème de conversion numérique ou d'accès au ldap", e);
     }
     ProviderResponse response = new ProviderResponse();
     response.setStatus(ProviderResponseStatus.OK);
