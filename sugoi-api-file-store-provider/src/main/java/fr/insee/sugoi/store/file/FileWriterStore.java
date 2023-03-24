@@ -27,6 +27,7 @@ import fr.insee.sugoi.model.RealmConfigKeys;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.model.exceptions.GroupAlreadyExistException;
+import fr.insee.sugoi.model.exceptions.NoGroupException;
 import fr.insee.sugoi.model.exceptions.UserNotFoundException;
 import java.io.File;
 import java.io.FileWriter;
@@ -119,6 +120,9 @@ public class FileWriterStore implements WriterStore {
   @Override
   public ProviderResponse createGroup(
       String appName, Group appGroup, ProviderRequest providerRequest) {
+    if (appGroup == null) {
+      throw new NoGroupException("no group provided");
+    }
     fileReaderStore.setResourceLoader(resourceLoader);
     Application application =
         fileReaderStore

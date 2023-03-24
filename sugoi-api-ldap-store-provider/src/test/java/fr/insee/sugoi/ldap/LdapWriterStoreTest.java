@@ -14,7 +14,9 @@
 package fr.insee.sugoi.ldap;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
@@ -22,9 +24,17 @@ import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
-import fr.insee.sugoi.model.*;
+import fr.insee.sugoi.model.Application;
+import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.Habilitation;
+import fr.insee.sugoi.model.Organization;
+import fr.insee.sugoi.model.PostalAddress;
+import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.UserStorage;
 import fr.insee.sugoi.model.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.model.exceptions.InvalidPasswordException;
+import fr.insee.sugoi.model.exceptions.NoGroupException;
 import fr.insee.sugoi.model.exceptions.StoragePolicyNotMetException;
 import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
 import fr.insee.sugoi.store.ldap.LdapReaderStore;
@@ -381,6 +391,17 @@ public class LdapWriterStoreTest {
         "Should retrieve Groupy",
         ldapReaderStore.getGroup("Applitest", "Groupy_Applitest").get().getName(),
         is("Groupy_Applitest"));
+  }
+
+  @Test
+  public void testCreateGroupWithNoGroup() {
+    Group group = null;
+    assertThrows(
+        NoGroupException.class,
+        () -> {
+          ldapWriterStore.createGroup("Applitest", group, null);
+        },
+        "Should throw NoGroupException");
   }
 
   @Test
