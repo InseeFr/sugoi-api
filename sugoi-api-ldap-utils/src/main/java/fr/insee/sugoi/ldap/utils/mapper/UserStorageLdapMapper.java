@@ -38,7 +38,7 @@ public class UserStorageLdapMapper {
         .forEach(
             attribute -> {
               for (String value : attribute.getValues()) {
-                String[] property = value.split("\\$");
+                String[] property = value.split("\\$", 2);
                 if (property.length == 2) {
                   RealmConfigKeys configKey =
                       realmConfigKeysConfiguration.getRealmConfigKey(property[0]);
