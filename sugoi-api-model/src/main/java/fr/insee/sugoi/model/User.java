@@ -15,7 +15,11 @@ package fr.insee.sugoi.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import fr.insee.sugoi.model.exceptions.StoreException;
+import fr.insee.sugoi.model.technics.ModelType;
+import fr.insee.sugoi.model.technics.StoreMapping;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @JsonInclude(Include.NON_NULL)
 public class User implements SugoiObject {
@@ -159,5 +163,25 @@ public class User implements SugoiObject {
       this.groups = new ArrayList<>();
     }
     this.groups.add(group);
+  }
+
+  public Map<String, String> getMapOfStringFields(List<StoreMapping> userStoreMappings) {
+    return userStoreMappings.stream()
+        .filter(mapping -> mapping.getModelType().equals(ModelType.STRING))
+        .map(StoreMapping::getSugoiName)
+        .collect(
+            Collectors.toMap(
+                m -> m,
+                m -> {
+                  try {
+                    return get(m).orElse("").toString();
+                  } catch (NoSuchFieldException e) {
+                    throw new StoreException(
+                        String.format(
+                            "Cannot convert non existing field %s on User. Check configuration.",
+                            m),
+                        e);
+                  }
+                }));
   }
 }

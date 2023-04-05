@@ -14,6 +14,7 @@
 package fr.insee.sugoi.config;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
@@ -213,5 +214,14 @@ public class LdapRealmProviderDAOTest {
             .get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE)
             .get(0),
         is("true"));
+  }
+
+  @Test
+  public void usGetConfigShouldExists() {
+    UserStorage userstorage =
+        ldapRealmProviderDAOImpl.load("domaine1").get().getUserStorageByName("default").get();
+    assertThat(
+        userstorage.getProperties().get(GlobalKeysConfig.USER_USERSTORAGE_DEFINED_ATTRIBUTES),
+        hasItem("fieldexample:Example $(username) $(mail)"));
   }
 }

@@ -299,6 +299,8 @@ inseepropriete: brancheContact$ou=contacts,ou=clients_domaine1,o=insee,c=fr
 inseepropriete: brancheAdresse$ou=adresses,ou=clients_domaine1,o=insee,c=fr
 inseepropriete: brancheOrganisation$ou=organisations,ou=clients_domaine1,o=in
  see,c=fr
+inseepropriete: user_us_defined_attributes$fieldexample:Example $(username) $(mail)
+inseepropriete: user_us_defined_attributes$fieldexample2:Example2 $(username) $(mail)
 inseepropriete: user_object_classes$top,inseeCompte,inseeContact,inseeAttributsAuthentification,inseeAttributsHabilitation,inseeAttributsCommunication
 inseepropriete: organization_object_classes$top,inseeOrganisation
 inseepropriete: userMapping$username:uid,String,rw

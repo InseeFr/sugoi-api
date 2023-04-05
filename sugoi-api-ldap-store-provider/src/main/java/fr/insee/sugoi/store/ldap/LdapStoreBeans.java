@@ -126,7 +126,7 @@ public class LdapStoreBeans {
     config.put(
         LdapConfigKeys.LDAP_CONNECTION_TIMEOUT,
         userStorage.getProperties().get(LdapConfigKeys.LDAP_CONNECTION_TIMEOUT) != null
-            ? userStorage.getProperties().get(LdapConfigKeys.LDAP_CONNECTION_TIMEOUT)
+            ? userStorage.getProperties().get(LdapConfigKeys.LDAP_CONNECTION_TIMEOUT).get(0)
             : defaultConnectionTimeout);
     config.put(GlobalKeysConfig.USER_SOURCE, userStorage.getUserSource());
     config.put(GlobalKeysConfig.APP_SOURCE, realm.getAppSource());

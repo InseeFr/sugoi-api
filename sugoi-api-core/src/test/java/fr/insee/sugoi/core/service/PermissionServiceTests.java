@@ -58,11 +58,11 @@ public class PermissionServiceTests {
     realm = new Realm();
     realm.setName("test");
     realm
-            .getProperties()
-            .put(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, List.of("(.*)_$(application)"));
+        .getProperties()
+        .put(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, List.of("(.*)_$(application)"));
     realm
-            .getProperties()
-            .put(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, List.of("my-attribute-key"));
+        .getProperties()
+        .put(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, List.of("my-attribute-key"));
 
     selfManagedGroupsApplication.setName("selfmanaged");
     selfManagedGroupsApplication.setIsSelfManagedGroupsApp(true);
