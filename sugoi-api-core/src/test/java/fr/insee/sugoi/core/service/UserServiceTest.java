@@ -35,6 +35,7 @@ import fr.insee.sugoi.model.exceptions.NoCertificateOnUserException;
 import fr.insee.sugoi.model.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.exceptions.UserAlreadyExistException;
 import fr.insee.sugoi.model.exceptions.UserNotFoundException;
+import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;
@@ -43,7 +44,9 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -88,6 +91,12 @@ public class UserServiceTest {
     user1 = new User();
     user1.setUsername("Toto");
     user1.setMail("toto@insee.fr");
+    user1.setAttributes(
+        new HashMap<String, Object>() {
+          {
+            put("personal_title", "titi");
+          }
+        });
 
     User userWithCertificate = new User("UserWithCertificate");
     userWithCertificate.setCertificate(
@@ -120,6 +129,12 @@ public class UserServiceTest {
     us1.setName("us1");
     UserStorage us2 = new UserStorage();
     us2.setName("us2");
+    us2.setProperties(
+        Map.of(
+            GlobalKeysConfig.USER_USERSTORAGE_DEFINED_ATTRIBUTES,
+            List.of("super:toto$(username)$(firstName)$(mail)$(attributes.personal_title)")));
+    us2.setUserMappings(StoreMappingFixture.getUserStoreMappings());
+    us1.setUserMappings(StoreMappingFixture.getUserStoreMappings());
     realm.setUserStorages(List.of(us1, us2));
     Mockito.when(realmProvider.load("realm")).thenReturn(Optional.of(realm));
 
@@ -290,6 +305,23 @@ public class UserServiceTest {
         "Should contain users from userstorage2",
         results.stream()
             .anyMatch(u -> u.getMetadatas().get(EventKeysConfig.USERSTORAGE).equals("us2")));
+  }
+
+  @Test
+  @DisplayName(
+      "When getting a field set via a user userstorage defined attributes, "
+          + "with values coming from attributes map, string field and empty string fields"
+          + "then it should be set in the field with blank value instead of empty field")
+  public void getUserWithUserDefinedAttributesOnStorage() {
+    assertThat(
+        "get user Toto",
+        userService.findById("realm", null, "Toto", false).getAttributes().get("super"),
+        is(
+            String.format(
+                "toto%s%s%s",
+                user1.getUsername(),
+                user1.getMail(),
+                user1.getAttributes().get("personal_title"))));
   }
 
   private PageResult<User> mockPageResultFromNUsersUs(

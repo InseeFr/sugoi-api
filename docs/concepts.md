@@ -27,6 +27,7 @@
     - [SeeAlso ldap](#seealso-ldap)
   - [Notify external webservices](#notify-external-webservices)
     - [Reserved keywords](#reserved-keywords)
+  - [User field defined at the userstorage level](#user-field-defined-at-the-userstorage-level)
 
 ## Use cases
 
@@ -256,3 +257,9 @@ Reserved keywords are template keywords that the user won't be able to set or th
 
 - **mail** : can be set as a template property but if not, the mail of the user on which the request is made will be taken as default.
 - **userId** : is the name of the user on which the request is done, cannot be changed
+
+## User field defined at the userstorage level
+
+Sometimes we need to define a field on a user at the userstorage level. For example, we need all users to have the field "userstoragedescription": "mydescription". Instead of adding the field userstoragedescription on each user in the store we can add it directly on the configuration of the userstorage via the userstorage property (see [user_us_defined_attributes](realm-configuration.md##generic-userstorage-properties)). When the user is fetch by username, this field is added in the attributes map of the user if it is not already existing on the user.
+
+This generic field can also be customized with data specific to the user. For example, we want all users to have a field "complicatedname" which is a combination of the personal title, first name and surname of a user. The userstorage defined attribute can be defined as a pattern of field on the user that are defined as String in the usermapping (see [user mapping](realm-configuration.md##realm-and-userstorage-mappings-with-a-ldap-store-provider)): "complicatedname": "The name is : $(attributes.personal_title) $(firstName) $(lastName)". Each user will have its own value in attributes like "The name is : Madame Example Person".

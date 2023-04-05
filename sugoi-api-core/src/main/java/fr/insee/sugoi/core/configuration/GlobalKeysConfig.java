@@ -32,7 +32,8 @@ public enum GlobalKeysConfig implements RealmConfigKeys {
   USERS_MAX_OUTPUT_SIZE("usersMaxOutputSize"),
   APPLICATIONS_MAX_OUTPUT_SIZE("applicationsMaxOutputSize"),
   GROUPS_MAX_OUTPUT_SIZE("groupsMaxOutputSize"),
-  ORGANIZATIONS_MAX_OUTPUT_SIZE("organizationsMaxOutputSize");
+  ORGANIZATIONS_MAX_OUTPUT_SIZE("organizationsMaxOutputSize"),
+  USER_USERSTORAGE_DEFINED_ATTRIBUTES("user_us_defined_attributes");
 
   private String name;
 

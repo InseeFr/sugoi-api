@@ -34,6 +34,7 @@ import fr.insee.sugoi.model.exceptions.UnableToUpdateCertificateException;
 import fr.insee.sugoi.model.exceptions.UserAlreadyExistException;
 import fr.insee.sugoi.model.exceptions.UserNotFoundByMailException;
 import fr.insee.sugoi.model.exceptions.UserNotFoundException;
+import fr.insee.sugoi.model.exceptions.UserStorageNotFoundException;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;
@@ -254,21 +255,27 @@ public class UserServiceImpl implements UserService {
     try {
       Realm realm =
           realmProvider.load(realmName).orElseThrow(() -> new RealmNotFoundException(realmName));
-      String nonNullStorage =
-          storage != null
-              ? storage
-              : realm.getUserStorages().stream()
+      UserStorage userStorage =
+          storage == null
+              ? realm.getUserStorages().stream()
                   .filter(us -> exist(realmName, us.getName(), id))
                   .findFirst()
-                  .orElseThrow(() -> new UserNotFoundException(realmName, id))
-                  .getName();
+                  .orElseThrow(() -> new UserStorageNotFoundException(realmName, id))
+              : realm
+                  .getUserStorageByName(storage)
+                  .orElseThrow(() -> new UserStorageNotFoundException(realmName, id));
       User user =
           storeProvider
-              .getReaderStore(realmName, nonNullStorage)
+              .getReaderStore(realmName, userStorage.getName())
               .getUser(id)
-              .orElseThrow(() -> new UserNotFoundException(realmName, nonNullStorage, id));
+              .orElseThrow(() -> new UserNotFoundException(realmName, userStorage.getName(), id));
       user.addMetadatas(GlobalKeysConfig.REALM.getName(), realmName.toLowerCase());
-      user.addMetadatas(GlobalKeysConfig.USERSTORAGE.getName(), nonNullStorage.toLowerCase());
+      user.addMetadatas(
+          GlobalKeysConfig.USERSTORAGE.getName(), userStorage.getName().toLowerCase());
+      userStorage
+          .getAddUsDefinedAttributesTransformer(
+              GlobalKeysConfig.USER_USERSTORAGE_DEFINED_ATTRIBUTES)
+          .accept(user);
       if (externalResolutionAllowed
           && seeAlsoService != null
           && realm.getProperties().containsKey(GlobalKeysConfig.SEEALSO_ATTRIBUTES)) {
@@ -278,7 +285,7 @@ public class UserServiceImpl implements UserService {
       }
       sugoiEventPublisher.publishCustomEvent(
           realmName,
-          nonNullStorage,
+          userStorage.getName(),
           SugoiEventTypeEnum.FIND_USER_BY_ID,
           Map.ofEntries(Map.entry(EventKeysConfig.USER_ID, id != null ? id : "")));
       return user;

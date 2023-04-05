@@ -19,7 +19,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
+import org.apache.commons.lang.text.StrSubstitutor;
 
 public class UserStorage implements Serializable {
   private String name;
@@ -89,5 +91,30 @@ public class UserStorage implements Serializable {
 
   public void setProperties(Map<RealmConfigKeys, List<String>> properties) {
     this.properties = properties;
+  }
+
+  public Consumer<User> getAddUsDefinedAttributesTransformer(
+      RealmConfigKeys userDefinedAttributeKey) {
+    return (User user) -> {
+      if (getUserMappings() != null && getProperties().containsKey(userDefinedAttributeKey))
+        getProperties()
+            .get(userDefinedAttributeKey)
+            .forEach(
+                userDefinedAttributeTemplate ->
+                    interpolateUserTemplatedValue(user, userDefinedAttributeTemplate));
+    };
+  }
+
+  private void interpolateUserTemplatedValue(
+      User userToModify, String userDefinedAttributeTemplate) {
+    userToModify
+        .getAttributes()
+        .put(
+            userDefinedAttributeTemplate.split(":")[0],
+            StrSubstitutor.replace(
+                userDefinedAttributeTemplate.split(":", 2)[1],
+                userToModify.getMapOfStringFields(getUserMappings()),
+                "$(",
+                ")"));
   }
 }
