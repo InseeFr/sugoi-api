@@ -142,7 +142,7 @@ public class UserServiceImpl implements UserService {
       if (!providerRequest.isAsynchronousAllowed()
           && response.getStatus().equals(ProviderResponseStatus.OK)) {
         user.setUsername(response.getEntityId());
-        response.setEntity(findById(realm, storage, user.getUsername()));
+        response.setEntity(findById(realm, storage, user.getUsername(), false));
       }
       return response;
     } catch (Exception e) {
@@ -198,7 +198,7 @@ public class UserServiceImpl implements UserService {
           Map.ofEntries(Map.entry(EventKeysConfig.USER, user)));
       if (!providerRequest.isAsynchronousAllowed()
           && response.getStatus().equals(ProviderResponseStatus.OK)) {
-        response.setEntity(findById(realm, storage, user.getUsername()));
+        response.setEntity(findById(realm, storage, user.getUsername(), false));
       }
       return response;
     } catch (Exception e) {
@@ -242,7 +242,8 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public User findById(String realmName, String storage, String id) {
+  public User findById(
+      String realmName, String storage, String id, boolean externalResolutionAllowed) {
     try {
       Realm realm =
           realmProvider.load(realmName).orElseThrow(() -> new RealmNotFoundException(realmName));
@@ -261,7 +262,8 @@ public class UserServiceImpl implements UserService {
               .orElseThrow(() -> new UserNotFoundException(realmName, nonNullStorage, id));
       user.addMetadatas(GlobalKeysConfig.REALM.getName(), realmName.toLowerCase());
       user.addMetadatas(GlobalKeysConfig.USERSTORAGE.getName(), nonNullStorage.toLowerCase());
-      if (seeAlsoService != null
+      if (externalResolutionAllowed
+          && seeAlsoService != null
           && realm.getProperties().containsKey(GlobalKeysConfig.SEEALSO_ATTRIBUTES)) {
         for (String seeAlso : findUserSeeAlsos(realm, user)) {
           seeAlsoService.decorateWithSeeAlso(user, seeAlso);
@@ -443,7 +445,8 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public User findByMail(String realmName, String storageName, String mail) {
+  public User findByMail(
+      String realmName, String storageName, String mail, boolean externalResolutionAllowed) {
     try {
       Realm realm =
           realmProvider.load(realmName).orElseThrow(() -> new RealmNotFoundException(realmName));
@@ -462,7 +465,8 @@ public class UserServiceImpl implements UserService {
               .orElseThrow(() -> new UserNotFoundByMailException(realmName, nonNullStorage, mail));
       user.addMetadatas(GlobalKeysConfig.REALM.getName(), realmName.toLowerCase());
       user.addMetadatas(GlobalKeysConfig.USERSTORAGE.getName(), nonNullStorage.toLowerCase());
-      if (seeAlsoService != null
+      if (externalResolutionAllowed
+          && seeAlsoService != null
           && realm.getProperties().containsKey(GlobalKeysConfig.SEEALSO_ATTRIBUTES)) {
         for (String seeAlso : findUserSeeAlsos(realm, user)) {
           seeAlsoService.decorateWithSeeAlso(user, seeAlso);
@@ -488,7 +492,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public byte[] getCertificate(String realm, String userStorage, String userId) {
-    User user = findById(realm, userStorage, userId);
+    User user = findById(realm, userStorage, userId, false);
     if (user.getCertificate() == null) {
       throw new NoCertificateOnUserException(realm, userId);
     } else {
@@ -504,7 +508,7 @@ public class UserServiceImpl implements UserService {
       byte[] certificat,
       ProviderRequest providerRequest) {
     try {
-      User user = findById(realm, userStorage, userId);
+      User user = findById(realm, userStorage, userId, false);
       ProviderResponse response =
           storeProvider
               .getWriterStore(realm, userStorage)
@@ -519,7 +523,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public ProviderResponse deleteCertificate(
       String realm, String userStorage, String id, ProviderRequest providerRequest) {
-    User user = findById(realm, userStorage, id);
+    User user = findById(realm, userStorage, id, false);
     ProviderResponse response =
         storeProvider
             .getWriterStore(realm, userStorage)

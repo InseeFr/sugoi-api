@@ -64,7 +64,7 @@ public interface UserService {
    * @throws UserNotFoundException if no match
    * @return user with matching idep
    */
-  User findById(String realm, String storageName, String idep);
+  User findById(String realm, String storageName, String idep, boolean externalResolutionAllowed);
 
   /**
    * Find a user by its mail in a realm
@@ -75,7 +75,7 @@ public interface UserService {
    * @throws UserNotFoundException if no match
    * @return user with matching mail
    */
-  User findByMail(String realm, String storageName, String mail);
+  User findByMail(String realm, String storageName, String mail, boolean externalResolutionAllowed);
 
   /**
    * Find users by criterias in a realm

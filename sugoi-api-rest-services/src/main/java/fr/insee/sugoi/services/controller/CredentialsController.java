@@ -175,7 +175,7 @@ public class CredentialsController {
           String transactionId,
       Authentication authentication) {
 
-    User user = userService.findById(realm, null, id);
+    User user = userService.findById(realm, null, id, false);
     return reinitPassword(
         templatePropertiesView,
         realm,
@@ -283,7 +283,7 @@ public class CredentialsController {
           String transactionId,
       Authentication authentication) {
 
-    User user = userService.findById(realm, null, id);
+    User user = userService.findById(realm, null, id, false);
     return changePassword(
         pcr,
         realm,
@@ -394,7 +394,7 @@ public class CredentialsController {
           String transactionId,
       Authentication authentication) {
 
-    User user = userService.findById(realm, null, id);
+    User user = userService.findById(realm, null, id, false);
     return initPassword(
         realm,
         (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
@@ -472,7 +472,7 @@ public class CredentialsController {
           String id,
       @Parameter(description = "User password to test", required = true) @RequestBody
           PasswordView passwordView) {
-    User user = userService.findById(realm, null, id);
+    User user = userService.findById(realm, null, id, false);
     return validatePassword(
         realm,
         (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
@@ -493,7 +493,7 @@ public class CredentialsController {
           String id,
       @RequestParam(name = "webhook-tag", required = false) String webserviceTag,
       @RequestBody(required = false) TemplatePropertiesView templatePropertiesView) {
-    User user = userService.findById(realm, null, id);
+    User user = userService.findById(realm, null, id, false);
     return sendLogin(
         realm,
         id,

@@ -100,7 +100,7 @@ public class CredentialWebhookTest {
     User toto = new User("toto");
     toto.setMail("toto@insee.fr");
 
-    Mockito.when(userService.findById("domaine1", "default", "toto")).thenReturn(toto);
+    Mockito.when(userService.findById("domaine1", "default", "toto", false)).thenReturn(toto);
   }
 
   @Test

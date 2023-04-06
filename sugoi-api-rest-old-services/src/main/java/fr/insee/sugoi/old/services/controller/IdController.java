@@ -34,6 +34,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -64,7 +65,13 @@ public class IdController {
   public ResponseEntity<?> getById(
       @Parameter(description = "Username of a contact or id of an organisation", required = true)
           @PathVariable(name = "id", required = true)
-          String id) {
+          String id,
+      @Parameter(description = "Recherche alternative autorisée", required = false)
+          @RequestParam(
+              name = "externalResolutionAllowed",
+              required = false,
+              defaultValue = "false")
+          Boolean externalResolutionAllowed) {
 
     List<Realm> realms =
         configService.getRealms().stream()
@@ -72,7 +79,10 @@ public class IdController {
             .collect(Collectors.toList());
 
     Optional<ContactOuganext> contact =
-        realms.stream().map(realm -> findContact(realm, id)).filter(c -> c != null).findFirst();
+        realms.stream()
+            .map(realm -> findContact(realm, id, externalResolutionAllowed))
+            .filter(c -> c != null)
+            .findFirst();
     if (contact.isPresent()) {
       return ResponseEntity.ok().body(contact.get());
     } else {
@@ -89,9 +99,10 @@ public class IdController {
     }
   }
 
-  private ContactOuganext findContact(Realm realm, String id) {
+  private ContactOuganext findContact(Realm realm, String id, boolean externalResolutionAllowed) {
     return ouganextSugoiMapper.serializeToOuganext(
-        userService.findById(realm.getName(), null, id), ContactOuganext.class);
+        userService.findById(realm.getName(), null, id, externalResolutionAllowed),
+        ContactOuganext.class);
   }
 
   private OrganisationOuganext findOrganisation(Realm realm, String id) {

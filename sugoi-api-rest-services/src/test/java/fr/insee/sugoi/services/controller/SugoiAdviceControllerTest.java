@@ -15,6 +15,7 @@ package fr.insee.sugoi.services.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -134,7 +135,8 @@ public class SugoiAdviceControllerTest {
   private void testResponseFromException(
       Exception thrownException, HttpStatus expectedStatus, String expectedMessage)
       throws Exception {
-    Mockito.when(userService.findById(Mockito.anyString(), Mockito.any(), Mockito.any()))
+    Mockito.when(
+            userService.findById(Mockito.anyString(), Mockito.any(), Mockito.any(), anyBoolean()))
         .thenThrow(thrownException);
     RequestBuilder requestBuilder =
         MockMvcRequestBuilders.get("/realms/domaine1/users/Toto")

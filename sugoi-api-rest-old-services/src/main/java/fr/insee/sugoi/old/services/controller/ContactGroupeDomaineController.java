@@ -97,7 +97,7 @@ public class ContactGroupeDomaineController {
 
     User user =
         userService.findById(
-            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant, false);
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             user.getGroups().stream()
@@ -164,7 +164,7 @@ public class ContactGroupeDomaineController {
     groupService.findById(realmUserStorage.getRealm(), nomAppli, nomGroupe);
     User user =
         userService.findById(
-            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant, false);
     if (user.getGroups() != null
         && user.getGroups().stream()
             .anyMatch(g -> g.getName().equals(nomGroupe) && g.getAppName().equals(nomAppli))) {
@@ -247,7 +247,7 @@ public class ContactGroupeDomaineController {
 
     User user =
         userService.findById(
-            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant, false);
     if (user.getGroups() != null
         && user.getGroups().stream()
             .anyMatch(
