@@ -137,7 +137,10 @@ public class ContactDomaineController {
           .body(
               ouganextSugoiMapper.serializeToOuganext(
                   userService.findById(
-                      realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant),
+                      realmUserStorage.getRealm(),
+                      realmUserStorage.getUserStorage(),
+                      identifiant,
+                      false),
                   ContactOuganext.class));
     }
 
@@ -158,7 +161,10 @@ public class ContactDomaineController {
         .body(
             ouganextSugoiMapper.serializeToOuganext(
                 userService.findById(
-                    realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant),
+                    realmUserStorage.getRealm(),
+                    realmUserStorage.getUserStorage(),
+                    identifiant,
+                    false),
                 ContactOuganext.class));
   }
 
@@ -203,7 +209,10 @@ public class ContactDomaineController {
         .body(
             ouganextSugoiMapper.serializeToOuganext(
                 userService.findById(
-                    realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant),
+                    realmUserStorage.getRealm(),
+                    realmUserStorage.getUserStorage(),
+                    identifiant,
+                    false),
                 ContactOuganext.class));
   }
 

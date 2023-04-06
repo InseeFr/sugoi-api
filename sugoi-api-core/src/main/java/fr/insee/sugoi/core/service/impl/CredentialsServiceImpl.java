@@ -65,7 +65,7 @@ public class CredentialsServiceImpl implements CredentialsService {
       boolean changePasswordResetStatus,
       ProviderRequest providerRequest) {
     try {
-      User user = userService.findById(realm, userStorage, userId);
+      User user = userService.findById(realm, userStorage, userId, false);
 
       if (user == null || StringUtils.isEmpty(user.getUsername())) {
         throw new UserNotFoundException(realm, userStorage, userId);
@@ -157,7 +157,7 @@ public class CredentialsServiceImpl implements CredentialsService {
       ProviderRequest providerRequest) {
     try {
 
-      User user = userService.findById(realm, userStorage, userId);
+      User user = userService.findById(realm, userStorage, userId, false);
 
       Map<RealmConfigKeys, String> userStorageProperties =
           realmProvider
@@ -257,7 +257,7 @@ public class CredentialsServiceImpl implements CredentialsService {
   public boolean validateCredential(
       String realm, String userStorage, String userName, String password) {
     try {
-      User user = userService.findById(realm, userStorage, userName);
+      User user = userService.findById(realm, userStorage, userName, false);
       boolean valid =
           storeProvider.getReaderStore(realm, userStorage).validateCredentials(user, password);
       sugoiEventPublisher.publishCustomEvent(
@@ -290,7 +290,7 @@ public class CredentialsServiceImpl implements CredentialsService {
       Map<String, String> templateProperties,
       String webhookTag) {
     try {
-      User user = userService.findById(realm, userStorage, id);
+      User user = userService.findById(realm, userStorage, id, false);
       sugoiEventPublisher.publishCustomEvent(
           realm,
           userStorage,

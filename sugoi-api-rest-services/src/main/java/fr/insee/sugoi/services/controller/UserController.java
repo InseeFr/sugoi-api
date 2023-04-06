@@ -471,7 +471,7 @@ public class UserController {
     if (StringUtils.isBlank(user.getUsername()) || !user.getUsername().equalsIgnoreCase(id)) {
       throw new IdNotMatchingException(id, user.getUsername());
     }
-    User foundUser = userService.findById(realm, null, id);
+    User foundUser = userService.findById(realm, null, id, false);
     return updateUsers(
         realm,
         (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
@@ -579,7 +579,7 @@ public class UserController {
           String transactionId,
       Authentication authentication) {
 
-    User foundUser = userService.findById(realm, null, id);
+    User foundUser = userService.findById(realm, null, id, false);
     return deleteUsers(
         realm,
         (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
@@ -617,8 +617,15 @@ public class UserController {
           @PathVariable(name = "storage", required = false)
           String storage,
       @Parameter(description = "Username to search", required = true) @PathVariable("username")
-          String id) {
-    return ResponseEntity.status(HttpStatus.OK).body(userService.findById(realm, storage, id));
+          String id,
+      @Parameter(description = "Recherche alternative autorisée", required = false)
+          @RequestParam(
+              name = "externalResolutionAllowed",
+              required = false,
+              defaultValue = "false")
+          Boolean externalResolutionAllowed) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(userService.findById(realm, storage, id, externalResolutionAllowed));
   }
 
   @GetMapping(
@@ -644,8 +651,14 @@ public class UserController {
           @PathVariable("realm")
           String realm,
       @Parameter(description = "Username to search", required = true) @PathVariable("username")
-          String id) {
-    return getUserByUsername(realm, null, id);
+          String id,
+      @Parameter(description = "Recherche alternative autorisée", required = false)
+          @RequestParam(
+              name = "externalResolutionAllowed",
+              required = false,
+              defaultValue = "false")
+          Boolean externalResolutionAllowed) {
+    return getUserByUsername(realm, null, id, externalResolutionAllowed);
   }
 
   @GetMapping(
@@ -681,7 +694,7 @@ public class UserController {
         configService.getRealm(realm).getProperties().get(GlobalKeysConfig.VERIFY_MAIL_UNICITY))) {
 
       return ResponseEntity.status(HttpStatus.OK)
-          .body(userService.findByMail(realm, storage, mail));
+          .body(userService.findByMail(realm, storage, mail, false));
     }
     return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
   }
@@ -763,7 +776,7 @@ public class UserController {
           String realm,
       @Parameter(description = "Username to search", required = true) @PathVariable("id") String id)
       throws CertificateException {
-    User user = userService.findById(realm, null, id);
+    User user = userService.findById(realm, null, id, false);
     return getUserCertificate(
         realm, (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()), id);
   }
@@ -854,7 +867,7 @@ public class UserController {
       Authentication authentication)
       throws IOException {
 
-    User user = userService.findById(realm, null, id);
+    User user = userService.findById(realm, null, id, false);
     return updateUserCertificate(
         realm,
         (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
@@ -947,7 +960,7 @@ public class UserController {
           String transactionId,
       Authentication authentication) {
 
-    User user = userService.findById(realm, null, id);
+    User user = userService.findById(realm, null, id, false);
     return deleteUserCertificate(
         realm,
         (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),

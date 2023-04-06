@@ -206,7 +206,7 @@ public class GroupServiceImpl implements GroupService {
       ProviderRequest providerRequest) {
     try {
       if (storage == null) {
-        User user = userService.findById(realm, null, userId);
+        User user = userService.findById(realm, null, userId, false);
         storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName());
       }
       ProviderResponse response =
@@ -246,7 +246,7 @@ public class GroupServiceImpl implements GroupService {
       ProviderRequest providerRequest) {
     try {
       if (storage == null) {
-        User user = userService.findById(realm, null, userId);
+        User user = userService.findById(realm, null, userId, false);
         storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName());
       }
       ProviderResponse response =
@@ -285,7 +285,7 @@ public class GroupServiceImpl implements GroupService {
       ProviderRequest providerRequest) {
     try {
       if (storage == null) {
-        User user = userService.findById(realm, null, userId);
+        User user = userService.findById(realm, null, userId, false);
         storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName());
       }
       ProviderResponse response =
@@ -322,7 +322,7 @@ public class GroupServiceImpl implements GroupService {
       ProviderRequest providerRequest) {
     try {
       if (storage == null) {
-        User user = userService.findById(realm, null, userId);
+        User user = userService.findById(realm, null, userId, false);
         storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName());
       }
       ProviderResponse response =

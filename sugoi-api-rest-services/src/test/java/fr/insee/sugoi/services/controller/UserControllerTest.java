@@ -143,7 +143,7 @@ public class UserControllerTest {
   public void shouldGetUserByID() {
     try {
 
-      Mockito.when(userService.findById("domaine1", null, "Toto")).thenReturn(user1);
+      Mockito.when(userService.findById("domaine1", null, "Toto", false)).thenReturn(user1);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.get("/realms/domaine1/users/Toto")
@@ -152,7 +152,7 @@ public class UserControllerTest {
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
       User res = objectMapper.readValue(response.getContentAsString(), User.class);
 
-      verify(userService).findById("domaine1", null, "Toto");
+      verify(userService).findById("domaine1", null, "Toto", false);
       assertThat("User returned should be Toto", res.getUsername(), is("Toto"));
       assertThat(
           "User returned should have toto@insee.fr as mail", res.getMail(), is("toto@insee.fr"));
@@ -174,7 +174,9 @@ public class UserControllerTest {
           .when(userService)
           .delete(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
 
-      Mockito.when(userService.findById(Mockito.anyString(), Mockito.isNull(), Mockito.anyString()))
+      Mockito.when(
+              userService.findById(
+                  Mockito.anyString(), Mockito.isNull(), Mockito.anyString(), Mockito.anyBoolean()))
           .thenReturn(user1)
           .thenReturn(user1);
 
@@ -197,7 +199,9 @@ public class UserControllerTest {
   public void updateShouldCallUpdateServiceAndReturnNewApp() {
     try {
 
-      Mockito.when(userService.findById(Mockito.anyString(), Mockito.any(), Mockito.any()))
+      Mockito.when(
+              userService.findById(
+                  Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.anyBoolean()))
           .thenReturn(user1)
           .thenReturn(user1Updated);
 
@@ -420,7 +424,9 @@ public class UserControllerTest {
   public void get404WhenNoUserIsFoundWhenGetById() {
     try {
 
-      Mockito.when(userService.findById(Mockito.anyString(), Mockito.isNull(), Mockito.anyString()))
+      Mockito.when(
+              userService.findById(
+                  Mockito.anyString(), Mockito.isNull(), Mockito.anyString(), Mockito.anyBoolean()))
           .thenThrow(new UserNotFoundException("domaine1", "dontexist"));
 
       RequestBuilder requestBuilder =
@@ -467,7 +473,7 @@ public class UserControllerTest {
 
       Mockito.doThrow(new UserNotFoundException("domaine1", "Toto"))
           .when(userService)
-          .findById("domaine1", null, "Toto");
+          .findById("domaine1", null, "Toto", false);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.put("/realms/domaine1/users/Toto")
@@ -494,7 +500,7 @@ public class UserControllerTest {
 
       Mockito.doThrow(new UserNotFoundException("domaine1", "dontexist"))
           .when(userService)
-          .findById("domaine1", null, "dontexist");
+          .findById("domaine1", null, "dontexist", false);
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.delete("/realms/domaine1/users/dontexist")

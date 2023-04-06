@@ -388,7 +388,7 @@ public class AppManagedUserAttributeController {
           String transactionId,
       Authentication authentication) {
 
-    User foundUser = userService.findById(realm, null, id);
+    User foundUser = userService.findById(realm, null, id, false);
     return addUserAttributesManagedByApp(
         realm,
         (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
@@ -448,7 +448,7 @@ public class AppManagedUserAttributeController {
           String transactionId,
       Authentication authentication) {
 
-    User foundUser = userService.findById(realm, null, id);
+    User foundUser = userService.findById(realm, null, id, false);
     return deleteUserAttributesManagedByApp(
         realm,
         (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),

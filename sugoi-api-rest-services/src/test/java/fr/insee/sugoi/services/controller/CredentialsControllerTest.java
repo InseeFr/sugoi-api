@@ -13,9 +13,9 @@
 */
 package fr.insee.sugoi.services.controller;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
@@ -142,7 +142,9 @@ public class CredentialsControllerTest {
     User user = new User("user");
     user.getMetadatas().put("userStorage", "foundUserstorage");
 
-    Mockito.when(userService.findById(Mockito.eq("domaine1"), Mockito.isNull(), Mockito.eq("user")))
+    Mockito.when(
+            userService.findById(
+                Mockito.eq("domaine1"), Mockito.isNull(), Mockito.eq("user"), Mockito.eq(false)))
         .thenReturn(user);
 
     PasswordView passwordView = new PasswordView();
@@ -173,7 +175,9 @@ public class CredentialsControllerTest {
     User user = new User("user");
     user.getMetadatas().put("userStorage", "foundUserstorage");
 
-    Mockito.when(userService.findById(Mockito.eq("domaine1"), Mockito.isNull(), Mockito.eq("user")))
+    Mockito.when(
+            userService.findById(
+                Mockito.eq("domaine1"), Mockito.isNull(), Mockito.eq("user"), Mockito.eq(false)))
         .thenReturn(user);
 
     PasswordView passwordView = new PasswordView();
@@ -202,7 +206,9 @@ public class CredentialsControllerTest {
                 Mockito.eq("myPassword")))
         .thenReturn(true);
 
-    Mockito.when(userService.findById(Mockito.eq("domaine1"), Mockito.isNull(), Mockito.eq("user")))
+    Mockito.when(
+            userService.findById(
+                Mockito.eq("domaine1"), Mockito.isNull(), Mockito.eq("user"), Mockito.eq(false)))
         .thenThrow(new UserNotFoundException("domaine1", "user"));
 
     PasswordView passwordView = new PasswordView();

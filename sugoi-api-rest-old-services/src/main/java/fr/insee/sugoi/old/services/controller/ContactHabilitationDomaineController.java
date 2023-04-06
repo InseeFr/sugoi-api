@@ -100,7 +100,10 @@ public class ContactHabilitationDomaineController {
             new HabilitationsOuganext(
                 userService
                     .findById(
-                        realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
+                        realmUserStorage.getRealm(),
+                        realmUserStorage.getUserStorage(),
+                        identifiant,
+                        false)
                     .getHabilitations()));
   }
 
@@ -159,7 +162,7 @@ public class ContactHabilitationDomaineController {
 
     User user =
         userService.findById(
-            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant, false);
     HabilitationsOuganext habilitations = new HabilitationsOuganext(user.getHabilitations());
     habilitations.addHabilitation(appName, nomRoles);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
@@ -230,7 +233,7 @@ public class ContactHabilitationDomaineController {
 
     User user =
         userService.findById(
-            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant, false);
     HabilitationsOuganext habilitations = new HabilitationsOuganext(user.getHabilitations());
     habilitations.addHabilitations(appName, role, proprietes);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
@@ -293,7 +296,7 @@ public class ContactHabilitationDomaineController {
 
     User user =
         userService.findById(
-            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant, false);
     HabilitationsOuganext habilitations = new HabilitationsOuganext(user.getHabilitations());
     habilitations.removeHabilitation(appName, nomRoles);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
@@ -363,7 +366,7 @@ public class ContactHabilitationDomaineController {
 
     User user =
         userService.findById(
-            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant, false);
     HabilitationsOuganext habilitations = new HabilitationsOuganext(user.getHabilitations());
     habilitations.removeHabilitation(appName, nomRole, proprietes);
     user.setHabilitations(habilitations.convertSugoiHabilitation());
