@@ -109,9 +109,11 @@ public class CredentialsServiceTest {
     acceptedResponse.setStatus(ProviderResponseStatus.ACCEPTED);
     Mockito.when(writerStore.changePassword(any(), any(), any(), any(), any(), any()))
         .thenReturn(acceptedResponse);
-    Mockito.when(userService.findById(any(), any(), any())).thenReturn(new User());
-    Mockito.when(userService.findById("realmWithoutUpperCase", "us1", "test")).thenReturn(user1);
-    Mockito.when(userService.findById("realmWithoutUpperCase", "us2", "test")).thenReturn(user2);
+    Mockito.when(userService.findById(any(), any(), any(), anyBoolean())).thenReturn(new User());
+    Mockito.when(userService.findById("realmWithoutUpperCase", "us1", "test", false))
+        .thenReturn(user1);
+    Mockito.when(userService.findById("realmWithoutUpperCase", "us2", "test", false))
+        .thenReturn(user2);
   }
 
   @Test

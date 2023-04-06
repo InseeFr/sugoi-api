@@ -98,7 +98,10 @@ public class ContactInseeRoleApplicatifDomaineController {
         .body(
             userService
                 .findById(
-                    realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant)
+                    realmUserStorage.getRealm(),
+                    realmUserStorage.getUserStorage(),
+                    identifiant,
+                    false)
                 .getAttributes()
                 .get("insee_roles_applicatifs"));
   }
@@ -150,7 +153,7 @@ public class ContactInseeRoleApplicatifDomaineController {
 
     User user =
         userService.findById(
-            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant, false);
     if (user.getAttributes().containsKey("insee_roles_applicatifs")) {
       @SuppressWarnings("unchecked")
       List<String> userRoles = (List<String>) user.getAttributes().get("insee_roles_applicatifs");
@@ -216,7 +219,7 @@ public class ContactInseeRoleApplicatifDomaineController {
 
     User user =
         userService.findById(
-            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant);
+            realmUserStorage.getRealm(), realmUserStorage.getUserStorage(), identifiant, false);
     if (user.getAttributes().containsKey("insee_roles_applicatifs")) {
       user.getAttributes()
           .put(

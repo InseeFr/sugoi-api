@@ -156,7 +156,7 @@ public class UserServiceTest {
 
   @Test
   public void getUserOnMultipleStorage() {
-    assertThat("get user Toto", userService.findById("realm", null, "Toto"), is(user1));
+    assertThat("get user Toto", userService.findById("realm", null, "Toto", false), is(user1));
   }
 
   @Test
@@ -165,7 +165,8 @@ public class UserServiceTest {
           + "then throw RealmNotFound exception")
   public void getUserShouldFailWhenRealmNotFound() {
     assertThrows(
-        RealmNotFoundException.class, () -> userService.findById("idonotexist", "us2", "Toto"));
+        RealmNotFoundException.class,
+        () -> userService.findById("idonotexist", "us2", "Toto", false));
   }
 
   @Test
@@ -187,7 +188,7 @@ public class UserServiceTest {
   public void findUserByMailShouldFailWhenRealmNotFound() {
     assertThrows(
         RealmNotFoundException.class,
-        () -> userService.findByMail("idonotexist", "us2", "toto@insee.fr"));
+        () -> userService.findByMail("idonotexist", "us2", "toto@insee.fr", false));
   }
 
   @Test
