@@ -17,8 +17,10 @@ import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
 import fr.insee.sugoi.core.model.SugoiUser;
+import fr.insee.sugoi.core.service.ApplicationService;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.model.Group;
+import fr.insee.sugoi.model.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.model.exceptions.IdNotMatchingException;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
@@ -67,6 +69,8 @@ public class GroupController {
 
   @Autowired private GroupService groupService;
 
+  @Autowired private ApplicationService applicationService;
+
   @GetMapping(
       path = {"/realms/{realm}/applications/{application}/groups"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -111,8 +115,14 @@ public class GroupController {
     filterGroup.setName(name);
     filterGroup.setDescription(description);
     PageableResult pageableResult = new PageableResult(size, offset, searchCookie);
+    PageResult<Group> foundGroups = null;
+    try {
+      applicationService.findById(realm, applicationName);
 
-    PageResult<Group> foundGroups =
+    } catch (ApplicationNotFoundException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    }
+    foundGroups =
         groupService.findByProperties(realm, applicationName, filterGroup, pageableResult);
 
     if (foundGroups.isHasMoreResult()) {
