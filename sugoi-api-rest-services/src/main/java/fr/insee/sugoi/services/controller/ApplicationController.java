@@ -142,7 +142,7 @@ public class ApplicationController {
             description = "Application already exist",
             content = {@Content(mediaType = "application/json")})
       })
-  @PreAuthorize("@NewAuthorizeMethodDecider.isWriter(#realm,#storage)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isApplicationCreator(#realm,#storage)")
   public ResponseEntity<Application> createApplication(
       @Parameter(
               description = "Name of the realm where the operation will be made",

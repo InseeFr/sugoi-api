@@ -47,12 +47,23 @@ public class PermissionServiceImpl implements PermissionService {
   @Value("${fr.insee.sugoi.api.regexp.role.application.manager:}")
   private List<String> applicationManagerRoleList;
 
+  @Value("${fr.insee.sugoi.api.regexp.role.application.creator:}")
+  private List<String> regexpApplicationCreator;
+
   public static final Logger logger = LoggerFactory.getLogger(PermissionServiceImpl.class);
 
   @Override
   public boolean isReader(SugoiUser sugoiUser, String realm, String userStorage) {
     List<String> searchRoleList =
         getSearchRoleList(sugoiUser, realm, userStorage, null, regexpReaderList);
+    return checkIfUserGetRoles(sugoiUser, searchRoleList)
+        || isWriter(sugoiUser, realm, userStorage);
+  }
+
+  @Override
+  public boolean isApplicationCreator(SugoiUser sugoiUser, String realm, String userStorage) {
+    List<String> searchRoleList =
+        getSearchRoleList(sugoiUser, realm, userStorage, null, regexpApplicationCreator);
     return checkIfUserGetRoles(sugoiUser, searchRoleList)
         || isWriter(sugoiUser, realm, userStorage);
   }

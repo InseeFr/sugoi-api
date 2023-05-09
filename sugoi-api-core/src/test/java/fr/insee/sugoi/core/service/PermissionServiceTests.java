@@ -67,6 +67,21 @@ public class PermissionServiceTests {
   }
 
   @Test
+  public void testApplicationCreatorRegexp() {
+    SugoiUser sugoiUser =
+        new SugoiUser("reader_realm1", List.of("ROLE_Application_creator_realm1"));
+
+    assertThat(
+        "User is application creator realm1",
+        permissions.isApplicationCreator(sugoiUser, "realm1", ""),
+        is(true));
+    assertThat(
+        "User is notapplication creator realm2",
+        permissions.isApplicationCreator(sugoiUser, "realm2", ""),
+        is(false));
+  }
+
+  @Test
   public void testWriterRegexp() {
     SugoiUser sugoiUser = new SugoiUser("writer_realm1", List.of("role_Writer_realm1_sugoi"));
     assertThat("User can read realm1", permissions.isReader(sugoiUser, "realm1", ""), is(true));
