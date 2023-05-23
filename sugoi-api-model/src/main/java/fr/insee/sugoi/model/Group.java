@@ -21,6 +21,8 @@ public class Group implements SugoiObject {
   private List<User> users;
   private String appName;
 
+  private Boolean isSelfManaged;
+
   public Group() {}
 
   public Group(String name) {
@@ -67,5 +69,13 @@ public class Group implements SugoiObject {
   @Override
   public String toString() {
     return name + " (" + appName + ")";
+  }
+
+  public void setIsSelfManaged(Boolean selfManaged) {
+    isSelfManaged = selfManaged;
+  }
+
+  public Boolean getIsSelfManaged() {
+    return isSelfManaged;
   }
 }

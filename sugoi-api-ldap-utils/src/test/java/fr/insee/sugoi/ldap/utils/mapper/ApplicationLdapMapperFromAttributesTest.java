@@ -15,6 +15,7 @@ package fr.insee.sugoi.ldap.utils.mapper;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import com.unboundid.ldap.sdk.Attribute;
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
@@ -55,6 +56,10 @@ public class ApplicationLdapMapperFromAttributesTest {
     Application mappedApplication = applicationLdapMapper.mapFromAttributes(attributes);
 
     assertThat("Should have a name", mappedApplication.getName(), is("appli"));
+    assertThat(
+        "Should not be a self-managed-groups application",
+        mappedApplication.getIsSelfManagedGroupsApp(),
+        nullValue());
   }
 
   @Test

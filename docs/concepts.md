@@ -10,6 +10,7 @@
     - [Reader](#reader)
     - [Password manager](#password-manager)
     - [Application manager](#application-manager)
+    - [Self managed groups and applications](#self-managed-groups-and-application)
   - [Providers](#providers)
     - [Realm config provider](#realm-config-provider)
       - [File](#file)
@@ -118,6 +119,14 @@ The application manager role is defined via the regexp.role.application.manager 
 Application manager can update an application and the associated groups (add or remove members, as well as create or delete groups). This also enable reader rights on a realm.
 
 Creating or deleting an application requires writer privileges.
+
+### Self-managed groups and applications
+
+Some groups have a self-managed property.
+When set to true, all members of the group can add or delete members of the group they belong to.
+
+With this feature, the application manager can delegate the ability to manage members to the first member they add in the group.
+A default can be set at the application level so that all groups are then considered self-managed by default. 
 
 ## Providers
 

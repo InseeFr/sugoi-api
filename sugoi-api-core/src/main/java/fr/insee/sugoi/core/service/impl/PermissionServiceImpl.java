@@ -14,7 +14,11 @@
 package fr.insee.sugoi.core.service.impl;
 
 import fr.insee.sugoi.core.model.SugoiUser;
+import fr.insee.sugoi.core.service.ApplicationService;
+import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.core.service.PermissionService;
+import fr.insee.sugoi.model.exceptions.ApplicationNotFoundException;
+import fr.insee.sugoi.model.exceptions.GroupNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,13 +28,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.text.StrSubstitutor;
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PermissionServiceImpl implements PermissionService {
+
+  @Autowired ApplicationService applicationService;
+
+  @Autowired GroupService groupService;
 
   @Value("${fr.insee.sugoi.api.regexp.role.reader:}")
   private List<String> regexpReaderList;
@@ -88,6 +98,24 @@ public class PermissionServiceImpl implements PermissionService {
   @Override
   public boolean isAtLeastOneApplicationManager(SugoiUser sugoiUser, String realm) {
     return this.isApplicationManager(sugoiUser, realm, "*");
+  }
+
+  public boolean isMemberOfSelfManagedGroup(
+      SugoiUser sugoiUser, String realm, String application, String groupName) {
+    try {
+      var group = groupService.findById(realm, application, groupName);
+      if (group == null) {
+        return false;
+      }
+      Boolean isGroupSelfManaged = group.getIsSelfManaged();
+      return BooleanUtils.isTrue(
+              (isGroupSelfManaged == null
+                  ? applicationService.findById(realm, application).getIsSelfManagedGroupsApp()
+                  : isGroupSelfManaged))
+          && sugoiUser.getRoles().stream().anyMatch(r -> r.equalsIgnoreCase("ROLE_" + groupName));
+    } catch (GroupNotFoundException | ApplicationNotFoundException e) {
+      return false;
+    }
   }
 
   @Override

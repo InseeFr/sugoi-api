@@ -21,6 +21,8 @@ public class Application implements SugoiObject {
   private String name;
   private List<Group> groups;
 
+  private Boolean isSelfManagedGroupsApp;
+
   private Map<String, Object> attributes = new HashMap<>();
 
   public List<Group> getGroups() {
@@ -29,6 +31,14 @@ public class Application implements SugoiObject {
 
   public void setGroups(List<Group> groups) {
     this.groups = groups;
+  }
+
+  public Boolean getIsSelfManagedGroupsApp() {
+    return isSelfManagedGroupsApp;
+  }
+
+  public void setIsSelfManagedGroupsApp(Boolean isSelfManagedGroupsApp) {
+    this.isSelfManagedGroupsApp = isSelfManagedGroupsApp;
   }
 
   public String getName() {

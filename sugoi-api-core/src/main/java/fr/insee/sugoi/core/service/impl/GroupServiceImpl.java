@@ -106,7 +106,6 @@ public class GroupServiceImpl implements GroupService {
   @Override
   public Group findById(String realm, String appName, String id) {
     try {
-
       Group group =
           storeProvider
               .getReaderStore(realm)
