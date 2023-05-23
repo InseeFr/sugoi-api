@@ -69,9 +69,11 @@ public class ApplicationControllerTest {
     application1.setName("SuperAppli");
     application1.setAttributes(
         Map.of("contacts", List.of("mycontact1", "mycontact2"), "owner", "myowner1"));
+    application1.setIsSelfManagedGroupsApp(true);
 
     application2 = new Application();
     application2.setName("SuperAppli2");
+    application2.setIsSelfManagedGroupsApp(false);
     application2.setAttributes(
         Map.of("contacts", List.of("mycontact1", "mycontact2"), "owner", "myowner2"));
 
@@ -92,45 +94,44 @@ public class ApplicationControllerTest {
 
   @Test
   @WithMockUser
-  public void retrieveAllApplications() {
-    try {
+  void retrieveAllApplications() throws Exception {
+    Mockito.when(
+            applicationService.findByProperties(Mockito.anyString(), Mockito.any(), Mockito.any()))
+        .thenReturn(pageResult);
 
-      Mockito.when(
-              applicationService.findByProperties(
-                  Mockito.anyString(), Mockito.any(), Mockito.any()))
-          .thenReturn(pageResult);
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.get("/realms/domaine1/applications")
+            .accept(MediaType.APPLICATION_JSON);
+    MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+    TypeReference<PageResult<Application>> mapType =
+        new TypeReference<PageResult<Application>>() {};
+    PageResult<Application> appRes = objectMapper.readValue(response.getContentAsString(), mapType);
 
-      RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/realms/domaine1/applications")
-              .accept(MediaType.APPLICATION_JSON);
-      MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-      TypeReference<PageResult<Application>> mapType =
-          new TypeReference<PageResult<Application>>() {};
-      PageResult<Application> appRes =
-          objectMapper.readValue(response.getContentAsString(), mapType);
-
-      assertThat(
-          "First element should be SuperAppli",
-          appRes.getResults().get(0).getName(),
-          is("SuperAppli"));
-      assertThat(
-          "SuperAppli should have owner myowner1",
-          appRes.getResults().get(0).getAttributes().get("owner"),
-          is("myowner1"));
-      assertThat(
-          "Second element should be SuperAppli2",
-          appRes.getResults().get(1).getName(),
-          is("SuperAppli2"));
-      assertThat(
-          "SuperAppli2 should have owner myowner2",
-          appRes.getResults().get(1).getAttributes().get("owner"),
-          is("myowner2"));
-      assertThat("Response code should be 200", response.getStatus(), is(200));
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+    assertThat(
+        "First element should be SuperAppli",
+        appRes.getResults().get(0).getName(),
+        is("SuperAppli"));
+    assertThat(
+        "SuperAppli should have owner myowner1",
+        appRes.getResults().get(0).getAttributes().get("owner"),
+        is("myowner1"));
+    assertThat(
+        "SuperAppli should have self-managed-groups",
+        true,
+        is(appRes.getResults().get(0).getIsSelfManagedGroupsApp()));
+    assertThat(
+        "Second element should be SuperAppli2",
+        appRes.getResults().get(1).getName(),
+        is("SuperAppli2"));
+    assertThat(
+        "SuperAppli2 should have owner myowner2",
+        appRes.getResults().get(1).getAttributes().get("owner"),
+        is("myowner2"));
+    assertThat(
+        "SuperAppli2 should not have self-managed-groups",
+        false,
+        is(appRes.getResults().get(1).getIsSelfManagedGroupsApp()));
+    assertThat("Response code should be 200", response.getStatus(), is(200));
   }
 
   @Disabled

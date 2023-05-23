@@ -23,5 +23,6 @@ public enum ModelType {
   LIST_GROUP,
   LIST_USER,
   LIST_STRING,
-  EXISTS
+  EXISTS,
+  BOOLEAN;
 }

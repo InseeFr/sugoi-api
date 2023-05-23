@@ -16,15 +16,23 @@ package fr.insee.sugoi.core.service;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.AdditionalMatchers.and;
+import static org.mockito.AdditionalMatchers.not;
+import static org.mockito.ArgumentMatchers.eq;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.model.SugoiUser;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.impl.PermissionServiceImpl;
+import fr.insee.sugoi.model.Application;
+import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Realm;
+import fr.insee.sugoi.model.User;
+import fr.insee.sugoi.model.exceptions.ApplicationNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,10 +45,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 public class PermissionServiceTests {
 
   @MockBean private RealmProvider realmProvider;
-
+  @MockBean private ApplicationService applicationService;
+  @MockBean private GroupService groupService;
   @Autowired PermissionService permissions;
 
   private Realm realm;
+  private Application selfManagedGroupsApplication = new Application();
+  private Application notSelfManagedGroupsApplication = new Application();
 
   @BeforeEach
   public void setup() {
@@ -48,6 +59,50 @@ public class PermissionServiceTests {
     realm.setName("test");
     realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, "(.*)_$(application)");
     realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, "my-attribute-key");
+
+    selfManagedGroupsApplication.setName("selfmanaged");
+    selfManagedGroupsApplication.setIsSelfManagedGroupsApp(true);
+    Group selfManagedGroup = new Group("selfManagedGroup");
+    selfManagedGroup.setUsers(List.of(new User("user2")));
+    selfManagedGroup.setIsSelfManaged(true);
+    Mockito.when(
+            groupService.findById(
+                Mockito.eq("test"), Mockito.any(), Mockito.matches("selfManagedGroup.*")))
+        .thenReturn(selfManagedGroup);
+    Group notSelfManagedGroup = new Group("notSelfManagedGroup");
+    notSelfManagedGroup.setUsers(List.of(new User("user3")));
+    notSelfManagedGroup.setIsSelfManaged(false);
+    Mockito.when(
+            groupService.findById(
+                Mockito.eq("test"), Mockito.any(), Mockito.matches("notSelfManagedGroup.*")))
+        .thenReturn(notSelfManagedGroup);
+    Group isMember = new Group("ismember");
+    Group isNotMember = new Group("isnotmember");
+    selfManagedGroupsApplication.setGroups(
+        List.of(isMember, isNotMember, selfManagedGroup, notSelfManagedGroup));
+    Mockito.when(
+            groupService.findById(Mockito.eq("test"), Mockito.any(), Mockito.matches("ismember.*")))
+        .thenReturn(isMember);
+    Mockito.when(
+            groupService.findById(
+                Mockito.eq("test"), Mockito.any(), Mockito.matches("isnotmember.*")))
+        .thenReturn(isNotMember);
+    notSelfManagedGroupsApplication.setName("notselfmanaged");
+    notSelfManagedGroupsApplication.setIsSelfManagedGroupsApp(false);
+    Group group = new Group("group");
+    group.setUsers(List.of(new User("user")));
+    Mockito.when(groupService.findById(Mockito.eq("test"), Mockito.any(), Mockito.eq("group")))
+        .thenReturn(group);
+    notSelfManagedGroupsApplication.setGroups(
+        List.of(group, selfManagedGroup, notSelfManagedGroup));
+    Mockito.when(applicationService.findById("test", "selfmanaged"))
+        .thenReturn(selfManagedGroupsApplication);
+    Mockito.when(applicationService.findById("test", "notselfmanaged"))
+        .thenReturn(notSelfManagedGroupsApplication);
+    Mockito.when(
+            applicationService.findById(
+                eq("test"), and(not(eq("notselfmanaged")), not(eq("selfmanaged")))))
+        .thenThrow(ApplicationNotFoundException.class);
   }
 
   @Test
@@ -193,5 +248,126 @@ public class PermissionServiceTests {
     } catch (Exception e) {
       fail();
     }
+  }
+
+  @Test
+  @DisplayName(
+      "Given a self-managed-groups application, "
+          + "with a user being in one group but not in the other, "
+          + "the user should be able to manage the groups they are in "
+          + "but not the group they don't belong to")
+  void changingMembersWithSelfManageAppTest() {
+    SugoiUser sugoiUser = new SugoiUser("user", List.of("role_ismember_selfmanaged"));
+    assertThat(
+        "The user should be able to add a member in the group it belongs to",
+        true,
+        is(
+            permissions.isMemberOfSelfManagedGroup(
+                sugoiUser, "test", "selfmanaged", "ismember_selfmanaged")));
+    assertThat(
+        "The user should not be able to add a member in the group it doesn't belong to",
+        false,
+        is(
+            permissions.isMemberOfSelfManagedGroup(
+                sugoiUser, "test", "selfmanaged", "isnotmember_selfmanaged")));
+    assertThat(
+        "If a group does not exist, the user is not member",
+        false,
+        is(
+            permissions.isMemberOfSelfManagedGroup(
+                sugoiUser, "test", "selfmanaged", "notexisting_selfmanaged")));
+    assertThat(
+        "If an application does not exist, the user is not member",
+        false,
+        is(
+            permissions.isMemberOfSelfManagedGroup(
+                sugoiUser, "test", "notexisting", "isnotmember_notexisting")));
+  }
+
+  @Test
+  @DisplayName(
+      "Given an application without the self-managed-group property, "
+          + "with a user being in one group but not in the other, "
+          + "the user should not be able to manage any groups")
+  void changingMembersWithoutSelfManageAppTest() {
+    SugoiUser sugoiUser = new SugoiUser("user", List.of("role_group_notselfmanaged"));
+    assertThat(
+        "The user should not be able to add a member in any group",
+        false,
+        is(
+            permissions.isMemberOfSelfManagedGroup(
+                sugoiUser, "test", "notselfmanaged", "group_notselfmanaged")));
+  }
+
+  @Test
+  @DisplayName(
+      "Given an application without the self-managed-group property, "
+          + "with a user being in one self managed group and another not , "
+          + "the user should be able to manage only the self managed group")
+  void changingMembersWithoutSelfManageAppInSelfManagedGroupButWithSelfManagedGroupTest() {
+    SugoiUser sugoiUser =
+        new SugoiUser(
+            "user",
+            List.of("role_selfManagedGroup_notselfmanaged", "role_ismember_notselfmanaged"));
+    assertThat(
+        "The user should be able to add a member in his group but not any",
+        true,
+        is(
+            permissions.isMemberOfSelfManagedGroup(
+                sugoiUser, "test", "notselfmanaged", "selfManagedGroup_notselfmanaged")));
+    assertThat(
+        "The user should not be able to add a member in another default existing group",
+        false,
+        is(
+            permissions.isMemberOfSelfManagedGroup(
+                sugoiUser, "test", "notselfmanaged", "ismember_notselfmanaged")));
+  }
+
+  @Test
+  @DisplayName(
+      "Given an application with the self-managed-group property, "
+          + "with a user being in a not self managed group and a self managed group, "
+          + "the user should not be able to manage this group but others")
+  void changingMemberInASelfManagedAppButNotInASelfManagedGroup() {
+    SugoiUser sugoiUser =
+        new SugoiUser(
+            "user",
+            List.of(
+                "role_notSelfManagedGroup_selfmanaged",
+                "role_selfManagedGroup_selfmanaged",
+                "role_ismember_selfmanaged"));
+    assertThat(
+        "The user should not be able to add a member in his group",
+        false,
+        is(
+            permissions.isMemberOfSelfManagedGroup(
+                sugoiUser, "test", "selfmanaged", "notSelfManagedGroup_selfmanaged")));
+    assertThat(
+        "The user should not be able to add a member in his group",
+        true,
+        is(
+            permissions.isMemberOfSelfManagedGroup(
+                sugoiUser, "test", "selfmanaged", "selfManagedGroup_selfmanaged")));
+    assertThat(
+        "The user should be able to add a member in another existing group",
+        true,
+        is(
+            permissions.isMemberOfSelfManagedGroup(
+                sugoiUser, "test", "selfmanaged", "ismember_selfmanaged")));
+  }
+
+  @Test
+  @DisplayName(
+      "Given an application without the self-managed-group property, "
+          + "with a user being in a not self-managed group, "
+          + "the user should not be able to manage any groups")
+  void changingMembersWithoutSelfManageAppButWithSelfManagedGroupTest() {
+    SugoiUser sugoiUser = new SugoiUser("user", List.of("role_notSelfManagedGroup_notselfmanaged"));
+    assertThat(
+        "The user should not be able to add a member in any group",
+        false,
+        is(
+            permissions.isMemberOfSelfManagedGroup(
+                sugoiUser, "test", "notselfmanaged", "notSelfManagedGroup_notselfmanaged")));
   }
 }

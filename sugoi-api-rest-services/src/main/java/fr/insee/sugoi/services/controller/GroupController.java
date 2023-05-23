@@ -379,7 +379,7 @@ public class GroupController {
       value = {"/realms/{realm}/applications/{application}/groups/{group_id}/members/{user_id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Add user to group")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#applicationName)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isGroupManager(#realm,#applicationName,#groupId)")
   public ResponseEntity<?> addUserToGroup(
       @PathVariable("realm") String realm,
       @PathVariable("group_id") String groupId,
@@ -426,7 +426,7 @@ public class GroupController {
       value = {"/realms/{realm}/applications/{application}/groups/{group_id}/members/{user_id}"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Delete user from group")
-  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#applicationName)")
+  @PreAuthorize("@NewAuthorizeMethodDecider.isGroupManager(#realm,#applicationName,#groupId)")
   public ResponseEntity<?> deleteUserFromGroup(
       @PathVariable("realm") String realm,
       @PathVariable("group_id") String groupId,

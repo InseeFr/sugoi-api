@@ -73,6 +73,8 @@ public class StoreMappingFixture {
     mappings.add(new StoreMapping("name", "ou", ModelType.STRING, true));
     mappings.add(new StoreMapping("attributes.owner", "description", ModelType.STRING, true));
     mappings.add(
+        new StoreMapping("isSelfManagedGroupsApp", "businessCategory", ModelType.BOOLEAN, true));
+    mappings.add(
         new StoreMapping("attributes.contacts", "postalAddress", ModelType.LIST_STRING, true));
     return mappings;
   }

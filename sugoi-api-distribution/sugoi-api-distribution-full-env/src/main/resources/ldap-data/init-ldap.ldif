@@ -258,6 +258,7 @@ inseepropriete: applicationMapping$attributes.owner:description,string,rw
 inseepropriete: groupMapping$name:cn,String,rw
 inseepropriete: groupMapping$description:description,String,rw
 inseepropriete: groupMapping$users:uniquemember,list_user,rw
+inseepropriete: groupMapping$isSelfManaged:businessCategory,Boolean,rw
 inseepropriete: uiUserMapping$Identifiant;Identifiant de l'utilisateur;Il servira pour le rechercher a travers l'annuaire. Caracteres autorises alphabetiques chiffres apostrophes espaces tirets;username;string;true;main;;required
 inseepropriete: uiUserMapping$Nom commun;Nom commun de l'utilisateur;Caracteres autorises alphabetiques chiffres apostrophes espaces tirets;attributes.common_name;string;true;main;
 inseepropriete: uiUserMapping$Nom;Nom de l'utilisateur;Caracteres autorises alphabetiques chiffres apostrophes espaces tirets;lastName;string;true;main;

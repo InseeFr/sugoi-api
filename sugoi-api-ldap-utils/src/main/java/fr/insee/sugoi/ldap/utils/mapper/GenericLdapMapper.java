@@ -135,6 +135,8 @@ public class GenericLdapMapper {
     switch (type) {
       case STRING:
         return attrs.get(0).getValue();
+      case BOOLEAN:
+        return Boolean.parseBoolean(attrs.get(0).getValue());
       case BYTE_ARRAY:
         return attrs.get(0).getValueByteArray();
       case ORGANIZATION:
@@ -210,6 +212,8 @@ public class GenericLdapMapper {
     switch (type) {
       case STRING:
         return new Attribute(ldapAttributeName, (String) sugoiValue);
+      case BOOLEAN:
+        return new Attribute(ldapAttributeName, ((Boolean) sugoiValue).toString());
       case ORGANIZATION:
         return new Attribute(
             ldapAttributeName,

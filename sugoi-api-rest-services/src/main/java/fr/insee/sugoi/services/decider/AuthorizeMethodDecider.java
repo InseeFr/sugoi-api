@@ -71,6 +71,24 @@ public class AuthorizeMethodDecider {
     return true;
   }
 
+  public boolean isGroupManager(String realm, String application, String groupName) {
+    if (enable) {
+      logger.info("Check if user is at least group manager on realm {}", realm);
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      List<String> roles =
+          authentication.getAuthorities().stream()
+              .map(GrantedAuthority::getAuthority)
+              .map(String::toUpperCase)
+              .collect(Collectors.toList());
+      SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
+      return permissionService.isMemberOfSelfManagedGroup(sugoiUser, realm, application, groupName)
+          || permissionService.isApplicationManager(sugoiUser, realm, application)
+          || permissionService.isWriter(sugoiUser, realm, null);
+    }
+    logger.warn("PreAuthorize on request is disabled, can cause security problem");
+    return true;
+  }
+
   public boolean isPasswordManager(String realm, String userStorage) {
     if (enable) {
       logger.info(

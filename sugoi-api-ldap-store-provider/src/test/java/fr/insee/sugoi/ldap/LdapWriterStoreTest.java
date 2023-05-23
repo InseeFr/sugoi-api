@@ -279,19 +279,32 @@ public class LdapWriterStoreTest {
         "My application should have groups",
         retrievedApp.getGroups().get(0).getName(),
         is("Group1_MyApplication"));
+    assertThat(
+        "MyApplication should not be a self-manage-groups application",
+        retrievedApp.getIsSelfManagedGroupsApp(),
+        nullValue());
   }
 
   @Test
   public void testUpdateApplicationWithGroupAdding() {
     Application application = ldapReaderStore.getApplication("Applitest").get();
+    assertThat(
+        "MyApplication should not be a self-manage-groups application",
+        application.getIsSelfManagedGroupsApp(),
+        nullValue());
     Group group1 = new Group("Group1_Applitest", "Applitest");
     application.getGroups().add(group1);
+    application.setIsSelfManagedGroupsApp(true);
     ldapWriterStore.updateApplication(application, null);
     Application retrievedApplication = ldapReaderStore.getApplication("Applitest").get();
     assertThat(
         "Applitest should have group1",
         retrievedApplication.getGroups().stream()
             .anyMatch(group -> group.getName().equals("Group1_Applitest")));
+    assertThat(
+        "MyApplication should be a self-manage-groups application",
+        application.getIsSelfManagedGroupsApp(),
+        is(true));
   }
 
   @Test

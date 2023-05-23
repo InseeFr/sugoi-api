@@ -28,6 +28,9 @@ public interface PermissionService {
 
   public boolean isPasswordValidator(SugoiUser sugoiUser, String realm, String userStorage);
 
+  public boolean isMemberOfSelfManagedGroup(
+      SugoiUser sugoiUser, String realm, String application, String groupName);
+
   public boolean isWriter(SugoiUser sugoiUser, String realm, String userStorage);
 
   public boolean isAdminRealm(SugoiUser sugoiUser, String realm, String userStorage);
