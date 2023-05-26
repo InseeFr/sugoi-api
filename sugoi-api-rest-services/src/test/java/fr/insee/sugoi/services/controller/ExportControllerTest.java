@@ -20,6 +20,7 @@ import static org.mockito.ArgumentMatchers.eq;
 
 import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
 import fr.insee.sugoi.core.service.ConfigService;
+import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.*;
 import fr.insee.sugoi.model.paging.PageResult;
@@ -55,6 +56,7 @@ public class ExportControllerTest {
   @MockBean private UserService userService;
 
   @MockBean private ConfigService configService;
+  @MockBean private GroupService groupService;
 
   private Realm reamlOneUS;
   private Realm realmTwoUS;

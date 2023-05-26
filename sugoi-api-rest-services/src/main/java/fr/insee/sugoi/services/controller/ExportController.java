@@ -14,12 +14,14 @@
 package fr.insee.sugoi.services.controller;
 
 import fr.insee.sugoi.core.service.ConfigService;
+import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Habilitation;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.exceptions.StoreException;
+import fr.insee.sugoi.model.exceptions.UserNotFoundException;
 import fr.insee.sugoi.model.exceptions.UserStorageNotFoundException;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
@@ -61,6 +63,7 @@ public class ExportController {
   private int pageSize;
 
   @Autowired private UserService userService;
+  @Autowired private GroupService groupService;
 
   @Autowired private ConfigService configService;
 
@@ -167,13 +170,7 @@ public class ExportController {
                 .flatMap(storage1 -> storage1.getUserMappings().stream())
                 .distinct()
                 .collect(Collectors.toList());
-    try {
-      csvPrinter.printRecord(
-          storeMappings.stream().map(StoreMapping::getSugoiName).collect(Collectors.toList()));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
+    printHeader(csvPrinter, storeMappings);
     if (storage != null && !storage.isEmpty()) {
       getExportUsersWithStorages(
           searchUser, storage, storeMappings, realm, typeRecherche, csvPrinter);
@@ -193,6 +190,65 @@ public class ExportController {
     }
   }
 
+  @GetMapping(
+      path = {"/realms/{realm}/applications/{application}/groups/{group}/export/export.csv"})
+  @Operation(summary = "Export all users in a group")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Members of group found",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = PageResult.class))
+            })
+      })
+  @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#application)")
+  public void getAllMembersInGroup(
+      @Parameter(
+              description = "Name of the realm where the operation will be made",
+              required = true)
+          @PathVariable("realm")
+          String realm,
+      @Parameter(description = "The application containing the group", required = true)
+          @PathVariable("application")
+          String application,
+      @Parameter(description = "Group from which members are to be retrieved", required = true)
+          @PathVariable("group")
+          String group,
+      HttpServletResponse response)
+      throws IOException {
+
+    response.setCharacterEncoding("UTF-8");
+    response.setContentType("text/csv");
+
+    List<StoreMapping> headerMappings =
+        configService.getRealm(realm).getUserStorages().stream()
+            .flatMap(storage1 -> storage1.getUserMappings().stream())
+            .distinct()
+            .collect(Collectors.toList());
+
+    CSVPrinter csvPrinter = new CSVPrinter(response.getWriter(), CSVFormat.DEFAULT);
+    printHeader(csvPrinter, headerMappings);
+    groupService
+        .findById(realm, application, group)
+        .getUsers()
+        .forEach(
+            u -> {
+              try {
+                csvPrinter.printRecord(
+                    getCsvLineFromUser(
+                        headerMappings, userService.findById(realm, null, u.getUsername(), false)));
+              } catch (IOException e) {
+                throw new RuntimeException(e);
+              } catch (UserNotFoundException e) {
+                // not a sugoi user
+              }
+            });
+    csvPrinter.flush();
+  }
+
   private void getExportUsersWithStorages(
       User searchUser,
       String storageName,
@@ -209,32 +265,7 @@ public class ExportController {
         PageResult<User> foundUsers =
             userService.findByProperties(realm, storageName, searchUser, pageable, typeRecherche);
         for (User foundUser : foundUsers.getResults()) {
-          List<String> attributesToPrint = new ArrayList<>();
-          for (StoreMapping headerMapping : headerMappings) {
-            String newAttribute;
-            switch (headerMapping.getModelType()) {
-              case LIST_HABILITATION:
-              case LIST_GROUP:
-                newAttribute =
-                    ((List<?>)
-                            foundUser.get(headerMapping.getSugoiName()).orElse(new ArrayList<>()))
-                        .stream()
-                            .filter(Objects::nonNull)
-                            .map(Object::toString)
-                            .collect(Collectors.joining(",", "", ""));
-                break;
-              case ORGANIZATION:
-                newAttribute =
-                    ((Organization)
-                            foundUser.get(headerMapping.getSugoiName()).orElse(new Organization()))
-                        .getIdentifiant();
-                break;
-              default:
-                newAttribute = foundUser.get(headerMapping.getSugoiName()).orElse("").toString();
-            }
-
-            attributesToPrint.add(newAttribute);
-          }
+          List<String> attributesToPrint = getCsvLineFromUser(headerMappings, foundUser);
           csvPrinter.printRecord(attributesToPrint);
           csvPrinter.flush();
         }
@@ -246,9 +277,6 @@ public class ExportController {
         }
       }
       csvPrinter.flush();
-    } catch (NoSuchFieldException e) {
-      throw new StoreException(
-          "A configured field has not been found during export. Check store configuration.", e);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -323,5 +351,47 @@ public class ExportController {
         groupFilter,
         applicationFilter,
         response);
+  }
+
+  private List<String> getCsvLineFromUser(List<StoreMapping> headerMappings, User user) {
+    try {
+      List<String> attributesToPrint = new ArrayList<>();
+      for (StoreMapping headerMapping : headerMappings) {
+        String newAttribute;
+        switch (headerMapping.getModelType()) {
+          case LIST_HABILITATION:
+          case LIST_GROUP:
+            newAttribute =
+                ((List<?>) user.get(headerMapping.getSugoiName()).orElse(new ArrayList<>()))
+                    .stream()
+                        .filter(Objects::nonNull)
+                        .map(Object::toString)
+                        .collect(Collectors.joining(",", "", ""));
+            break;
+          case ORGANIZATION:
+            newAttribute =
+                ((Organization) user.get(headerMapping.getSugoiName()).orElse(new Organization()))
+                    .getIdentifiant();
+            break;
+          default:
+            newAttribute = user.get(headerMapping.getSugoiName()).orElse("").toString();
+        }
+
+        attributesToPrint.add(newAttribute);
+      }
+      return attributesToPrint;
+    } catch (NoSuchFieldException e) {
+      throw new StoreException(
+          "A configured field has not been found during export. Check store configuration.", e);
+    }
+  }
+
+  private void printHeader(CSVPrinter csvPrinter, List<StoreMapping> storeMappings) {
+    try {
+      csvPrinter.printRecord(
+          storeMappings.stream().map(StoreMapping::getSugoiName).collect(Collectors.toList()));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 }
