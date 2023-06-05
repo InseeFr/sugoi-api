@@ -68,7 +68,7 @@ public class SerializeTest {
     assertThat("Should be domaine1", realm.getName(), is("newrealm"));
     assertThat(
         "Should have password property",
-        realm.getProperties().get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE),
+        realm.getProperties().get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE).get(0),
         is("true"));
   }
 }

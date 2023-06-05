@@ -43,7 +43,11 @@ public class UserStorageLdapMapper {
                   RealmConfigKeys configKey =
                       realmConfigKeysConfiguration.getRealmConfigKey(property[0]);
                   if (configKey != null) {
-                    userStorage.getProperties().put(configKey, property[1]);
+                    if (!userStorage.getProperties().containsKey(configKey)
+                        || userStorage.getProperties().get(configKey) == null) {
+                      userStorage.getProperties().put(configKey, new ArrayList<>());
+                    }
+                    userStorage.getProperties().get(configKey).add(property[1]);
                   } else if (property[0].equalsIgnoreCase("brancheContact")) {
                     userStorage.setUserSource(property[1]);
                   } else if (property[0].equalsIgnoreCase("brancheOrganisation")) {
@@ -101,10 +105,13 @@ public class UserStorageLdapMapper {
         .getProperties()
         .forEach(
             (propertyKey, propertyValue) ->
-                attributes.add(
-                    new Attribute(
-                        "inseepropriete",
-                        String.format("%s$%s", propertyKey.getName(), propertyValue))));
+                propertyValue.stream()
+                    .forEach(
+                        v ->
+                            attributes.add(
+                                new Attribute(
+                                    "inseepropriete",
+                                    String.format("%s$%s", propertyKey.getName(), v)))));
     if (userStorage.getUserMappings() != null) {
       for (StoreMapping storeMapping : userStorage.getUserMappings()) {
         attributes.add(

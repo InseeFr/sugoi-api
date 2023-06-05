@@ -29,7 +29,7 @@ public class UserStorage implements Serializable {
 
   @JsonDeserialize(using = RealmConfigKeysDeserializer.class)
   @IgnoreSizeOf
-  private Map<RealmConfigKeys, String> properties = new HashMap<>();
+  private Map<RealmConfigKeys, List<String>> properties = new HashMap<>();
 
   @IgnoreSizeOf private List<StoreMapping> userMappings;
 
@@ -83,15 +83,11 @@ public class UserStorage implements Serializable {
     this.addressSource = addressSource;
   }
 
-  public Map<RealmConfigKeys, String> getProperties() {
+  public Map<RealmConfigKeys, List<String>> getProperties() {
     return properties;
   }
 
-  public void setProperties(Map<RealmConfigKeys, String> properties) {
+  public void setProperties(Map<RealmConfigKeys, List<String>> properties) {
     this.properties = properties;
-  }
-
-  public void addProperty(RealmConfigKeys key, String value) {
-    this.properties.put(key, value);
   }
 }

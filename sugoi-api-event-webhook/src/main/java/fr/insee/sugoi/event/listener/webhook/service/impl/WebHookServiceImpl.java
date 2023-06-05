@@ -13,6 +13,7 @@
 */
 package fr.insee.sugoi.event.listener.webhook.service.impl;
 
+import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.event.listener.webhook.service.WebHookService;
@@ -181,7 +182,8 @@ public class WebHookServiceImpl implements WebHookService {
               .findFirst()
               .orElseThrow()
               .getProperties()
-              .get(realmTemplateConfiguration);
+              .get(GlobalKeysConfig.getRealmConfigKey(realmTemplateConfiguration))
+              .get(0);
     } catch (Exception e) {
       // we don't need to manage this exception here
     }

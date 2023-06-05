@@ -24,9 +24,9 @@ Feature: Realms scenario synchrone
               "url": "localhost",
               "appSource": "ou=Applications,o=insee,c=fr",
               "properties": {
-                "app-managed-attribute-keys-list": "inseegroupedefaut,inseeroleapplicatif",
-                "app-managed-attribute-patterns-list": "(.*)_$(application),$(application)\\$\\$(.*)",
-                "description": "Le profil domaine2<br/>Test <b>html</b> in description"
+                "app-managed-attribute-keys-list": ["inseegroupedefaut,inseeroleapplicatif"],
+                "app-managed-attribute-patterns-list": ["(.*)_$(application),$(application)\\$\\$(.*)"],
+                "description": ["Le profil domaine2<br/>Test <b>html</b> in description"]
               },
               "userStorages": [
                 {
@@ -35,10 +35,10 @@ Feature: Realms scenario synchrone
                   "organizationSource": "ou=organisations,ou=clients_domaine1,o=insee,c=fr",
                   "addressSource": "ou=adresses,ou=clients_domaine1,o=insee,c=fr",
                   "properties": {
-                    "group_filter_pattern": "(cn={group}_{appliname})",
-                    "organization_object_classes": "top,inseeOrganisation",
-                    "user_object_classes": "top,inseeCompte,inseeContact,inseeAttributsAuthentification,inseeAttributsHabilitation,inseeAttributsCommunication",
-                    "group_source_pattern": "ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr"
+                    "group_filter_pattern": ["(cn={group}_{appliname})"],
+                    "organization_object_classes": ["top,inseeOrganisation"],
+                    "user_object_classes": ["top,inseeCompte,inseeContact,inseeAttributsAuthentification,inseeAttributsHabilitation,inseeAttributsCommunication"],
+                    "group_source_pattern": ["ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr"]
                   },
                   "userMappings": [
                     {
@@ -213,9 +213,9 @@ Feature: Realms scenario synchrone
               "url": "localhost",
               "appSource": "ou=Applications,o=insee,c=fr",
               "properties": {
-                "app-managed-attribute-keys-list": "inseegroupedefaut,inseeroleapplicatif",
-                "app-managed-attribute-patterns-list": "(.*)_$(application),$(application)\\$\\$(.*)",
-                "description": "I'm updated"
+                "app-managed-attribute-keys-list": ["inseegroupedefaut,inseeroleapplicatif"],
+                "app-managed-attribute-patterns-list": ["(.*)_$(application),$(application)\\$\\$(.*)"],
+                "description": ["I'm updated"]
               },
               "userStorages": [
                 {
@@ -224,10 +224,10 @@ Feature: Realms scenario synchrone
                   "organizationSource": "ou=organisations,ou=clients_domaine1,o=insee,c=fr",
                   "addressSource": "ou=adresses,ou=clients_domaine1,o=insee,c=fr",
                   "properties": {
-                    "group_filter_pattern": "(cn={group}_{appliname})",
-                    "organization_object_classes": "top,inseeOrganisation",
-                    "user_object_classes": "top,inseeCompte,inseeContact,inseeAttributsAuthentification,inseeAttributsHabilitation,inseeAttributsCommunication",
-                    "group_source_pattern": "ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr"
+                    "group_filter_pattern": ["(cn={group}_{appliname})"],
+                    "organization_object_classes": ["top,inseeOrganisation"],
+                    "user_object_classes": ["top,inseeCompte,inseeContact,inseeAttributsAuthentification,inseeAttributsHabilitation,inseeAttributsCommunication"],
+                    "group_source_pattern": ["ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr"]
                   },
                   "userMappings": [
                     {

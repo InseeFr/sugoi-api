@@ -44,8 +44,13 @@ public class RealmLdapMapper {
     Realm realm = new Realm();
     // this means we can't have _ in a realm name !
     realm.setName(searchResultEntry.getAttributeValue("cn").split("_")[1]);
-    realm.addProperty(
-        GlobalKeysConfig.REALM_DESCRIPTION, searchResultEntry.getAttributeValue("description"));
+    if (searchResultEntry.getAttributeValue("description") != null) {
+      realm
+          .getProperties()
+          .put(
+              GlobalKeysConfig.REALM_DESCRIPTION,
+              List.of(searchResultEntry.getAttributeValue("description")));
+    }
     String[] inseeProperties = searchResultEntry.getAttributeValues("inseepropriete");
     for (String inseeProperty : inseeProperties) {
       String[] property = inseeProperty.split("\\$", 2);
@@ -60,7 +65,11 @@ public class RealmLdapMapper {
           } else if (configKey.equals(LdapConfigKeys.PORT)) {
             realm.setPort(property[1]);
           } else {
-            realm.getProperties().put(configKey, property[1]);
+            if (realm.getProperties().containsKey(configKey)
+                || realm.getProperties().get(configKey) == null) {
+              realm.getProperties().put(configKey, new ArrayList<>());
+            }
+            realm.getProperties().get(configKey).add(property[1]);
           }
         } else if (property[0].equalsIgnoreCase("default_writer_type")) {
           realm.setWriterType(property[1]);
@@ -120,7 +129,7 @@ public class RealmLdapMapper {
       attributes.add(
           new Attribute(
               GlobalKeysConfig.REALM_DESCRIPTION.getName(),
-              realm.getProperties().get(GlobalKeysConfig.REALM_DESCRIPTION)));
+              realm.getProperties().get(GlobalKeysConfig.REALM_DESCRIPTION).get(0)));
     }
     if (realm.getAppSource() != null) {
       attributes.add(
@@ -154,10 +163,13 @@ public class RealmLdapMapper {
         .getProperties()
         .forEach(
             (configKey, propertyValue) ->
-                attributes.add(
-                    new Attribute(
-                        "inseepropriete",
-                        String.format("%s$%s", configKey.getName(), propertyValue))));
+                propertyValue.stream()
+                    .forEach(
+                        v ->
+                            attributes.add(
+                                new Attribute(
+                                    "inseepropriete",
+                                    String.format("%s$%s", configKey.getName(), v)))));
     if (realm.getApplicationMappings() != null) {
       for (StoreMapping storeMapping : realm.getApplicationMappings()) {
         attributes.add(

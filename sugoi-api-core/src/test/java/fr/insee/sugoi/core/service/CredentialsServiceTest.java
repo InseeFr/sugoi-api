@@ -78,12 +78,15 @@ public class CredentialsServiceTest {
   public void setup() {
     UserStorage us1 = new UserStorage();
     us1.setName("us1");
-    us1.addProperty(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE, "false");
-    us1.addProperty(PasswordPolicyConstants.CREATE_PASSWORD_SIZE, "40");
+    us1.getProperties()
+        .put(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE, List.of("false"));
+    us1.getProperties().put(PasswordPolicyConstants.CREATE_PASSWORD_SIZE, List.of("40"));
 
     UserStorage usUppercase = new UserStorage();
     usUppercase.setName("us1");
-    usUppercase.addProperty(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE, "true");
+    usUppercase
+        .getProperties()
+        .put(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE, List.of("true"));
 
     user1 = new User();
     user1.setUsername("Toto");
@@ -95,7 +98,9 @@ public class CredentialsServiceTest {
     realmUpperCase = new Realm();
     realmUpperCase.setUserStorages(List.of(usUppercase));
     realmUpperCase.setName("realmWithUpperCase");
-    realmUpperCase.addProperty(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE, "true");
+    realmUpperCase
+        .getProperties()
+        .put(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE, List.of("true"));
     Mockito.when(realmProvider.load("realmWithUpperCase")).thenReturn(Optional.of(realmUpperCase));
 
     realmNoUpperCase = new Realm();

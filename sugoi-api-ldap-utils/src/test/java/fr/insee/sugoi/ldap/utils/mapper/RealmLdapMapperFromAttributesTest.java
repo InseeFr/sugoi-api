@@ -44,13 +44,13 @@ public class RealmLdapMapperFromAttributesTest {
     Realm realm = RealmLdapMapper.mapFromSearchEntry(searchResultEntry);
     assertThat(
         "Should have group source pattern",
-        realm.getProperties().get(LdapConfigKeys.GROUP_SOURCE_PATTERN),
+        realm.getProperties().get(LdapConfigKeys.GROUP_SOURCE_PATTERN).get(0),
         is("ou={appliname}_Objets,ou={appliname},ou=Applications,o=insee,c=fr"));
     assertThat(
         "Should have application source", realm.getAppSource(), is("ou=applications,o=insee,c=fr"));
     assertThat(
         "Should have group filter pattern",
-        realm.getProperties().get(LdapConfigKeys.GROUP_FILTER_PATTERN),
+        realm.getProperties().get(LdapConfigKeys.GROUP_FILTER_PATTERN).get(0),
         is("(cn={group}_{appliname})"));
   }
 }
