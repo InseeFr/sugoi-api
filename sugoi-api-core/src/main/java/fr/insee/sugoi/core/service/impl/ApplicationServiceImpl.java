@@ -152,7 +152,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     try {
       Realm r = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
       pageableResult.setSizeWithMax(
-          Integer.parseInt(r.getProperties().get(GlobalKeysConfig.APPLICATIONS_MAX_OUTPUT_SIZE)));
+          Integer.parseInt(
+              r.getProperties().get(GlobalKeysConfig.APPLICATIONS_MAX_OUTPUT_SIZE).get(0)));
       PageResult<Application> apps =
           storeProvider
               .getReaderStore(realm)

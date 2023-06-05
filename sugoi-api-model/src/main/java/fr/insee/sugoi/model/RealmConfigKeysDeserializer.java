@@ -18,14 +18,17 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class RealmConfigKeysDeserializer extends StdDeserializer<Map<RealmConfigKeys, String>> {
+public class RealmConfigKeysDeserializer
+    extends StdDeserializer<Map<RealmConfigKeys, List<String>>> {
 
-  private static RealmConfigKeysFinder configuration = new RealmConfigKeysFinder();
+  private static final RealmConfigKeysFinder configuration = new RealmConfigKeysFinder();
 
   protected RealmConfigKeysDeserializer() {
     this(null);
@@ -36,16 +39,17 @@ public class RealmConfigKeysDeserializer extends StdDeserializer<Map<RealmConfig
   }
 
   @Override
-  public Map<RealmConfigKeys, String> deserialize(JsonParser p, DeserializationContext ctxt)
+  public Map<RealmConfigKeys, List<String>> deserialize(JsonParser p, DeserializationContext ctxt)
       throws IOException {
     JsonNode node = p.readValueAsTree();
-    Map<RealmConfigKeys, String> map = new HashMap<>();
+    Map<RealmConfigKeys, List<String>> map = new HashMap<>();
     Iterator<Entry<String, JsonNode>> fieldsIterator = node.fields();
     while (fieldsIterator.hasNext()) {
       Entry<String, JsonNode> field = fieldsIterator.next();
       RealmConfigKeys keyConfig = configuration.getRealmConfigKey(field.getKey());
       if (keyConfig != null) {
-        map.put(keyConfig, field.getValue().asText());
+        map.put(keyConfig, new ArrayList<>());
+        field.getValue().elements().forEachRemaining(e -> map.get(keyConfig).add(e.asText()));
       }
     }
     return map;

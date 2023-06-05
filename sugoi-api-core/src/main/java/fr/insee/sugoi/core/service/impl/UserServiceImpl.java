@@ -55,6 +55,8 @@ public class UserServiceImpl implements UserService {
 
   private boolean verifyUniqueMail = false;
 
+  private int usersMaxoutputsize = 1000;
+
   /* Size of the ids randomly generated */
   private int idCreateLength = 7;
 
@@ -115,7 +117,9 @@ public class UserServiceImpl implements UserService {
                 realmLoaded
                     .getProperties()
                     .getOrDefault(
-                        GlobalKeysConfig.VERIFY_MAIL_UNICITY, Boolean.toString(verifyUniqueMail)))
+                        GlobalKeysConfig.VERIFY_MAIL_UNICITY,
+                        List.of(Boolean.toString(verifyUniqueMail)))
+                    .get(0))
             && user.getMail() != null
             && realmLoaded.getUserStorages().stream()
                 .map(
@@ -172,7 +176,10 @@ public class UserServiceImpl implements UserService {
       if (Boolean.parseBoolean(
               realmLoaded
                   .getProperties()
-                  .getOrDefault(GlobalKeysConfig.VERIFY_MAIL_UNICITY, "false"))
+                  .getOrDefault(
+                      GlobalKeysConfig.VERIFY_MAIL_UNICITY,
+                      List.of(Boolean.toString(verifyUniqueMail)))
+                  .get(0))
           && user.getMail() != null
           && !user.getMail().isBlank()) {
         if (realmLoaded.getUserStorages().stream()
@@ -298,7 +305,12 @@ public class UserServiceImpl implements UserService {
     PageResult<User> result = new PageResult<>();
     Realm r = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
     pageable.setSizeWithMax(
-        Integer.parseInt(r.getProperties().get(GlobalKeysConfig.USERS_MAX_OUTPUT_SIZE)));
+        Integer.parseInt(
+            r.getProperties()
+                .getOrDefault(
+                    GlobalKeysConfig.USERS_MAX_OUTPUT_SIZE,
+                    List.of(Integer.toString(usersMaxoutputsize)))
+                .get(0)));
     result.setPageSize(pageable.getSize());
 
     try {
@@ -582,7 +594,12 @@ public class UserServiceImpl implements UserService {
 
   private List<String> findUserSeeAlsos(Realm realm, User user) {
     String[] seeAlsosAttributes =
-        realm.getProperties().get(GlobalKeysConfig.SEEALSO_ATTRIBUTES).replace(" ", "").split(",");
+        realm
+            .getProperties()
+            .get(GlobalKeysConfig.SEEALSO_ATTRIBUTES)
+            .get(0)
+            .replace(" ", "")
+            .split(",");
     List<String> seeAlsos = new ArrayList<>();
     for (String seeAlsoAttribute : seeAlsosAttributes) {
       Object seeAlsoAttributeValue = user.getAttributes().get(seeAlsoAttribute);

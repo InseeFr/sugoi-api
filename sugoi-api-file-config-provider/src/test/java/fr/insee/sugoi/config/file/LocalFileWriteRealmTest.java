@@ -82,7 +82,7 @@ public class LocalFileWriteRealmTest {
     UserStorage uniqueUserStorage = new UserStorage();
     uniqueUserStorage.setUserSource("ou=SSM,o=insee,c=fr");
     uniqueUserStorage.setOrganizationSource("ou=organisations,ou=clients_domaine2,o=insee,c=fr");
-    uniqueUserStorage.getProperties().put(LdapConfigKeys.GROUP_FILTER_PATTERN, "toto");
+    uniqueUserStorage.getProperties().put(LdapConfigKeys.GROUP_FILTER_PATTERN, List.of("toto"));
     realmToAdd.setUserStorages(List.of(uniqueUserStorage));
     assertThat("Realm should not exist", localFileConfig.load("toadd").isEmpty());
     localFileConfig.createRealm(realmToAdd, null);
@@ -103,7 +103,8 @@ public class LocalFileWriteRealmTest {
             .getUserStorages()
             .get(0)
             .getProperties()
-            .get(LdapConfigKeys.GROUP_FILTER_PATTERN),
+            .get(LdapConfigKeys.GROUP_FILTER_PATTERN)
+            .get(0),
         is("toto"));
   }
 
@@ -116,12 +117,12 @@ public class LocalFileWriteRealmTest {
     userStorage1.setName("first");
     userStorage1.setUserSource("ou=SSM,o=insee,c=fr");
     userStorage1.setOrganizationSource("ou=organisations,ou=clients_domaine2,o=insee,c=fr");
-    userStorage1.getProperties().put(LdapConfigKeys.GROUP_FILTER_PATTERN, "toto");
+    userStorage1.getProperties().put(LdapConfigKeys.GROUP_FILTER_PATTERN, List.of("toto"));
     UserStorage userStorage2 = new UserStorage();
     userStorage2.setName("second");
     userStorage2.setUserSource("ou=SSM,o=insee,c=fr");
     userStorage2.setOrganizationSource("ou=organisations,ou=clients_domaine2,o=insee,c=fr");
-    userStorage2.getProperties().put(LdapConfigKeys.GROUP_FILTER_PATTERN, "toto");
+    userStorage2.getProperties().put(LdapConfigKeys.GROUP_FILTER_PATTERN, List.of("toto"));
     List<UserStorage> userStorages = new ArrayList<>();
     userStorages.add(userStorage1);
     userStorages.add(userStorage2);
@@ -142,7 +143,8 @@ public class LocalFileWriteRealmTest {
             .getUserStorages()
             .get(0)
             .getProperties()
-            .get(LdapConfigKeys.GROUP_FILTER_PATTERN),
+            .get(LdapConfigKeys.GROUP_FILTER_PATTERN)
+            .get(0),
         is("toto"));
   }
 

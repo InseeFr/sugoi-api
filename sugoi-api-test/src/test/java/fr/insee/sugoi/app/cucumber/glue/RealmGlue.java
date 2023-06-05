@@ -66,7 +66,8 @@ public class RealmGlue {
   public void expect_description_of_realm_to_be(String description)
       throws JsonMappingException, JsonProcessingException {
     Realm realm = mapper.readValue(stepData.getLatestResponse().getBody(), Realm.class);
-    assertThat(realm.getProperties().get(GlobalKeysConfig.REALM_DESCRIPTION), is(description));
+    assertThat(
+        realm.getProperties().get(GlobalKeysConfig.REALM_DESCRIPTION).get(0), is(description));
   }
 
   @Then("the client expect uiUserMapping to contain {}")

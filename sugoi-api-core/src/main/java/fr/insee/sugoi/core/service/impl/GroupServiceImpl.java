@@ -138,7 +138,7 @@ public class GroupServiceImpl implements GroupService {
     try {
       Realm r = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
       pageableResult.setSizeWithMax(
-          Integer.parseInt(r.getProperties().get(GlobalKeysConfig.GROUPS_MAX_OUTPUT_SIZE)));
+          Integer.parseInt(r.getProperties().get(GlobalKeysConfig.GROUPS_MAX_OUTPUT_SIZE).get(0)));
       PageResult<Group> groups =
           storeProvider
               .getReaderStore(realm)

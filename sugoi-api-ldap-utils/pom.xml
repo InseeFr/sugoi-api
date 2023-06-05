@@ -37,6 +37,10 @@
         <type>test-jar</type>
         <scope>test</scope>
     </dependency>
+      <dependency>
+          <groupId>fr.insee.sugoi</groupId>
+          <artifactId>sugoi-api-model</artifactId>
+      </dependency>
   </dependencies>
 
 </project>

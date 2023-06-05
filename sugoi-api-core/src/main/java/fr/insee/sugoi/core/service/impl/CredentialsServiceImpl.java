@@ -75,7 +75,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         throw new UserNoEmailException(realm, userStorage, userId);
       }
 
-      Map<RealmConfigKeys, String> userStorageProperties =
+      Map<RealmConfigKeys, List<String>> userStorageProperties =
           realmProvider
               .load(realm)
               .orElseThrow(() -> new RealmNotFoundException(realm))
@@ -84,33 +84,16 @@ public class CredentialsServiceImpl implements CredentialsService {
               .getProperties();
       String password =
           passwordService.generatePassword(
-              userStorageProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE)
-                      != null
-                  ? Boolean.parseBoolean(
-                      userStorageProperties.get(
-                          PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE))
-                  : null,
-              userStorageProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_LOWERCASE)
-                      != null
-                  ? Boolean.parseBoolean(
-                      userStorageProperties.get(
-                          PasswordPolicyConstants.CREATE_PASSWORD_WITH_LOWERCASE))
-                  : null,
-              userStorageProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_DIGITS) != null
-                  ? Boolean.parseBoolean(
-                      userStorageProperties.get(
-                          PasswordPolicyConstants.CREATE_PASSWORD_WITH_DIGITS))
-                  : null,
-              userStorageProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_SPECIAL)
-                      != null
-                  ? Boolean.parseBoolean(
-                      userStorageProperties.get(
-                          PasswordPolicyConstants.CREATE_PASSWORD_WITH_SPECIAL))
-                  : null,
-              userStorageProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_SIZE) != null
-                  ? Integer.parseInt(
-                      userStorageProperties.get(PasswordPolicyConstants.CREATE_PASSWORD_SIZE))
-                  : null);
+              getPasswordBooleanConfiguration(
+                  userStorageProperties, PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE),
+              getPasswordBooleanConfiguration(
+                  userStorageProperties, PasswordPolicyConstants.CREATE_PASSWORD_WITH_LOWERCASE),
+              getPasswordBooleanConfiguration(
+                  userStorageProperties, PasswordPolicyConstants.CREATE_PASSWORD_WITH_DIGITS),
+              getPasswordBooleanConfiguration(
+                  userStorageProperties, PasswordPolicyConstants.CREATE_PASSWORD_WITH_SPECIAL),
+              getPasswordIntConfiguration(
+                  userStorageProperties, PasswordPolicyConstants.CREATE_PASSWORD_SIZE));
 
       ProviderResponse response =
           storeProvider
@@ -159,7 +142,7 @@ public class CredentialsServiceImpl implements CredentialsService {
 
       User user = userService.findById(realm, userStorage, userId, false);
 
-      Map<RealmConfigKeys, String> userStorageProperties =
+      Map<RealmConfigKeys, List<String>> userStorageProperties =
           realmProvider
               .load(realm)
               .orElseThrow(() -> new RealmNotFoundException(realm))
@@ -218,7 +201,7 @@ public class CredentialsServiceImpl implements CredentialsService {
       ProviderRequest providerRequest) {
     try {
 
-      Map<RealmConfigKeys, String> realmProperties =
+      Map<RealmConfigKeys, List<String>> realmProperties =
           realmProvider
               .load(realm)
               .orElseThrow(() -> new RealmNotFoundException(realm))
@@ -322,28 +305,36 @@ public class CredentialsServiceImpl implements CredentialsService {
   }
 
   private Boolean validatePassword(
-      String password, Map<RealmConfigKeys, String> userStorageProperties) {
+      String password, Map<RealmConfigKeys, List<String>> userStorageProperties) {
     return passwordService.validatePassword(
         password,
-        userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE) != null
-            ? Boolean.parseBoolean(
-                userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE))
-            : null,
-        userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_LOWERCASE) != null
-            ? Boolean.parseBoolean(
-                userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_LOWERCASE))
-            : null,
-        userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_DIGITS) != null
-            ? Boolean.parseBoolean(
-                userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_DIGITS))
-            : null,
-        userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_SPECIAL) != null
-            ? Boolean.parseBoolean(
-                userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_SPECIAL))
-            : null,
-        userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_MIN_SIZE) != null
-            ? Integer.parseInt(
-                userStorageProperties.get(PasswordPolicyConstants.VALIDATE_PASSWORD_MIN_SIZE))
-            : null);
+        getPasswordBooleanConfiguration(
+            userStorageProperties, PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE),
+        getPasswordBooleanConfiguration(
+            userStorageProperties, PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_LOWERCASE),
+        getPasswordBooleanConfiguration(
+            userStorageProperties, PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_DIGITS),
+        getPasswordBooleanConfiguration(
+            userStorageProperties, PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_SPECIAL),
+        getPasswordIntConfiguration(
+            userStorageProperties, PasswordPolicyConstants.VALIDATE_PASSWORD_MIN_SIZE));
+  }
+
+  private Boolean getPasswordBooleanConfiguration(
+      Map<RealmConfigKeys, List<String>> userStorageProperties, RealmConfigKeys configkey) {
+    return (userStorageProperties.containsKey(configkey)
+            && userStorageProperties.get(configkey) != null
+            && !userStorageProperties.get(configkey).isEmpty())
+        ? Boolean.parseBoolean(userStorageProperties.get(configkey).get(0))
+        : null;
+  }
+
+  private Integer getPasswordIntConfiguration(
+      Map<RealmConfigKeys, List<String>> userStorageProperties, RealmConfigKeys configkey) {
+    return (userStorageProperties.containsKey(configkey)
+            && userStorageProperties.get(configkey) != null
+            && !userStorageProperties.get(configkey).isEmpty())
+        ? Integer.parseInt(userStorageProperties.get(configkey).get(0))
+        : null;
   }
 }

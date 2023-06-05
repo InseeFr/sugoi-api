@@ -80,10 +80,12 @@ public class LdapWriterStoreTest {
     us.setUserSource(userSource);
     us.setAddressSource(addressSource);
     us.setName("default");
-    us.addProperty(
-        LdapConfigKeys.USER_OBJECT_CLASSES,
-        "top,inseeContact,inseeAttributsHabilitation,inseeAttributsCommunication");
-    us.addProperty(LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES, "top,inseeOrganisation");
+    us.getProperties()
+        .put(
+            LdapConfigKeys.USER_OBJECT_CLASSES,
+            List.of("top,inseeContact,inseeAttributsHabilitation,inseeAttributsCommunication"));
+    us.getProperties()
+        .put(LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES, List.of("top,inseeOrganisation"));
 
     us.setUserMappings(StoreMappingFixture.getUserStoreMappings());
     us.setOrganizationMappings(StoreMappingFixture.getOrganizationStoreMappings());
@@ -96,11 +98,16 @@ public class LdapWriterStoreTest {
     realm.setName("domaine1");
     realm.setUrl("localhost");
     realm.setAppSource(appSource);
-    realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, appManagedAttributeKey);
-    realm.addProperty(
-        GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, appManagedAttributePattern);
-    realm.addProperty(LdapConfigKeys.GROUP_FILTER_PATTERN, groupFilterPattern);
-    realm.addProperty(LdapConfigKeys.GROUP_SOURCE_PATTERN, groupSourcePattern);
+    realm
+        .getProperties()
+        .put(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, List.of(appManagedAttributeKey));
+    realm
+        .getProperties()
+        .put(
+            GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST,
+            List.of(appManagedAttributePattern));
+    realm.getProperties().put(LdapConfigKeys.GROUP_FILTER_PATTERN, List.of(groupFilterPattern));
+    realm.getProperties().put(LdapConfigKeys.GROUP_SOURCE_PATTERN, List.of(groupSourcePattern));
     realm.setApplicationMappings(StoreMappingFixture.getApplicationStoreMappings());
     realm.setGroupMappings(StoreMappingFixture.getGroupStoreMappings());
 

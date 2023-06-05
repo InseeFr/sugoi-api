@@ -66,8 +66,12 @@ public class AppManagedUserAttributeControllerTest {
   public void setup() {
     realm = new Realm();
     realm.setName("test");
-    realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, "(.*)_$(application)");
-    realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, "my-attribute-key");
+    realm
+        .getProperties()
+        .put(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, List.of("(.*)_$(application)"));
+    realm
+        .getProperties()
+        .put(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, List.of("my-attribute-key"));
   }
 
   @Test
