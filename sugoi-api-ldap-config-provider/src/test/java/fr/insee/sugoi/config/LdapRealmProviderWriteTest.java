@@ -47,8 +47,8 @@ public class LdapRealmProviderWriteTest {
     Realm realmToAdd = new Realm();
     realmToAdd.setName("toadd");
     realmToAdd.setUrl("localhost");
-    realmToAdd.addProperty(LdapConfigKeys.GROUP_FILTER_PATTERN, "toto");
-    realmToAdd.getProperties().put(LdapConfigKeys.APPLICATION_OBJECT_CLASSES, "app-class");
+    realmToAdd.getProperties().put(LdapConfigKeys.GROUP_FILTER_PATTERN, List.of("toto"));
+    realmToAdd.getProperties().put(LdapConfigKeys.APPLICATION_OBJECT_CLASSES, List.of("app-class"));
     UserStorage uniqueUserStorage = new UserStorage();
     uniqueUserStorage.setUserSource("ou=SSM,o=insee,c=fr");
     uniqueUserStorage.setOrganizationSource("ou=organisations,ou=clients_domaine2,o=insee,c=fr");
@@ -69,11 +69,11 @@ public class LdapRealmProviderWriteTest {
         is("ou=organisations,ou=clients_domaine2,o=insee,c=fr"));
     assertThat(
         "Realm should have a groupfilterpattern",
-        retrievedRealm.getProperties().get(LdapConfigKeys.GROUP_FILTER_PATTERN),
+        retrievedRealm.getProperties().get(LdapConfigKeys.GROUP_FILTER_PATTERN).get(0),
         is("toto"));
     assertThat(
         "Realm should have a application object class",
-        retrievedRealm.getProperties().get(LdapConfigKeys.APPLICATION_OBJECT_CLASSES),
+        retrievedRealm.getProperties().get(LdapConfigKeys.APPLICATION_OBJECT_CLASSES).get(0),
         is("app-class"));
   }
 
@@ -82,7 +82,7 @@ public class LdapRealmProviderWriteTest {
     Realm realmToAdd = new Realm();
     realmToAdd.setName("multistorage");
     realmToAdd.setUrl("localhost");
-    realmToAdd.addProperty(LdapConfigKeys.GROUP_FILTER_PATTERN, "toto");
+    realmToAdd.getProperties().put(LdapConfigKeys.GROUP_FILTER_PATTERN, List.of("toto"));
     UserStorage userStorage1 = new UserStorage();
     userStorage1.setName("first");
     userStorage1.setUserSource("ou=SSM,o=insee,c=fr");
@@ -107,7 +107,7 @@ public class LdapRealmProviderWriteTest {
         is("ou=SSM,o=insee,c=fr"));
     assertThat(
         "Realm should have a groupfilterpattern",
-        retrievedRealm.getProperties().get(LdapConfigKeys.GROUP_FILTER_PATTERN),
+        retrievedRealm.getProperties().get(LdapConfigKeys.GROUP_FILTER_PATTERN).get(0),
         is("toto"));
   }
 

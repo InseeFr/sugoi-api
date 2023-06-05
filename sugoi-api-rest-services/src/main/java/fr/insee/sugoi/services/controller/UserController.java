@@ -691,7 +691,11 @@ public class UserController {
       @Parameter(description = "User's mail to search", required = true) @PathVariable("mail")
           String mail) {
     if (Boolean.parseBoolean(
-        configService.getRealm(realm).getProperties().get(GlobalKeysConfig.VERIFY_MAIL_UNICITY))) {
+        configService
+            .getRealm(realm)
+            .getProperties()
+            .get(GlobalKeysConfig.VERIFY_MAIL_UNICITY)
+            .get(0))) {
 
       return ResponseEntity.status(HttpStatus.OK)
           .body(userService.findByMail(realm, storage, mail, false));

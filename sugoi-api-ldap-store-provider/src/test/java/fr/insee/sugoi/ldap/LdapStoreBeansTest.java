@@ -72,8 +72,8 @@ public class LdapStoreBeansTest {
     us.setUserSource(userSource);
     us.setAddressSource(addressSource);
     us.setName("default");
-    us.getProperties().put(LdapConfigKeys.GROUP_FILTER_PATTERN, groupFilterPattern);
-    us.getProperties().put(LdapConfigKeys.GROUP_SOURCE_PATTERN, groupSourcePattern);
+    us.getProperties().put(LdapConfigKeys.GROUP_FILTER_PATTERN, List.of(groupFilterPattern));
+    us.getProperties().put(LdapConfigKeys.GROUP_SOURCE_PATTERN, List.of(groupSourcePattern));
 
     us.setUserMappings(StoreMappingFixture.getUserStoreMappings());
     return us;

@@ -154,7 +154,8 @@ public class OrganizationServiceImpl implements OrganizationService {
     result.setPageSize(pageableResult.getSize());
     Realm r = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
     pageableResult.setSizeWithMax(
-        Integer.parseInt(r.getProperties().get(GlobalKeysConfig.ORGANIZATIONS_MAX_OUTPUT_SIZE)));
+        Integer.parseInt(
+            r.getProperties().get(GlobalKeysConfig.ORGANIZATIONS_MAX_OUTPUT_SIZE).get(0)));
     try {
       if (storageName != null) {
         result =

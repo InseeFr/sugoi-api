@@ -58,8 +58,8 @@ public class LdapStoreBeansWithDefaultTest {
     us.setUserSource(userSource);
     us.setAddressSource(addressSource);
     us.setName("default");
-    us.addProperty(LdapConfigKeys.GROUP_FILTER_PATTERN, groupFilterPattern);
-    us.addProperty(LdapConfigKeys.GROUP_SOURCE_PATTERN, groupSourcePattern);
+    us.getProperties().put(LdapConfigKeys.GROUP_FILTER_PATTERN, List.of(groupFilterPattern));
+    us.getProperties().put(LdapConfigKeys.GROUP_SOURCE_PATTERN, List.of(groupSourcePattern));
     return us;
   }
 

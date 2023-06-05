@@ -128,6 +128,7 @@ public class AppManagedUserAttributeController {
             _realm
                 .getProperties()
                 .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST)
+                .get(0)
                 .toUpperCase()
                 .split(","));
     try {
@@ -159,6 +160,7 @@ public class AppManagedUserAttributeController {
               _realm
                   .getProperties()
                   .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST)
+                  .get(0)
                   .toUpperCase()
                   .split(",")[attributes_allowed.indexOf(attributeKey.toUpperCase())];
           if (permissionService.isValidAttributeAccordingAttributePattern(
@@ -266,6 +268,7 @@ public class AppManagedUserAttributeController {
             _realm
                 .getProperties()
                 .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST)
+                .get(0)
                 .toUpperCase()
                 .split(","));
     try {
@@ -297,6 +300,7 @@ public class AppManagedUserAttributeController {
               _realm
                   .getProperties()
                   .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST)
+                  .get(0)
                   .toUpperCase()
                   .split(",")[attributes_allowed.indexOf(attributeKey.toUpperCase())];
           if (permissionService.isValidAttributeAccordingAttributePattern(

@@ -98,7 +98,11 @@ public class UserStorageLdapMapperTest {
         UserStorageLdapMapper.mapFromAttributes(List.of(inseeProprieteAttributes, cnAttribute));
     assertThat(
         "user storage should have  user object classes",
-        userStorage.getProperties().get(LdapConfigKeys.USER_OBJECT_CLASSES).equals("top,person"));
+        userStorage
+            .getProperties()
+            .get(LdapConfigKeys.USER_OBJECT_CLASSES)
+            .get(0)
+            .equals("top,person"));
   }
 
   @Test
@@ -140,7 +144,9 @@ public class UserStorageLdapMapperTest {
   @Test
   public void getObjectClassesAttributesFromUserStorage() {
     UserStorage userStorage = new UserStorage();
-    userStorage.addProperty(LdapConfigKeys.USER_OBJECT_CLASSES, "top,person,other");
+    userStorage
+        .getProperties()
+        .put(LdapConfigKeys.USER_OBJECT_CLASSES, List.of("top,person,other"));
     List<Attribute> attributes = UserStorageLdapMapper.mapToAttributes(userStorage);
     assertThat(
         "Should have inseePropriete with user object classes",

@@ -46,8 +46,12 @@ public class PermissionServiceTests {
   public void setup() {
     realm = new Realm();
     realm.setName("test");
-    realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, "(.*)_$(application)");
-    realm.addProperty(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, "my-attribute-key");
+    realm
+        .getProperties()
+        .put(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST, List.of("(.*)_$(application)"));
+    realm
+        .getProperties()
+        .put(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, List.of("my-attribute-key"));
   }
 
   @Test
@@ -188,6 +192,7 @@ public class PermissionServiceTests {
               realm
                   .getProperties()
                   .get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST)
+                  .get(0)
                   .split(",")[0]);
       assertThat("allowed Attributes Pattern", allowedAttributesPattern.size(), is(2));
     } catch (Exception e) {

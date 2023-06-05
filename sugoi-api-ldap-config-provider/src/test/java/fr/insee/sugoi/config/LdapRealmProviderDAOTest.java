@@ -96,11 +96,11 @@ public class LdapRealmProviderDAOTest {
     Realm realm = ldapRealmProviderDAOImpl.load("domaine1").get();
     assertThat(
         "app_managed_attribute_key should be inseeGroupeDefaut",
-        realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST),
+        realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST).get(0),
         is("inseeGroupeDefaut"));
     assertThat(
         "app_managed_attribute_pattern should be (.*)_$(application)",
-        realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST),
+        realm.getProperties().get(GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST).get(0),
         is("(.*)_$(application)"));
   }
 
@@ -197,7 +197,8 @@ public class LdapRealmProviderDAOTest {
             .getUserStorages()
             .get(0)
             .getProperties()
-            .get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE),
+            .get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE)
+            .get(0),
         is("true"));
   }
 
@@ -207,7 +208,10 @@ public class LdapRealmProviderDAOTest {
         ldapRealmProviderDAOImpl.load("domaine1").get().getUserStorageByName("default").get();
     assertThat(
         "Should get validate password with uppercase from realm",
-        userstorage.getProperties().get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE),
+        userstorage
+            .getProperties()
+            .get(PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE)
+            .get(0),
         is("true"));
   }
 }

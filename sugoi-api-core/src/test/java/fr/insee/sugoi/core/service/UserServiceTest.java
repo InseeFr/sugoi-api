@@ -115,7 +115,7 @@ public class UserServiceTest {
 
     realm = new Realm();
     realm.setName("realm");
-    realm.addProperty(GlobalKeysConfig.USERS_MAX_OUTPUT_SIZE, "100000");
+    realm.getProperties().put(GlobalKeysConfig.USERS_MAX_OUTPUT_SIZE, List.of("100000"));
     UserStorage us1 = new UserStorage();
     us1.setName("us1");
     UserStorage us2 = new UserStorage();

@@ -158,8 +158,8 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   }
 
   private void addDefaultProperties(
-      UserStorage userstorage, Map<RealmConfigKeys, String> defaultRealmProperties) {
-    for (Entry<RealmConfigKeys, String> entry : defaultRealmProperties.entrySet()) {
+      UserStorage userstorage, Map<RealmConfigKeys, List<String>> defaultRealmProperties) {
+    for (Entry<RealmConfigKeys, List<String>> entry : defaultRealmProperties.entrySet()) {
       userstorage.getProperties().putIfAbsent(entry.getKey(), entry.getValue());
     }
   }
@@ -247,7 +247,8 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   }
 
   private List<UserStorage> loadUserStorages(
-      String realmName, Map<RealmConfigKeys, String> defaultRealmProperties) throws LDAPException {
+      String realmName, Map<RealmConfigKeys, List<String>> defaultRealmProperties)
+      throws LDAPException {
     List<UserStorage> userstorages =
         ldapPoolConnection()
             .search(
@@ -292,12 +293,13 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
     realm
         .getProperties()
         .putIfAbsent(
-            GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST, defaultAppManagedAttributeKeyList);
+            GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_KEYS_LIST,
+            List.of(defaultAppManagedAttributeKeyList));
     realm
         .getProperties()
         .putIfAbsent(
             GlobalKeysConfig.APP_MANAGED_ATTRIBUTE_PATTERNS_LIST,
-            defaultAppManagedAttributePatternList);
+            List.of(defaultAppManagedAttributePatternList));
     realm
         .getUiMapping()
         .putIfAbsent(UIMappingType.UI_USER_MAPPING, uiMappingService.getUserUiDefaultField());
@@ -306,21 +308,23 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
         .putIfAbsent(
             UIMappingType.UI_ORGANIZATION_MAPPING,
             uiMappingService.getOrganizationUiDefaultField());
-    realm.getProperties().putIfAbsent(LdapConfigKeys.SORT_KEY, defaultSortKey);
+    realm.getProperties().putIfAbsent(LdapConfigKeys.SORT_KEY, List.of(defaultSortKey));
     realm
         .getProperties()
-        .putIfAbsent(GlobalKeysConfig.USERS_MAX_OUTPUT_SIZE, defaultUserMaxOutputSize);
-    realm
-        .getProperties()
-        .putIfAbsent(
-            GlobalKeysConfig.APPLICATIONS_MAX_OUTPUT_SIZE, defaultApplicationMaxOutputSize);
-    realm
-        .getProperties()
-        .putIfAbsent(GlobalKeysConfig.GROUPS_MAX_OUTPUT_SIZE, defaultGroupMaxOutputSize);
+        .putIfAbsent(GlobalKeysConfig.USERS_MAX_OUTPUT_SIZE, List.of(defaultUserMaxOutputSize));
     realm
         .getProperties()
         .putIfAbsent(
-            GlobalKeysConfig.ORGANIZATIONS_MAX_OUTPUT_SIZE, defaultOrganizationMaxOutputSize);
+            GlobalKeysConfig.APPLICATIONS_MAX_OUTPUT_SIZE,
+            List.of(defaultApplicationMaxOutputSize));
+    realm
+        .getProperties()
+        .putIfAbsent(GlobalKeysConfig.GROUPS_MAX_OUTPUT_SIZE, List.of(defaultGroupMaxOutputSize));
+    realm
+        .getProperties()
+        .putIfAbsent(
+            GlobalKeysConfig.ORGANIZATIONS_MAX_OUTPUT_SIZE,
+            List.of(defaultOrganizationMaxOutputSize));
   }
 
   private LDAPConnectionPool ldapPoolConnection() {
