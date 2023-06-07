@@ -55,6 +55,8 @@ public class UserServiceImpl implements UserService {
 
   private boolean verifyUniqueMail = false;
 
+  private int usersMaxoutputsize = 1000;
+
   /* Size of the ids randomly generated */
   private int idCreateLength = 7;
 
@@ -174,7 +176,9 @@ public class UserServiceImpl implements UserService {
       if (Boolean.parseBoolean(
               realmLoaded
                   .getProperties()
-                  .getOrDefault(GlobalKeysConfig.VERIFY_MAIL_UNICITY, List.of("false"))
+                  .getOrDefault(
+                      GlobalKeysConfig.VERIFY_MAIL_UNICITY,
+                      List.of(Boolean.toString(verifyUniqueMail)))
                   .get(0))
           && user.getMail() != null
           && !user.getMail().isBlank()) {
@@ -301,7 +305,12 @@ public class UserServiceImpl implements UserService {
     PageResult<User> result = new PageResult<>();
     Realm r = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
     pageable.setSizeWithMax(
-        Integer.parseInt(r.getProperties().get(GlobalKeysConfig.USERS_MAX_OUTPUT_SIZE).get(0)));
+        Integer.parseInt(
+            r.getProperties()
+                .getOrDefault(
+                    GlobalKeysConfig.USERS_MAX_OUTPUT_SIZE,
+                    List.of(Integer.toString(usersMaxoutputsize)))
+                .get(0)));
     result.setPageSize(pageable.getSize());
 
     try {

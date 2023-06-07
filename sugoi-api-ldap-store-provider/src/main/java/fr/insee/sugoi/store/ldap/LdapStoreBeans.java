@@ -127,47 +127,59 @@ public class LdapStoreBeans {
     config.put(
         LdapConfigKeys.GROUP_SOURCE_PATTERN,
         realm.getProperties().get(LdapConfigKeys.GROUP_SOURCE_PATTERN) != null
+                && !realm.getProperties().get(LdapConfigKeys.GROUP_SOURCE_PATTERN).isEmpty()
             ? realm.getProperties().get(LdapConfigKeys.GROUP_SOURCE_PATTERN).get(0)
             : defaultGroupSourcePattern);
     config.put(
         LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN,
         realm.getProperties().get(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN) != null
+                && !realm.getProperties().get(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN).isEmpty()
             ? realm.getProperties().get(LdapConfigKeys.GROUP_MANAGER_SOURCE_PATTERN).get(0)
             : defaultGroupManagerSourcePattern);
     config.put(
         LdapConfigKeys.GROUP_FILTER_PATTERN,
         realm.getProperties().get(LdapConfigKeys.GROUP_FILTER_PATTERN) != null
+                && !realm.getProperties().get(LdapConfigKeys.GROUP_FILTER_PATTERN).isEmpty()
             ? realm.getProperties().get(LdapConfigKeys.GROUP_FILTER_PATTERN).get(0)
             : defaultGroupFilterPattern);
     config.put(LdapConfigKeys.REALM_NAME, realm.getName());
     config.put(
         LdapConfigKeys.VLV_ENABLED,
         realm.getProperties().get(LdapConfigKeys.VLV_ENABLED) != null
+                && !realm.getProperties().get(LdapConfigKeys.VLV_ENABLED).isEmpty()
             ? realm.getProperties().get(LdapConfigKeys.VLV_ENABLED).get(0)
             : vlvEnabled);
     config.put(
         LdapConfigKeys.USER_OBJECT_CLASSES,
         userStorage.getProperties().get(LdapConfigKeys.USER_OBJECT_CLASSES) != null
+                && !userStorage.getProperties().get(LdapConfigKeys.USER_OBJECT_CLASSES).isEmpty()
             ? userStorage.getProperties().get(LdapConfigKeys.USER_OBJECT_CLASSES).get(0)
             : defaultUserObjectClasses);
     config.put(
         LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES,
         userStorage.getProperties().get(LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES) != null
+                && !userStorage
+                    .getProperties()
+                    .get(LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES)
+                    .isEmpty()
             ? userStorage.getProperties().get(LdapConfigKeys.ORGANIZATION_OBJECT_CLASSES).get(0)
             : defaultOrganizationObjectClasses);
     config.put(
         LdapConfigKeys.GROUP_OBJECT_CLASSES,
         realm.getProperties().get(LdapConfigKeys.GROUP_OBJECT_CLASSES) != null
+                && !realm.getProperties().get(LdapConfigKeys.GROUP_OBJECT_CLASSES).isEmpty()
             ? realm.getProperties().get(LdapConfigKeys.GROUP_OBJECT_CLASSES).get(0)
             : defaultGroupObjectClasses);
     config.put(
         LdapConfigKeys.APPLICATION_OBJECT_CLASSES,
         realm.getProperties().get(LdapConfigKeys.APPLICATION_OBJECT_CLASSES) != null
+                && !realm.getProperties().get(LdapConfigKeys.APPLICATION_OBJECT_CLASSES).isEmpty()
             ? realm.getProperties().get(LdapConfigKeys.APPLICATION_OBJECT_CLASSES).get(0)
             : defaultApplicationObjectClasses);
     config.put(
         LdapConfigKeys.ADDRESS_OBJECT_CLASSES,
         userStorage.getProperties().get(LdapConfigKeys.ADDRESS_OBJECT_CLASSES) != null
+                && !userStorage.getProperties().get(LdapConfigKeys.ADDRESS_OBJECT_CLASSES).isEmpty()
             ? userStorage.getProperties().get(LdapConfigKeys.ADDRESS_OBJECT_CLASSES).get(0)
             : defaultAddressObjectClasses);
 

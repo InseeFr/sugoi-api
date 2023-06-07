@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -75,6 +76,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RequestMapping(value = {"/v2", "/"})
 @SecurityRequirements(
     value = {@SecurityRequirement(name = "oAuth"), @SecurityRequirement(name = "basic")})
+@ConfigurationProperties("fr.insee.sugoi")
 public class UserController {
 
   @Autowired private UserService userService;
@@ -82,6 +84,8 @@ public class UserController {
   @Autowired private ConfigService configService;
 
   @Autowired private CertificateService certificateService;
+
+  private boolean verifyUniqueMail = false;
 
   @GetMapping(
       path = {"/realms/{realm}/storages/{storage}/users"},
@@ -694,7 +698,8 @@ public class UserController {
         configService
             .getRealm(realm)
             .getProperties()
-            .get(GlobalKeysConfig.VERIFY_MAIL_UNICITY)
+            .getOrDefault(
+                GlobalKeysConfig.VERIFY_MAIL_UNICITY, List.of(Boolean.toString(verifyUniqueMail)))
             .get(0))) {
 
       return ResponseEntity.status(HttpStatus.OK)
