@@ -26,8 +26,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class LdapFactory {
 
-  // private static final Logger logger = LogManager.getLogger(LdapUtils.class);
-
   private static final Map<String, LDAPConnectionPool> openLdapPoolConnection = new HashMap<>();
   private static final Map<String, String> openLdapPoolConnectionConfig = new HashMap<>();
   private static final Map<String, String> openLdapMonoConnectionConfig = new HashMap<>();
@@ -61,12 +59,14 @@ public class LdapFactory {
       if (openLdapPoolConnection.containsKey(name)) {
         openLdapPoolConnection.get(name).close();
       }
+      LDAPConnection ldapConnection =
+          new LDAPConnection(
+              config.get(LdapConfigKeys.URL), Integer.valueOf(config.get(LdapConfigKeys.PORT)));
+      setConnectionTimeout(ldapConnection, config);
       openLdapPoolConnection.put(
           name,
           new LDAPConnectionPool(
-              new LDAPConnection(
-                  config.get(LdapConfigKeys.URL), Integer.valueOf(config.get(LdapConfigKeys.PORT))),
-              Integer.valueOf(config.get(LdapConfigKeys.POOL_SIZE))));
+              ldapConnection, Integer.valueOf(config.get(LdapConfigKeys.POOL_SIZE))));
       // Only put key if ldap connection correctly open
       openLdapPoolConnectionConfig.put(key, name);
     }
@@ -98,10 +98,11 @@ public class LdapFactory {
           || forceErase) {
         openLdapMonoConnection.get(name).close();
       }
-      openLdapMonoConnection.put(
-          name,
+      LDAPConnection ldapConnection =
           new LDAPConnection(
-              config.get(LdapConfigKeys.URL), Integer.valueOf(config.get(LdapConfigKeys.PORT))));
+              config.get(LdapConfigKeys.URL), Integer.valueOf(config.get(LdapConfigKeys.PORT)));
+      setConnectionTimeout(ldapConnection, config);
+      openLdapMonoConnection.put(name, ldapConnection);
       // Only put key if ldap connection correctly open
       openLdapMonoConnectionConfig.put(key, name);
     }
@@ -136,15 +137,17 @@ public class LdapFactory {
       if (openLdapPoolConnection.containsKey(name)) {
         openLdapPoolConnection.get(name).close();
       }
+      LDAPConnection ldapConnection =
+          new LDAPConnection(
+              config.get(LdapConfigKeys.URL),
+              Integer.valueOf(config.get(LdapConfigKeys.PORT)),
+              config.get(LdapConfigKeys.USERNAME),
+              config.get(LdapConfigKeys.PASSWORD));
+      setConnectionTimeout(ldapConnection, config);
       openLdapPoolConnection.put(
           name,
           new LDAPConnectionPool(
-              new LDAPConnection(
-                  config.get(LdapConfigKeys.URL),
-                  Integer.valueOf(config.get(LdapConfigKeys.PORT)),
-                  config.get(LdapConfigKeys.USERNAME),
-                  config.get(LdapConfigKeys.PASSWORD)),
-              Integer.valueOf(config.get(LdapConfigKeys.POOL_SIZE))));
+              ldapConnection, Integer.valueOf(config.get(LdapConfigKeys.POOL_SIZE))));
       // Only put key if ldap connection correctly open
       openLdapPoolConnectionConfig.put(key, name);
     }
@@ -175,13 +178,14 @@ public class LdapFactory {
           || forceErase) {
         openLdapMonoConnection.get(name).close();
       }
-      openLdapMonoConnection.put(
-          name,
+      LDAPConnection ldapConnection =
           new LDAPConnection(
               config.get(LdapConfigKeys.URL),
               Integer.valueOf(config.get(LdapConfigKeys.PORT)),
               config.get(LdapConfigKeys.USERNAME),
-              config.get(LdapConfigKeys.PASSWORD)));
+              config.get(LdapConfigKeys.PASSWORD));
+      setConnectionTimeout(ldapConnection, config);
+      openLdapMonoConnection.put(name, ldapConnection);
       // Only put key if ldap connection correctly open
       openLdapMonoConnectionConfig.put(key, name);
     }
@@ -201,5 +205,13 @@ public class LdapFactory {
       return false;
     }
     return true;
+  }
+
+  private static void setConnectionTimeout(
+      LDAPConnection connection, Map<RealmConfigKeys, String> config) {
+    connection
+        .getConnectionOptions()
+        .setResponseTimeoutMillis(
+            Integer.parseInt(config.get(LdapConfigKeys.LDAP_CONNECTION_TIMEOUT)));
   }
 }

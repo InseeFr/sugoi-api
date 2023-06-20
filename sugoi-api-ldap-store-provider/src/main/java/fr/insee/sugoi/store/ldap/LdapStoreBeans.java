@@ -45,6 +45,9 @@ public class LdapStoreBeans {
   @Value("${fr.insee.sugoi.ldap.default.pool:}")
   private String defaultPoolSize;
 
+  @Value("${fr.insee.sugoi.ldap.default.connection.timeout:30000}")
+  private String defaultConnectionTimeout;
+
   @Value("${fr.insee.sugoi.ldap.default.port:}")
   private String defaultPort;
 
@@ -120,6 +123,11 @@ public class LdapStoreBeans {
         LdapConfigKeys.READ_CONNECTION_AUTHENTICATED,
         String.valueOf(useAuthenticatedConnectionForReading));
     config.put(LdapConfigKeys.POOL_SIZE, defaultPoolSize);
+    config.put(
+        LdapConfigKeys.LDAP_CONNECTION_TIMEOUT,
+        userStorage.getProperties().get(LdapConfigKeys.LDAP_CONNECTION_TIMEOUT) != null
+            ? userStorage.getProperties().get(LdapConfigKeys.LDAP_CONNECTION_TIMEOUT)
+            : defaultConnectionTimeout);
     config.put(GlobalKeysConfig.USER_SOURCE, userStorage.getUserSource());
     config.put(GlobalKeysConfig.APP_SOURCE, realm.getAppSource());
     config.put(GlobalKeysConfig.ORGANIZATION_SOURCE, userStorage.getOrganizationSource());
