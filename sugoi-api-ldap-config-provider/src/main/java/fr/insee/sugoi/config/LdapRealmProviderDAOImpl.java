@@ -86,6 +86,9 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   @Value("${fr.insee.sugoi.config.ldap.profils.branche:}")
   private String baseDn;
 
+  @Value("${fr.insee.sugoi.config.ldap.profils.timeout:30000}")
+  private String connectionTimeout;
+
   @Value("${fr.insee.sugoi.store.defaultReader:}")
   private String defaultReader;
 
@@ -333,6 +336,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
           config.put(LdapConfigKeys.URL, url);
           config.put(LdapConfigKeys.PORT, String.valueOf(port));
           config.put(LdapConfigKeys.POOL_SIZE, defaultPoolSize);
+          config.put(LdapConfigKeys.LDAP_CONNECTION_TIMEOUT, connectionTimeout);
           ldapConnectionPool = LdapFactory.getConnectionPool(config);
         }
       }
@@ -352,6 +356,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
         config.put(LdapConfigKeys.POOL_SIZE, defaultPoolSize);
         config.put(LdapConfigKeys.USERNAME, defaultUsername);
         config.put(LdapConfigKeys.PASSWORD, defaultPassword);
+        config.put(LdapConfigKeys.LDAP_CONNECTION_TIMEOUT, connectionTimeout);
         ldapConnectionPool = LdapFactory.getConnectionPoolAuthenticated(config);
       }
       return ldapConnectionPool;
