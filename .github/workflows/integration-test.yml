@@ -29,7 +29,3 @@ jobs:
         run: mvn -B package -D.maven.test.skip=true --file pom.xml
       - name: Test with Maven
         run: mvn verify
-      - uses: deblockt/cucumber-report-annotations-action@v1.7
-        with:
-          access-token: ${{ secrets.GITHUB_TOKEN }}
-          path: "sugoi-api-test/target/cucumber/cucumber.json"
