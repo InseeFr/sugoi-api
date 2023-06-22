@@ -1,3 +1,9 @@
+# 1.9.2
+
+
+- [ENH] :sparkles: Connection to ldap should have a timeout property
+
+
 # 1.9.1
 
 
