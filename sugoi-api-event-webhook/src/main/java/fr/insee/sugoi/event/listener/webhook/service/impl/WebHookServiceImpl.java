@@ -15,8 +15,10 @@ package fr.insee.sugoi.event.listener.webhook.service.impl;
 
 import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
 import fr.insee.sugoi.core.realm.RealmProvider;
+import fr.insee.sugoi.event.listener.webhook.service.TemplateConfigKeys;
 import fr.insee.sugoi.event.listener.webhook.service.WebHookService;
 import fr.insee.sugoi.model.exceptions.NoReceiverMailException;
+import fr.insee.sugoi.model.exceptions.UserStorageNotFoundException;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -25,10 +27,13 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,15 +55,17 @@ public class WebHookServiceImpl implements WebHookService {
   public static final Logger logger = LoggerFactory.getLogger(WebHookServiceImpl.class);
   private static final String WEBHOOK_PROPERTY_PREFIX = "sugoi.api.event.webhook.";
 
+  private static RestTemplate restTemplate = new RestTemplate();
+
   @Autowired private Environment env;
 
   @Autowired private RealmProvider realmProvider;
 
   @Override
   public void resetPassword(String webHookName, Map<String, Object> values) {
-    if (!((List<String>) values.get(EventKeysConfig.MAILS)).isEmpty()) {
+    if (!((List<?>) values.get(EventKeysConfig.MAILS)).isEmpty()) {
       sendRequestToWebhookFromTemplate(
-          values, webHookName, "_reset_template", ".default.reset.template");
+          values, webHookName, TemplateConfigKeys.RESET_TEMPLATE, ".default.reset.template");
     } else {
       throw new NoReceiverMailException("There is no mail address to send the message to");
     }
@@ -66,9 +73,12 @@ public class WebHookServiceImpl implements WebHookService {
 
   @Override
   public void changePassword(String webHookName, Map<String, Object> values) {
-    if (!((List<String>) values.get(EventKeysConfig.MAILS)).isEmpty()) {
+    if (!((List<?>) values.get(EventKeysConfig.MAILS)).isEmpty()) {
       sendRequestToWebhookFromTemplate(
-          values, webHookName, "_changepwd_template", ".default.changepwd.template");
+          values,
+          webHookName,
+          TemplateConfigKeys.CHANGEPWD_TEMPLATE,
+          ".default.changepwd.template");
     } else {
       throw new NoReceiverMailException("There is no mail address to send the message to");
     }
@@ -76,9 +86,9 @@ public class WebHookServiceImpl implements WebHookService {
 
   @Override
   public void sendLogin(String webHookName, Map<String, Object> values) {
-    if (!((List<String>) values.get(EventKeysConfig.MAILS)).isEmpty()) {
+    if (!((List<?>) values.get(EventKeysConfig.MAILS)).isEmpty()) {
       sendRequestToWebhookFromTemplate(
-          values, webHookName, "_send_login_template", ".default.send-login.template");
+          values, webHookName, TemplateConfigKeys.LOGIN_TEMPLATE, ".default.send-login.template");
     } else {
       throw new NoReceiverMailException("There is no mail address to send the message to");
     }
@@ -87,11 +97,12 @@ public class WebHookServiceImpl implements WebHookService {
   private void sendRequestToWebhookFromTemplate(
       Map<String, Object> templateProperties,
       String webHookName,
-      String realmTemplateSuffix,
+      TemplateConfigKeys realmTemplateKey,
       String propertyTemplateSuffix) {
     String template =
         loadTemplate(
-            webHookName + realmTemplateSuffix,
+            realmTemplateKey,
+            webHookName,
             WEBHOOK_PROPERTY_PREFIX + webHookName + propertyTemplateSuffix,
             (String) templateProperties.get(EventKeysConfig.REALM),
             (String) templateProperties.get(EventKeysConfig.USERSTORAGE));
@@ -112,7 +123,6 @@ public class WebHookServiceImpl implements WebHookService {
     try {
       HttpHeaders finalHeaders = new HttpHeaders();
       headers.keySet().stream().forEach(header -> finalHeaders.add(header, headers.get(header)));
-      RestTemplate restTemplate = new RestTemplate();
       HttpEntity<String> request = new HttpEntity<>(content, finalHeaders);
       restTemplate.postForEntity(target, request, String.class);
       logger.info("Sending webHook to {} success", target);
@@ -169,25 +179,43 @@ public class WebHookServiceImpl implements WebHookService {
   }
 
   private String loadTemplate(
-      String realmTemplateConfiguration,
+      TemplateConfigKeys realmTemplateKey,
+      String webhookName,
       String propertyTemplateConfiguration,
       String realmName,
       String userStorageName) {
-    String template = null;
-    try {
-      template =
-          realmProvider.load(realmName).orElseThrow().getUserStorages().stream()
-              .filter(us -> us.getName().equalsIgnoreCase(userStorageName))
-              .findFirst()
-              .orElseThrow()
-              .getProperties()
-              .get(realmTemplateConfiguration);
-    } catch (Exception e) {
-      // we don't need to manage this exception here
+    String templateLocation =
+        createTemplateLocationMapByWebhook(
+                realmProvider.load(realmName).orElseThrow().getUserStorages().stream()
+                    .filter(us -> us.getName().equalsIgnoreCase(userStorageName))
+                    .findFirst()
+                    .orElseThrow(() -> new UserStorageNotFoundException(realmName, userStorageName))
+                    .getProperties()
+                    .get(realmTemplateKey))
+            .get(webhookName);
+    if (templateLocation != null) {
+      try {
+        return restTemplate.getForEntity(templateLocation, String.class).getBody();
+      } catch (Exception e) {
+        logger.error(
+            "Could not retrieve template at location {} . Falling back on property. {}",
+            templateLocation,
+            e.getLocalizedMessage());
+      }
     }
-    if (template == null && propertyTemplateConfiguration != null) {
-      template = loadResource(env.getProperty(propertyTemplateConfiguration));
+    if (propertyTemplateConfiguration != null) {
+      return loadResource(env.getProperty(propertyTemplateConfiguration));
     }
-    return template;
+    return null;
+  }
+
+  private Map<String, String> createTemplateLocationMapByWebhook(String allWebhookConfiguration) {
+    if (allWebhookConfiguration != null) {
+      return Arrays.stream(allWebhookConfiguration.split("\\|"))
+          .collect(
+              Collectors.toMap(
+                  conf -> StringUtils.substringBefore(conf, ":"),
+                  conf -> StringUtils.substringAfter(conf, ":")));
+    } else return new HashMap<>();
   }
 }
