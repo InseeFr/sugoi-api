@@ -1,3 +1,26 @@
+# 1.10.0
+
+
+- [ENH] :sparkles: Connection to ldap should have a timeout property
+- [CI] :green_heart: Remove not working publishing of cucumber report
+- [REL] :rocket: release version 1.9.2
+- [ENH] :sparkles: Connection to ldap should have a timeout property
+- [ENH] Writer realm should not have rights on App attributes
+- [REF] :recycle: Add a get and set on Sugoi Objects
+- [ENH] 753 sparkles create a role password validator
+- [ENH] :sparkles: SeeAlso resolution can be authenticated (#682)
+- [UP] :arrow_up: Bump org.springdoc.version from 1.6.14 to 1.7.0
+- [UP] :arrow_up: Bump maven-surefire-plugin from 3.0.0-M8 to 3.0.0
+- [UP] :arrow_up: Bump tomcat.version from 9.0.71 to 9.0.73
+- [BUG]500-is-returned-on-password-error-on-change-password-when-using-ldapstore
+- [ENH] Make seeAlso request optional
+- [UP] :arrow_up: Bump freemarker from 2.3.31 to 2.3.32
+- [BUG]Extra-space-in-default-send-login-title-mail
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 1.9.1
+- [REL] :rocket: release version 1.9.1
+
+
 # 1.9.1
 
 
