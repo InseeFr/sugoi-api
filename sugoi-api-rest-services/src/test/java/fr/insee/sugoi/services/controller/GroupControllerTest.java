@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
+import fr.insee.sugoi.core.service.ApplicationService;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.exceptions.GroupAlreadyExistException;
@@ -57,6 +58,8 @@ public class GroupControllerTest {
   @Autowired MockMvc mockMvc;
 
   @MockBean private GroupService groupService;
+
+  @MockBean private ApplicationService applicationService;
 
   ObjectMapper objectMapper = new ObjectMapper();
   Group group1, group2, group2Updated;

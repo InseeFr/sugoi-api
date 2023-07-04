@@ -11,6 +11,10 @@ Feature: Groups scenario admin
         Then the client receives status code 200
         Then the client expect to receive a list of groups
 
+    Scenario: Get groups application not exist
+        When the client perform GET request on url /realms/domaine1/applications/non/groups
+         Then the client receives status code 404
+
     Scenario: Get group
         When the client perform GET request on url /realms/domaine1/applications/applitest/groups/Administrateurs_AppliTest
         And show body received
@@ -21,6 +25,10 @@ Feature: Groups scenario admin
         When the client perform GET request on url /realms/domaine1/applications/applitest/groups/Administrateurs_AppliTest
         And show body received
         Then the client receives status code 200
+
+     Scenario: Get group application not exist
+        When the client perform GET request on url /realms/domaine1/applications/non/groups/Administrateurs_AppliTest
+        Then the client receives status code 404
 
     Scenario: Post group
         When the client perform POST request with body on url /realms/domaine1/applications/applitest/groups body:
