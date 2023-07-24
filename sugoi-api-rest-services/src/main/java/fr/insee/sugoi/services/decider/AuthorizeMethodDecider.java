@@ -82,6 +82,7 @@ public class AuthorizeMethodDecider {
               .collect(Collectors.toList());
       SugoiUser sugoiUser = new SugoiUser(authentication.getName(), roles);
       return permissionService.isMemberOfSelfManagedGroup(sugoiUser, realm, application, groupName)
+          || permissionService.isGroupManager(sugoiUser, realm, application, groupName)
           || permissionService.isApplicationManager(sugoiUser, realm, application)
           || permissionService.isWriter(sugoiUser, realm, null);
     }
