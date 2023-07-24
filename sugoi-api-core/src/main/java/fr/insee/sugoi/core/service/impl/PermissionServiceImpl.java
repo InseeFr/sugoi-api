@@ -63,12 +63,15 @@ public class PermissionServiceImpl implements PermissionService {
   @Value("${fr.insee.sugoi.api.regexp.role.application.manager:}")
   private List<String> applicationManagerRoleList;
 
+  @Value("${fr.insee.sugoi.api.regexp.role.group.manager:}")
+  private List<String> groupManagerRoleList;
+
   public static final Logger logger = LoggerFactory.getLogger(PermissionServiceImpl.class);
 
   @Override
   public boolean isReader(SugoiUser sugoiUser, String realm, String userStorage) {
     List<String> searchRoleList =
-        getSearchRoleList(sugoiUser, realm, userStorage, null, regexpReaderList);
+        getSearchRoleList(realm, userStorage, null, null, regexpReaderList);
     return this.checkIfUserGetRoles(sugoiUser, searchRoleList)
         || this.isAtLeastOneApplicationManager(sugoiUser, realm)
         || isWriter(sugoiUser, realm, userStorage);
@@ -77,21 +80,21 @@ public class PermissionServiceImpl implements PermissionService {
   @Override
   public boolean isPasswordManager(SugoiUser sugoiUser, String realm, String userStorage) {
     List<String> searchRoleList =
-        getSearchRoleList(sugoiUser, realm, userStorage, null, passwordManagerRoleList);
+        getSearchRoleList(realm, userStorage, null, null, passwordManagerRoleList);
     return checkIfUserGetRoles(sugoiUser, searchRoleList);
   }
 
   @Override
   public boolean isPasswordValidator(SugoiUser sugoiUser, String realm, String userStorage) {
     List<String> searchRoleList =
-        getSearchRoleList(sugoiUser, realm, userStorage, null, passwordValidatorRoleList);
+        getSearchRoleList(realm, userStorage, null, null, passwordValidatorRoleList);
     return checkIfUserGetRoles(sugoiUser, searchRoleList);
   }
 
   @Override
   public boolean isApplicationManager(SugoiUser sugoiUser, String realm, String application) {
     List<String> searchRoleList =
-        getSearchRoleList(sugoiUser, realm, null, application, applicationManagerRoleList);
+        getSearchRoleList(realm, null, application, null, applicationManagerRoleList);
     return checkIfUserGetRoles(sugoiUser, searchRoleList);
   }
 
@@ -119,9 +122,16 @@ public class PermissionServiceImpl implements PermissionService {
   }
 
   @Override
+  public boolean isGroupManager(
+      SugoiUser sugoiUser, String realm, String application, String groupName) {
+    return checkIfUserGetRoles(
+        sugoiUser, getSearchRoleList(realm, null, application, groupName, groupManagerRoleList));
+  }
+
+  @Override
   public boolean isWriter(SugoiUser sugoiUser, String realm, String userStorage) {
     List<String> searchRoleList =
-        getSearchRoleList(sugoiUser, realm, userStorage, null, regexpWriterList);
+        getSearchRoleList(realm, userStorage, null, null, regexpWriterList);
     return checkIfUserGetRoles(sugoiUser, searchRoleList)
         || this.isAdminRealm(sugoiUser, realm, userStorage);
   }
@@ -129,7 +139,7 @@ public class PermissionServiceImpl implements PermissionService {
   @Override
   public boolean isAdminRealm(SugoiUser sugoiUser, String realm, String userStorage) {
     List<String> searchRoleList =
-        getSearchRoleList(sugoiUser, realm, userStorage, null, regexpAdminRealmList);
+        getSearchRoleList(realm, userStorage, null, null, regexpAdminRealmList);
     return checkIfUserGetRoles(sugoiUser, searchRoleList) || isAdmin(sugoiUser);
   }
 
@@ -180,10 +190,10 @@ public class PermissionServiceImpl implements PermissionService {
   private List<String> getUserRightList(SugoiUser sugoiUser, List<String> regexpListToSearch) {
     List<String> searchRoleList =
         getSearchRoleList(
-                sugoiUser,
                 "(?<realm>.*)",
                 "(?<userStorage>.*)",
                 "(?<application>.*)",
+                "(?<group>.*)",
                 regexpListToSearch)
             .stream()
             .map(String::toUpperCase)
@@ -230,11 +240,7 @@ public class PermissionServiceImpl implements PermissionService {
   }
 
   private List<String> getSearchRoleList(
-      SugoiUser sugoiUser,
-      String realm,
-      String userStorage,
-      String application,
-      List<String> regexpList) {
+      String realm, String userStorage, String application, String group, List<String> regexpList) {
     Map<String, String> valueMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     valueMap.put("realm", realm.toUpperCase());
     if (userStorage != null) {
@@ -242,6 +248,9 @@ public class PermissionServiceImpl implements PermissionService {
     }
     if (application != null) {
       valueMap.put("application", application);
+    }
+    if (group != null) {
+      valueMap.put("group", group);
     }
     return regexpList.stream()
         .map(regexp -> StrSubstitutor.replace(regexp, valueMap, "$(", ")"))

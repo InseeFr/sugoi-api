@@ -370,4 +370,25 @@ public class PermissionServiceTests {
             permissions.isMemberOfSelfManagedGroup(
                 sugoiUser, "test", "notselfmanaged", "notSelfManagedGroup_notselfmanaged")));
   }
+
+  @Test
+  @DisplayName(
+      "Given a user being in a group managing an other group"
+          + "the user should be able to manage this group and only this group")
+  void groupManagerTest() {
+    SugoiUser sugoiUser =
+        new SugoiUser("user", List.of("role_admin_appli", "role_ASI_manageme_appli", "", "role_"));
+    assertThat(
+        "The user should be manager of manageme",
+        permissions.isGroupManager(sugoiUser, "test", "appli", "manageme"),
+        is(true));
+    assertThat(
+        "The user should not be manager of admin",
+        permissions.isGroupManager(sugoiUser, "test", "appli", "admin"),
+        is(false));
+    assertThat(
+        "The user should not be manager of the application",
+        permissions.isApplicationManager(sugoiUser, "test", "appli"),
+        is(false));
+  }
 }

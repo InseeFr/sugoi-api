@@ -120,6 +120,14 @@ Application manager can update an application and the associated groups (add or 
 
 Creating or deleting an application requires writer privileges.
 
+### Group manager
+
+The group manager role is defined via the regexp.role.group.manager property. For example ROLE_ASI_${group}.
+
+Group manager can add and delete users in a group.
+
+If the group manager role is ROLE_ASI_${group}, users in ASI_admin_myapp can add or remove users from admin_myapp (in this case in any application so the group name should be application scoped).
+
 ### Self-managed groups and applications
 
 Some groups have a self-managed property.
