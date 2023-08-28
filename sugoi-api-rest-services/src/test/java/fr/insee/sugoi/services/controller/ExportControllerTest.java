@@ -23,6 +23,7 @@ import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.core.service.GroupService;
 import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.*;
+import fr.insee.sugoi.model.exceptions.UserNotFoundException;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.technics.ModelType;
 import fr.insee.sugoi.model.technics.StoreMapping;
@@ -124,6 +125,16 @@ public class ExportControllerTest {
             new StoreMapping("lastName", "cn", ModelType.STRING, false)));
     realmTwoUS.setUserStorages(List.of(userStorage2, userStorage));
     Mockito.when(configService.getRealm("realmTwoUS")).thenReturn(realmTwoUS);
+
+    Group aGroup = new Group("agroup_anapplication", "anapplication");
+    User nonExistantUser = new User("nonExistantUser");
+    aGroup.setUsers(List.of(user1, user, nonExistantUser));
+    Mockito.when(groupService.findById("realmTwoUS", "anapplication", "agroup_anapplication"))
+        .thenReturn(aGroup);
+    Mockito.when(userService.findById("realmTwoUS", null, "user1", false)).thenReturn(user1);
+    Mockito.when(userService.findById("realmTwoUS", null, "user", false)).thenReturn(user);
+    Mockito.when(userService.findById("realmTwoUS", null, "nonExistantUser", false))
+        .thenThrow(UserNotFoundException.class);
   }
 
   @Test
@@ -228,6 +239,22 @@ public class ExportControllerTest {
         "should have address in body",
         retrieveAttribute(lines.get(0), lines.get(1), "address"),
         is("\"33 rue des Fleurs 56700 Fleurville Cedex 1234 \""));
+  }
+
+  @Test
+  @WithMockUser
+  void testExportUsersInGroup() throws Exception {
+    List<String> lines =
+        getResponse(
+                "/realms/realmTwoUS/applications/anapplication/groups/agroup_anapplication/export/export.csv")
+            .getContentAsString()
+            .lines()
+            .collect(Collectors.toList());
+    assertThat("Should have two users plus one header", lines.size(), is(3));
+    assertThat(
+        "Should have mail in body",
+        retrieveAttribute(lines.get(0), lines.get(2), "mail"),
+        is("test@test.com"));
   }
 
   private String retrieveAttribute(String header, String userLine, String attributeName) {

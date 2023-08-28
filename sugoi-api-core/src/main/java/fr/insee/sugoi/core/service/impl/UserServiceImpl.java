@@ -260,10 +260,10 @@ public class UserServiceImpl implements UserService {
               ? realm.getUserStorages().stream()
                   .filter(us -> exist(realmName, us.getName(), id))
                   .findFirst()
-                  .orElseThrow(() -> new UserStorageNotFoundException(realmName, id))
+                  .orElseThrow(() -> new UserNotFoundException(realmName, id))
               : realm
                   .getUserStorageByName(storage)
-                  .orElseThrow(() -> new UserStorageNotFoundException(realmName, id));
+                  .orElseThrow(() -> new UserStorageNotFoundException(realmName, storage));
       User user =
           storeProvider
               .getReaderStore(realmName, userStorage.getName())
