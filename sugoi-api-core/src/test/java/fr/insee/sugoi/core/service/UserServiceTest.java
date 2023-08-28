@@ -216,6 +216,24 @@ public class UserServiceTest {
 
   @Test
   @DisplayName(
+      "Given we try to get a user that do not exist on a userstorage, then throw UserNotFoundException")
+  public void getUserThatDoNotExistOnUserstorageShouldFail() {
+    assertThrows(
+        UserNotFoundException.class,
+        () -> userService.findById("realm", "us2", "donotexist", false));
+  }
+
+  @Test
+  @DisplayName(
+      "Given we try to get a user that do not exist on an entire realm, then throw UserNotFoundException")
+  public void getUserThatDoNotExistOnRealmShouldFail() {
+    assertThrows(
+        UserNotFoundException.class,
+        () -> userService.findById("realm", null, "donotexist", false));
+  }
+
+  @Test
+  @DisplayName(
       "Given we try to delete a user on a realm do not exist, "
           + "then throw RealmNotFoundException")
   public void deleteUserShouldFailWhenRealmNotFound() {
