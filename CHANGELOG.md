@@ -1,3 +1,22 @@
+# 2.0.0
+
+
+- [BUG] :bug: Fix export a non existing user in a group
+- [ENH] :sparkles: Compound fields on users can be defined at a userstorage level
+- [REF] :recycling: Realm and US properties can have multiple values
+- [BUG] :bug: Fix realm properties on ldap can contain $
+- [BUG] :bug: Readers can read groups in any app
+- [ENH] :sparkles: Add a group manager right
+- [ENH] :sparkles: Applications can have self-managed groups
+- [UP] :arrow_up: Bump tomcat.version from 9.0.73 to 9.0.78
+- [UP] :arrow_up: Bump spring-boot.version from 2.7.2 to 2.7.11
+- [UP] :arrow_up: Bump unboundid-ldapsdk from 6.0.7 to 6.0.8
+- [ENH] :sparkles: Add an export endpoint for group members
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 1.10.0
+- [REL] :rocket: release version 1.10.0
+
+
 # 1.10.0
 
 
