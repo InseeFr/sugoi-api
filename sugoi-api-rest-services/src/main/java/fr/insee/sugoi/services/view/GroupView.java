@@ -17,6 +17,7 @@ public class GroupView {
   private String name;
   private String description;
   private String appName;
+  private Boolean isSelfManaged;
 
   public GroupView() {}
 
@@ -42,5 +43,13 @@ public class GroupView {
 
   public void setAppName(String appName) {
     this.appName = appName;
+  }
+
+  public void setIsSelfManaged(Boolean selfManaged) {
+    isSelfManaged = selfManaged;
+  }
+
+  public Boolean getIsSelfManaged() {
+    return isSelfManaged;
   }
 }
