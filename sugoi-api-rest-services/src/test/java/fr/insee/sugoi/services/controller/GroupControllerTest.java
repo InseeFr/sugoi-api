@@ -16,6 +16,7 @@ package fr.insee.sugoi.services.controller;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
@@ -34,6 +35,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -58,6 +60,13 @@ public class GroupControllerTest {
 
   @MockBean private GroupService groupService;
 
+  public static class GroupSelfManagedMatcher implements ArgumentMatcher<Group> {
+    @Override
+    public boolean matches(Group toTest) {
+      return toTest.getIsSelfManaged() != null && toTest.getIsSelfManaged();
+    }
+  }
+
   ObjectMapper objectMapper = new ObjectMapper();
   Group group1, group2, group2Updated;
   PageResult<Group> pageResult;
@@ -75,6 +84,7 @@ public class GroupControllerTest {
     group2Updated = new Group();
     group2Updated.setName("Group2");
     group2Updated.setDescription("groupe pas fou");
+    group2Updated.setIsSelfManaged(true);
 
     List<Group> groups = new ArrayList<>();
     groups.add(group1);
@@ -193,7 +203,11 @@ public class GroupControllerTest {
       MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
       verify(groupService)
-          .update(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any());
+          .update(
+              Mockito.anyString(),
+              Mockito.anyString(),
+              argThat(new GroupSelfManagedMatcher()),
+              Mockito.any());
       assertThat(
           "Should get updated group",
           objectMapper.readValue(response.getContentAsString(), Group.class).getDescription(),
