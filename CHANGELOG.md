@@ -1,3 +1,12 @@
+# 2.0.1
+
+
+- [BUG] :bug: Fix isSelfManaged cannot be updated on group
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 2.0.0
+- [REL] :rocket: release version 2.0.0
+
+
 # 2.0.0
 
 
