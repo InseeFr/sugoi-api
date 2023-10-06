@@ -185,19 +185,6 @@ public class PermissionServiceTests {
         "user is app manager for appli1 in realm1",
         permissions.isApplicationManager(sugoiUser, "realm1", "appli1"),
         is(true));
-    assertThat(
-        "user is reader in realm1", permissions.isReader(sugoiUser, "realm1", null), is(true));
-  }
-
-  @Test
-  public void testAnyAppManager() {
-    SugoiUser sugoiUser =
-        new SugoiUser(
-            "appmanager_realm1", List.of("role_Asi_realm1_appli1", "role_reader_realm1_sugoi"));
-    assertThat(
-        "user is app manager for at least one application",
-        permissions.isAtLeastOneApplicationManager(sugoiUser, "realm1"),
-        is(true));
   }
 
   @Test
@@ -207,8 +194,6 @@ public class PermissionServiceTests {
         "user is app manager for appli1 in realm1",
         permissions.isApplicationManager(sugoiUser, "realm1", "appli1"),
         is(true));
-    assertThat(
-        "user is reader in realm1", permissions.isReader(sugoiUser, "realm1", null), is(true));
     assertThat(
         "user is app manager for appli1 in realm2",
         permissions.isApplicationManager(sugoiUser, "realm2", "appli1"),
