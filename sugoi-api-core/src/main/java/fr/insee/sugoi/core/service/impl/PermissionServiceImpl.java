@@ -73,7 +73,6 @@ public class PermissionServiceImpl implements PermissionService {
     List<String> searchRoleList =
         getSearchRoleList(realm, userStorage, null, null, regexpReaderList);
     return this.checkIfUserGetRoles(sugoiUser, searchRoleList)
-        || this.isAtLeastOneApplicationManager(sugoiUser, realm)
         || isWriter(sugoiUser, realm, userStorage);
   }
 
@@ -96,11 +95,6 @@ public class PermissionServiceImpl implements PermissionService {
     List<String> searchRoleList =
         getSearchRoleList(realm, null, application, null, applicationManagerRoleList);
     return checkIfUserGetRoles(sugoiUser, searchRoleList);
-  }
-
-  @Override
-  public boolean isAtLeastOneApplicationManager(SugoiUser sugoiUser, String realm) {
-    return this.isApplicationManager(sugoiUser, realm, "*");
   }
 
   public boolean isMemberOfSelfManagedGroup(
