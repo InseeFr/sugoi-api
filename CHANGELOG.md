@@ -1,3 +1,10 @@
+# 2.0.2
+
+
+- [BUG] :bug: Fix application manager can read all realms
+- [REL] :rocket: release version 2.0.1
+
+
 # 2.0.0
 
 
