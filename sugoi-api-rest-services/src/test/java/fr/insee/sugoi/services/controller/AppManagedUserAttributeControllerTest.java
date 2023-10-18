@@ -29,6 +29,8 @@ import fr.insee.sugoi.core.service.UserService;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import java.util.List;
+
+import fr.insee.sugoi.services.logging.SugoiLoggerComponent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
