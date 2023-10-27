@@ -51,6 +51,7 @@ import fr.insee.sugoi.model.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.model.exceptions.GroupAlreadyExistException;
 import fr.insee.sugoi.model.exceptions.GroupNotFoundException;
 import fr.insee.sugoi.model.exceptions.InvalidPasswordException;
+import fr.insee.sugoi.model.exceptions.NoGroupException;
 import fr.insee.sugoi.model.exceptions.OrganizationAlreadyExistException;
 import fr.insee.sugoi.model.exceptions.OrganizationNotFoundException;
 import fr.insee.sugoi.model.exceptions.StoragePolicyNotMetException;
@@ -61,6 +62,7 @@ import fr.insee.sugoi.model.exceptions.UserNotFoundException;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -217,10 +219,17 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
       String appName, Group group, ProviderRequest providerRequest) {
 
     try {
-      if (ldapReaderStore.getApplication(appName).isEmpty()) {
+      if (group == null) {
+        throw new NoGroupException("no group provided");
+      }
+      Optional<Application> applicationOptional = ldapReaderStore.getApplication(appName);
+      if (applicationOptional.isEmpty()) {
         throw new ApplicationNotFoundException(appName);
       }
-
+      Application application = applicationOptional.get();
+      if (application.getGroups() == null) {
+        application.setGroups(new ArrayList<Group>());
+      }
       if (ldapReaderStore.getGroup(appName, group.getName()).isPresent()) {
         throw new GroupAlreadyExistException(
             String.format(

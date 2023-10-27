@@ -34,6 +34,21 @@ Feature: Applications scenario
         Then the client receives status code 201
         Then the client expect to receive an application
 
+    Scenario: Post application without group
+        When the client perform POST request with body on url /realms/domaine1/applications body:
+            """
+            {
+      "name": "dada",
+      "groups": null,
+      "attributes": {
+        "owner": "Branche privative de l'application applitest"
+      }
+    }
+            """
+        And show body received
+        Then the client receives status code 201
+        Then the client expect to receive an application
+
     Scenario: Post application alreadyExist
         When the client perform POST request with body on url /realms/domaine1/applications body:
             """

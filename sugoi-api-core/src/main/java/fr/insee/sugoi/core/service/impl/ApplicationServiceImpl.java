@@ -24,12 +24,14 @@ import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.ApplicationService;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Application;
+import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.exceptions.ApplicationNotFoundException;
 import fr.insee.sugoi.model.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;
+import java.util.ArrayList;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,6 +47,9 @@ public class ApplicationServiceImpl implements ApplicationService {
   public ProviderResponse create(
       String realm, Application application, ProviderRequest providerRequest) {
     try {
+      if (application.getGroups() == null) {
+        application.setGroups(new ArrayList<Group>());
+      }
       ProviderResponse response =
           storeProvider.getWriterStore(realm).createApplication(application, providerRequest);
       sugoiEventPublisher.publishCustomEvent(

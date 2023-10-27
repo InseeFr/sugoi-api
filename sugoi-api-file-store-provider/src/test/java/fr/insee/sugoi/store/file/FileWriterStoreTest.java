@@ -15,9 +15,11 @@ package fr.insee.sugoi.store.file;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.model.*;
+import fr.insee.sugoi.model.exceptions.NoGroupException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -356,6 +358,17 @@ public class FileWriterStoreTest {
         "Should retrieve Groupy",
         fileReaderStore.getGroup("Applitest", "Groupy_Applitest").get().getName(),
         is("Groupy_Applitest"));
+  }
+
+  @Test
+  public void testCreateGroupWithNoGroup() {
+    Group group = null;
+    assertThrows(
+        NoGroupException.class,
+        () -> {
+          fileWriterStore.createGroup("Applitest", group, null);
+        },
+        "Should throw NoGroupException");
   }
 
   @Test
