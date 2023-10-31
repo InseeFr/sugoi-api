@@ -45,7 +45,7 @@ public class AuthorizeMethodDecider {
 
   public boolean isAtLeastConsultant(String domaine) {
     if (enable) {
-      logger.info("Check if user is at least consultant on domaine {}", domaine);
+      logger.debug("Check if user is at least consultant on domaine {}", domaine);
       Map<String, String> valueMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
       valueMap.put("domaine", domaine.toUpperCase());
       List<String> searchRoles =
@@ -61,7 +61,7 @@ public class AuthorizeMethodDecider {
 
   public boolean isAtLeastGestionnaire(String domaine) {
     if (enable) {
-      logger.info("Check if user is at least gestionnaire on domaine {}", domaine);
+      logger.debug("Check if user is at least gestionnaire on domaine {}", domaine);
       Map<String, String> valueMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
       valueMap.put("domaine", domaine.toUpperCase());
       List<String> searchRoles =
@@ -77,7 +77,7 @@ public class AuthorizeMethodDecider {
 
   public boolean isAdmin() {
     if (enable) {
-      logger.info("Check if user is at least admin");
+      logger.debug("Check if user is at least admin");
       logger.debug("Checking if user is in : {}", regexpAdmin);
       return checkIfUserGetRoles(regexpAdmin);
     }
