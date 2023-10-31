@@ -28,6 +28,8 @@ public interface SeeAlsoDecorator {
    */
   public Object getResourceFromUrl(String url, String subobject);
 
-  /** @return the list of the protocols the SeeAlsoDecorator is able to deal with */
+  /**
+   * @return the list of the protocols the SeeAlsoDecorator is able to deal with
+   */
   public List<String> getProtocols();
 }

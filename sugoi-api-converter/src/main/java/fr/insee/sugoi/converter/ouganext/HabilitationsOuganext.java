@@ -125,7 +125,9 @@ public class HabilitationsOuganext {
   @JacksonXmlElementWrapper(useWrapping = false)
   protected List<ApplicationOuganext> application = new ArrayList<ApplicationOuganext>();
 
-  /** @return la liste des applications avec habilitations ou une liste vide. */
+  /**
+   * @return la liste des applications avec habilitations ou une liste vide.
+   */
   public List<ApplicationOuganext> getApplication() {
     if (application == null) {
       application = new ArrayList<ApplicationOuganext>();

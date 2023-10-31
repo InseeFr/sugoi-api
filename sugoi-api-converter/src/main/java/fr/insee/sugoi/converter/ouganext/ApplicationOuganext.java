@@ -49,7 +49,9 @@ public class ApplicationOuganext {
     this.name = name;
   }
 
-  /** @return la liste des roles ou une liste vide. */
+  /**
+   * @return la liste des roles ou une liste vide.
+   */
   public Collection<RoleOuganext> getRole() {
     if (role == null) {
       role = new ArrayList<RoleOuganext>();
