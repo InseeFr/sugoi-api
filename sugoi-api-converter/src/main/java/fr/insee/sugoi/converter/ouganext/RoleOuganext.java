@@ -48,7 +48,9 @@ public class RoleOuganext {
     this.name = name;
   }
 
-  /** @return la liste des propriétés ou une liste vide. */
+  /**
+   * @return la liste des propriétés ou une liste vide.
+   */
   public List<String> getPropriete() {
     if (propriete == null) {
       propriete = new ArrayList<String>();
