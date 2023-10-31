@@ -36,81 +36,35 @@ public class SugoiAdviceController {
 
   private static final Logger logger = LoggerFactory.getLogger(SugoiAdviceController.class);
 
-  @ExceptionHandler(NotFoundException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(NotFoundException e) {
-    ErrorView errorView = new ErrorView(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(ConflictException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(ConflictException e) {
-    ErrorView errorView = new ErrorView(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.CONFLICT);
-  }
-
-  @ExceptionHandler(BadRequestException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(BadRequestException e) {
-    ErrorView errorView = new ErrorView(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.BAD_REQUEST);
-  }
-
-  @ExceptionHandler(ForbiddenException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(ForbiddenException e) {
-    ErrorView errorView = new ErrorView(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.FORBIDDEN);
-  }
-
-  @ExceptionHandler(AccessDeniedException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(AccessDeniedException e) {
-    ErrorView errorView = new ErrorView(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.FORBIDDEN);
-  }
-
-  @ExceptionHandler(UnsupportedOperationException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(UnsupportedOperationException e) {
-    ErrorView errorView = new ErrorView(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.NOT_IMPLEMENTED);
-  }
-
-  @ExceptionHandler(HttpMessageNotReadableException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(HttpMessageNotReadableException e) {
-    ErrorView errorView = new ErrorView(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.BAD_REQUEST);
-  }
-
-  @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(HttpMediaTypeNotSupportedException e) {
-    ErrorView errorView = new ErrorView(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.BAD_REQUEST);
-  }
-
-  @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(HttpMediaTypeNotAcceptableException e) {
-    ErrorView errorView = new ErrorView(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.BAD_REQUEST);
-  }
-
-  @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorView> exception(HttpRequestMethodNotSupportedException e) {
-    ErrorView errorView = new ErrorView(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.METHOD_NOT_ALLOWED);
-  }
-
   @ExceptionHandler(Exception.class)
   @ResponseBody
   public ResponseEntity<ErrorView> exception(Exception e) {
-    logger.error(e.getMessage(), e);
     ErrorView errorView = new ErrorView(e.getMessage());
-    return new ResponseEntity<>(errorView, HttpStatus.INTERNAL_SERVER_ERROR);
+    HttpStatus status = computeStatusFromException(e);
+    if (status.is5xxServerError()) {
+      logger.error(e.getMessage(), e);
+    }
+    return new ResponseEntity<>(errorView, status);
+  }
+
+  private HttpStatus computeStatusFromException(Exception e) {
+    if (e instanceof NotFoundException) {
+      return HttpStatus.NOT_FOUND;
+    } else if (e instanceof ConflictException) {
+      return HttpStatus.CONFLICT;
+    } else if (e instanceof BadRequestException
+        || e instanceof HttpMessageNotReadableException
+        || e instanceof HttpMediaTypeNotSupportedException
+        || e instanceof HttpMediaTypeNotAcceptableException) {
+      return HttpStatus.BAD_REQUEST;
+    } else if (e instanceof ForbiddenException || e instanceof AccessDeniedException) {
+      return HttpStatus.FORBIDDEN;
+    } else if (e instanceof UnsupportedOperationException) {
+      return HttpStatus.NOT_IMPLEMENTED;
+    } else if (e instanceof HttpRequestMethodNotSupportedException) {
+      return HttpStatus.METHOD_NOT_ALLOWED;
+    } else {
+      return HttpStatus.INTERNAL_SERVER_ERROR;
+    }
   }
 }
