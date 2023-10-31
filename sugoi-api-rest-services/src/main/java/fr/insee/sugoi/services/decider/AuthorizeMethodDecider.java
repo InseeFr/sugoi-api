@@ -38,7 +38,7 @@ public class AuthorizeMethodDecider {
 
   public boolean isReader(String realm, String userStorage) {
     if (enable) {
-      logger.info("Check if user is reader on realm {} and userStorage {}", realm, userStorage);
+      logger.debug("Check if user is reader on realm {} and userStorage {}", realm, userStorage);
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       List<String> roles =
           authentication.getAuthorities().stream()
@@ -56,7 +56,7 @@ public class AuthorizeMethodDecider {
 
   public boolean isAppManager(String realm, String application) {
     if (enable) {
-      logger.info("Check if user is at least reader on realm {}", realm);
+      logger.debug("Check if user is at least reader on realm {}", realm);
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       List<String> roles =
           authentication.getAuthorities().stream()
@@ -73,7 +73,7 @@ public class AuthorizeMethodDecider {
 
   public boolean isGroupManager(String realm, String application, String groupName) {
     if (enable) {
-      logger.info("Check if user is at least group manager on realm {}", realm);
+      logger.debug("Check if user is at least group manager on realm {}", realm);
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       List<String> roles =
           authentication.getAuthorities().stream()
@@ -92,7 +92,7 @@ public class AuthorizeMethodDecider {
 
   public boolean isPasswordManager(String realm, String userStorage) {
     if (enable) {
-      logger.info(
+      logger.debug(
           "Check if user is at least reader on realm {} and userStorage {}", realm, userStorage);
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       List<String> roles =
@@ -110,7 +110,7 @@ public class AuthorizeMethodDecider {
 
   public boolean isPasswordValidator(String realm, String userStorage) {
     if (enable) {
-      logger.info(
+      logger.debug(
           "Check if user is at least password validator on realm {} and userStorage {}",
           realm,
           userStorage);
@@ -131,7 +131,7 @@ public class AuthorizeMethodDecider {
 
   public boolean isWriter(String realm, String userStorage) {
     if (enable) {
-      logger.info(
+      logger.debug(
           "Check if user is at least writer on realm {} and userStorage {}", realm, userStorage);
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       List<String> roles =
@@ -148,7 +148,7 @@ public class AuthorizeMethodDecider {
 
   public boolean isAdmin() {
     if (enable) {
-      logger.info("Check if user is admin");
+      logger.debug("Check if user is admin");
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       List<String> roles =
           authentication.getAuthorities().stream()
