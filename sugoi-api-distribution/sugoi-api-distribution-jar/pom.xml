@@ -88,17 +88,7 @@
 
     <dependency>
       <groupId>fr.insee.sugoi</groupId>
-      <artifactId>sugoi-api-event-log</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>fr.insee.sugoi</groupId>
       <artifactId>sugoi-api-event-webhook</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>fr.insee.sugoi</groupId>
-      <artifactId>sugoi-api-event-metrics</artifactId>
     </dependency>
 
     <dependency>

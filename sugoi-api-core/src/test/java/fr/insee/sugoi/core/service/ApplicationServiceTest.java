@@ -15,7 +15,6 @@ package fr.insee.sugoi.core.service;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.impl.ApplicationServiceImpl;
 import fr.insee.sugoi.core.store.ReaderStore;
@@ -41,8 +40,6 @@ public class ApplicationServiceTest {
   @MockBean private StoreProvider storeProvider;
 
   @MockBean private RealmProvider realmProvider;
-
-  @MockBean private SugoiEventPublisher sugoiEventPublisher;
 
   @Mock private ReaderStore readerStore2;
 

@@ -33,6 +33,10 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>fr.insee.sugoi</groupId>
 			<artifactId>sugoi-api-rest-commons-services</artifactId>
 		</dependency>
@@ -41,6 +45,7 @@
 			<groupId>fr.insee.sugoi</groupId>
 			<artifactId>sugoi-api-core</artifactId>
 		</dependency>
+
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>

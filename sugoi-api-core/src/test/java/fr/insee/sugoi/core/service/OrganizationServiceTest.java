@@ -17,7 +17,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.impl.OrganizationServiceImpl;
 import fr.insee.sugoi.core.store.ReaderStore;
@@ -48,8 +47,6 @@ public class OrganizationServiceTest {
   @MockBean private StoreProvider storeProvider;
 
   @MockBean private RealmProvider realmProvider;
-
-  @MockBean private SugoiEventPublisher sugoiEventPublisher;
 
   @Mock private ReaderStore readerStore1;
 

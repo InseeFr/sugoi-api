@@ -136,20 +136,9 @@
 				<artifactId>sugoi-api-jms-store-provider</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-
-			<dependency>
-				<groupId>fr.insee.sugoi</groupId>
-				<artifactId>sugoi-api-event-log</artifactId>
-				<version>${project.version}</version>
-			</dependency>
 			<dependency>
 				<groupId>fr.insee.sugoi</groupId>
 				<artifactId>sugoi-api-event-webhook</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>fr.insee.sugoi</groupId>
-				<artifactId>sugoi-api-event-metrics</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -328,9 +317,7 @@
 		<module>sugoi-api-rest-services</module>
 		<module>sugoi-api-rest-old-services</module>
 		<module>sugoi-api-rest-commons-services</module>
-		<module>sugoi-api-event-log</module>
 		<module>sugoi-api-event-webhook</module>
-		<module>sugoi-api-event-metrics</module>
 		<module>sugoi-api-converter</module>
 		<module>sugoi-api-distribution</module>
 		<module>sugoi-api-file-config-provider</module>
