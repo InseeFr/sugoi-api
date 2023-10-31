@@ -46,6 +46,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -81,7 +82,7 @@ public class ExportController {
             })
       })
   @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
-  public void getAllUsers(
+  public ResponseEntity<Void> getAllUsers(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -188,6 +189,7 @@ public class ExportController {
                       typeRecherche,
                       csvPrinter));
     }
+    return ResponseEntity.ok().build();
   }
 
   @GetMapping(
@@ -205,7 +207,7 @@ public class ExportController {
             })
       })
   @PreAuthorize("@NewAuthorizeMethodDecider.isAppManager(#realm,#application)")
-  public void getAllMembersInGroup(
+  public ResponseEntity<Void> getAllMembersInGroup(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -247,6 +249,7 @@ public class ExportController {
               }
             });
     csvPrinter.flush();
+    return ResponseEntity.ok().build();
   }
 
   private void getExportUsersWithStorages(
@@ -296,7 +299,7 @@ public class ExportController {
             })
       })
   @PreAuthorize("@NewAuthorizeMethodDecider.isReader(#realm,#storage)")
-  public void getAllUsers(
+  public ResponseEntity<Void> getAllUsers(
       @Parameter(
               description = "Name of the realm where the operation will be made",
               required = true)
@@ -336,7 +339,7 @@ public class ExportController {
           @RequestParam(name = "applicationFilter", required = false)
           String applicationFilter,
       HttpServletResponse response) {
-    getAllUsers(
+    return getAllUsers(
         realm,
         null,
         identifiant,

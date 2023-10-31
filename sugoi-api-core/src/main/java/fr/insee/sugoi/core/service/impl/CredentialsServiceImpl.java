@@ -64,68 +64,57 @@ public class CredentialsServiceImpl implements CredentialsService {
       String webserviceTag,
       boolean changePasswordResetStatus,
       ProviderRequest providerRequest) {
-    try {
-      User user = userService.findById(realm, userStorage, userId, false);
+    User user = userService.findById(realm, userStorage, userId, false);
 
-      if (user == null || StringUtils.isEmpty(user.getUsername())) {
-        throw new UserNotFoundException(realm, userStorage, userId);
-      }
-
-      if (computeReceiverMails(templateProperties, user).isEmpty()) {
-        throw new UserNoEmailException(realm, userStorage, userId);
-      }
-
-      Map<RealmConfigKeys, List<String>> userStorageProperties =
-          realmProvider
-              .load(realm)
-              .orElseThrow(() -> new RealmNotFoundException(realm))
-              .getUserStorageByName(userStorage)
-              .orElseThrow(() -> new UserStorageNotFoundException(realm, userStorage))
-              .getProperties();
-      String password =
-          passwordService.generatePassword(
-              getPasswordBooleanConfiguration(
-                  userStorageProperties, PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE),
-              getPasswordBooleanConfiguration(
-                  userStorageProperties, PasswordPolicyConstants.CREATE_PASSWORD_WITH_LOWERCASE),
-              getPasswordBooleanConfiguration(
-                  userStorageProperties, PasswordPolicyConstants.CREATE_PASSWORD_WITH_DIGITS),
-              getPasswordBooleanConfiguration(
-                  userStorageProperties, PasswordPolicyConstants.CREATE_PASSWORD_WITH_SPECIAL),
-              getPasswordIntConfiguration(
-                  userStorageProperties, PasswordPolicyConstants.CREATE_PASSWORD_SIZE));
-
-      ProviderResponse response =
-          storeProvider
-              .getWriterStore(realm, userStorage)
-              .reinitPassword(
-                  userId,
-                  password,
-                  changePasswordResetStatus,
-                  templateProperties,
-                  webserviceTag,
-                  providerRequest);
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          userStorage,
-          SugoiEventTypeEnum.REINIT_PASSWORD,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.PROPERTIES, templateProperties),
-              Map.entry(EventKeysConfig.MAILS, computeReceiverMails(templateProperties, user)),
-              Map.entry(EventKeysConfig.USER, user),
-              Map.entry(EventKeysConfig.WEBSERVICE_TAG, webserviceTag != null ? webserviceTag : ""),
-              Map.entry(EventKeysConfig.PASSWORD, password)));
-      return response;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          userStorage,
-          SugoiEventTypeEnum.RESET_PASSWORD_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.USER_ID, userId),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
+    if (user == null || StringUtils.isEmpty(user.getUsername())) {
+      throw new UserNotFoundException(realm, userStorage, userId);
     }
+
+    if (computeReceiverMails(templateProperties, user).isEmpty()) {
+      throw new UserNoEmailException(realm, userStorage, userId);
+    }
+
+    Map<RealmConfigKeys, List<String>> userStorageProperties =
+        realmProvider
+            .load(realm)
+            .orElseThrow(() -> new RealmNotFoundException(realm))
+            .getUserStorageByName(userStorage)
+            .orElseThrow(() -> new UserStorageNotFoundException(realm, userStorage))
+            .getProperties();
+    String password =
+        passwordService.generatePassword(
+            getPasswordBooleanConfiguration(
+                userStorageProperties, PasswordPolicyConstants.CREATE_PASSWORD_WITH_UPPERCASE),
+            getPasswordBooleanConfiguration(
+                userStorageProperties, PasswordPolicyConstants.CREATE_PASSWORD_WITH_LOWERCASE),
+            getPasswordBooleanConfiguration(
+                userStorageProperties, PasswordPolicyConstants.CREATE_PASSWORD_WITH_DIGITS),
+            getPasswordBooleanConfiguration(
+                userStorageProperties, PasswordPolicyConstants.CREATE_PASSWORD_WITH_SPECIAL),
+            getPasswordIntConfiguration(
+                userStorageProperties, PasswordPolicyConstants.CREATE_PASSWORD_SIZE));
+
+    ProviderResponse response =
+        storeProvider
+            .getWriterStore(realm, userStorage)
+            .reinitPassword(
+                userId,
+                password,
+                changePasswordResetStatus,
+                templateProperties,
+                webserviceTag,
+                providerRequest);
+    sugoiEventPublisher.publishCustomEvent(
+        realm,
+        userStorage,
+        SugoiEventTypeEnum.REINIT_PASSWORD,
+        Map.ofEntries(
+            Map.entry(EventKeysConfig.PROPERTIES, templateProperties),
+            Map.entry(EventKeysConfig.MAILS, computeReceiverMails(templateProperties, user)),
+            Map.entry(EventKeysConfig.USER, user),
+            Map.entry(EventKeysConfig.WEBSERVICE_TAG, webserviceTag != null ? webserviceTag : ""),
+            Map.entry(EventKeysConfig.PASSWORD, password)));
+    return response;
   }
 
   @Override
@@ -138,56 +127,45 @@ public class CredentialsServiceImpl implements CredentialsService {
       String webserviceTag,
       Map<String, String> templateProperties,
       ProviderRequest providerRequest) {
-    try {
 
-      User user = userService.findById(realm, userStorage, userId, false);
+    User user = userService.findById(realm, userStorage, userId, false);
 
-      Map<RealmConfigKeys, List<String>> userStorageProperties =
-          realmProvider
-              .load(realm)
-              .orElseThrow(() -> new RealmNotFoundException(realm))
-              .getUserStorageByName(userStorage)
-              .orElseThrow(() -> new UserStorageNotFoundException(realm, userStorage))
-              .getProperties();
+    Map<RealmConfigKeys, List<String>> userStorageProperties =
+        realmProvider
+            .load(realm)
+            .orElseThrow(() -> new RealmNotFoundException(realm))
+            .getUserStorageByName(userStorage)
+            .orElseThrow(() -> new UserStorageNotFoundException(realm, userStorage))
+            .getProperties();
 
-      boolean newPasswordIsValid = validatePassword(newPassword, userStorageProperties);
+    boolean newPasswordIsValid = validatePassword(newPassword, userStorageProperties);
 
-      if (newPasswordIsValid) {
-        ProviderResponse providerResponse =
-            storeProvider
-                .getWriterStore(realm, userStorage)
-                .changePassword(
-                    userId,
-                    oldPassword,
-                    newPassword,
-                    webserviceTag,
-                    templateProperties,
-                    providerRequest);
-        sugoiEventPublisher.publishCustomEvent(
-            realm,
-            userStorage,
-            SugoiEventTypeEnum.CHANGE_PASSWORD,
-            Map.ofEntries(
-                Map.entry(EventKeysConfig.NEW_PASSWORD, newPassword),
-                Map.entry(EventKeysConfig.OLD_PASSWORD, newPassword),
-                Map.entry(EventKeysConfig.USER_ID, userId),
-                Map.entry(EventKeysConfig.PROPERTIES, templateProperties),
-                Map.entry(EventKeysConfig.MAILS, computeReceiverMails(templateProperties, user)),
-                Map.entry(
-                    EventKeysConfig.WEBSERVICE_TAG, webserviceTag != null ? webserviceTag : "")));
-        return providerResponse;
-      } else {
-        throw new PasswordPolicyNotMetException("New password is not valid");
-      }
-    } catch (Exception e) {
+    if (newPasswordIsValid) {
+      ProviderResponse providerResponse =
+          storeProvider
+              .getWriterStore(realm, userStorage)
+              .changePassword(
+                  userId,
+                  oldPassword,
+                  newPassword,
+                  webserviceTag,
+                  templateProperties,
+                  providerRequest);
       sugoiEventPublisher.publishCustomEvent(
           realm,
           userStorage,
-          SugoiEventTypeEnum.CHANGE_PASSWORD_ERROR,
+          SugoiEventTypeEnum.CHANGE_PASSWORD,
           Map.ofEntries(
-              Map.entry(EventKeysConfig.ERROR, e.toString()),
-              Map.entry(EventKeysConfig.USER_ID, userId)));
-      throw e;
+              Map.entry(EventKeysConfig.NEW_PASSWORD, newPassword),
+              Map.entry(EventKeysConfig.OLD_PASSWORD, newPassword),
+              Map.entry(EventKeysConfig.USER_ID, userId),
+              Map.entry(EventKeysConfig.PROPERTIES, templateProperties),
+              Map.entry(EventKeysConfig.MAILS, computeReceiverMails(templateProperties, user)),
+              Map.entry(
+                  EventKeysConfig.WEBSERVICE_TAG, webserviceTag != null ? webserviceTag : "")));
+      return providerResponse;
+    } else {
+      throw new PasswordPolicyNotMetException("New password is not valid");
     }
   }
 
@@ -199,70 +177,30 @@ public class CredentialsServiceImpl implements CredentialsService {
       String newPassword,
       boolean changePasswordResetStatus,
       ProviderRequest providerRequest) {
-    try {
 
-      Map<RealmConfigKeys, List<String>> realmProperties =
-          realmProvider
-              .load(realm)
-              .orElseThrow(() -> new RealmNotFoundException(realm))
-              .getUserStorageByName(userStorage)
-              .orElseThrow(() -> new UserStorageNotFoundException(realm, userStorage))
-              .getProperties();
+    Map<RealmConfigKeys, List<String>> realmProperties =
+        realmProvider
+            .load(realm)
+            .orElseThrow(() -> new RealmNotFoundException(realm))
+            .getUserStorageByName(userStorage)
+            .orElseThrow(() -> new UserStorageNotFoundException(realm, userStorage))
+            .getProperties();
 
-      boolean newPasswordIsValid = validatePassword(newPassword, realmProperties);
-      if (newPasswordIsValid) {
-        ProviderResponse response =
-            storeProvider
-                .getWriterStore(realm, userStorage)
-                .initPassword(userId, newPassword, changePasswordResetStatus, providerRequest);
-        sugoiEventPublisher.publishCustomEvent(
-            realm,
-            userStorage,
-            SugoiEventTypeEnum.INIT_PASSWORD,
-            Map.ofEntries(Map.entry(EventKeysConfig.USER_ID, userId)));
-        return response;
-      } else {
-        throw new PasswordPolicyNotMetException("New password is not valid");
-      }
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          userStorage,
-          SugoiEventTypeEnum.INIT_PASSWORD_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.USER_ID, userId),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
+    boolean newPasswordIsValid = validatePassword(newPassword, realmProperties);
+    if (newPasswordIsValid) {
+      return storeProvider
+          .getWriterStore(realm, userStorage)
+          .initPassword(userId, newPassword, changePasswordResetStatus, providerRequest);
+    } else {
+      throw new PasswordPolicyNotMetException("New password is not valid");
     }
   }
 
   @Override
   public boolean validateCredential(
       String realm, String userStorage, String userName, String password) {
-    try {
-      User user = userService.findById(realm, userStorage, userName, false);
-      boolean valid =
-          storeProvider.getReaderStore(realm, userStorage).validateCredentials(user, password);
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          userStorage,
-          SugoiEventTypeEnum.VALIDATE_CREDENTIAL,
-          Map.ofEntries(Map.entry(EventKeysConfig.USER, user)));
-      return valid;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          userStorage,
-          SugoiEventTypeEnum.VALIDATE_CREDENTIAL_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.USER, userName),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      if (e instanceof UserNotFoundException) {
-        throw (UserNotFoundException) e;
-      } else {
-        throw e;
-      }
-    }
+    User user = userService.findById(realm, userStorage, userName, false);
+    return storeProvider.getReaderStore(realm, userStorage).validateCredentials(user, password);
   }
 
   @Override

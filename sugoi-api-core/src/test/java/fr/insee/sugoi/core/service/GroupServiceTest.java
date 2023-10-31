@@ -15,7 +15,6 @@ package fr.insee.sugoi.core.service;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.service.impl.GroupServiceImpl;
 import fr.insee.sugoi.core.service.impl.UserServiceImpl;
@@ -48,8 +47,6 @@ public class GroupServiceTest {
   @MockBean private StoreStorage storeStorage;
 
   @MockBean private RealmProvider realmProvider;
-
-  @MockBean private SugoiEventPublisher sugoiEventPublisher;
 
   @Autowired private GroupServiceImpl groupService;
 

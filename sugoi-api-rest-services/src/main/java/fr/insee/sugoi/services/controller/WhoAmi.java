@@ -24,6 +24,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -53,7 +55,7 @@ public class WhoAmi {
                   schema = @Schema(implementation = WhoamiView.class))
             })
       })
-  public WhoamiView whoami() {
+  public ResponseEntity<WhoamiView> whoami() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     List<String> roles =
         authentication.getAuthorities().stream()
@@ -68,6 +70,6 @@ public class WhoAmi {
     res.setWriterRealm(permissionService.getUserRealmWriter(sugoiUser));
     res.setAppManager(permissionService.getUserRealmAppManager(sugoiUser));
     res.setIsAdmin(permissionService.isAdmin(sugoiUser));
-    return res;
+    return ResponseEntity.status(HttpStatus.OK).body(res);
   }
 }

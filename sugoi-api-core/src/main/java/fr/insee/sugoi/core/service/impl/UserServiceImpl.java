@@ -15,8 +15,6 @@ package fr.insee.sugoi.core.service.impl;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
-import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
-import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -40,7 +38,6 @@ import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.passay.CharacterRule;
 import org.passay.PasswordGenerator;
@@ -72,8 +69,6 @@ public class UserServiceImpl implements UserService {
 
   @Autowired private RealmProvider realmProvider;
 
-  @Autowired private SugoiEventPublisher sugoiEventPublisher;
-
   @Autowired(required = false)
   private SeeAlsoService seeAlsoService;
 
@@ -82,84 +77,66 @@ public class UserServiceImpl implements UserService {
   @Override
   public ProviderResponse create(
       String realm, String storage, User user, ProviderRequest providerRequest) {
-    try {
+    // Mail and Id unicity check, generated id if missing only when reader and
+    // writer are synchronous
+    if (!readerStoreAsynchronous) {
 
-      // Mail and Id unicity check, generated id if missing only when reader and
-      // writer are synchronous
-      if (!readerStoreAsynchronous) {
+      Realm realmLoaded = realmProvider.load(realm).get();
+      if (user.getUsername() == null) {
+        // generate id if null
+        boolean idGeneratedAndUnique = false;
+        do {
+          final String id = generateId(true, true, idCreateLength);
+          user.setUsername(id);
+          // unicity requiered at realm level
+          idGeneratedAndUnique =
+              realmLoaded.getUserStorages().stream()
+                  .map(us -> storeProvider.getReaderStore(realm, us.getName()).getUser(id))
+                  .noneMatch(Optional::isPresent);
+        } while (!idGeneratedAndUnique);
+      } else {
+        // check id unicity
+        if (realmLoaded.getUserStorages().stream()
+            .map(
+                us -> storeProvider.getReaderStore(realm, us.getName()).getUser(user.getUsername()))
+            .anyMatch(Optional::isPresent)) {
+          throw new UserAlreadyExistException(
+              "User " + user.getUsername() + " already exist in realm " + realm);
+        }
+      }
 
-        Realm realmLoaded = realmProvider.load(realm).get();
-        if (user.getUsername() == null) {
-          // generate id if null
-          boolean idGeneratedAndUnique = false;
-          do {
-            final String id = generateId(true, true, idCreateLength);
-            user.setUsername(id);
-            // unicity requiered at realm level
-            idGeneratedAndUnique =
-                realmLoaded.getUserStorages().stream()
-                    .map(us -> storeProvider.getReaderStore(realm, us.getName()).getUser(id))
-                    .noneMatch(Optional::isPresent);
-          } while (!idGeneratedAndUnique);
-        } else {
-          // check id unicity
-          if (realmLoaded.getUserStorages().stream()
+      // check mail unicity if needed
+      if (Boolean.parseBoolean(
+              realmLoaded
+                  .getProperties()
+                  .getOrDefault(
+                      GlobalKeysConfig.VERIFY_MAIL_UNICITY,
+                      List.of(Boolean.toString(verifyUniqueMail)))
+                  .get(0))
+          && user.getMail() != null
+          && realmLoaded.getUserStorages().stream()
               .map(
                   us ->
-                      storeProvider.getReaderStore(realm, us.getName()).getUser(user.getUsername()))
+                      storeProvider
+                          .getReaderStore(realm, us.getName())
+                          .getUserByMail(user.getMail()))
               .anyMatch(Optional::isPresent)) {
-            throw new UserAlreadyExistException(
-                "User " + user.getUsername() + " already exist in realm " + realm);
-          }
-        }
-
-        // check mail unicity if needed
-        if (Boolean.parseBoolean(
-                realmLoaded
-                    .getProperties()
-                    .getOrDefault(
-                        GlobalKeysConfig.VERIFY_MAIL_UNICITY,
-                        List.of(Boolean.toString(verifyUniqueMail)))
-                    .get(0))
-            && user.getMail() != null
-            && realmLoaded.getUserStorages().stream()
-                .map(
-                    us ->
-                        storeProvider
-                            .getReaderStore(realm, us.getName())
-                            .getUserByMail(user.getMail()))
-                .anyMatch(Optional::isPresent)) {
-          throw new UserAlreadyExistException(
-              "A user has the same mail " + user.getMail() + " in realm " + realm);
-        }
+        throw new UserAlreadyExistException(
+            "A user has the same mail " + user.getMail() + " in realm " + realm);
       }
-
-      ProviderResponse response =
-          storeProvider.getWriterStore(realm, storage).createUser(user, providerRequest);
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          storage,
-          SugoiEventTypeEnum.CREATE_USER,
-          Map.ofEntries(Map.entry(EventKeysConfig.USER, user)));
-
-      // TODO Must be done here because at the provider level we don't have the
-      // readerstore
-      if (!providerRequest.isAsynchronousAllowed()
-          && response.getStatus().equals(ProviderResponseStatus.OK)) {
-        user.setUsername(response.getEntityId());
-        response.setEntity(findById(realm, storage, user.getUsername(), false));
-      }
-      return response;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          storage,
-          SugoiEventTypeEnum.CREATE_USER_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.USER, user),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
     }
+
+    ProviderResponse response =
+        storeProvider.getWriterStore(realm, storage).createUser(user, providerRequest);
+
+    // TODO Must be done here because at the provider level we don't have the
+    // readerstore
+    if (!providerRequest.isAsynchronousAllowed()
+        && response.getStatus().equals(ProviderResponseStatus.OK)) {
+      user.setUsername(response.getEntityId());
+      response.setEntity(findById(realm, storage, user.getUsername(), false));
+    }
+    return response;
   }
 
   @Override
@@ -196,109 +173,53 @@ public class UserServiceImpl implements UserService {
       }
     }
 
-    try {
-      ProviderResponse response =
-          storeProvider.getWriterStore(realm, storage).updateUser(user, providerRequest);
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          storage,
-          SugoiEventTypeEnum.UPDATE_USER,
-          Map.ofEntries(Map.entry(EventKeysConfig.USER, user)));
-      if (!providerRequest.isAsynchronousAllowed()
-          && response.getStatus().equals(ProviderResponseStatus.OK)) {
-        response.setEntity(findById(realm, storage, user.getUsername(), false));
-      }
-      return response;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          storage,
-          SugoiEventTypeEnum.UPDATE_USER_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.USER, user),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
+    ProviderResponse response =
+        storeProvider.getWriterStore(realm, storage).updateUser(user, providerRequest);
+    if (!providerRequest.isAsynchronousAllowed()
+        && response.getStatus().equals(ProviderResponseStatus.OK)) {
+      response.setEntity(findById(realm, storage, user.getUsername(), false));
     }
+    return response;
   }
 
   @Override
   public ProviderResponse delete(
       String realmName, String storage, String id, ProviderRequest providerRequest) {
-    try {
-      ProviderResponse response =
-          storeProvider.getWriterStore(realmName, storage).deleteUser(id, providerRequest);
-      sugoiEventPublisher.publishCustomEvent(
-          realmName,
-          storage,
-          SugoiEventTypeEnum.DELETE_USER,
-          Map.ofEntries(Map.entry(EventKeysConfig.USER_ID, id)));
-      return response;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realmName,
-          storage,
-          SugoiEventTypeEnum.DELETE_USER_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.USER_ID, id),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      if (e instanceof UserNotFoundException) {
-        throw (UserNotFoundException) e;
-      } else {
-        throw e;
-      }
-    }
+    return storeProvider.getWriterStore(realmName, storage).deleteUser(id, providerRequest);
   }
 
   @Override
   public User findById(
       String realmName, String storage, String id, boolean externalResolutionAllowed) {
-    try {
-      Realm realm =
-          realmProvider.load(realmName).orElseThrow(() -> new RealmNotFoundException(realmName));
-      UserStorage userStorage =
-          storage == null
-              ? realm.getUserStorages().stream()
-                  .filter(us -> exist(realmName, us.getName(), id))
-                  .findFirst()
-                  .orElseThrow(() -> new UserNotFoundException(realmName, id))
-              : realm
-                  .getUserStorageByName(storage)
-                  .orElseThrow(() -> new UserStorageNotFoundException(realmName, storage));
-      User user =
-          storeProvider
-              .getReaderStore(realmName, userStorage.getName())
-              .getUser(id)
-              .orElseThrow(() -> new UserNotFoundException(realmName, userStorage.getName(), id));
-      user.addMetadatas(GlobalKeysConfig.REALM.getName(), realmName.toLowerCase());
-      user.addMetadatas(
-          GlobalKeysConfig.USERSTORAGE.getName(), userStorage.getName().toLowerCase());
-      userStorage
-          .getAddUsDefinedAttributesTransformer(
-              GlobalKeysConfig.USER_USERSTORAGE_DEFINED_ATTRIBUTES)
-          .accept(user);
-      if (externalResolutionAllowed
-          && seeAlsoService != null
-          && realm.getProperties().containsKey(GlobalKeysConfig.SEEALSO_ATTRIBUTES)) {
-        for (String seeAlso : findUserSeeAlsos(realm, user)) {
-          seeAlsoService.decorateWithSeeAlso(user, seeAlso);
-        }
+    Realm realm =
+        realmProvider.load(realmName).orElseThrow(() -> new RealmNotFoundException(realmName));
+    UserStorage userStorage =
+        storage == null
+            ? realm.getUserStorages().stream()
+                .filter(us -> exist(realmName, us.getName(), id))
+                .findFirst()
+                .orElseThrow(() -> new UserNotFoundException(realmName, id))
+            : realm
+                .getUserStorageByName(storage)
+                .orElseThrow(() -> new UserStorageNotFoundException(realmName, storage));
+    User user =
+        storeProvider
+            .getReaderStore(realmName, userStorage.getName())
+            .getUser(id)
+            .orElseThrow(() -> new UserNotFoundException(realmName, userStorage.getName(), id));
+    user.addMetadatas(GlobalKeysConfig.REALM.getName(), realmName.toLowerCase());
+    user.addMetadatas(GlobalKeysConfig.USERSTORAGE.getName(), userStorage.getName().toLowerCase());
+    userStorage
+        .getAddUsDefinedAttributesTransformer(GlobalKeysConfig.USER_USERSTORAGE_DEFINED_ATTRIBUTES)
+        .accept(user);
+    if (externalResolutionAllowed
+        && seeAlsoService != null
+        && realm.getProperties().containsKey(GlobalKeysConfig.SEEALSO_ATTRIBUTES)) {
+      for (String seeAlso : findUserSeeAlsos(realm, user)) {
+        seeAlsoService.decorateWithSeeAlso(user, seeAlso);
       }
-      sugoiEventPublisher.publishCustomEvent(
-          realmName,
-          userStorage.getName(),
-          SugoiEventTypeEnum.FIND_USER_BY_ID,
-          Map.ofEntries(Map.entry(EventKeysConfig.USER_ID, id != null ? id : "")));
-      return user;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realmName,
-          storage,
-          SugoiEventTypeEnum.FIND_USER_BY_ID_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.USER_ID, id != null ? id : ""),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
     }
+    return user;
   }
 
   @Override
@@ -320,74 +241,45 @@ public class UserServiceImpl implements UserService {
                 .get(0)));
     result.setPageSize(pageable.getSize());
 
-    try {
-      if (storage != null) {
-        result =
+    if (storage != null) {
+      result =
+          storeProvider
+              .getReaderStore(realm, storage)
+              .searchUsers(userProperties, pageable, typeRecherche.name());
+      result
+          .getResults()
+          .forEach(
+              user -> {
+                user.addMetadatas(EventKeysConfig.REALM, realm);
+                user.addMetadatas(EventKeysConfig.USERSTORAGE, storage);
+              });
+    } else {
+      for (UserStorage us : r.getUserStorages()) {
+        PageResult<User> temResult =
             storeProvider
-                .getReaderStore(realm, storage)
+                .getReaderStore(realm, us.getName())
                 .searchUsers(userProperties, pageable, typeRecherche.name());
-        result
+        temResult
             .getResults()
             .forEach(
                 user -> {
                   user.addMetadatas(EventKeysConfig.REALM, realm);
-                  user.addMetadatas(EventKeysConfig.USERSTORAGE, storage);
+                  user.addMetadatas(EventKeysConfig.USERSTORAGE, us.getName());
                 });
-      } else {
-        for (UserStorage us : r.getUserStorages()) {
-          PageResult<User> temResult =
-              storeProvider
-                  .getReaderStore(realm, us.getName())
-                  .searchUsers(userProperties, pageable, typeRecherche.name());
-          temResult
-              .getResults()
-              .forEach(
-                  user -> {
-                    user.addMetadatas(EventKeysConfig.REALM, realm);
-                    user.addMetadatas(EventKeysConfig.USERSTORAGE, us.getName());
-                  });
-          result.getResults().addAll(temResult.getResults());
-          result.setTotalElements(
-              temResult.getTotalElements() == -1
-                  ? temResult.getTotalElements()
-                  : result.getTotalElements() + temResult.getTotalElements());
-          result.setSearchToken(temResult.getSearchToken());
-          result.setHasMoreResult(temResult.isHasMoreResult());
-          if (result.getResults().size() >= result.getPageSize()) {
-            sugoiEventPublisher.publishCustomEvent(
-                realm,
-                storage,
-                SugoiEventTypeEnum.FIND_USERS,
-                Map.ofEntries(
-                    Map.entry(EventKeysConfig.USER_PROPERTIES, userProperties),
-                    Map.entry(EventKeysConfig.PAGEABLE, pageable),
-                    Map.entry(EventKeysConfig.TYPE_RECHERCHE, typeRecherche)));
-            return result;
-          }
-          pageable.setSize(pageable.getSize() - result.getTotalElements());
+        result.getResults().addAll(temResult.getResults());
+        result.setTotalElements(
+            temResult.getTotalElements() == -1
+                ? temResult.getTotalElements()
+                : result.getTotalElements() + temResult.getTotalElements());
+        result.setSearchToken(temResult.getSearchToken());
+        result.setHasMoreResult(temResult.isHasMoreResult());
+        if (result.getResults().size() >= result.getPageSize()) {
+          return result;
         }
+        pageable.setSize(pageable.getSize() - result.getTotalElements());
       }
-
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          storage,
-          SugoiEventTypeEnum.FIND_USERS_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.USER_PROPERTIES, userProperties),
-              Map.entry(EventKeysConfig.PAGEABLE, pageable),
-              Map.entry(EventKeysConfig.TYPE_RECHERCHE, typeRecherche),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
     }
-    sugoiEventPublisher.publishCustomEvent(
-        realm,
-        storage,
-        SugoiEventTypeEnum.FIND_USERS,
-        Map.ofEntries(
-            Map.entry(EventKeysConfig.USER_PROPERTIES, userProperties),
-            Map.entry(EventKeysConfig.PAGEABLE, pageable),
-            Map.entry(EventKeysConfig.TYPE_RECHERCHE, typeRecherche)));
+
     return result;
   }
 
@@ -399,32 +291,9 @@ public class UserServiceImpl implements UserService {
       String attributeKey,
       String attribute,
       ProviderRequest providerRequest) {
-    try {
-      ProviderResponse response =
-          storeProvider
-              .getWriterStore(realm, storage)
-              .addAppManagedAttribute(userId, attributeKey, attribute, providerRequest);
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          storage,
-          SugoiEventTypeEnum.ADD_APP_MANAGED_ATTRIBUTES,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.ATTRIBUTE_KEY, attributeKey),
-              Map.entry(EventKeysConfig.ATTRIBUTE_VALUE, attribute),
-              Map.entry(EventKeysConfig.USER_ID, userId)));
-      return response;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          storage,
-          SugoiEventTypeEnum.ADD_APP_MANAGED_ATTRIBUTES_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.ATTRIBUTE_KEY, attributeKey),
-              Map.entry(EventKeysConfig.ATTRIBUTE_VALUE, attribute),
-              Map.entry(EventKeysConfig.USER_ID, userId),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
-    }
+    return storeProvider
+        .getWriterStore(realm, storage)
+        .addAppManagedAttribute(userId, attributeKey, attribute, providerRequest);
   }
 
   @Override
@@ -435,78 +304,39 @@ public class UserServiceImpl implements UserService {
       String attributeKey,
       String attribute,
       ProviderRequest providerRequest) {
-    try {
-      ProviderResponse response =
-          storeProvider
-              .getWriterStore(realm, storage)
-              .deleteAppManagedAttribute(userId, attributeKey, attribute, providerRequest);
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          storage,
-          SugoiEventTypeEnum.DELETE_APP_MANAGED_ATTRIBUTES,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.ATTRIBUTE_KEY, attributeKey),
-              Map.entry(EventKeysConfig.ATTRIBUTE_VALUE, attribute),
-              Map.entry(EventKeysConfig.USER_ID, userId)));
-      return response;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          storage,
-          SugoiEventTypeEnum.DELETE_APP_MANAGED_ATTRIBUTES_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.ATTRIBUTE_KEY, attributeKey),
-              Map.entry(EventKeysConfig.ATTRIBUTE_VALUE, attribute),
-              Map.entry(EventKeysConfig.USER_ID, userId),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
-    }
+    return storeProvider
+        .getWriterStore(realm, storage)
+        .deleteAppManagedAttribute(userId, attributeKey, attribute, providerRequest);
   }
 
   @Override
   public User findByMail(
       String realmName, String storageName, String mail, boolean externalResolutionAllowed) {
-    try {
-      Realm realm =
-          realmProvider.load(realmName).orElseThrow(() -> new RealmNotFoundException(realmName));
-      String nonNullStorage =
-          storageName != null
-              ? storageName
-              : realm.getUserStorages().stream()
-                  .filter(us -> existByMail(realmName, us.getName(), mail))
-                  .findFirst()
-                  .orElseThrow(() -> new UserNotFoundByMailException(realmName, mail))
-                  .getName();
-      User user =
-          storeProvider
-              .getReaderStore(realmName, storageName)
-              .getUserByMail(mail)
-              .orElseThrow(() -> new UserNotFoundByMailException(realmName, nonNullStorage, mail));
-      user.addMetadatas(GlobalKeysConfig.REALM.getName(), realmName.toLowerCase());
-      user.addMetadatas(GlobalKeysConfig.USERSTORAGE.getName(), nonNullStorage.toLowerCase());
-      if (externalResolutionAllowed
-          && seeAlsoService != null
-          && realm.getProperties().containsKey(GlobalKeysConfig.SEEALSO_ATTRIBUTES)) {
-        for (String seeAlso : findUserSeeAlsos(realm, user)) {
-          seeAlsoService.decorateWithSeeAlso(user, seeAlso);
-        }
+    Realm realm =
+        realmProvider.load(realmName).orElseThrow(() -> new RealmNotFoundException(realmName));
+    String nonNullStorage =
+        storageName != null
+            ? storageName
+            : realm.getUserStorages().stream()
+                .filter(us -> existByMail(realmName, us.getName(), mail))
+                .findFirst()
+                .orElseThrow(() -> new UserNotFoundByMailException(realmName, mail))
+                .getName();
+    User user =
+        storeProvider
+            .getReaderStore(realmName, storageName)
+            .getUserByMail(mail)
+            .orElseThrow(() -> new UserNotFoundByMailException(realmName, nonNullStorage, mail));
+    user.addMetadatas(GlobalKeysConfig.REALM.getName(), realmName.toLowerCase());
+    user.addMetadatas(GlobalKeysConfig.USERSTORAGE.getName(), nonNullStorage.toLowerCase());
+    if (externalResolutionAllowed
+        && seeAlsoService != null
+        && realm.getProperties().containsKey(GlobalKeysConfig.SEEALSO_ATTRIBUTES)) {
+      for (String seeAlso : findUserSeeAlsos(realm, user)) {
+        seeAlsoService.decorateWithSeeAlso(user, seeAlso);
       }
-      sugoiEventPublisher.publishCustomEvent(
-          realmName,
-          storageName,
-          SugoiEventTypeEnum.FIND_USER_BY_MAIL,
-          Map.ofEntries(Map.entry(EventKeysConfig.USER_MAIL, mail != null ? mail : "")));
-      return user;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realmName,
-          storageName,
-          SugoiEventTypeEnum.FIND_USER_BY_MAIL_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.USER_MAIL, mail != null ? mail : ""),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
     }
+    return user;
   }
 
   @Override

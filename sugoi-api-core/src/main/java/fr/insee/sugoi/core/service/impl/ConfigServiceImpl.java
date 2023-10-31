@@ -13,9 +13,6 @@
 */
 package fr.insee.sugoi.core.service.impl;
 
-import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
-import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
-import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -24,7 +21,6 @@ import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.exceptions.RealmNotFoundException;
 import java.util.List;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,99 +30,38 @@ public class ConfigServiceImpl implements ConfigService {
 
   @Autowired private RealmProvider realmProvider;
 
-  @Autowired private SugoiEventPublisher sugoiEventPublisher;
-
   @Override
   public Realm getRealm(String name) {
-    try {
-      Realm realm = realmProvider.load(name).orElseThrow(() -> new RealmNotFoundException(name));
-      sugoiEventPublisher.publishCustomEvent(
-          null,
-          null,
-          SugoiEventTypeEnum.FIND_REALM_BY_ID,
-          Map.ofEntries(Map.entry(EventKeysConfig.REALM_NAME, name)));
-      return realm;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          null,
-          null,
-          SugoiEventTypeEnum.FIND_REALM_BY_ID_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.REALM_NAME, name),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
-    }
+    return realmProvider.load(name).orElseThrow(() -> new RealmNotFoundException(name));
   }
 
   @Override
   public List<Realm> getRealms() {
-    try {
-      List<Realm> realms = realmProvider.findAll();
-      sugoiEventPublisher.publishCustomEvent(null, null, SugoiEventTypeEnum.FIND_REALMS, null);
-      return realms;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          null,
-          null,
-          SugoiEventTypeEnum.FIND_REALMS_ERROR,
-          Map.ofEntries(Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
-    }
+    return realmProvider.findAll();
   }
 
   @Override
   public ProviderResponse deleteRealm(String realmName, ProviderRequest providerRequest) {
-    try {
-      ProviderResponse response = realmProvider.deleteRealm(realmName, providerRequest);
-      sugoiEventPublisher.publishCustomEvent(null, null, SugoiEventTypeEnum.DELETE_REALM, null);
-      return response;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          null,
-          null,
-          SugoiEventTypeEnum.DELETE_REALM_ERROR,
-          Map.ofEntries(Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
-    }
+    return realmProvider.deleteRealm(realmName, providerRequest);
   }
 
   @Override
   public ProviderResponse updateRealm(Realm realm, ProviderRequest providerRequest) {
-    try {
-      ProviderResponse response = realmProvider.updateRealm(realm, providerRequest);
-      sugoiEventPublisher.publishCustomEvent(null, null, SugoiEventTypeEnum.UPDATE_REALM, null);
-      if (!providerRequest.isAsynchronousAllowed()
-          && response.getStatus().equals(ProviderResponseStatus.OK)) {
-        response.setEntity(getRealm(realm.getName()));
-      }
-      return response;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          null,
-          null,
-          SugoiEventTypeEnum.UPDATE_REALM_ERROR,
-          Map.ofEntries(Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
+    ProviderResponse response = realmProvider.updateRealm(realm, providerRequest);
+    if (!providerRequest.isAsynchronousAllowed()
+        && response.getStatus().equals(ProviderResponseStatus.OK)) {
+      response.setEntity(getRealm(realm.getName()));
     }
+    return response;
   }
 
   @Override
   public ProviderResponse createRealm(Realm realm, ProviderRequest providerRequest) {
-    try {
-      ProviderResponse response = realmProvider.createRealm(realm, providerRequest);
-      sugoiEventPublisher.publishCustomEvent(null, null, SugoiEventTypeEnum.CREATE_REALM, null);
-      if (!providerRequest.isAsynchronousAllowed()
-          && response.getStatus().equals(ProviderResponseStatus.OK)) {
-        response.setEntity(getRealm(realm.getName()));
-      }
-      return response;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          null,
-          null,
-          SugoiEventTypeEnum.CREATE_REALM_ERROR,
-          Map.ofEntries(Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
+    ProviderResponse response = realmProvider.createRealm(realm, providerRequest);
+    if (!providerRequest.isAsynchronousAllowed()
+        && response.getStatus().equals(ProviderResponseStatus.OK)) {
+      response.setEntity(getRealm(realm.getName()));
     }
+    return response;
   }
 }

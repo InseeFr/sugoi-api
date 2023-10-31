@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
-import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -71,8 +70,6 @@ public class UserServiceTest {
   @MockBean private StoreProvider storeProvider;
 
   @MockBean private RealmProvider realmProvider;
-
-  @MockBean private SugoiEventPublisher sugoiEventPublisher;
 
   @Mock private ReaderStore readerStore1;
 

@@ -14,9 +14,6 @@
 package fr.insee.sugoi.core.service.impl;
 
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
-import fr.insee.sugoi.core.event.configuration.EventKeysConfig;
-import fr.insee.sugoi.core.event.model.SugoiEventTypeEnum;
-import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -33,7 +30,6 @@ import fr.insee.sugoi.model.exceptions.RealmNotFoundException;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,8 +38,6 @@ public class GroupServiceImpl implements GroupService {
 
   @Autowired private StoreProvider storeProvider;
 
-  @Autowired private SugoiEventPublisher sugoiEventPublisher;
-
   @Autowired private UserService userService;
 
   @Autowired private RealmProvider realmProvider;
@@ -51,148 +45,52 @@ public class GroupServiceImpl implements GroupService {
   @Override
   public ProviderResponse create(
       String realm, String appName, Group group, ProviderRequest providerRequest) {
-    try {
-      ProviderResponse response =
-          storeProvider.getWriterStore(realm).createGroup(appName, group, providerRequest);
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          null,
-          SugoiEventTypeEnum.CREATE_GROUP,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.GROUP, group),
-              Map.entry(EventKeysConfig.APPLICATION_NAME, appName)));
-      if (!providerRequest.isAsynchronousAllowed()
-          && response.getStatus().equals(ProviderResponseStatus.OK)) {
-        response.setEntity(findById(realm, appName, group.getName()));
-      }
-      return response;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          null,
-          SugoiEventTypeEnum.CREATE_GROUP_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.GROUP, group),
-              Map.entry(EventKeysConfig.APPLICATION_NAME, appName),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
+    ProviderResponse response =
+        storeProvider.getWriterStore(realm).createGroup(appName, group, providerRequest);
+    if (!providerRequest.isAsynchronousAllowed()
+        && response.getStatus().equals(ProviderResponseStatus.OK)) {
+      response.setEntity(findById(realm, appName, group.getName()));
     }
+    return response;
   }
 
   @Override
   public ProviderResponse delete(
       String realm, String appName, String id, ProviderRequest providerRequest) {
-    try {
-      ProviderResponse response =
-          storeProvider.getWriterStore(realm).deleteGroup(appName, id, providerRequest);
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          null,
-          SugoiEventTypeEnum.DELETE_GROUP,
-          Map.ofEntries(Map.entry(EventKeysConfig.GROUP_ID, id)));
-      return response;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          null,
-          SugoiEventTypeEnum.DELETE_GROUP_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.GROUP_ID, id),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
-    }
+    return storeProvider.getWriterStore(realm).deleteGroup(appName, id, providerRequest);
   }
 
   @Override
   public Group findById(String realm, String appName, String id) {
-    try {
-      Group group =
-          storeProvider
-              .getReaderStore(realm)
-              .getGroup(appName, id)
-              .orElseThrow(() -> new GroupNotFoundException(realm, appName, id));
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          null,
-          SugoiEventTypeEnum.FIND_GROUP_BY_ID,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.GROUP_ID, id != null ? id : ""),
-              Map.entry(EventKeysConfig.APPLICATION_NAME, appName != null ? appName : "")));
-      return group;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          null,
-          SugoiEventTypeEnum.FIND_GROUP_BY_ID_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.GROUP_ID, id != null ? id : ""),
-              Map.entry(EventKeysConfig.APPLICATION_NAME, appName != null ? appName : ""),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
-    }
+    return storeProvider
+        .getReaderStore(realm)
+        .getGroup(appName, id)
+        .orElseThrow(() -> new GroupNotFoundException(realm, appName, id));
   }
 
   @Override
   public PageResult<Group> findByProperties(
       String realm, String appName, Group groupFilter, PageableResult pageableResult) {
-    try {
-      Realm r = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
-      pageableResult.setSizeWithMax(
-          Integer.parseInt(r.getProperties().get(GlobalKeysConfig.GROUPS_MAX_OUTPUT_SIZE).get(0)));
-      PageResult<Group> groups =
-          storeProvider
-              .getReaderStore(realm)
-              .searchGroups(appName, groupFilter, pageableResult, SearchType.AND.name());
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          null,
-          SugoiEventTypeEnum.FIND_GROUPS,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.APPLICATION_NAME, appName),
-              Map.entry(EventKeysConfig.GROUP_FILTER, groupFilter)));
-      return groups;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          null,
-          SugoiEventTypeEnum.FIND_GROUPS_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.APPLICATION_NAME, appName),
-              Map.entry(EventKeysConfig.GROUP_FILTER, groupFilter),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
-    }
+    Realm r = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
+    pageableResult.setSizeWithMax(
+        Integer.parseInt(r.getProperties().get(GlobalKeysConfig.GROUPS_MAX_OUTPUT_SIZE).get(0)));
+    PageResult<Group> groups =
+        storeProvider
+            .getReaderStore(realm)
+            .searchGroups(appName, groupFilter, pageableResult, SearchType.AND.name());
+    return groups;
   }
 
   @Override
   public ProviderResponse update(
       String realm, String appName, Group group, ProviderRequest providerRequest) {
-    try {
-      ProviderResponse response =
-          storeProvider.getWriterStore(realm).updateGroup(appName, group, providerRequest);
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          null,
-          SugoiEventTypeEnum.UPDATE_GROUP,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.GROUP, group),
-              Map.entry(EventKeysConfig.APPLICATION_NAME, appName)));
-      if (!providerRequest.isAsynchronousAllowed()
-          && response.getStatus().equals(ProviderResponseStatus.OK)) {
-        response.setEntity(findById(realm, appName, group.getName()));
-      }
-      return response;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          null,
-          SugoiEventTypeEnum.UPDATE_GROUP,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.GROUP, group),
-              Map.entry(EventKeysConfig.APPLICATION_NAME, appName),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
+    ProviderResponse response =
+        storeProvider.getWriterStore(realm).updateGroup(appName, group, providerRequest);
+    if (!providerRequest.isAsynchronousAllowed()
+        && response.getStatus().equals(ProviderResponseStatus.OK)) {
+      response.setEntity(findById(realm, appName, group.getName()));
     }
+    return response;
   }
 
   @Override
@@ -203,36 +101,13 @@ public class GroupServiceImpl implements GroupService {
       String appName,
       String groupName,
       ProviderRequest providerRequest) {
-    try {
-      if (storage == null) {
-        User user = userService.findById(realm, null, userId, false);
-        storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName());
-      }
-      ProviderResponse response =
-          storeProvider
-              .getWriterStore(realm, storage)
-              .addUserToGroup(appName, groupName, userId, providerRequest);
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          storage,
-          SugoiEventTypeEnum.ADD_USER_TO_GROUP,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.USER, userId),
-              Map.entry(EventKeysConfig.APPLICATION_NAME, appName),
-              Map.entry(EventKeysConfig.GROUP_NAME, groupName)));
-      return response;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          storage,
-          SugoiEventTypeEnum.ADD_USER_TO_GROUP_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.USER, userId),
-              Map.entry(EventKeysConfig.APPLICATION_NAME, appName),
-              Map.entry(EventKeysConfig.GROUP_NAME, groupName),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
+    if (storage == null) {
+      User user = userService.findById(realm, null, userId, false);
+      storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName());
     }
+    return storeProvider
+        .getWriterStore(realm, storage)
+        .addUserToGroup(appName, groupName, userId, providerRequest);
   }
 
   @Override
@@ -243,36 +118,13 @@ public class GroupServiceImpl implements GroupService {
       String appName,
       String groupName,
       ProviderRequest providerRequest) {
-    try {
-      if (storage == null) {
-        User user = userService.findById(realm, null, userId, false);
-        storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName());
-      }
-      ProviderResponse response =
-          storeProvider
-              .getWriterStore(realm, storage)
-              .deleteUserFromGroup(appName, groupName, userId, providerRequest);
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          null,
-          SugoiEventTypeEnum.DELETE_USER_FROM_GROUP,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.USER, userId),
-              Map.entry(EventKeysConfig.APPLICATION_NAME, appName),
-              Map.entry(EventKeysConfig.GROUP_NAME, groupName)));
-      return response;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          null,
-          SugoiEventTypeEnum.DELETE_USER_FROM_GROUP,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.USER, userId),
-              Map.entry(EventKeysConfig.APPLICATION_NAME, appName),
-              Map.entry(EventKeysConfig.GROUP_NAME, groupName),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
+    if (storage == null) {
+      User user = userService.findById(realm, null, userId, false);
+      storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName());
     }
+    return storeProvider
+        .getWriterStore(realm, storage)
+        .deleteUserFromGroup(appName, groupName, userId, providerRequest);
   }
 
   @Override
@@ -282,34 +134,13 @@ public class GroupServiceImpl implements GroupService {
       String userId,
       String applicationName,
       ProviderRequest providerRequest) {
-    try {
-      if (storage == null) {
-        User user = userService.findById(realm, null, userId, false);
-        storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName());
-      }
-      ProviderResponse response =
-          storeProvider
-              .getWriterStore(realm, storage)
-              .addUserToGroupManager(applicationName, userId, providerRequest);
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          storage,
-          SugoiEventTypeEnum.ADD_USER_TO_GROUP_MANAGER,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.USER, userId),
-              Map.entry(EventKeysConfig.APPLICATION_NAME, applicationName)));
-      return response;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          storage,
-          SugoiEventTypeEnum.ADD_USER_TO_GROUP_MANAGER_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.USER, userId),
-              Map.entry(EventKeysConfig.APPLICATION_NAME, applicationName),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
+    if (storage == null) {
+      User user = userService.findById(realm, null, userId, false);
+      storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName());
     }
+    return storeProvider
+        .getWriterStore(realm, storage)
+        .addUserToGroupManager(applicationName, userId, providerRequest);
   }
 
   @Override
@@ -319,59 +150,20 @@ public class GroupServiceImpl implements GroupService {
       String userId,
       String applicationName,
       ProviderRequest providerRequest) {
-    try {
-      if (storage == null) {
-        User user = userService.findById(realm, null, userId, false);
-        storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName());
-      }
-      ProviderResponse response =
-          storeProvider
-              .getWriterStore(realm, storage)
-              .deleteUserFromManagerGroup(applicationName, userId, providerRequest);
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          null,
-          SugoiEventTypeEnum.DELETE_USER_FROM_GROUP_MANAGER,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.USER, userId),
-              Map.entry(EventKeysConfig.APPLICATION_NAME, applicationName)));
-      return response;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          null,
-          SugoiEventTypeEnum.DELETE_USER_FROM_GROUP_MANAGER_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.USER, userId),
-              Map.entry(EventKeysConfig.APPLICATION_NAME, applicationName),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
+    if (storage == null) {
+      User user = userService.findById(realm, null, userId, false);
+      storage = (String) user.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName());
     }
+    return storeProvider
+        .getWriterStore(realm, storage)
+        .deleteUserFromManagerGroup(applicationName, userId, providerRequest);
   }
 
   @Override
   public Group getManagerGroup(String realm, String applicationName) {
-    try {
-      Group group =
-          storeProvider
-              .getReaderStore(realm)
-              .getManagerGroup(applicationName)
-              .orElseThrow(() -> new ManagerGroupNotFoundException(realm, applicationName));
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          null,
-          SugoiEventTypeEnum.GET_GROUP_MANAGER,
-          Map.ofEntries(Map.entry(EventKeysConfig.APPLICATION_NAME, applicationName)));
-      return group;
-    } catch (Exception e) {
-      sugoiEventPublisher.publishCustomEvent(
-          realm,
-          null,
-          SugoiEventTypeEnum.GET_GROUP_MANAGER_ERROR,
-          Map.ofEntries(
-              Map.entry(EventKeysConfig.APPLICATION_NAME, applicationName),
-              Map.entry(EventKeysConfig.ERROR, e.toString())));
-      throw e;
-    }
+    return storeProvider
+        .getReaderStore(realm)
+        .getManagerGroup(applicationName)
+        .orElseThrow(() -> new ManagerGroupNotFoundException(realm, applicationName));
   }
 }
