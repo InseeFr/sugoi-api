@@ -1,3 +1,17 @@
+# 2.1.0
+
+
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 2.0.2
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 2.0.1
+- [LOG] :loud_sound: Improve log by watching controllers
+- [REF] :recycle: Refactor advice controller
+- [LOG] :loud_sound: User rights log is only debug
+- [UP] :arrow_up: Move google-java-format to 1.15.0
+- [REL] :rocket: release version 2.0.2
+
+
 # 2.0.2
 
 
