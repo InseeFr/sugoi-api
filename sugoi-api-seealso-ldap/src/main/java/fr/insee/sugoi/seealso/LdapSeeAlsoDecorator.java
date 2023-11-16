@@ -13,14 +13,14 @@
 */
 package fr.insee.sugoi.seealso;
 
-import com.unboundid.ldap.sdk.Attribute;
-import com.unboundid.ldap.sdk.LDAPConnection;
-import com.unboundid.ldap.sdk.LDAPConnectionPool;
-import com.unboundid.ldap.sdk.LDAPException;
-import com.unboundid.ldap.sdk.LDAPURL;
-import com.unboundid.ldap.sdk.SearchResultEntry;
+import com.unboundid.ldap.sdk.*;
+import com.unboundid.util.ssl.AggregateTrustManager;
+import com.unboundid.util.ssl.JVMDefaultTrustManager;
+import com.unboundid.util.ssl.SSLUtil;
 import fr.insee.sugoi.core.seealso.SeeAlsoCredentialsConfiguration.SeeAlsoCredential;
 import fr.insee.sugoi.core.seealso.SeeAlsoDecorator;
+import fr.insee.sugoi.model.exceptions.LdapDecoratorException;
+import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +65,7 @@ public class LdapSeeAlsoDecorator implements SeeAlsoDecorator {
   private SearchResultEntry getResourceFromLdapURL(String url) {
     try {
       LDAPURL ldapUrl = new LDAPURL(url);
-      return getConnectionByHost(ldapUrl.getHost(), ldapUrl.getPort())
+      return getConnectionByHost(ldapUrl.getHost(), ldapUrl.getPort(), ldapUrl.getScheme())
           .searchForEntry(ldapUrl.toSearchRequest());
     } catch (LDAPException e) {
       logger.error("Ldap request for seealso failed with : {}", e.getLocalizedMessage());
@@ -83,14 +83,28 @@ public class LdapSeeAlsoDecorator implements SeeAlsoDecorator {
     }
   }
 
-  private LDAPConnectionPool getConnectionByHost(String host, int port) throws LDAPException {
-    if (!ldapConnectionByHost.containsKey(host + "_" + port)) {
-      ldapConnectionByHost.put(host + "_" + port, createHostConnection(host, port));
+  private LDAPConnectionPool getConnectionByHost(String host, int port, String protocol)
+      throws LDAPException {
+    if (!ldapConnectionByHost.containsKey(host + "_" + port + "_" + protocol)) {
+      ldapConnectionByHost.put(
+          host + "_" + port + "_" + protocol, createHostConnection(host, port, protocol));
     }
-    return ldapConnectionByHost.get(host + "_" + port);
+    return ldapConnectionByHost.get(host + "_" + port + "_" + protocol);
   }
 
-  private LDAPConnectionPool createHostConnection(String host, int port) throws LDAPException {
+  private LDAPConnectionPool createHostConnection(String host, int port, String hostProtocol)
+      throws LDAPException {
+    switch (hostProtocol) {
+      case "ldap":
+        return createLdapHostConnection(host, port);
+      case "ldaps":
+        return createLdapsHostConnection(host, port);
+      default:
+        throw new LdapDecoratorException("Unimplemented host protocol for host " + host);
+    }
+  }
+
+  private LDAPConnectionPool createLdapHostConnection(String host, int port) throws LDAPException {
     if (credentialsByDomain != null && credentialsByDomain.containsKey(host)) {
       try (LDAPConnection initialConnection =
           new LDAPConnection(
@@ -105,5 +119,39 @@ public class LdapSeeAlsoDecorator implements SeeAlsoDecorator {
         return new LDAPConnectionPool(initialConnection, 10);
       }
     }
+  }
+
+  private LDAPConnectionPool createLdapsHostConnection(String host, int port) {
+    if (credentialsByDomain != null && credentialsByDomain.containsKey(host)) {
+      try (LDAPConnection initialConnection =
+          new LDAPConnection(
+              getSslUtil().createSSLSocketFactory(),
+              host,
+              port,
+              credentialsByDomain.get(host).getUsername(),
+              credentialsByDomain.get(host).getPassword())) {
+        return new LDAPConnectionPool(initialConnection, 10);
+      } catch (GeneralSecurityException e) {
+        throw new LdapDecoratorException("SSL context for ldap decorator is misconfigured", e);
+      } catch (LDAPException e) {
+        throw new LdapDecoratorException(
+            "Ldap exception during pool creation for seeAlso resolution", e);
+      }
+    } else {
+      try (LDAPConnection initialConnection =
+          new LDAPConnection(getSslUtil().createSSLSocketFactory(), host, port)) {
+        return new LDAPConnectionPool(initialConnection, 10);
+      } catch (GeneralSecurityException e) {
+        throw new LdapDecoratorException("SSL context for ldap decorator is misconfigured", e);
+      } catch (LDAPException e) {
+        throw new LdapDecoratorException("Ldap during pool creation for seeAlso resolution", e);
+      }
+    }
+  }
+
+  private SSLUtil getSslUtil() {
+    AggregateTrustManager trustManager =
+        new AggregateTrustManager(false, JVMDefaultTrustManager.getInstance());
+    return new SSLUtil(trustManager);
   }
 }
