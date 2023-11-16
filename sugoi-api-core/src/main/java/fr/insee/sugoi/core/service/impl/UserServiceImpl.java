@@ -452,4 +452,9 @@ public class UserServiceImpl implements UserService {
   private boolean existByMail(String realm, String userStorage, String mail) {
     return storeProvider.getReaderStore(realm, userStorage).getUserByMail(mail).isPresent();
   }
+
+  @Override
+  public PageResult<User> findWithScimFilter(String scimFilter, PageableResult pageable) {
+    return null;
+  }
 }

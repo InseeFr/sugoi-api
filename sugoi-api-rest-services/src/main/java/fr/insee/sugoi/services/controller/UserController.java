@@ -978,4 +978,38 @@ public class UserController {
         transactionId,
         authentication);
   }
+
+    public ResponseEntity<?> getUsersByFilter(
+            @Parameter(description = "Filter on attributes ", required = false)
+            @RequestParam(name = "scimFilter", required = false)
+            String scimFilter,
+            @Parameter(description = "Expected size of result", required = false)
+            @RequestParam(name = "size", defaultValue = "20")
+            int size,
+            @Parameter(description = "Offset to apply when searching", required = false)
+            @RequestParam(name = "offset", required = false, defaultValue = "0")
+            int offset,
+            @Parameter(description = "Token to continue a previous search", required = false)
+            @RequestParam(name = "searchToken", required = false)
+            String searchCookie) {
+
+        // set the user which will serve as a model to retrieve the matching users
+        // set the page to maintain the search request pagination
+        PageableResult pageable = new PageableResult(size, offset, searchCookie);
+
+        PageResult<User> foundUsers = userService.findWithScimFilter(scimFilter,pageable);
+
+
+        if (foundUsers.isHasMoreResult()) {
+            URI location =
+                    ServletUriComponentsBuilder.fromCurrentRequest()
+                            .replaceQueryParam("searchToken", foundUsers.getSearchToken())
+                            .build()
+                            .toUri();
+            return ResponseEntity.status(HttpStatus.OK)
+                    .header(HttpHeaders.LOCATION, location.toString())
+                    .body(foundUsers);
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).body(foundUsers);
+        }
 }

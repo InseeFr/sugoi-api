@@ -161,4 +161,6 @@ public interface UserService {
    * @return true if userId exists on realm/userstorage, else false
    */
   boolean exist(String realm, String userStorage, String userId);
+
+    PageResult<User> findWithScimFilter(String scimFilter, PageableResult pageable);
 }
