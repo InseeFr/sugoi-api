@@ -84,7 +84,9 @@ public class LdapSeeAlsoDecorator implements SeeAlsoDecorator {
   }
 
   private LDAPConnectionPool getConnectionByHost(String host, int port) throws LDAPException {
-    ldapConnectionByHost.putIfAbsent(host + "_" + port, createHostConnection(host, port));
+    if (!ldapConnectionByHost.containsKey(host + "_" + port)) {
+      ldapConnectionByHost.put(host + "_" + port, createHostConnection(host, port));
+    }
     return ldapConnectionByHost.get(host + "_" + port);
   }
 
