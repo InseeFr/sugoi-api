@@ -39,7 +39,7 @@ public class LdapSeeAlsoDecoratorBadAuthentTest {
   public void requestWithBadCredentialsShouldFail() {
     Object res =
         ldapSeeAlsoDecorator.getResourceFromUrl(
-            "ldap://localhost:10389/uid=testc,ou=contacts,ou=clients_domaine1,o=insee,c=fr", "cn");
+            "ldap://localhost:10389/uid=testc,ou=contacts,ou=clients_domaine2,o=insee,c=fr", "cn");
     assertThat("Resource should be null", res, is(nullValue()));
   }
 }
