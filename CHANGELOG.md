@@ -1,3 +1,13 @@
+# 2.1.1
+
+
+- [ENH] :sparkles: add ldaps connexion to see also decorator
+- [BUG] :bug: Hotfix connection pooling created though already exists decorator
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 2.1.0
+- [REL] :rocket: release version 2.1.0
+
+
 # 2.1.0
 
 
