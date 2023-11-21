@@ -15,9 +15,11 @@ package fr.insee.sugoi.ldap;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.*;
+import fr.insee.sugoi.model.exceptions.MultipleUserWithSameMailException;
 import fr.insee.sugoi.model.fixtures.StoreMappingFixture;
 import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
@@ -370,5 +372,45 @@ public class LdapReaderStoreTest {
         "Should have hasPassword to false",
         ldapReaderStore.getUser("agarder").get().getAttributes().get("hasPassword"),
         is(false));
+  }
+
+  @Test
+  @DisplayName(
+      "Given a user which mail is unique in the realm"
+          + "the user should be retrievable via its mail")
+  public void getUserByMailTest() {
+    assertThat(
+        "Should be the user mail1",
+        ldapReaderStore.getUserByMail("userwithuniqueemail@insee.fr").get().getUsername(),
+        is("mail1"));
+  }
+
+  @Test
+  @DisplayName(
+      "Given a user which mail is unique in the realm "
+          + "even though his mail is a sub of another user mail "
+          + "the user should be retrievable via its mail")
+  public void getUserByMailWithSubMailTest() {
+    assertThat(
+        "Should be the user mailsub",
+        ldapReaderStore.getUserByMail("userwithsubemail@insee.fr").get().getUsername(),
+        is("mailsub"));
+  }
+
+  @Test
+  @DisplayName("Given we search a user by a mail that does not exist, " + "no user should be given")
+  public void getNoneExistingUserByMailTest() {
+    assertThat(
+        "Should not get a user",
+        ldapReaderStore.getUserByMail("notexistingmail@insee.fr").isEmpty(),
+        is(true));
+  }
+
+  @Test
+  @DisplayName("Given several users have the same mail, " + "an exception should be raised")
+  public void getConflictingMailUserTest() {
+    assertThrows(
+        MultipleUserWithSameMailException.class,
+        () -> ldapReaderStore.getUserByMail("conflictingmail@insee.fr"));
   }
 }
