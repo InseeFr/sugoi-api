@@ -366,11 +366,15 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     logger.debug("Searching user with mail {}", mail);
     User searchedUser = new User();
     searchedUser.setMail(mail);
-    PageResult<User> users =
-        searchUsers(searchedUser, new PageableResult(2, 0, null), SearchType.OR.name());
+    List<User> users =
+        searchUsers(searchedUser, new PageableResult(2, 0, null), SearchType.OR.name())
+            .getResults()
+            .stream()
+            .filter(u -> u.getMail().equalsIgnoreCase(mail))
+            .collect(Collectors.toList());
     User user = null;
-    if (users.getResults().size() == 1) {
-      user = users.getResults().get(0);
+    if (users.size() == 1) {
+      user = users.get(0);
       if (user.getAddress() != null && user.getAddress().getId() != null) {
         PostalAddress address = getAddress(user.getAddress().getId());
         if (address != null) {
@@ -381,7 +385,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       if (user.getOrganization() != null) {
         user.setOrganization(getOrganization(user.getOrganization().getIdentifiant()).orElse(null));
       }
-    } else if (users.getResults().size() > 1) {
+    } else if (users.size() > 1) {
       throw new MultipleUserWithSameMailException(mail);
     }
     return Optional.ofNullable(user);

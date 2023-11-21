@@ -397,6 +397,61 @@ pwdReset: false
 uid: havepwdreset
 cn: havepwdreset
 
+dn: uid=mail1,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+uid: mail1
+cn: mail1
+mail: userwithuniqueemail@insee.fr
+
+dn: uid=mailsub,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+uid: mailsub
+cn: mailsub
+mail: userwithsubemail@insee.fr
+
+dn: uid=mailext,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+uid: mailext
+cn: mailext
+mail: extuserwithsubemail@insee.fr
+
+dn: uid=mailconflict1,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+uid: mailconflict1
+cn: mailconflict1
+mail: conflictingmail@insee.fr
+
+dn: uid=mailconflict2,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+uid: mailconflict2
+cn: mailconflict2
+mail: conflictingmail@insee.fr
+
 dn: uid=testo,ou=organisations,ou=clients_domaine1,o=insee,c=fr
 objectClass: top
 objectClass: inseeOrganisation
