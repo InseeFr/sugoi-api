@@ -15,21 +15,20 @@ package fr.insee.sugoi.ldap.utils;
 
 import com.unboundid.ldap.sdk.BindResult;
 import com.unboundid.ldap.sdk.LDAPConnection;
-import com.unboundid.ldap.sdk.LDAPConnectionPool;
 import com.unboundid.ldap.sdk.LDAPException;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.model.RealmConfigKeys;
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.stereotype.Component;
 
-@Component
 public class LdapFactory {
 
-  private static final Map<String, LDAPConnectionPool> openLdapPoolConnection = new HashMap<>();
+  private static final Map<String, RetriableLdapConnectionPool> openLdapPoolConnection =
+      new HashMap<>();
   private static final Map<String, String> openLdapPoolConnectionConfig = new HashMap<>();
   private static final Map<String, String> openLdapMonoConnectionConfig = new HashMap<>();
-  private static final Map<String, LDAPConnection> openLdapMonoConnection = new HashMap<>();
+  private static final Map<String, RetriableLdapConnection> openLdapMonoConnection =
+      new HashMap<>();
 
   /**
    * Give an unauthenticated Ldap Connection Pool
@@ -38,7 +37,7 @@ public class LdapFactory {
    * @return
    * @throws LDAPException
    */
-  public static LDAPConnectionPool getConnectionPool(Map<RealmConfigKeys, String> config)
+  public static RetriableLdapConnectionPool getConnectionPool(Map<RealmConfigKeys, String> config)
       throws LDAPException {
     // Check if a ldap connection pool already exist for this userStorage and create
     // it if it doesn't exist
@@ -61,25 +60,22 @@ public class LdapFactory {
       }
       LDAPConnection ldapConnection =
           new LDAPConnection(
-              config.get(LdapConfigKeys.URL), Integer.valueOf(config.get(LdapConfigKeys.PORT)));
+              config.get(LdapConfigKeys.URL), Integer.parseInt(config.get(LdapConfigKeys.PORT)));
       setConnectionTimeout(ldapConnection, config);
       openLdapPoolConnection.put(
           name,
-          new LDAPConnectionPool(
-              ldapConnection, Integer.valueOf(config.get(LdapConfigKeys.POOL_SIZE))));
+          new RetriableLdapConnectionPool(
+              ldapConnection,
+              Integer.parseInt(config.get(LdapConfigKeys.POOL_SIZE)),
+              Integer.parseInt(config.get(LdapConfigKeys.MAX_RETRIES))));
       // Only put key if ldap connection correctly open
       openLdapPoolConnectionConfig.put(key, name);
     }
     return openLdapPoolConnection.get(name);
   }
 
-  public static LDAPConnection getSingleConnection(Map<RealmConfigKeys, String> config)
+  public static RetriableLdapConnection getSingleConnection(Map<RealmConfigKeys, String> config)
       throws LDAPException {
-    return getSingleConnection(config, false);
-  }
-
-  public static LDAPConnection getSingleConnection(
-      Map<RealmConfigKeys, String> config, boolean forceErase) throws LDAPException {
     String key =
         config.get(LdapConfigKeys.REALM_NAME)
             + "_"
@@ -93,16 +89,11 @@ public class LdapFactory {
             + config.get(LdapConfigKeys.USERSTORAGE_NAME)
             + "_R";
 
-    if (!openLdapMonoConnectionConfig.containsKey(key) || forceErase) {
-      if (openLdapMonoConnection.containsKey(name) && openLdapMonoConnection.get(name) != null
-          || forceErase) {
+    if (!openLdapMonoConnectionConfig.containsKey(key)) {
+      if (openLdapMonoConnection.containsKey(name) && openLdapMonoConnection.get(name) != null) {
         openLdapMonoConnection.get(name).close();
       }
-      LDAPConnection ldapConnection =
-          new LDAPConnection(
-              config.get(LdapConfigKeys.URL), Integer.valueOf(config.get(LdapConfigKeys.PORT)));
-      setConnectionTimeout(ldapConnection, config);
-      openLdapMonoConnection.put(name, ldapConnection);
+      openLdapMonoConnection.put(name, new RetriableLdapConnection(config));
       // Only put key if ldap connection correctly open
       openLdapMonoConnectionConfig.put(key, name);
     }
@@ -116,7 +107,7 @@ public class LdapFactory {
    * @return
    * @throws LDAPException
    */
-  public static LDAPConnectionPool getConnectionPoolAuthenticated(
+  public static RetriableLdapConnectionPool getConnectionPoolAuthenticated(
       Map<RealmConfigKeys, String> config) throws LDAPException {
     // Check if a ldap connection pool already exist for this userStorage and create
     // it if it doesn't exist
@@ -140,27 +131,24 @@ public class LdapFactory {
       LDAPConnection ldapConnection =
           new LDAPConnection(
               config.get(LdapConfigKeys.URL),
-              Integer.valueOf(config.get(LdapConfigKeys.PORT)),
+              Integer.parseInt(config.get(LdapConfigKeys.PORT)),
               config.get(LdapConfigKeys.USERNAME),
               config.get(LdapConfigKeys.PASSWORD));
       setConnectionTimeout(ldapConnection, config);
       openLdapPoolConnection.put(
           name,
-          new LDAPConnectionPool(
-              ldapConnection, Integer.valueOf(config.get(LdapConfigKeys.POOL_SIZE))));
+          new RetriableLdapConnectionPool(
+              ldapConnection,
+              Integer.parseInt(config.get(LdapConfigKeys.POOL_SIZE)),
+              Integer.parseInt(config.get(LdapConfigKeys.MAX_RETRIES))));
       // Only put key if ldap connection correctly open
       openLdapPoolConnectionConfig.put(key, name);
     }
     return openLdapPoolConnection.get(name);
   }
 
-  public static LDAPConnection getSingleConnectionAuthenticated(Map<RealmConfigKeys, String> config)
-      throws LDAPException {
-    return getSingleConnectionAuthenticated(config, false);
-  }
-
-  public static LDAPConnection getSingleConnectionAuthenticated(
-      Map<RealmConfigKeys, String> config, boolean forceErase) throws LDAPException {
+  public static RetriableLdapConnection getSingleConnectionAuthenticated(
+      Map<RealmConfigKeys, String> config) throws LDAPException {
     String name =
         config.get(LdapConfigKeys.REALM_NAME)
             + "_"
@@ -173,19 +161,11 @@ public class LdapFactory {
             + "_"
             + config.hashCode()
             + "_RW";
-    if (!openLdapMonoConnectionConfig.containsKey(key) || forceErase) {
-      if (openLdapMonoConnection.containsKey(name) && openLdapMonoConnection.get(name) != null
-          || forceErase) {
+    if (!openLdapMonoConnectionConfig.containsKey(key)) {
+      if (openLdapMonoConnection.containsKey(name) && openLdapMonoConnection.get(name) != null) {
         openLdapMonoConnection.get(name).close();
       }
-      LDAPConnection ldapConnection =
-          new LDAPConnection(
-              config.get(LdapConfigKeys.URL),
-              Integer.valueOf(config.get(LdapConfigKeys.PORT)),
-              config.get(LdapConfigKeys.USERNAME),
-              config.get(LdapConfigKeys.PASSWORD));
-      setConnectionTimeout(ldapConnection, config);
-      openLdapMonoConnection.put(name, ldapConnection);
+      openLdapMonoConnection.put(name, new RetriableLdapConnection(config));
       // Only put key if ldap connection correctly open
       openLdapMonoConnectionConfig.put(key, name);
     }

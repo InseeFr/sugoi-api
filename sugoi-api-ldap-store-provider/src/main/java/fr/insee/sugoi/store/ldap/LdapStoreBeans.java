@@ -95,6 +95,9 @@ public class LdapStoreBeans {
   @Value("#{'${fr.insee.sugoi.ldap.default.application-mapping:name:ou,String,rw}'.split(';')}")
   private List<String> defaultApplicationMapping;
 
+  @Value("${fr.insee.sugoi.config.ldap.default.max-retries:10}")
+  private String maxRetries;
+
   @Bean("LdapReaderStore")
   @Lazy
   @Scope("prototype")
@@ -190,6 +193,12 @@ public class LdapStoreBeans {
                 && !userStorage.getProperties().get(LdapConfigKeys.ADDRESS_OBJECT_CLASSES).isEmpty()
             ? userStorage.getProperties().get(LdapConfigKeys.ADDRESS_OBJECT_CLASSES).get(0)
             : defaultAddressObjectClasses);
+    config.put(
+        LdapConfigKeys.MAX_RETRIES,
+        realm.getProperties().get(LdapConfigKeys.MAX_RETRIES) != null
+                && !realm.getProperties().get(LdapConfigKeys.MAX_RETRIES).isEmpty()
+            ? realm.getProperties().get(LdapConfigKeys.MAX_RETRIES).get(0)
+            : maxRetries);
 
     return config;
   }

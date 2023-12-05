@@ -19,6 +19,7 @@ import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.ldap.utils.LdapFactory;
 import fr.insee.sugoi.ldap.utils.LdapFilter;
 import fr.insee.sugoi.ldap.utils.LdapUtils;
+import fr.insee.sugoi.ldap.utils.RetriableLDAPException;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
@@ -53,10 +54,8 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       if (Boolean.TRUE.equals(
           Boolean.valueOf(config.get(LdapConfigKeys.READ_CONNECTION_AUTHENTICATED)))) {
         this.ldapPoolConnection = LdapFactory.getConnectionPoolAuthenticated(config);
-        this.ldapMonoConnection = LdapFactory.getSingleConnectionAuthenticated(config);
       } else {
         this.ldapPoolConnection = LdapFactory.getConnectionPool(config);
-        this.ldapMonoConnection = LdapFactory.getSingleConnection(config);
       }
       this.config = config;
       userLdapMapper = new UserLdapMapper(config, mappings.get(MappingType.USERMAPPING));
@@ -300,7 +299,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       logger.debug("Fetching {}", dn);
 
       return ldapPoolConnection.getEntry(dn, "+", "*");
-    } catch (LDAPException e) {
+    } catch (RetriableLDAPException e) {
       throw new StoreException("Failed to execute " + dn, e);
     }
   }
@@ -326,25 +325,16 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     if (pageableResult != null) {
       LdapUtils.setRequestControls(searchRequest, pageableResult, config);
     }
-    SearchResult searchResult = null;
+    SearchResult searchResult;
     try {
-      searchResult = ldapMonoConnection.search(searchRequest);
-    } catch (LDAPException e) {
-      if (e.getResultCode().intValue() == ResultCode.SERVER_DOWN_INT_VALUE) {
-        try {
-          if (Boolean.TRUE.equals(
-              Boolean.valueOf(config.get(LdapConfigKeys.READ_CONNECTION_AUTHENTICATED)))) {
-            ldapMonoConnection = LdapFactory.getSingleConnectionAuthenticated(config, true);
-          } else {
-            ldapMonoConnection = LdapFactory.getSingleConnection(config, true);
-          }
-        } catch (LDAPException e1) {
-          throw new StoreException("Search failed", e1);
-        }
-        searchResult = ldapMonoConnection.search(searchRequest);
+      if (Boolean.TRUE.equals(
+          Boolean.valueOf(config.get(LdapConfigKeys.READ_CONNECTION_AUTHENTICATED)))) {
+        searchResult = LdapFactory.getSingleConnectionAuthenticated(config).search(searchRequest);
       } else {
-        throw new StoreException("search failed", e);
+        searchResult = LdapFactory.getSingleConnection(config).search(searchRequest);
       }
+    } catch (LDAPException | RetriableLDAPException e) {
+      throw new StoreException("search failed", e);
     }
     PageResult<R> pageResult = new PageResult<>();
     pageResult.setResults(
