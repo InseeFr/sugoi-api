@@ -13,9 +13,8 @@
 */
 package fr.insee.sugoi.store.ldap;
 
-import com.unboundid.ldap.sdk.LDAPConnection;
-import com.unboundid.ldap.sdk.LDAPConnectionPool;
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
+import fr.insee.sugoi.ldap.utils.RetriableLdapConnectionPool;
 import fr.insee.sugoi.ldap.utils.config.LdapConfigKeys;
 import fr.insee.sugoi.ldap.utils.mapper.AddressLdapMapper;
 import fr.insee.sugoi.ldap.utils.mapper.ApplicationLdapMapper;
@@ -30,9 +29,7 @@ import org.slf4j.LoggerFactory;
 
 public class LdapStore {
 
-  protected LDAPConnectionPool ldapPoolConnection;
-  protected LDAPConnection ldapMonoConnection;
-
+  protected RetriableLdapConnectionPool ldapPoolConnection;
   protected static final Logger logger = LoggerFactory.getLogger(LdapStore.class);
 
   protected UserLdapMapper userLdapMapper;

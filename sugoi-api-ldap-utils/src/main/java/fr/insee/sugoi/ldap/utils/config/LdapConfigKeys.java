@@ -36,7 +36,8 @@ public enum LdapConfigKeys implements RealmConfigKeys {
   ADDRESS_OBJECT_CLASSES("address_object_classes"),
   USERSTORAGE_NAME("userstorage_name"),
   READ_CONNECTION_AUTHENTICATED("read_connection_authenticated"),
-  LDAP_CONNECTION_TIMEOUT("ldap_connection_timeout");
+  LDAP_CONNECTION_TIMEOUT("ldap_connection_timeout"),
+  MAX_RETRIES("max_retries");
 
   private String name;
 
