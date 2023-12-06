@@ -1,3 +1,12 @@
+# 2.1.2
+
+
+- [BUG] :bug: Fix max time before a connection is dropped from ldap connection pool
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 2.1.1
+- [REL] :rocket: release version 2.1.1
+
+
 # 2.1.1
 
 
