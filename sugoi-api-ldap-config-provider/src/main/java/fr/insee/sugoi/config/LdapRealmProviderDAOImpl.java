@@ -107,6 +107,9 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
   @Value("${fr.insee.sugoi.config.ldap.default.sortKey:}")
   private String defaultSortKey;
 
+  @Value("${fr.insee.sugoi.config.ldap.default.max-pool-connection-age:60000}")
+  private String maxPoolConnectionAge;
+
   @Autowired UiMappingService uiMappingService;
 
   private static final Logger logger = LoggerFactory.getLogger(LdapRealmProviderDAOImpl.class);
@@ -341,6 +344,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
           config.put(LdapConfigKeys.PORT, String.valueOf(port));
           config.put(LdapConfigKeys.POOL_SIZE, defaultPoolSize);
           config.put(LdapConfigKeys.LDAP_CONNECTION_TIMEOUT, connectionTimeout);
+          config.put(LdapConfigKeys.MAX_POOL_CONNECTION_AGE, maxPoolConnectionAge);
           ldapConnectionPool = LdapFactory.getConnectionPool(config);
         }
       }
@@ -361,6 +365,7 @@ public class LdapRealmProviderDAOImpl implements RealmProvider {
         config.put(LdapConfigKeys.USERNAME, defaultUsername);
         config.put(LdapConfigKeys.PASSWORD, defaultPassword);
         config.put(LdapConfigKeys.LDAP_CONNECTION_TIMEOUT, connectionTimeout);
+        config.put(LdapConfigKeys.MAX_POOL_CONNECTION_AGE, maxPoolConnectionAge);
         ldapConnectionPool = LdapFactory.getConnectionPoolAuthenticated(config);
       }
       return ldapConnectionPool;

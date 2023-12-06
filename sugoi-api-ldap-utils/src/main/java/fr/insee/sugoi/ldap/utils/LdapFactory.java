@@ -61,12 +61,14 @@ public class LdapFactory {
       }
       LDAPConnection ldapConnection =
           new LDAPConnection(
-              config.get(LdapConfigKeys.URL), Integer.valueOf(config.get(LdapConfigKeys.PORT)));
+              config.get(LdapConfigKeys.URL), Integer.parseInt(config.get(LdapConfigKeys.PORT)));
       setConnectionTimeout(ldapConnection, config);
-      openLdapPoolConnection.put(
-          name,
+      LDAPConnectionPool ldapConnectionPool =
           new LDAPConnectionPool(
-              ldapConnection, Integer.valueOf(config.get(LdapConfigKeys.POOL_SIZE))));
+              ldapConnection, Integer.parseInt(config.get(LdapConfigKeys.POOL_SIZE)));
+      ldapConnectionPool.setMaxConnectionAgeMillis(
+          Integer.parseInt(config.get(LdapConfigKeys.MAX_POOL_CONNECTION_AGE)));
+      openLdapPoolConnection.put(name, ldapConnectionPool);
       // Only put key if ldap connection correctly open
       openLdapPoolConnectionConfig.put(key, name);
     }
@@ -140,14 +142,16 @@ public class LdapFactory {
       LDAPConnection ldapConnection =
           new LDAPConnection(
               config.get(LdapConfigKeys.URL),
-              Integer.valueOf(config.get(LdapConfigKeys.PORT)),
+              Integer.parseInt(config.get(LdapConfigKeys.PORT)),
               config.get(LdapConfigKeys.USERNAME),
               config.get(LdapConfigKeys.PASSWORD));
       setConnectionTimeout(ldapConnection, config);
-      openLdapPoolConnection.put(
-          name,
+      LDAPConnectionPool ldapConnectionPool =
           new LDAPConnectionPool(
-              ldapConnection, Integer.valueOf(config.get(LdapConfigKeys.POOL_SIZE))));
+              ldapConnection, Integer.parseInt(config.get(LdapConfigKeys.POOL_SIZE)));
+      ldapConnectionPool.setMaxConnectionAgeMillis(
+          Integer.parseInt(config.get(LdapConfigKeys.MAX_POOL_CONNECTION_AGE)));
+      openLdapPoolConnection.put(name, ldapConnectionPool);
       // Only put key if ldap connection correctly open
       openLdapPoolConnectionConfig.put(key, name);
     }
