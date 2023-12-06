@@ -84,6 +84,9 @@ public class LdapStoreBeans {
       "#{'${fr.insee.sugoi.ldap.default.user-mapping:username:uid,String,rw;groups:memberOf,list_group,ro;habilitations:inseeGroupeDefaut,list_habilitation,rw}'.split(';')}")
   private List<String> defaultUserMapping;
 
+  @Value("${fr.insee.sugoi.config.ldap.default.max-pool-connection-age:60000}")
+  private String maxPoolConnectionAge;
+
   @Value(
       "#{'${fr.insee.sugoi.ldap.default.organization-mapping:identifiant:uid,String,rw;address:inseeAdressePostaleDN,address,rw;organization:inseeOrganisationDN,organization,rw}'.split(';')}")
   private List<String> defaultOrganizationMapping;
@@ -157,6 +160,12 @@ public class LdapStoreBeans {
                 && !realm.getProperties().get(LdapConfigKeys.VLV_ENABLED).isEmpty()
             ? realm.getProperties().get(LdapConfigKeys.VLV_ENABLED).get(0)
             : vlvEnabled);
+    config.put(
+        LdapConfigKeys.MAX_POOL_CONNECTION_AGE,
+        realm.getProperties().get(LdapConfigKeys.MAX_POOL_CONNECTION_AGE) != null
+                && !realm.getProperties().get(LdapConfigKeys.MAX_POOL_CONNECTION_AGE).isEmpty()
+            ? realm.getProperties().get(LdapConfigKeys.MAX_POOL_CONNECTION_AGE).get(0)
+            : maxPoolConnectionAge);
     config.put(
         LdapConfigKeys.USER_OBJECT_CLASSES,
         userStorage.getProperties().get(LdapConfigKeys.USER_OBJECT_CLASSES) != null
