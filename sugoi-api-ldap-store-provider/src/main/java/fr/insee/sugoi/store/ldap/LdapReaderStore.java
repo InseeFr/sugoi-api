@@ -330,21 +330,18 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     try {
       searchResult = ldapMonoConnection.search(searchRequest);
     } catch (LDAPException e) {
-      if (e.getResultCode().intValue() == ResultCode.SERVER_DOWN_INT_VALUE) {
-        try {
-          if (Boolean.TRUE.equals(
-              Boolean.valueOf(config.get(LdapConfigKeys.READ_CONNECTION_AUTHENTICATED)))) {
-            ldapMonoConnection = LdapFactory.getSingleConnectionAuthenticated(config, true);
-          } else {
-            ldapMonoConnection = LdapFactory.getSingleConnection(config, true);
-          }
-        } catch (LDAPException e1) {
-          throw new StoreException("Search failed", e1);
+      try {
+        logger.info("Retry connection for error code " + e.getResultCode().intValue());
+        if (Boolean.TRUE.equals(
+            Boolean.valueOf(config.get(LdapConfigKeys.READ_CONNECTION_AUTHENTICATED)))) {
+          ldapMonoConnection = LdapFactory.getSingleConnectionAuthenticated(config, true);
+        } else {
+          ldapMonoConnection = LdapFactory.getSingleConnection(config, true);
         }
-        searchResult = ldapMonoConnection.search(searchRequest);
-      } else {
-        throw new StoreException("search failed", e);
+      } catch (LDAPException e1) {
+        throw new StoreException("Failed to reopen connection", e1);
       }
+      searchResult = ldapMonoConnection.search(searchRequest);
     }
     PageResult<R> pageResult = new PageResult<>();
     pageResult.setResults(
