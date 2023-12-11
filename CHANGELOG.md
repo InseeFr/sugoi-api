@@ -3,7 +3,7 @@
 - [BUG] :goal_net: Catch all LdapException when using mono connection
 - [REL] :rocket: release version 2.1.2
 
- 
+
 # 2.1.2
 
 - [BUG] :bug: Fix max time before a connection is dropped from ldap connection pool
