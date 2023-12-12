@@ -1,3 +1,14 @@
+# 2.1.4
+
+
+- [BUG] :bug: Fix conflict when getting by mail a user with a similar mail
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 2.1.3
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 2.1.2
+- [REL] :rocket: release version 2.1.3
+
+
 # 2.1.3
 
 - [BUG] :goal_net: Catch all LdapException when using mono connection
