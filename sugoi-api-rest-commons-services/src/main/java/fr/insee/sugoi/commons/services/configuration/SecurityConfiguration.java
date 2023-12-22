@@ -67,12 +67,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   /** Path to the role field in token. For instance realm_access.role */
   private String oidcClaimRole = "realm_access.roles";
 
-  /** Enable a monitoring user */
-  private boolean monitorUserEnabled = false;
-
-  private String monitorUserName = "monitor";
-  private String monitorUserPassword;
-
   @Value("${fr.insee.sugoi.security.default-roles-for-users:}")
   private List<String> defaultRolesForUsers;
 
@@ -172,12 +166,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    if (monitorUserEnabled && monitorUserPassword != null) {
-      auth.inMemoryAuthentication()
-          .withUser(monitorUserName)
-          .password("{noop}" + monitorUserPassword)
-          .roles("MONITOR");
-    }
     if (ldapAccountManagmentEnabled) {
       auth.ldapAuthentication()
           .userSearchBase(ldapAccountManagmentUserBase)
@@ -261,29 +249,5 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   public void setOidcClaimRole(String oidcClaimRole) {
     this.oidcClaimRole = oidcClaimRole;
-  }
-
-  public String getMonitorUserName() {
-    return monitorUserName;
-  }
-
-  public void setMonitorUserName(String monitorUserName) {
-    this.monitorUserName = monitorUserName;
-  }
-
-  public String getMonitorUserPassword() {
-    return monitorUserPassword;
-  }
-
-  public void setMonitorUserPassword(String monitorUserPassword) {
-    this.monitorUserPassword = monitorUserPassword;
-  }
-
-  public boolean isMonitorUserEnabled() {
-    return monitorUserEnabled;
-  }
-
-  public void setMonitorUserEnabled(boolean monitorUserEnabled) {
-    this.monitorUserEnabled = monitorUserEnabled;
   }
 }
