@@ -13,6 +13,8 @@
 */
 package fr.insee.sugoi.commons.services.configuration;
 
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 import fr.insee.sugoi.commons.services.configuration.basic.CustomLdapAuthoritiesPopulator;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +32,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.http.HttpMethod;
 import org.springframework.ldap.core.support.BaseLdapPathContextSource;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -42,7 +45,6 @@ import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @ConfigurationProperties("fr.insee.sugoi.security")
@@ -108,26 +110,16 @@ public class SecurityConfiguration {
     String[] monitorRoles = (String[]) ArrayUtils.add(adminRegex.split(","), "ROLE_MONITOR");
 
     http.authorizeHttpRequests(
-        authz ->
-            authz
-                .requestMatchers(new AntPathRequestMatcher("/actuator/health/**"))
-                .permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**"))
-                .permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/v3/api-docs/**"))
-                .permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/**", "OPTIONS"))
-                .permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/realms", "GET"))
-                .permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/v2/realms", "GET"))
-                .permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/actuator/**"))
-                .hasAnyAuthority(monitorRoles)
-                .requestMatchers(new AntPathRequestMatcher("/**"))
-                .authenticated()
-                .anyRequest()
-                .denyAll());
+        configurer -> {
+          configurer.requestMatchers(antMatcher(HttpMethod.OPTIONS)).permitAll();
+          configurer.requestMatchers(antMatcher("/actuator/health/**")).permitAll();
+          configurer.requestMatchers(antMatcher("/swagger-ui/**")).permitAll();
+          configurer.requestMatchers(antMatcher("/v3/api-docs/**")).permitAll();
+          configurer.requestMatchers(antMatcher(HttpMethod.GET, "/realms")).permitAll();
+          configurer.requestMatchers(antMatcher(HttpMethod.GET, "/v2/realms")).permitAll();
+          configurer.requestMatchers(antMatcher("/actuator/**")).hasAnyAuthority(monitorRoles);
+          configurer.anyRequest().authenticated();
+        });
     return http.build();
   }
 

@@ -18,7 +18,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import fr.insee.sugoi.model.technics.UiField;
 import java.util.*;
-import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
 
 public class Realm implements SugoiObject {
 
@@ -29,14 +28,12 @@ public class Realm implements SugoiObject {
   private List<UserStorage> userStorages;
 
   @JsonDeserialize(using = RealmConfigKeysDeserializer.class)
-  @IgnoreSizeOf
   private Map<RealmConfigKeys, List<String>> properties = new HashMap<>();
 
-  @IgnoreSizeOf
   private Map<UIMappingType, List<UiField>> uiMapping = new EnumMap<>(UIMappingType.class);
 
-  @IgnoreSizeOf private List<StoreMapping> groupMappings;
-  @IgnoreSizeOf private List<StoreMapping> applicationMappings;
+  private List<StoreMapping> groupMappings;
+  private List<StoreMapping> applicationMappings;
 
   private String readerType;
   private String writerType;

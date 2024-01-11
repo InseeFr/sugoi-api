@@ -25,14 +25,14 @@
 		<jacoco.unit-tests.limit.class-complexity>20</jacoco.unit-tests.limit.class-complexity>
 		<jacoco.unit-tests.limit.method-complexity>5</jacoco.unit-tests.limit.method-complexity>
 		<java.version>17</java.version>
-		<spring-boot.version>2.7.18</spring-boot.version>
+		<spring-boot.version>3.1.4</spring-boot.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<tomcat.version>9.0.78</tomcat.version>
+		<tomcat.version>10.1.18</tomcat.version>
 		<commons-io.version>2.11.0</commons-io.version>
 		<com.unboundid.version>6.0.8</com.unboundid.version>
 		<org.xmlunit.version>2.9.1</org.xmlunit.version>
 		<commons-lang.version>2.6</commons-lang.version>
-		<org.springdoc.version>1.7.0</org.springdoc.version>
+		<org.springdoc.version>2.3.0</org.springdoc.version>
 		<cucumber.version>7.5.0</cucumber.version>
 		<cucumber-reporting-plugin.version>7.3.0</cucumber-reporting-plugin.version>
 		<httpclient.version>4.5.14</httpclient.version>
@@ -42,8 +42,10 @@
 		<freemarker.version>2.3.32</freemarker.version>
 		<git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
 		<commons-io.version>2.11.0</commons-io.version>
-		<net.sf.ehcache.version>2.10.9.2</net.sf.ehcache.version>
+		<org.ehcache.version>3.10.8</org.ehcache.version>
 		<maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
+		<javax.jms-api.version>2.0.1</javax.jms-api.version>
+		<org.activemq.version>6.0.1</org.activemq.version>
 	</properties>
 
 	<dependencies></dependencies>
@@ -57,66 +59,6 @@
 				<version>${spring-boot.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
-				<exclusions>
-					<exclusion>
-						<groupId>org.springframework.security</groupId>
-						<artifactId>spring-security-web</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-web</artifactId>
-				<version>5.8.8</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-config</artifactId>
-				<version>5.8.8</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-ldap</artifactId>
-				<version>5.8.8</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-core</artifactId>
-				<version>5.8.8</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-crypto</artifactId>
-				<version>5.8.8</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-oauth2-jose</artifactId>
-				<version>5.8.8</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-test</artifactId>
-				<version>5.8.8</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-oauth2-resource-server</artifactId>
-				<version>5.8.8</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-oauth2-core</artifactId>
-				<version>5.8.8</version>
 			</dependency>
 
 			<dependency>
@@ -301,13 +243,7 @@
 
 			<dependency>
 				<groupId>org.springdoc</groupId>
-				<artifactId>springdoc-openapi-ui</artifactId>
-				<version>${org.springdoc.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.springdoc</groupId>
-				<artifactId>springdoc-openapi-security</artifactId>
+				<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 				<version>${org.springdoc.version}</version>
 			</dependency>
 
@@ -358,14 +294,32 @@
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>{commons-io.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>net.sf.ehcache</groupId>
-				<artifactId>ehcache</artifactId>
-				<version>${net.sf.ehcache.version}</version>
+				<version>${commons-io.version}</version>
 			</dependency>
 
+			<dependency>
+				<groupId>org.ehcache</groupId>
+				<artifactId>ehcache</artifactId>
+				<version>${org.ehcache.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>javax.jms</groupId>
+				<artifactId>javax.jms-api</artifactId>
+				<version>${javax.jms-api.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.activemq</groupId>
+				<artifactId>activemq-broker</artifactId>
+				<version>${org.activemq.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.activemq</groupId>
+				<artifactId>activemq-kahadb-store</artifactId>
+				<version>${org.activemq.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

@@ -13,7 +13,7 @@
 */
 package fr.insee.sugoi.jms.configuration;
 
-import javax.jms.ConnectionFactory;
+import jakarta.jms.ConnectionFactory;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -13,15 +13,15 @@
 */
 package fr.insee.sugoi.app.cucumber.configuration;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 public class RestTemplateConfiguration {
   public static RestTemplate getRestTemplate() {
     RestTemplate restTemplate = new RestTemplate();
-    HttpClient httpClient = HttpClientBuilder.create().build();
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     HttpComponentsClientHttpRequestFactory requestFactory =
         new HttpComponentsClientHttpRequestFactory(httpClient);
     restTemplate.setRequestFactory(requestFactory);
