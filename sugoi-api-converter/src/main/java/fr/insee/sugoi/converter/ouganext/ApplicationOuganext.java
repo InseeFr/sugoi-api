@@ -18,10 +18,10 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import fr.insee.sugoi.converter.utils.MapFromAttribute;
+import jakarta.xml.bind.annotation.XmlAttribute;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
-import javax.xml.bind.annotation.XmlAttribute;
 
 @JacksonXmlRootElement(localName = "application", namespace = Namespace.ANNUAIRE)
 @JsonPropertyOrder({"name", "role"})

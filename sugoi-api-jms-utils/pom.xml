@@ -28,8 +28,15 @@
       </dependency>
 
       <dependency>
+         <groupId>javax.jms</groupId>
+         <artifactId>javax.jms-api</artifactId>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
          <groupId>org.apache.activemq</groupId>
          <artifactId>activemq-broker</artifactId>
+         <scope>test</scope>
       </dependency>
 
       <dependency>
@@ -42,5 +49,9 @@
          <groupId>fr.insee.sugoi</groupId>
          <artifactId>sugoi-api-core</artifactId>
       </dependency>
+       <dependency>
+           <groupId>jakarta.jms</groupId>
+           <artifactId>jakarta.jms-api</artifactId>
+       </dependency>
    </dependencies>
 </project>

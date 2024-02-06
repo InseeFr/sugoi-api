@@ -187,7 +187,7 @@ Sugoi-api implements spring actuator documentation available here : [link](https
 | management.info.defaults.enabled             |             |               |         |
 | management.endpoint.metrics.enabled          |             |               |         |
 | management.endpoint.prometheus.enabled       |             |               |         |
-| management.metrics.export.prometheus.enabled |             |               |         |
+| management.prometheus.metrics.export.enabled |             |               |         |
 
 A metrics event module is provided to add metrics when events occured. This is disabled by default and could be enable with :
 

@@ -16,8 +16,8 @@ package fr.insee.sugoi.converter.ouganext.adapters;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import jakarta.xml.bind.DatatypeConverter;
 import java.io.IOException;
-import javax.xml.bind.DatatypeConverter;
 
 public class CertificateSerializer extends StdSerializer<byte[]> {
 
