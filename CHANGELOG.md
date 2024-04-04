@@ -1,3 +1,12 @@
+# 2.1.5
+
+
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 2.1.4
+- [ENH] :sparkles: Add warning on reset password default mail
+- [REL] :rocket: release version 2.1.4
+
+
 # 2.1.4
 
 
