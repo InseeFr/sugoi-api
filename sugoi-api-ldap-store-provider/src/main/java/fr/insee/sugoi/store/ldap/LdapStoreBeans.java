@@ -62,6 +62,21 @@ public class LdapStoreBeans {
   @Value("${fr.insee.sugoi.ldap.default.group_manager_source_pattern:}")
   private String defaultGroupManagerSourcePattern;
 
+  @Value("${fr.insee.sugoi.ldap.default.organization_dn_pattern:uid={id},{source}}")
+  private String defaultOrganizationDnPattern;
+
+  @Value("${fr.insee.sugoi.ldap.default.user_dn_pattern:uid={id},{source}}")
+  private String defaultUserDnPattern;
+
+  @Value("${fr.insee.sugoi.ldap.default.address_dn_pattern:l={id},{source}}")
+  private String defaultAddressDnPattern;
+
+  @Value("${fr.insee.sugoi.ldap.default.group_dn_pattern:cn={id},{source}}")
+  private String defaultGroupDnPattern;
+
+  @Value("${fr.insee.sugoi.ldap.default.application_dn_pattern:ou={id},{source}}")
+  private String defaultApplicationDnPattern;
+
   @Value("${fr.insee.sugoi.ldap.default.vlv.enabled:false}")
   private String vlvEnabled;
 
@@ -135,6 +150,31 @@ public class LdapStoreBeans {
     config.put(GlobalKeysConfig.APP_SOURCE, realm.getAppSource());
     config.put(GlobalKeysConfig.ORGANIZATION_SOURCE, userStorage.getOrganizationSource());
     config.put(GlobalKeysConfig.ADDRESS_SOURCE, userStorage.getAddressSource());
+    config.put(
+        LdapConfigKeys.ORGANIZATION_DN_PATTERN,
+        userStorage.getProperties().get(LdapConfigKeys.ORGANIZATION_DN_PATTERN) != null
+            ? userStorage.getProperties().get(LdapConfigKeys.ORGANIZATION_DN_PATTERN).get(0)
+            : defaultOrganizationDnPattern);
+    config.put(
+        LdapConfigKeys.USER_DN_PATTERN,
+        userStorage.getProperties().get(LdapConfigKeys.USER_DN_PATTERN) != null
+            ? userStorage.getProperties().get(LdapConfigKeys.USER_DN_PATTERN).get(0)
+            : defaultUserDnPattern);
+    config.put(
+        LdapConfigKeys.ADDRESS_DN_PATTERN,
+        userStorage.getProperties().get(LdapConfigKeys.ADDRESS_DN_PATTERN) != null
+            ? userStorage.getProperties().get(LdapConfigKeys.ADDRESS_DN_PATTERN).get(0)
+            : defaultAddressDnPattern);
+    config.put(
+        LdapConfigKeys.GROUP_DN_PATTERN,
+        userStorage.getProperties().get(LdapConfigKeys.GROUP_DN_PATTERN) != null
+            ? userStorage.getProperties().get(LdapConfigKeys.GROUP_DN_PATTERN).get(0)
+            : defaultGroupDnPattern);
+    config.put(
+        LdapConfigKeys.APPLICATION_DN_PATTERN,
+        userStorage.getProperties().get(LdapConfigKeys.APPLICATION_DN_PATTERN) != null
+            ? userStorage.getProperties().get(LdapConfigKeys.APPLICATION_DN_PATTERN).get(0)
+            : defaultApplicationDnPattern);
     config.put(
         LdapConfigKeys.GROUP_SOURCE_PATTERN,
         realm.getProperties().get(LdapConfigKeys.GROUP_SOURCE_PATTERN) != null
