@@ -25,7 +25,6 @@ import com.unboundid.ldap.sdk.ModifyRequest;
 import com.unboundid.ldap.sdk.ResultCode;
 import com.unboundid.ldap.sdk.extensions.PasswordModifyExtendedRequest;
 import com.unboundid.util.SubtreeDeleter;
-import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -474,8 +473,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
             .orElseThrow(
                 () -> new UserNotFoundException(config.get(LdapConfigKeys.REALM_NAME), userId));
     try {
-      ldapPoolConnection.modify(
-          "uid=" + user.getUsername() + "," + config.get(GlobalKeysConfig.USER_SOURCE), mod);
+      ldapPoolConnection.modify(getUserDN(user.getUsername()), mod);
       changePasswordResetStatus(userId, changePasswordResetStatus);
       ProviderResponse response = new ProviderResponse();
       response.setStatus(ProviderResponseStatus.OK);
@@ -499,8 +497,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
             .orElseThrow(
                 () -> new UserNotFoundException(config.get(LdapConfigKeys.REALM_NAME), userId));
     try {
-      ldapPoolConnection.modify(
-          "uid=" + user.getUsername() + "," + config.get(GlobalKeysConfig.USER_SOURCE), mod);
+      ldapPoolConnection.modify(getUserDN(user.getUsername()), mod);
       changePasswordResetStatus(userId, changePasswordResetStatus);
       ProviderResponse response = new ProviderResponse();
       response.setStatus(ProviderResponseStatus.OK);
@@ -527,9 +524,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     try {
       PasswordModifyExtendedRequest pmer =
           new PasswordModifyExtendedRequest(
-              "uid=" + user.getUsername() + "," + config.get(GlobalKeysConfig.USER_SOURCE),
-              oldPassword,
-              newPassword);
+              getUserDN(user.getUsername()), oldPassword, newPassword);
       ExtendedResult result = ldapPoolConnection.processExtendedOperation(pmer);
 
       if (result.getResultCode().intValue() == ResultCode.INVALID_CREDENTIALS_INT_VALUE
@@ -563,8 +558,7 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
             .orElseThrow(
                 () -> new UserNotFoundException(config.get(LdapConfigKeys.REALM_NAME), userId));
     try {
-      ldapPoolConnection.modify(
-          "uid=" + user.getUsername() + "," + config.get(GlobalKeysConfig.USER_SOURCE), mod);
+      ldapPoolConnection.modify(getUserDN(user.getUsername()), mod);
       ProviderResponse response = new ProviderResponse();
       response.setStatus(ProviderResponseStatus.OK);
       response.setEntityId(user.getUsername());

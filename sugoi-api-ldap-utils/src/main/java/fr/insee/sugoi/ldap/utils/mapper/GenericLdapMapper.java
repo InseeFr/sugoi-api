@@ -217,25 +217,19 @@ public class GenericLdapMapper {
       case ORGANIZATION:
         return new Attribute(
             ldapAttributeName,
-            String.format(
-                "%s=%s,%s",
-                // TODO should be a param
-                "uid",
-                //
-                ((Organization) sugoiValue).getIdentifiant(),
-                config.get(GlobalKeysConfig.ORGANIZATION_SOURCE)));
+            config
+                .get(LdapConfigKeys.ORGANIZATION_DN_PATTERN)
+                .replace("{id}", ((Organization) sugoiValue).getIdentifiant())
+                .replace("{source}", config.get(GlobalKeysConfig.ORGANIZATION_SOURCE)));
       case ADDRESS:
         if (((PostalAddress) sugoiValue).getId() != null
             && config.get(GlobalKeysConfig.ADDRESS_SOURCE) != null) {
           return new Attribute(
               ldapAttributeName,
-              String.format(
-                  "%s=%s,%s",
-                  // TODO should be a param
-                  "l",
-                  //
-                  ((PostalAddress) sugoiValue).getId(),
-                  config.get(GlobalKeysConfig.ADDRESS_SOURCE)));
+              config
+                  .get(LdapConfigKeys.ADDRESS_DN_PATTERN)
+                  .replace("{id}", ((PostalAddress) sugoiValue).getId())
+                  .replace("{source}", config.get(GlobalKeysConfig.ADDRESS_SOURCE)));
         } else return null;
       case LIST_HABILITATION:
         // Assume that if list is empty it's really to set an empty list (delete all
@@ -253,7 +247,10 @@ public class GenericLdapMapper {
         // Assume that if list is empty it's really to set an empty list (delete all
         // values)
         // Groups list can be set null if not needed
-        String genericGroup = "cn={group}" + "," + config.get(LdapConfigKeys.GROUP_SOURCE_PATTERN);
+        String genericGroup =
+            config
+                .get(LdapConfigKeys.GROUP_DN_PATTERN)
+                .replace("{source}", config.get(LdapConfigKeys.GROUP_SOURCE_PATTERN));
 
         return new Attribute(
             ldapAttributeName,
@@ -263,7 +260,7 @@ public class GenericLdapMapper {
                         group ->
                             genericGroup
                                 .replace("{appliname}", group.getAppName())
-                                .replace("{group}", group.getName()))
+                                .replace("{id}", group.getName()))
                     .collect(Collectors.toList()));
       case LIST_STRING:
         // Assume that if list is empty it's really to set an empty list (delete all

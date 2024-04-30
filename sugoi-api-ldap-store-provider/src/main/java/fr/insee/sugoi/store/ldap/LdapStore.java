@@ -90,36 +90,28 @@ public class LdapStore {
 
   protected String getApplicationDN(String applicationName) {
     if (StringUtils.isNotBlank(config.get(GlobalKeysConfig.APP_SOURCE))) {
-      return String.format(
-          "%s=%s,%s",
-          // TODO should be a param
-          "ou",
-          //
-          applicationName,
-          config.get(GlobalKeysConfig.APP_SOURCE));
+      return config
+          .get(LdapConfigKeys.APPLICATION_DN_PATTERN)
+          .replace("{id}", applicationName)
+          .replace("{source}", config.get(GlobalKeysConfig.APP_SOURCE));
     } else {
       throw new UnsupportedOperationException("Applications feature not configured for this realm");
     }
   }
 
   protected String getGroupDN(String applicationName, String groupName) {
-    return String.format(
-        "%s=%s,%s",
-        // TODO should be a param
-        "cn",
-        //
-        groupName,
-        getGroupSource(applicationName));
+    return config
+        .get(LdapConfigKeys.GROUP_DN_PATTERN)
+        .replace("{id}", groupName)
+        .replace("{source}", getGroupSource(applicationName));
   }
 
   protected String getOrganizationDN(String organizationId) {
     if (StringUtils.isNotBlank(config.get(GlobalKeysConfig.ORGANIZATION_SOURCE))) {
-      return String.format(
-          "%s=%s,%s", // TODO should be a param
-          "uid",
-          //
-          organizationId,
-          config.get(GlobalKeysConfig.ORGANIZATION_SOURCE));
+      return config
+          .get(LdapConfigKeys.ORGANIZATION_DN_PATTERN)
+          .replace("{id}", organizationId)
+          .replace("{source}", config.get(GlobalKeysConfig.ORGANIZATION_SOURCE));
     } else {
       throw new UnsupportedOperationException(
           "Organizations feature not configured for this storage");
@@ -127,22 +119,16 @@ public class LdapStore {
   }
 
   protected String getUserDN(String username) {
-    return String.format(
-        "%s=%s,%s",
-        // TODO should be a param
-        "uid",
-        //
-        username,
-        config.get(GlobalKeysConfig.USER_SOURCE));
+    return config
+        .get(LdapConfigKeys.USER_DN_PATTERN)
+        .replace("{id}", username)
+        .replace("{source}", config.get(GlobalKeysConfig.USER_SOURCE));
   }
 
   protected String getAddressDN(String addressId) {
-    return String.format(
-        "%s=%s,%s",
-        // TODO should be a param
-        "l",
-        //
-        addressId,
-        config.get(GlobalKeysConfig.ADDRESS_SOURCE));
+    return config
+        .get(LdapConfigKeys.ADDRESS_DN_PATTERN)
+        .replace("{id}", addressId)
+        .replace("{source}", config.get(GlobalKeysConfig.ADDRESS_SOURCE));
   }
 }

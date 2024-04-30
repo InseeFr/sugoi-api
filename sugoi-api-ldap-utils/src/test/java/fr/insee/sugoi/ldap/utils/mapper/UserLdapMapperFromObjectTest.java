@@ -42,6 +42,8 @@ public class UserLdapMapperFromObjectTest {
     config.put(GlobalKeysConfig.ORGANIZATION_SOURCE, "ou=organisations,o=insee,c=fr");
     config.put(GlobalKeysConfig.ADDRESS_SOURCE, "ou=address,o=insee,c=fr");
     config.put(LdapConfigKeys.USER_OBJECT_CLASSES, "top,person");
+    config.put(LdapConfigKeys.ORGANIZATION_DN_PATTERN, "uid={id},{source}");
+    config.put(LdapConfigKeys.ADDRESS_DN_PATTERN, "l={id},{source}");
 
     userLdapMapper = new UserLdapMapper(config, StoreMappingFixture.getUserStoreMappings());
 
