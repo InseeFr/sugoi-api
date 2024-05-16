@@ -53,7 +53,7 @@ public interface RealmProvider {
    *
    * @return List<Realm>, the realm list
    */
-  @Cacheable("Realms")
+  @Cacheable(value = "Realms", key = "#root.methodName")
   public List<Realm> findAll();
 
   @CacheEvict(

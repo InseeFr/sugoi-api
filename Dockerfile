@@ -1,4 +1,4 @@
-FROM tomcat:9.0.38-jdk11-openjdk
+FROM tomcat:10-jre17-temurin
 EXPOSE 8080 
 EXPOSE 8443
 

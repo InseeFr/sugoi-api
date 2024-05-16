@@ -16,12 +16,16 @@ package fr.insee.sugoi.app.service;
 import fr.insee.sugoi.app.service.utils.PropertiesLoaderService;
 import fr.insee.sugoi.app.service.utils.UserDirService;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.ServletException;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
@@ -31,6 +35,7 @@ import org.apache.catalina.valves.RemoteIpValve;
 import org.apache.commons.io.FileUtils;
 import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.util.net.SSLHostConfig;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.scan.StandardJarScanFilter;
 
 public class TomcatEmbeddedService {
@@ -45,7 +50,7 @@ public class TomcatEmbeddedService {
       String warURL,
       int httpPort,
       int httpsPort)
-      throws ServletException, IOException {
+      throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException {
 
     String workUri = getWorkUri();
 
@@ -77,9 +82,13 @@ public class TomcatEmbeddedService {
     sslHostConfig.setSslProtocol("TLS");
     File keystoreFile =
         new File(UserDirService.getUserDir() + "/src/main/resources/ssl/server.p12");
-    sslHostConfig.setCertificateKeystoreFile(keystoreFile.getAbsolutePath());
-    sslHostConfig.setCertificateKeystorePassword("changeit");
-    sslHostConfig.setCertificateKeystoreType("PKCS12");
+    KeyStore keyStore = KeyStore.getInstance("PKCS12");
+    keyStore.load(new FileInputStream(keystoreFile.getAbsolutePath()), "changeit".toCharArray());
+    sslHostConfig.setTrustStore(keyStore);
+    SSLHostConfigCertificate certificate =
+        new SSLHostConfigCertificate(new SSLHostConfig(), SSLHostConfigCertificate.Type.RSA);
+    certificate.setCertificateKeystore(keyStore);
+    sslHostConfig.addCertificate(certificate);
     connectorHttps.addSslHostConfig(sslHostConfig);
     tomcat.getService().addConnector(connectorHttps);
 
@@ -98,7 +107,7 @@ public class TomcatEmbeddedService {
                 /**/
                 if (jarName.contains("xalan")
                     || jarName.contains("xml")
-                    || jarName.contains("jaxb") | jarName.contains("asm")
+                    || jarName.contains("jakarta") | jarName.contains("asm")
                     || jarName.contains("hk2")
                     || jarName.contains("class")) {
                   return false;
@@ -114,7 +123,7 @@ public class TomcatEmbeddedService {
                 /**/
                 if (jarName.contains("xalan")
                     || jarName.contains("xml")
-                    || jarName.contains("jaxb")
+                    || jarName.contains("jakarta")
                     || jarName.contains("asm")
                     || jarName.contains("hk2")
                     || jarName.contains("class")) {
