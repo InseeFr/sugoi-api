@@ -24,6 +24,8 @@ public class ProviderResponse implements Serializable {
   String exceptionType;
   Object entity;
 
+  String hostname;
+
   public ProviderResponse(
       String entityId,
       String requestId,
@@ -41,6 +43,10 @@ public class ProviderResponse implements Serializable {
   }
 
   public ProviderResponse() {}
+
+  public ProviderResponse(String hostname) {
+    this.hostname = hostname;
+  }
 
   public enum ProviderResponseStatus {
     // Request is executed and result is effective at once
@@ -104,5 +110,9 @@ public class ProviderResponse implements Serializable {
 
   public void setExceptionType(String exceptionType) {
     this.exceptionType = exceptionType;
+  }
+
+  public String getHostname() {
+    return hostname;
   }
 }
