@@ -39,11 +39,16 @@ public class SugoiAdviceController {
   @ExceptionHandler(Exception.class)
   @ResponseBody
   public ResponseEntity<ErrorView> exception(Exception e) {
-    ErrorView errorView = new ErrorView(e.getMessage());
-    HttpStatus status = computeStatusFromException(e);
-    if (status.is5xxServerError()) {
+    ResponseEntity<ErrorView> errorView = createErrorView(e);
+    if (errorView.getStatusCode().is5xxServerError()) {
       logger.error(e.getMessage(), e);
     }
+    return errorView;
+  }
+
+  public ResponseEntity<ErrorView> createErrorView(Exception e) {
+    ErrorView errorView = new ErrorView(e.getMessage());
+    HttpStatus status = computeStatusFromException(e);
     return new ResponseEntity<>(errorView, status);
   }
 
