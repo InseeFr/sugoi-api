@@ -187,6 +187,7 @@ public class LdapReaderStoreTest {
   @Test
   public void testSearchAllUsers() {
     PageableResult pageableResult = new PageableResult();
+    pageableResult.setSize(50);
     List<User> users = ldapReaderStore.searchUsers(new User(), pageableResult, "AND").getResults();
     assertThat(
         "Should contain testo",
@@ -207,6 +208,39 @@ public class LdapReaderStoreTest {
     List<User> users = ldapReaderStore.searchUsers(testUser, pageableResult, "AND").getResults();
     assertThat("Should find one result", users.size(), is(1));
     assertThat("First element found should be testc", users.get(0).getUsername(), is("testc"));
+  }
+
+  @Test
+  void testSearchUserWithCommonName() {
+    PageableResult pageableResult = new PageableResult();
+    User testUser = new User();
+    testUser.getAttributes().put("common_name", "Charlés d'Artagnan");
+    List<User> users = ldapReaderStore.searchUsers(testUser, pageableResult, "AND").getResults();
+    assertThat("Should find one result", users.size(), is(1));
+    assertThat("First element found should be testc", users.get(0).getUsername(), is("dartagnan1"));
+  }
+
+  @Test
+  void testFuzzySearchUserWithCommonName() {
+    User testUser = new User();
+    testUser.getAttributes().put("common_name", "Charlés d'Artagnan");
+    List<User> users =
+        ldapReaderStore.fuzzySearchUsers(testUser, new PageableResult(), "AND").getResults();
+    assertThat("Should find two results", users.size(), is(2));
+    assertThat(
+        "One result should be dartagnan1",
+        users.stream().anyMatch(u -> u.getUsername().equals("dartagnan1")));
+    assertThat(
+        "The other dartagnan3", users.stream().anyMatch(u -> u.getUsername().equals("dartagnan3")));
+    User testUser2 = new User();
+    testUser2.getAttributes().put("common_name", "Charles-dArtag nan");
+    assertThat(
+        "Two - are accepted",
+        ldapReaderStore
+            .fuzzySearchUsers(testUser2, new PageableResult(), "AND")
+            .getResults()
+            .stream()
+            .anyMatch(u -> u.getUsername().equals("dartagnan5")));
   }
 
   @Test

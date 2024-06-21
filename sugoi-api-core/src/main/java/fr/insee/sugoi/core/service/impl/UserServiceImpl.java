@@ -22,6 +22,7 @@ import fr.insee.sugoi.core.model.SugoiRandomIdCharacterData;
 import fr.insee.sugoi.core.realm.RealmProvider;
 import fr.insee.sugoi.core.seealso.SeeAlsoService;
 import fr.insee.sugoi.core.service.UserService;
+import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.core.store.StoreProvider;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
@@ -39,6 +40,7 @@ import fr.insee.sugoi.model.paging.SearchType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.passay.CharacterRule;
 import org.passay.PasswordGenerator;
 import org.slf4j.Logger;
@@ -64,6 +66,8 @@ public class UserServiceImpl implements UserService {
    * connected by a broker to the real service
    */
   private boolean readerStoreAsynchronous = false;
+
+  private boolean fuzzySearchAllowed = false;
 
   @Autowired private StoreProvider storeProvider;
 
@@ -228,7 +232,8 @@ public class UserServiceImpl implements UserService {
       String storage,
       User userProperties,
       PageableResult pageable,
-      SearchType typeRecherche) {
+      SearchType typeRecherche,
+      boolean fuzzySearchEnabled) {
 
     PageResult<User> result = new PageResult<>();
     Realm r = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
@@ -241,43 +246,34 @@ public class UserServiceImpl implements UserService {
                 .get(0)));
     result.setPageSize(pageable.getSize());
 
-    if (storage != null) {
-      result =
-          storeProvider
-              .getReaderStore(realm, storage)
-              .searchUsers(userProperties, pageable, typeRecherche.name());
-      result
+    List<String> userStoragesToBrowse =
+        storage != null
+            ? List.of(storage)
+            : r.getUserStorages().stream().map(UserStorage::getName).collect(Collectors.toList());
+    for (String usName : userStoragesToBrowse) {
+      ReaderStore readerStore = storeProvider.getReaderStore(realm, usName);
+      PageResult<User> temResult =
+          fuzzySearchEnabled && fuzzySearchAllowed
+              ? readerStore.fuzzySearchUsers(userProperties, pageable, typeRecherche.name())
+              : readerStore.searchUsers(userProperties, pageable, typeRecherche.name());
+      temResult
           .getResults()
           .forEach(
               user -> {
                 user.addMetadatas(EventKeysConfig.REALM, realm);
-                user.addMetadatas(EventKeysConfig.USERSTORAGE, storage);
+                user.addMetadatas(EventKeysConfig.USERSTORAGE, usName);
               });
-    } else {
-      for (UserStorage us : r.getUserStorages()) {
-        PageResult<User> temResult =
-            storeProvider
-                .getReaderStore(realm, us.getName())
-                .searchUsers(userProperties, pageable, typeRecherche.name());
-        temResult
-            .getResults()
-            .forEach(
-                user -> {
-                  user.addMetadatas(EventKeysConfig.REALM, realm);
-                  user.addMetadatas(EventKeysConfig.USERSTORAGE, us.getName());
-                });
-        result.getResults().addAll(temResult.getResults());
-        result.setTotalElements(
-            temResult.getTotalElements() == -1
-                ? temResult.getTotalElements()
-                : result.getTotalElements() + temResult.getTotalElements());
-        result.setSearchToken(temResult.getSearchToken());
-        result.setHasMoreResult(temResult.isHasMoreResult());
-        if (result.getResults().size() >= result.getPageSize()) {
-          return result;
-        }
-        pageable.setSize(pageable.getSize() - result.getTotalElements());
+      result.getResults().addAll(temResult.getResults());
+      result.setTotalElements(
+          temResult.getTotalElements() == -1
+              ? temResult.getTotalElements()
+              : result.getTotalElements() + temResult.getTotalElements());
+      result.setSearchToken(temResult.getSearchToken());
+      result.setHasMoreResult(temResult.isHasMoreResult());
+      if (result.getResults().size() >= result.getPageSize()) {
+        return result;
       }
+      pageable.setSize(pageable.getSize() - result.getTotalElements());
     }
 
     return result;
