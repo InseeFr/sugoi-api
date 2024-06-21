@@ -1,3 +1,12 @@
+# 2.1.6
+
+
+- [ENH] :sparkles: DNs can be configured on ldap stores
+- [REL] :rocket: prepare next version
+- [REL] :rocket: release version 2.1.5
+- [REL] :rocket: release version 2.1.5
+
+
 # 2.1.5
 
 
