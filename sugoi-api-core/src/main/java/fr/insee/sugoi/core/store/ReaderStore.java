@@ -60,6 +60,19 @@ public interface ReaderStore {
       User userFilter, PageableResult pageable, String searchOperator);
 
   /**
+   * Search users matching userFilter filled attributes. More results are returned than normal
+   * search since accents and other special characters are ignored.
+   *
+   * @param userFilter an incomplete user with attributes set to be matched with
+   * @param pageable properties for pageable request
+   * @param searchOperator 'OR' or 'AND' to determine if multiple attributes should match or only
+   *     one
+   * @return a PageResult containing a list of matching users.
+   */
+  public PageResult<User> fuzzySearchUsers(
+      User userFilter, PageableResult pageable, String searchOperator);
+
+  /**
    * Retrieve the organization with the given id in the store.
    *
    * @param id the id of the organization

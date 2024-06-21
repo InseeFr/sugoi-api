@@ -157,7 +157,10 @@ public class UserController {
           List<String> groups,
       @Parameter(description = "Filter on application. groupFilter parameter is required")
           @RequestParam(name = "applicationFilter", required = false)
-          String applicationFilter) {
+          String applicationFilter,
+      @Parameter(description = "Fuzzy search on common name enabled", required = false)
+          @RequestParam(name = "fuzzySearchEnabled", required = false, defaultValue = "false")
+          Boolean fuzzySearchEnabled) {
 
     // set the user which will serve as a model to retrieve the matching users
     User searchUser = new User();
@@ -188,7 +191,8 @@ public class UserController {
     PageableResult pageable = new PageableResult(size, offset, searchCookie);
 
     PageResult<User> foundUsers =
-        userService.findByProperties(realm, storage, searchUser, pageable, typeRecherche);
+        userService.findByProperties(
+            realm, storage, searchUser, pageable, typeRecherche, fuzzySearchEnabled);
     if (foundUsers.isHasMoreResult()) {
       URI location =
           ServletUriComponentsBuilder.fromCurrentRequest()
@@ -266,7 +270,10 @@ public class UserController {
           List<String> groups,
       @Parameter(description = "Filter on application")
           @RequestParam(name = "applicationFilter", required = false)
-          String applicationFilter) {
+          String applicationFilter,
+      @Parameter(description = "Fuzzy search on common name enabled", required = false)
+          @RequestParam(name = "fuzzySearchEnabled", required = false, defaultValue = "false")
+          Boolean fuzzySearchEnabled) {
     return getUsers(
         realm,
         null,
@@ -283,7 +290,8 @@ public class UserController {
         typeRecherche,
         habilitations,
         groups,
-        applicationFilter);
+        applicationFilter,
+        fuzzySearchEnabled);
   }
 
   @PostMapping(

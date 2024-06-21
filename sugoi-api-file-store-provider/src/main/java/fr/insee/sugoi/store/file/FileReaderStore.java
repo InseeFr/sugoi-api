@@ -95,6 +95,12 @@ public class FileReaderStore implements ReaderStore {
   }
 
   @Override
+  public PageResult<User> fuzzySearchUsers(
+      User userFilter, PageableResult pageable, String searchOperator) {
+    throw new NotImplementedException();
+  }
+
+  @Override
   public Optional<Organization> getOrganization(String id) {
     if (StringUtils.isNotBlank(config.get(GlobalKeysConfig.ORGANIZATION_SOURCE))) {
       return getOrganization(id, false);
