@@ -293,7 +293,8 @@ public class ContactsDomaineController {
             realmUserStorage.getUserStorage(),
             searchSugoiUser,
             pageable,
-            SearchType.AND);
+            SearchType.AND,
+            false);
 
     HttpHeaders headers = new HttpHeaders();
     headers.add("X-Total-Size", String.valueOf(foundUsers.getTotalElements()));
@@ -420,7 +421,8 @@ public class ContactsDomaineController {
             realmUserStorage.getUserStorage(),
             new User(),
             pageable,
-            SearchType.AND);
+            SearchType.AND,
+            false);
     return ResponseEntity.status(HttpStatus.NO_CONTENT)
         .header("X-Total-Size", String.valueOf(foundUsers.getTotalElements()))
         .build();

@@ -190,7 +190,12 @@ public class UserServiceTest {
         RealmNotFoundException.class,
         () ->
             userService.findByProperties(
-                "idonotexist", "us2", new User("Toto"), new PageableResult(), SearchType.AND));
+                "idonotexist",
+                "us2",
+                new User("Toto"),
+                new PageableResult(),
+                SearchType.AND,
+                false));
   }
 
   @Test
@@ -309,7 +314,7 @@ public class UserServiceTest {
     PageableResult pageable = new PageableResult(30000, 0, null);
     List<User> results =
         userService
-            .findByProperties(realm.getName(), null, new User(), pageable, SearchType.AND)
+            .findByProperties(realm.getName(), null, new User(), pageable, SearchType.AND, false)
             .getResults();
     assertThat("30000 users are retrieved", results.size(), is(30000));
     assertThat(

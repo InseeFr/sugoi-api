@@ -266,7 +266,8 @@ public class ExportController {
 
       while (true) {
         PageResult<User> foundUsers =
-            userService.findByProperties(realm, storageName, searchUser, pageable, typeRecherche);
+            userService.findByProperties(
+                realm, storageName, searchUser, pageable, typeRecherche, false);
         for (User foundUser : foundUsers.getResults()) {
           List<String> attributesToPrint = getCsvLineFromUser(headerMappings, foundUser);
           csvPrinter.printRecord(attributesToPrint);

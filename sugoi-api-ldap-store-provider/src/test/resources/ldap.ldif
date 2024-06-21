@@ -279,6 +279,56 @@ cn: byebye
 memberOf: cn=Utilisateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
 inseeAdressePostaleDN: l=supprime, ou=adresses,ou=clients_domaine1,o=insee,c=fr
 
+dn: uid=dartagnan1,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+uid: dartagnan1
+cn: Charlés d'Artagnan
+
+dn: uid=dartagnan2,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+uid: dartagnan2
+cn: Chàrles-d-oArtagnan
+
+dn: uid=dartagnan3,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+uid: dartagnan3
+cn: Charles d'Artàgnan
+
+dn: uid=dartagnan4,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+uid: dartagnan4
+cn: Charleeees dArtagnan
+
+dn: uid=dartagnan5,ou=contacts,ou=clients_domaine1,o=insee,c=fr
+objectClass: top
+objectClass: inseeCompte
+objectClass: inseeContact
+objectClass: inseeAttributsAuthentification
+objectClass: inseeAttributsHabilitation
+objectClass: inseeAttributsCommunication
+uid: dartagnan5
+cn: Charles--dArtag  nan
+
 dn: uid=asupprimer,ou=contacts,ou=clients_domaine1,o=insee,c=fr
 objectClass: top
 objectClass: inseeCompte

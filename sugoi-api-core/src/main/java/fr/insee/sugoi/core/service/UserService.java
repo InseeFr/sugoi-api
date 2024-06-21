@@ -85,6 +85,8 @@ public interface UserService {
    * @param userProperties
    * @param pageable
    * @param typeRecherche
+   * @param fuzzySearchEnabled if true, the user common name should be searched without taking into
+   *     account accents, spaces and other specials characters
    * @return a list of users
    */
   PageResult<User> findByProperties(
@@ -92,7 +94,8 @@ public interface UserService {
       String storageName,
       User userProperties,
       PageableResult pageable,
-      SearchType typeRecherche);
+      SearchType typeRecherche,
+      boolean fuzzySearchEnabled);
 
   /**
    * Allow to add only the app-managed attribute of an user, this attribute must follow the

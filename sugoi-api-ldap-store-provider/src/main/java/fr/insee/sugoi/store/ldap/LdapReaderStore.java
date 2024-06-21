@@ -40,9 +40,11 @@ import fr.insee.sugoi.model.paging.PageResult;
 import fr.insee.sugoi.model.paging.PageableResult;
 import fr.insee.sugoi.model.paging.SearchType;
 import fr.insee.sugoi.model.technics.StoreMapping;
+import java.text.Normalizer;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.util.Assert;
 
 public class LdapReaderStore extends LdapStore implements ReaderStore {
 
@@ -127,6 +129,46 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
           userLdapMapper);
     } catch (LDAPSearchException e) {
       throw new StoreException("Fail to execute user search", e);
+    }
+  }
+
+  @Override
+  public PageResult<User> fuzzySearchUsers(
+      User userFilter, PageableResult pageable, String typeRecherche) {
+    String initialCommonName = (String) userFilter.getAttributes().get("common_name");
+    if (initialCommonName == null) {
+      return searchUsers(userFilter, pageable, typeRecherche);
+    } else {
+      try {
+        userFilter
+            .getAttributes()
+            .put(
+                "common_name",
+                initialCommonName
+                    .replaceAll(
+                        "[ÀÁÂÃÄAÅÇCÈÉÊËEÌÍIÎÏÐÒÓÔOÕÖÙUÚÛÜÝYŸàáâãäåçèéêëìíîïðòóôõöùúûüýÿaeiouc \\-']",
+                        "*")
+                    .replaceAll("\\*+", "*"));
+        PageResult<User> results =
+            searchOnLdap(
+                config.get(GlobalKeysConfig.USER_SOURCE),
+                SearchScope.SUBORDINATE_SUBTREE,
+                getFilterFromObject(userFilter, userLdapMapper, typeRecherche, false),
+                pageable,
+                userLdapMapper);
+        String normalizedCommonName = removeSpecialChars(initialCommonName);
+        List<User> filteredUsers =
+            results.getResults().stream()
+                .filter(
+                    u ->
+                        removeSpecialChars((String) u.getAttributes().get("common_name"))
+                            .equalsIgnoreCase(normalizedCommonName))
+                .collect(Collectors.toList());
+        results.setResults(filteredUsers);
+        return results;
+      } catch (LDAPException e) {
+        throw new StoreException("Fail to execute user search", e);
+      }
     }
   }
 
@@ -249,6 +291,11 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
     }
   }
 
+  private <M extends SugoiObject> Filter getFilterFromObject(
+      M object, LdapMapper<M> mapper, String searchType) {
+    return getFilterFromObject(object, mapper, searchType, true);
+  }
+
   /**
    * Create a filter from an object using a mapper class. Each set field of the object is
    * transformed to a filter.
@@ -259,40 +306,68 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
    * @return a filter corresponding to the properties of object
    */
   private <M extends SugoiObject> Filter getFilterFromObject(
-      M object, LdapMapper<M> mapper, String searchType) {
-    if (searchType.equalsIgnoreCase("AND")) {
+      M object, LdapMapper<M> mapper, String searchType, boolean encodeCommonNameWildcard) {
+    Assert.isTrue(
+        searchType.equals("AND") || searchType.equals("OR"), "Search type should be AND or OR.");
+    List<Attribute> attributes = mapper.createAttributesForFilter(object);
+    List<Filter> attributeListFilter = getAttributesFilters(attributes, encodeCommonNameWildcard);
+    List<Filter> objectClassListFilter = getObjectClassFilters(attributes);
+    if (!objectClassListFilter.isEmpty() && attributeListFilter.isEmpty()) {
+      return LdapFilter.and(objectClassListFilter);
+    } else if (objectClassListFilter.isEmpty() && !attributeListFilter.isEmpty()) {
+      return searchType.equals("AND")
+          ? LdapFilter.or(attributeListFilter)
+          : LdapFilter.and(attributeListFilter);
+    } else {
       return LdapFilter.and(
-          mapper.createAttributesForFilter(object).stream()
-              .filter(attribute -> !attribute.getValue().equals(""))
-              .map(attribute -> LdapFilter.createFilter(attribute.getName(), attribute.getValues()))
-              .collect(Collectors.toList()));
-    } else if (searchType.equalsIgnoreCase("OR")) {
-      List<Filter> objectClassListFilter =
-          mapper.createAttributesForFilter(object).stream()
-              .filter(attribute -> attribute.getName().equals("objectClass"))
-              .map(attribute -> LdapFilter.createFilter(attribute.getName(), attribute.getValues()))
-              .collect(Collectors.toList());
+          Arrays.asList(
+              LdapFilter.and(objectClassListFilter),
+              searchType.equals("AND")
+                  ? LdapFilter.or(attributeListFilter)
+                  : LdapFilter.and(attributeListFilter)));
+    }
+  }
 
-      List<Filter> attributeListFilter =
-          mapper.createAttributesForFilter(object).stream()
-              .filter(
-                  attribute ->
-                      !attribute.getName().equals("objectClass")
-                          && !attribute.getValue().equals(""))
-              .map(attribute -> LdapFilter.createFilter(attribute.getName(), attribute.getValues()))
-              .collect(Collectors.toList());
+  private List<Filter> getObjectClassFilters(List<Attribute> attributes) {
+    return attributes.stream()
+        .filter(attribute -> attribute.getName().equals("objectClass"))
+        .map(attribute -> LdapFilter.createFilter(attribute.getName(), attribute.getValues()))
+        .collect(Collectors.toList());
+  }
 
-      if (!objectClassListFilter.isEmpty() && attributeListFilter.isEmpty()) {
-        return LdapFilter.and(objectClassListFilter);
-      } else if (objectClassListFilter.isEmpty() && !attributeListFilter.isEmpty()) {
-        return LdapFilter.or(attributeListFilter);
+  private List<Filter> getAttributesFilters(
+      List<Attribute> attributes, boolean encodeCommonNameWildcard) {
+    List<Filter> filters =
+        attributes.stream()
+            .filter(
+                attribute ->
+                    !attribute.getName().equals("objectClass")
+                        && !attribute.getValue().isEmpty()
+                        && !attribute.getName().equals("cn"))
+            .map(attribute -> LdapFilter.createFilter(attribute.getName(), attribute.getValues()))
+            .collect(Collectors.toList());
+    Optional<Attribute> commonNameAttribute =
+        attributes.stream().filter(attribute -> attribute.getName().equals("cn")).findFirst();
+    if (commonNameAttribute.isPresent()) {
+      if (encodeCommonNameWildcard) {
+        filters.add(
+            LdapFilter.createFilter(
+                commonNameAttribute.get().getName(), commonNameAttribute.get().getValues()));
       } else {
-        return LdapFilter.and(
-            Arrays.asList(
-                LdapFilter.and(objectClassListFilter), LdapFilter.or(attributeListFilter)));
+        try {
+          filters.add(
+              Filter.create(
+                  "cn="
+                      + Filter.encodeValue(commonNameAttribute.get().getValue())
+                          .replace("\\2a", "*")));
+        } catch (LDAPException e) {
+          filters.add(
+              LdapFilter.createFilter(
+                  commonNameAttribute.get().getName(), commonNameAttribute.get().getValues()));
+        }
       }
     }
-    throw new RuntimeException("Invalid searchType must be AND or OR");
+    return filters;
   }
 
   private SearchResultEntry getEntryByDn(String dn) {
@@ -419,5 +494,11 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
           getOrganization(org.getOrganization().getIdentifiant(), true).orElse(null));
     }
     return Optional.ofNullable(org);
+  }
+
+  public String removeSpecialChars(String string) {
+    return Normalizer.normalize(string, Normalizer.Form.NFD)
+        .replaceAll("[-'\\s]+", "")
+        .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
   }
 }

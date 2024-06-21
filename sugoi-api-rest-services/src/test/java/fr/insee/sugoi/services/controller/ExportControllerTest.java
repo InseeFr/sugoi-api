@@ -16,6 +16,7 @@ package fr.insee.sugoi.services.controller;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 
 import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
@@ -109,12 +110,14 @@ public class ExportControllerTest {
     PageResult<User> pageResultUserStorage1 = new PageResult<>();
 
     pageResultUserStorage1.setResults(List.of(user, userAttribute));
-    Mockito.when(userService.findByProperties(any(), eq("storage"), any(), any(), any()))
+    Mockito.when(
+            userService.findByProperties(any(), eq("storage"), any(), any(), any(), anyBoolean()))
         .thenReturn(pageResultUserStorage1);
 
     PageResult<User> pageResultUserStorage2 = new PageResult<>();
     pageResultUserStorage2.setResults(List.of(user1));
-    Mockito.when(userService.findByProperties(any(), eq("storage2"), any(), any(), any()))
+    Mockito.when(
+            userService.findByProperties(any(), eq("storage2"), any(), any(), any(), anyBoolean()))
         .thenReturn(pageResultUserStorage2);
 
     UserStorage userStorage2 = new UserStorage();
