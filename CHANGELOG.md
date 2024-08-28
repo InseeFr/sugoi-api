@@ -1,3 +1,10 @@
+# 2.2.2
+
+
+- [BUG] :bug: Fix search OR and AND reversed when has objectclass
+- [REL] :rocket: release version 2.2.1
+
+
 # 2.1.5
 
 
