@@ -1,3 +1,10 @@
+# 2.2.1
+
+
+- [BUG] :bug: Fix search OR and AND reversed
+- [REL] :rocket: release version 2.2.0
+
+
 # 2.1.5
 
 
