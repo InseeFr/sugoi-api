@@ -308,14 +308,15 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
   private <M extends SugoiObject> Filter getFilterFromObject(
       M object, LdapMapper<M> mapper, String searchType, boolean encodeCommonNameWildcard) {
     Assert.isTrue(
-        searchType.equals("AND") || searchType.equals("OR"), "Search type should be AND or OR.");
+        searchType.equalsIgnoreCase("AND") || searchType.equalsIgnoreCase("OR"),
+        "Search type should be AND or OR.");
     List<Attribute> attributes = mapper.createAttributesForFilter(object);
     List<Filter> attributeListFilter = getAttributesFilters(attributes, encodeCommonNameWildcard);
     List<Filter> objectClassListFilter = getObjectClassFilters(attributes);
     if (!objectClassListFilter.isEmpty() && attributeListFilter.isEmpty()) {
       return LdapFilter.and(objectClassListFilter);
     } else if (objectClassListFilter.isEmpty() && !attributeListFilter.isEmpty()) {
-      return searchType.equals("AND")
+      return searchType.equalsIgnoreCase("OR")
           ? LdapFilter.or(attributeListFilter)
           : LdapFilter.and(attributeListFilter);
     } else {
