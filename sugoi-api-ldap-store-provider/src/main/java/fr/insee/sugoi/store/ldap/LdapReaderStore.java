@@ -323,7 +323,7 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
       return LdapFilter.and(
           Arrays.asList(
               LdapFilter.and(objectClassListFilter),
-              searchType.equals("AND")
+              searchType.equalsIgnoreCase("OR")
                   ? LdapFilter.or(attributeListFilter)
                   : LdapFilter.and(attributeListFilter)));
     }
