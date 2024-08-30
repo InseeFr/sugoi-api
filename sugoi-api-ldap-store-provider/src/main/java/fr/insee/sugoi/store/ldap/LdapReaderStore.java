@@ -149,6 +149,8 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
                         "[ÀÁÂÃÄAÅÇCÈÉÊËEÌÍIÎÏÐÒÓÔOÕÖÙUÚÛÜÝYŸàáâãäåçèéêëìíîïðòóôõöùúûüýÿaeiouc \\-']",
                         "*")
                     .replaceAll("\\*+", "*"));
+        int originalPageSize = pageable.getSize();
+        pageable.setSize(50000);
         PageResult<User> results =
             searchOnLdap(
                 config.get(GlobalKeysConfig.USER_SOURCE),
@@ -162,7 +164,9 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
                 .filter(
                     u ->
                         removeSpecialChars((String) u.getAttributes().get("common_name"))
-                            .equalsIgnoreCase(normalizedCommonName))
+                            .toUpperCase()
+                            .contains(normalizedCommonName.toUpperCase()))
+                .limit(originalPageSize)
                 .collect(Collectors.toList());
         results.setResults(filteredUsers);
         return results;
