@@ -1,3 +1,10 @@
+# 2.2.3
+
+
+- [BUG] :bug: Fix cannot configure instance to accept fuzzy search
+- [REL] :rocket: release version 2.2.2
+
+
 # 2.1.5
 
 
