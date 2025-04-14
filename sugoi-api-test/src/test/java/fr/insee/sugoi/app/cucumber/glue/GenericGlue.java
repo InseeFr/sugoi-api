@@ -34,7 +34,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.net.util.Base64;
+import org.apache.commons.codec.binary.Base64;
 
 public class GenericGlue {
 

@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
+import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationModule;
 
 public class CustomObjectMapper {
 
@@ -32,7 +32,7 @@ public class CustomObjectMapper {
 
   public static XmlMapper XMLObjectMapper() {
     XmlMapper xmlMapper = new XmlMapper();
-    JaxbAnnotationModule module = new JaxbAnnotationModule();
+    JakartaXmlBindAnnotationModule module = new JakartaXmlBindAnnotationModule();
     xmlMapper.registerModule(module);
     xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
     xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
