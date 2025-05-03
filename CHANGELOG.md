@@ -1,3 +1,10 @@
+# 2.2.0
+
+
+- [FEA] :sparkles: Users can be searched ignoring accents
+- [REL] :rocket: release version 2.1.6
+
+
 # 2.1.5
 
 
