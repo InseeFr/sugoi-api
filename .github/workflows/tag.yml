@@ -19,8 +19,7 @@ jobs:
 
       - name: Prepare
         run: |
-          git config --global user.name "Insee - Domaine Outils Transverses"
-          git config --global user.email "dg75-dsi-domaine-outils-transverses@insee.fr"  
+          git config --global user.name "Insee - Team sugoi"
           git clone https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{github.repository}}.git
           cd sugoi-api/
           git checkout ${{ github.ref_name }}
@@ -28,7 +27,7 @@ jobs:
           git checkout -b release-${{ github.event.inputs.version }}
           mvn -B versions:set -DnewVersion=${{ github.event.inputs.version }}  -DgenerateBackupPoms=false
           echo -e "# ${{ github.event.inputs.version }} \n\n" >> changelog.tmp
-          git log --pretty=format:"- %s" `git tag --sort=-committerdate | head -1`...@ >> changelog.tmp
+          git log --pretty=format:"- %s" `git tag --sort=-committerdate | head -1`...@ | grep -v [REL] >> changelog.tmp
           echo -e "\n\n" >> changelog.tmp
           cat CHANGELOG.md >> changelog.tmp
           mv changelog.tmp CHANGELOG.md
@@ -92,8 +91,7 @@ jobs:
         with:
           node-version: 14
       - run: |
-          git config --global user.name "Insee - Domaine Outils Transverses"
-          git config --global user.email "dg75-dsi-domaine-outils-transverses@insee.fr"  
+          git config --global user.name "Insee - Team sugoi"
           git clone https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{github.repository}}.git
           cd sugoi-api/
           git checkout release-${{ github.event.inputs.version }}
