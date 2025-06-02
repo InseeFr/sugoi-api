@@ -25,7 +25,7 @@
 		<jacoco.unit-tests.limit.class-complexity>20</jacoco.unit-tests.limit.class-complexity>
 		<jacoco.unit-tests.limit.method-complexity>5</jacoco.unit-tests.limit.method-complexity>
 		<java.version>17</java.version>
-		<spring-boot.version>3.1.4</spring-boot.version>
+		<spring-boot.version>3.5.0</spring-boot.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<tomcat.version>11.0.8</tomcat.version>
 		<commons-io.version>2.14.0</commons-io.version>
@@ -46,6 +46,8 @@
 		<maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
 		<javax.jms-api.version>2.0.1</javax.jms-api.version>
 		<org.activemq.version>6.0.1</org.activemq.version>
+		<com.squareup.okhttp3.version>4.12.0</com.squareup.okhttp3.version>
+
 	</properties>
 
 	<dependencies></dependencies>
@@ -320,6 +322,14 @@
 				<artifactId>activemq-kahadb-store</artifactId>
 				<version>${org.activemq.version}</version>
 			</dependency>
+
+			<dependency>
+				<groupId>com.squareup.okhttp3</groupId>
+				<artifactId>mockwebserver</artifactId>
+				<version>${com.squareup.okhttp3.version}</version>
+				<scope>test</scope>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 
