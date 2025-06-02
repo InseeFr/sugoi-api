@@ -1,3 +1,15 @@
+# 2.5.0
+
+
+- [UP] :arrow_up: Bump maven-compiler-plugin from 3.10.1 to 3.11.0
+- [UP] :arrow_up: Bump maven-assembly-plugin from 3.4.2 to 3.6.0
+- [UP] action gitlab cache
+- Spring boot 3 (#881)
+- [UP] ⬆️ upload and download artifacts to v4
+- [BUG] :bug: Fix no users are returned when doing fuzzysearch
+
+
+
 # 2.2.3
 
 - [BUG] :bug: Fix cannot configure instance to accept fuzzy search
