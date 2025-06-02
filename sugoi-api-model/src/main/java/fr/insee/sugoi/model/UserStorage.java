@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
 import org.apache.commons.lang.text.StrSubstitutor;
 
 public class UserStorage implements Serializable {
@@ -30,12 +29,11 @@ public class UserStorage implements Serializable {
   private String addressSource;
 
   @JsonDeserialize(using = RealmConfigKeysDeserializer.class)
-  @IgnoreSizeOf
   private Map<RealmConfigKeys, List<String>> properties = new HashMap<>();
 
-  @IgnoreSizeOf private List<StoreMapping> userMappings;
+  private List<StoreMapping> userMappings;
 
-  @IgnoreSizeOf private List<StoreMapping> organizationMappings;
+  private List<StoreMapping> organizationMappings;
 
   public List<StoreMapping> getUserMappings() {
     return userMappings;

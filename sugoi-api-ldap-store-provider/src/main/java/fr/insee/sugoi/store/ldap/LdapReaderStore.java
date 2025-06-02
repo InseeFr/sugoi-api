@@ -149,6 +149,8 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
                         "[ÀÁÂÃÄAÅÇCÈÉÊËEÌÍIÎÏÐÒÓÔOÕÖÙUÚÛÜÝYŸàáâãäåçèéêëìíîïðòóôõöùúûüýÿaeiouc \\-']",
                         "*")
                     .replaceAll("\\*+", "*"));
+        int originalPageSize = pageable.getSize();
+        pageable.setSize(50000);
         PageResult<User> results =
             searchOnLdap(
                 config.get(GlobalKeysConfig.USER_SOURCE),
@@ -162,7 +164,9 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
                 .filter(
                     u ->
                         removeSpecialChars((String) u.getAttributes().get("common_name"))
-                            .equalsIgnoreCase(normalizedCommonName))
+                            .toUpperCase()
+                            .contains(normalizedCommonName.toUpperCase()))
+                .limit(originalPageSize)
                 .collect(Collectors.toList());
         results.setResults(filteredUsers);
         return results;
@@ -308,21 +312,22 @@ public class LdapReaderStore extends LdapStore implements ReaderStore {
   private <M extends SugoiObject> Filter getFilterFromObject(
       M object, LdapMapper<M> mapper, String searchType, boolean encodeCommonNameWildcard) {
     Assert.isTrue(
-        searchType.equals("AND") || searchType.equals("OR"), "Search type should be AND or OR.");
+        searchType.equalsIgnoreCase("AND") || searchType.equalsIgnoreCase("OR"),
+        "Search type should be AND or OR.");
     List<Attribute> attributes = mapper.createAttributesForFilter(object);
     List<Filter> attributeListFilter = getAttributesFilters(attributes, encodeCommonNameWildcard);
     List<Filter> objectClassListFilter = getObjectClassFilters(attributes);
     if (!objectClassListFilter.isEmpty() && attributeListFilter.isEmpty()) {
       return LdapFilter.and(objectClassListFilter);
     } else if (objectClassListFilter.isEmpty() && !attributeListFilter.isEmpty()) {
-      return searchType.equals("AND")
+      return searchType.equalsIgnoreCase("OR")
           ? LdapFilter.or(attributeListFilter)
           : LdapFilter.and(attributeListFilter);
     } else {
       return LdapFilter.and(
           Arrays.asList(
               LdapFilter.and(objectClassListFilter),
-              searchType.equals("AND")
+              searchType.equalsIgnoreCase("OR")
                   ? LdapFilter.or(attributeListFilter)
                   : LdapFilter.and(attributeListFilter)));
     }

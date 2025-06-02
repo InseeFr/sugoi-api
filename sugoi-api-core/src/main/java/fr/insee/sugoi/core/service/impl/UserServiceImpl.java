@@ -425,6 +425,14 @@ public class UserServiceImpl implements UserService {
     this.readerStoreAsynchronous = readerStoreAsynchronous;
   }
 
+  public boolean isFuzzySearchAllowed() {
+    return fuzzySearchAllowed;
+  }
+
+  public void setFuzzySearchAllowed(boolean fuzzySearchAllowed) {
+    this.fuzzySearchAllowed = fuzzySearchAllowed;
+  }
+
   private List<String> findUserSeeAlsos(Realm realm, User user) {
     String[] seeAlsosAttributes =
         realm

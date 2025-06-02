@@ -57,5 +57,11 @@
 			<artifactId>commons-io</artifactId>
 		</dependency>
 
-	</dependencies>
+		<dependency>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+    </dependencies>
 </project>

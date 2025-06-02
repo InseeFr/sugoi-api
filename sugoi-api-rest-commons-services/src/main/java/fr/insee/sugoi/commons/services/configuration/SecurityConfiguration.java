@@ -13,30 +13,47 @@
 */
 package fr.insee.sugoi.commons.services.configuration;
 
-import fr.insee.sugoi.commons.services.configuration.basic.CustomAuthorityMapper;
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
+import fr.insee.sugoi.commons.services.configuration.basic.CustomLdapAuthoritiesPopulator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.ldap.core.support.BaseLdapPathContextSource;
+import org.springframework.ldap.core.support.LdapContextSource;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.ldap.LdapBindAuthenticationManagerFactory;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator;
+import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @ConfigurationProperties("fr.insee.sugoi.security")
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+@EnableMethodSecurity
+public class SecurityConfiguration {
+
+  private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
+
+  @Autowired ApplicationContext applicationContext;
 
   /** Enable basic authentication */
   private boolean basicAuthenticationEnabled = false;
@@ -51,9 +68,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
    */
   private boolean bearerAuthenticationEnabled = false;
 
-  /** Enable basic authentication over ldap connection */
-  private boolean ldapAccountManagmentEnabled = false;
-
   /** Ldap url where are stored accounts for managment */
   private String ldapAccountManagmentUrl;
   /** Base DN where are stored ldap accounts for managment */
@@ -67,17 +81,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   /** Path to the role field in token. For instance realm_access.role */
   private String oidcClaimRole = "realm_access.roles";
 
-  /** Enable a monitoring user */
-  private boolean monitorUserEnabled = false;
-
-  private String monitorUserName = "monitor";
-  private String monitorUserPassword;
-
   @Value("${fr.insee.sugoi.security.default-roles-for-users:}")
   private List<String> defaultRolesForUsers;
 
-  @Override
-  protected void configure(HttpSecurity http) throws Exception {
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     // api, so csrf is disabled
     http.csrf().disable();
 
@@ -96,28 +104,23 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     String adminRegex =
-        getApplicationContext()
+        applicationContext
             .getEnvironment()
             .getProperty("fr.insee.sugoi.api.regexp.role.admin", "ROLE_ADMIN");
     String[] monitorRoles = (String[]) ArrayUtils.add(adminRegex.split(","), "ROLE_MONITOR");
 
-    http.authorizeRequests(
-        authz ->
-            authz
-                .antMatchers("/actuator/health/**")
-                .permitAll()
-                .antMatchers("/actuator/**")
-                .hasAnyAuthority(monitorRoles)
-                .antMatchers("/swagger-ui/**", "/v3/api-docs/**")
-                .permitAll()
-                .antMatchers(HttpMethod.OPTIONS)
-                .permitAll()
-                .antMatchers(HttpMethod.GET, "/**")
-                .permitAll()
-                .antMatchers("/**")
-                .authenticated()
-                .anyRequest()
-                .denyAll());
+    http.authorizeHttpRequests(
+        configurer -> {
+          configurer.requestMatchers(antMatcher(HttpMethod.OPTIONS)).permitAll();
+          configurer.requestMatchers(antMatcher("/actuator/health/**")).permitAll();
+          configurer.requestMatchers(antMatcher("/swagger-ui/**")).permitAll();
+          configurer.requestMatchers(antMatcher("/v3/api-docs/**")).permitAll();
+          configurer.requestMatchers(antMatcher(HttpMethod.GET, "/realms")).permitAll();
+          configurer.requestMatchers(antMatcher(HttpMethod.GET, "/v2/realms")).permitAll();
+          configurer.requestMatchers(antMatcher("/actuator/**")).hasAnyAuthority(monitorRoles);
+          configurer.anyRequest().authenticated();
+        });
+    return http.build();
   }
 
   // Customization to get Keycloak Role
@@ -170,25 +173,41 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     };
   }
 
-  @Override
-  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    if (monitorUserEnabled && monitorUserPassword != null) {
-      auth.inMemoryAuthentication()
-          .withUser(monitorUserName)
-          .password("{noop}" + monitorUserPassword)
-          .roles("MONITOR");
-    }
-    if (ldapAccountManagmentEnabled) {
-      auth.ldapAuthentication()
-          .userSearchBase(ldapAccountManagmentUserBase)
-          .userSearchFilter("(uid={0})")
-          .groupSearchBase(ldapAccountManagmentGroupeBase)
-          .groupSearchSubtree(ldapAccountManagmentGroupSubtree)
-          .contextSource()
-          .url(ldapAccountManagmentUrl)
-          .and()
-          .authoritiesMapper(new CustomAuthorityMapper(defaultRolesForUsers));
-    }
+  @Bean
+  @ConditionalOnProperty(
+      value = "fr.insee.sugoi.security.ldap-account-managment-enabled",
+      havingValue = "true")
+  LdapContextSource contextSourceFactoryBean() {
+    LdapContextSource ldapContextSource = new LdapContextSource();
+    ldapContextSource.setUrl(ldapAccountManagmentUrl);
+    return ldapContextSource;
+  }
+
+  @Bean
+  @ConditionalOnProperty(
+      value = "fr.insee.sugoi.security.ldap-account-managment-enabled",
+      havingValue = "true")
+  LdapAuthoritiesPopulator authorities(BaseLdapPathContextSource contextSource) {
+    DefaultLdapAuthoritiesPopulator authorities =
+        new CustomLdapAuthoritiesPopulator(
+            contextSource, ldapAccountManagmentGroupeBase, defaultRolesForUsers);
+    authorities.setGroupSearchFilter("(uniquemember={0})");
+    authorities.setSearchSubtree(ldapAccountManagmentGroupSubtree);
+    return authorities;
+  }
+
+  @Bean
+  @ConditionalOnProperty(
+      value = "fr.insee.sugoi.security.ldap-account-managment-enabled",
+      havingValue = "true")
+  AuthenticationManager ldapAuthenticationManager(
+      BaseLdapPathContextSource contextSource, LdapAuthoritiesPopulator ldapAuthoritiesPopulator) {
+    LdapBindAuthenticationManagerFactory factory =
+        new LdapBindAuthenticationManagerFactory(contextSource);
+    factory.setUserSearchBase(ldapAccountManagmentUserBase);
+    factory.setUserSearchFilter("(uid={0})");
+    factory.setLdapAuthoritiesPopulator(ldapAuthoritiesPopulator);
+    return factory.createAuthenticationManager();
   }
 
   public boolean isBasicAuthenticationEnabled() {
@@ -205,14 +224,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   public void setBearerAuthenticationEnabled(boolean bearerAuthenticationEnabled) {
     this.bearerAuthenticationEnabled = bearerAuthenticationEnabled;
-  }
-
-  public boolean isLdapAccountManagmentEnabled() {
-    return ldapAccountManagmentEnabled;
-  }
-
-  public void setLdapAccountManagmentEnabled(boolean ldapAccountManagmentEnabled) {
-    this.ldapAccountManagmentEnabled = ldapAccountManagmentEnabled;
   }
 
   public String getLdapAccountManagmentUrl() {
@@ -261,29 +272,5 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   public void setOidcClaimRole(String oidcClaimRole) {
     this.oidcClaimRole = oidcClaimRole;
-  }
-
-  public String getMonitorUserName() {
-    return monitorUserName;
-  }
-
-  public void setMonitorUserName(String monitorUserName) {
-    this.monitorUserName = monitorUserName;
-  }
-
-  public String getMonitorUserPassword() {
-    return monitorUserPassword;
-  }
-
-  public void setMonitorUserPassword(String monitorUserPassword) {
-    this.monitorUserPassword = monitorUserPassword;
-  }
-
-  public boolean isMonitorUserEnabled() {
-    return monitorUserEnabled;
-  }
-
-  public void setMonitorUserEnabled(boolean monitorUserEnabled) {
-    this.monitorUserEnabled = monitorUserEnabled;
   }
 }

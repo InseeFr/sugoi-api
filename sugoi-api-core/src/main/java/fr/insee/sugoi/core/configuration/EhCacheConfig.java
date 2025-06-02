@@ -13,17 +13,13 @@
 */
 package fr.insee.sugoi.core.configuration;
 
-import net.sf.ehcache.config.CacheConfiguration;
-import org.springframework.cache.CacheManager;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
+import org.ehcache.config.units.EntryUnit;
+import org.ehcache.jsr107.Eh107Configuration;
+import org.springframework.boot.autoconfigure.cache.JCacheManagerCustomizer;
 import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.ehcache.EhCacheCacheManager;
-import org.springframework.cache.interceptor.CacheErrorHandler;
-import org.springframework.cache.interceptor.CacheResolver;
-import org.springframework.cache.interceptor.KeyGenerator;
-import org.springframework.cache.interceptor.SimpleCacheErrorHandler;
-import org.springframework.cache.interceptor.SimpleCacheResolver;
-import org.springframework.cache.interceptor.SimpleKeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,48 +27,26 @@ import org.springframework.context.annotation.Configuration;
 @EnableCaching
 public class EhCacheConfig implements CachingConfigurer {
 
-  @Bean(destroyMethod = "shutdown")
-  public net.sf.ehcache.CacheManager ehCacheManager() {
-
-    CacheConfiguration cacheConfiguration = new CacheConfiguration();
-    cacheConfiguration.setName("Realms");
-    cacheConfiguration.setMemoryStoreEvictionPolicy("LRU");
-    cacheConfiguration.setMaxEntriesLocalHeap(1000);
-
-    CacheConfiguration cacheConfiguration1 = new CacheConfiguration();
-    cacheConfiguration1.setName("Realm");
-    cacheConfiguration1.setMemoryStoreEvictionPolicy("LRU");
-    cacheConfiguration1.setMaxEntriesLocalHeap(1000);
-
-    net.sf.ehcache.config.Configuration config = new net.sf.ehcache.config.Configuration();
-
-    config.addCache(cacheConfiguration);
-    config.addCache(cacheConfiguration1);
-
-    return net.sf.ehcache.CacheManager.newInstance(config);
-  }
-
   @Bean
-  @Override
-  public CacheManager cacheManager() {
-    return new EhCacheCacheManager(ehCacheManager());
-  }
+  public JCacheManagerCustomizer cacheManagerCustomizer() {
+    javax.cache.configuration.Configuration<String, Object> realmsConfiguration =
+        Eh107Configuration.fromEhcacheCacheConfiguration(
+            CacheConfigurationBuilder.newCacheConfigurationBuilder(
+                    String.class,
+                    Object.class,
+                    ResourcePoolsBuilder.newResourcePoolsBuilder().heap(1000, EntryUnit.ENTRIES))
+                .build());
+    javax.cache.configuration.Configuration<String, Object> realmConfiguration =
+        Eh107Configuration.fromEhcacheCacheConfiguration(
+            CacheConfigurationBuilder.newCacheConfigurationBuilder(
+                    String.class,
+                    Object.class,
+                    ResourcePoolsBuilder.newResourcePoolsBuilder().heap(1000, EntryUnit.ENTRIES))
+                .build());
 
-  @Bean
-  @Override
-  public KeyGenerator keyGenerator() {
-    return new SimpleKeyGenerator();
-  }
-
-  @Bean
-  @Override
-  public CacheResolver cacheResolver() {
-    return new SimpleCacheResolver(cacheManager());
-  }
-
-  @Bean
-  @Override
-  public CacheErrorHandler errorHandler() {
-    return new SimpleCacheErrorHandler();
+    return cm -> {
+      cm.createCache("Realms", realmsConfiguration);
+      cm.createCache("Realm", realmConfiguration);
+    };
   }
 }
