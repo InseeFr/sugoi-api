@@ -36,6 +36,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.ldap.core.support.BaseLdapPathContextSource;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.ldap.LdapBindAuthenticationManagerFactory;
@@ -87,11 +88,11 @@ public class SecurityConfiguration {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     // api, so csrf is disabled
-    http.csrf().disable();
+    http.csrf(csrf -> csrf.disable());
 
     // allow basic authentication
     if (basicAuthenticationEnabled) {
-      http.httpBasic();
+      http.httpBasic(Customizer.withDefaults());
     }
     // allow jwt bearer authentication
     if (bearerAuthenticationEnabled) {

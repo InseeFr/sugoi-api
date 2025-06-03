@@ -32,14 +32,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest(classes = JmsWriter.class)
 public class JmsWriterStoreTest {
 
   JmsWriterStore jmsWriterStore;
 
-  @MockBean private JmsWriter jmsWriter;
+  @MockitoBean private JmsWriter jmsWriter;
 
   @BeforeEach
   public void setUp() {
