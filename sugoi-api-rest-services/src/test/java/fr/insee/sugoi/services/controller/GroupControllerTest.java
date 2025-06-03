@@ -40,10 +40,10 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -58,7 +58,7 @@ public class GroupControllerTest {
 
   @Autowired MockMvc mockMvc;
 
-  @MockBean private GroupService groupService;
+  @MockitoBean private GroupService groupService;
 
   public static class GroupSelfManagedMatcher implements ArgumentMatcher<Group> {
     @Override
@@ -414,7 +414,8 @@ public class GroupControllerTest {
           .thenThrow(new GroupNotFoundException("domaine1", "monApplication", "dontexist"));
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.get("/realms/domaine1/application/monApplication/groups/dontexist")
+          MockMvcRequestBuilders.get(
+                  "/realms/domaine1/applications/monApplication/groups/dontexist")
               .accept(MediaType.APPLICATION_JSON);
 
       assertThat(
@@ -489,7 +490,7 @@ public class GroupControllerTest {
 
       RequestBuilder requestBuilder =
           MockMvcRequestBuilders.delete(
-                  "/realms/domaine1/groups/application/monApplication/dontexist")
+                  "/realms/domaine1/applications/monApplication/groups/dontexist")
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 

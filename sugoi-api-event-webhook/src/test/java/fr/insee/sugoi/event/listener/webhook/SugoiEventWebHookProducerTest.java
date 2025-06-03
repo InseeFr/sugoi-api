@@ -25,13 +25,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest(classes = {SugoiEventWebHookProducer.class, WebHookServiceImpl.class})
 @TestPropertySource(locations = "classpath:/application2.properties")
 class SugoiEventWebHookProducerTest {
-  @MockBean WebHookServiceImpl webHookService;
+  @MockitoBean WebHookServiceImpl webHookService;
 
   @Autowired SugoiEventWebHookProducer sugoiEventWebHookProducer;
   private SugoiEvent sugoiEventSendLogin;

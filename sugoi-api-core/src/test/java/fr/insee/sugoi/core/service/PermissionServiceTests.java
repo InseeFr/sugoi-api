@@ -37,16 +37,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest(
     classes = PermissionServiceImpl.class,
     properties = "spring.config.location=classpath:/permissions/test-regexp-permissions.properties")
 public class PermissionServiceTests {
 
-  @MockBean private RealmProvider realmProvider;
-  @MockBean private ApplicationService applicationService;
-  @MockBean private GroupService groupService;
+  @MockitoBean private RealmProvider realmProvider;
+  @MockitoBean private ApplicationService applicationService;
+  @MockitoBean private GroupService groupService;
   @Autowired PermissionService permissions;
 
   private Realm realm;

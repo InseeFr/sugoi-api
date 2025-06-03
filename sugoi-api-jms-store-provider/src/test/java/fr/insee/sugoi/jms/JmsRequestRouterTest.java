@@ -33,16 +33,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest(classes = {JmsRequestRouter.class, Converter.class})
 public class JmsRequestRouterTest {
 
-  @MockBean private StoreProvider storeProvider;
-  @MockBean private UserService userService;
-  @MockBean private CredentialsService credentialsService;
-  @MockBean private GroupService groupService;
-  @MockBean private OrganizationService orgService;
+  @MockitoBean private StoreProvider storeProvider;
+  @MockitoBean private UserService userService;
+  @MockitoBean private CredentialsService credentialsService;
+  @MockitoBean private GroupService groupService;
+  @MockitoBean private OrganizationService orgService;
 
   @Autowired JmsRequestRouter jmsRequestRouter;
 
