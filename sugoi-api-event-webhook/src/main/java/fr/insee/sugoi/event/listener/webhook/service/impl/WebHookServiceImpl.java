@@ -26,6 +26,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,6 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Base64Utils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -134,7 +134,7 @@ public class WebHookServiceImpl implements WebHookService {
       String username = env.getProperty(WEBHOOK_PROPERTY_PREFIX + webHookName + ".auth.user");
       String password = env.getProperty(WEBHOOK_PROPERTY_PREFIX + webHookName + ".auth.password");
       String auth = username + ":" + password;
-      byte[] encodedAuth = Base64Utils.encode(auth.getBytes());
+      byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes());
       String authHeader = "Basic " + new String(encodedAuth);
       headers.put("Authorization", authHeader);
     } else if (authType.equalsIgnoreCase("oauth")) {

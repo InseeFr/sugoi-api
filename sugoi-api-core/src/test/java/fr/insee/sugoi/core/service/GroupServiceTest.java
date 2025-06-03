@@ -37,16 +37,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest(classes = {GroupServiceImpl.class, UserServiceImpl.class, StoreProviderImpl.class})
 @TestPropertySource(locations = "classpath:/application.properties")
 public class GroupServiceTest {
 
-  @MockBean private StoreStorage storeStorage;
+  @MockitoBean private StoreStorage storeStorage;
 
-  @MockBean private RealmProvider realmProvider;
+  @MockitoBean private RealmProvider realmProvider;
 
   @Autowired private GroupServiceImpl groupService;
 
