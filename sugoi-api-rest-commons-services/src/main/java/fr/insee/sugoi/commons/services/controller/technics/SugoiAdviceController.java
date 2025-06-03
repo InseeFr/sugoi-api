@@ -30,6 +30,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 @ControllerAdvice
 public class SugoiAdviceController {
@@ -48,7 +49,7 @@ public class SugoiAdviceController {
   }
 
   private HttpStatus computeStatusFromException(Exception e) {
-    if (e instanceof NotFoundException) {
+    if (e instanceof NotFoundException || e instanceof NoHandlerFoundException) {
       return HttpStatus.NOT_FOUND;
     } else if (e instanceof ConflictException) {
       return HttpStatus.CONFLICT;

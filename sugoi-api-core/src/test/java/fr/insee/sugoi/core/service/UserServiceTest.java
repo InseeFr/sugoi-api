@@ -58,8 +58,8 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -67,9 +67,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @TestPropertySource(locations = "classpath:/application.properties")
 public class UserServiceTest {
 
-  @MockBean private StoreProvider storeProvider;
+  @MockitoBean private StoreProvider storeProvider;
 
-  @MockBean private RealmProvider realmProvider;
+  @MockitoBean private RealmProvider realmProvider;
 
   @Mock private ReaderStore readerStore1;
 

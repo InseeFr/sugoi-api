@@ -37,10 +37,10 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -58,12 +58,12 @@ public class CredentialsJmsTest {
   private JmsWriterStore jmsWriterStore;
   @Mock private JmsWriterStore doNothingWriterStore;
 
-  @MockBean private StoreProvider storeProvider;
-  @MockBean private PasswordService passwordService;
-  @MockBean private RealmProvider realmprovider;
-  @MockBean private UserService userService;
-  @MockBean private GroupService groupService;
-  @MockBean private OrganizationService organizationService;
+  @MockitoBean private StoreProvider storeProvider;
+  @MockitoBean private PasswordService passwordService;
+  @MockitoBean private RealmProvider realmprovider;
+  @MockitoBean private UserService userService;
+  @MockitoBean private GroupService groupService;
+  @MockitoBean private OrganizationService organizationService;
 
   @BeforeEach
   public void setUp() {

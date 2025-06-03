@@ -40,9 +40,9 @@ import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest(
     classes = {
@@ -55,17 +55,17 @@ public class CredentialWebhookTest {
 
   @Autowired CredentialsServiceImpl credentialsServiceImpl;
 
-  @MockBean private StoreProvider storeProvider;
+  @MockitoBean private StoreProvider storeProvider;
 
-  @MockBean private PasswordService passwordService;
+  @MockitoBean private PasswordService passwordService;
 
   @SpyBean private WebHookServiceImpl webHookServiceImpl;
 
-  @MockBean private RealmProvider realmProvider;
+  @MockitoBean private RealmProvider realmProvider;
 
-  @MockBean private UserService userService;
+  @MockitoBean private UserService userService;
 
-  @MockBean private WriterStore writerStore;
+  @MockitoBean private WriterStore writerStore;
 
   @Captor ArgumentCaptor<Map<String, Object>> argumentCaptorProperties;
 
