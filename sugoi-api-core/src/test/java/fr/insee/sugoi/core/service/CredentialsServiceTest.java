@@ -46,20 +46,20 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest(classes = {CredentialsServiceImpl.class, PasswordServiceImpl.class})
 @TestPropertySource(locations = "classpath:/application.properties")
 public class CredentialsServiceTest {
 
-  @MockBean private StoreProvider storeProvider;
+  @MockitoBean private StoreProvider storeProvider;
 
-  @MockBean private SugoiEventPublisher sugoiEventPublisher;
+  @MockitoBean private SugoiEventPublisher sugoiEventPublisher;
 
-  @MockBean private RealmProvider realmProvider;
+  @MockitoBean private RealmProvider realmProvider;
 
-  @MockBean private UserService userService;
+  @MockitoBean private UserService userService;
 
   @Autowired CredentialsServiceImpl credentialsService;
 
