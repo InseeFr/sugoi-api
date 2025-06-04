@@ -38,15 +38,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest(classes = OrganizationServiceImpl.class)
 @TestPropertySource(locations = "classpath:/application.properties")
 public class OrganizationServiceTest {
-  @MockBean private StoreProvider storeProvider;
+  @MockitoBean private StoreProvider storeProvider;
 
-  @MockBean private RealmProvider realmProvider;
+  @MockitoBean private RealmProvider realmProvider;
 
   @Mock private ReaderStore readerStore1;
 
