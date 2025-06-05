@@ -1,3 +1,10 @@
+# 2.5.1
+
+
+- [FIX] path root unavailable and trailing path matching
+
+
+
 # 2.5.0
 
 
