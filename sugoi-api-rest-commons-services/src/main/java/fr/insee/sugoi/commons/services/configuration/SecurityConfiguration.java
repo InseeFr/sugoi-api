@@ -112,6 +112,7 @@ public class SecurityConfiguration {
     http.authorizeHttpRequests(
         configurer -> {
           configurer.requestMatchers(antMatcher(HttpMethod.OPTIONS)).permitAll();
+          configurer.requestMatchers(antMatcher("/")).permitAll();
           configurer.requestMatchers(antMatcher("/actuator/health/**")).permitAll();
           configurer.requestMatchers(antMatcher("/swagger-ui/**")).permitAll();
           configurer.requestMatchers(antMatcher("/v3/api-docs/**")).permitAll();
