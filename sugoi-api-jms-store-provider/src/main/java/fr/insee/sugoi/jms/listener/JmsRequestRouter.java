@@ -56,8 +56,10 @@ public class JmsRequestRouter {
 
   @Autowired private OrganizationService orgService;
 
+  private static final String hostName = System.getenv("HOSTNAME");
+
   public ProviderResponse exec(BrokerRequest request) throws Exception {
-    ProviderResponse response = new ProviderResponse();
+    ProviderResponse response = new ProviderResponse(hostName);
     try {
       String realm = (String) request.getmethodParams().get("realm");
       String userStorage = (String) request.getmethodParams().get("userStorage");
@@ -256,6 +258,16 @@ public class JmsRequestRouter {
       }
       response.setStatus(ProviderResponseStatus.OK);
     } catch (RuntimeException e) {
+      if (!e.getClass().getPackage().getName().startsWith("fr.insee.sugoi")
+          || e.getClass().getSuperclass().getCanonicalName().equals("java.lang.RuntimeException")) {
+        logger.error(
+            "An error occurred while processing request "
+                + request.getCorrelationId()
+                + " for "
+                + request.getmethodParams().get(JmsAtttributes.PROVIDER_HOSTNAME)
+                + " : ",
+            e);
+      }
       response.setStatus(ProviderResponseStatus.KO);
       response.setException(e);
       response.setExceptionType(e.getClass().getCanonicalName());

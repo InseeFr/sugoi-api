@@ -60,4 +60,6 @@ public class JmsAtttributes {
   public static final String WEBHOOK_TAG = "webhookTag";
 
   public static final String SHOULD_RESET_PASSWORD = "should-reset-password";
+
+  public static final String PROVIDER_HOSTNAME = "hostname";
 }
