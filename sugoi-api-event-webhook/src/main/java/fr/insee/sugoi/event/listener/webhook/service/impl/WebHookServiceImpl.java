@@ -78,9 +78,11 @@ public class WebHookServiceImpl implements WebHookService {
   @Override
   public void sendLogin(String webHookName, Map<String, Object> values) {
     if (!((List<String>) values.get(EventKeysConfig.MAILS)).isEmpty()) {
+      System.out.println("pas vide");
       sendRequestToWebhookFromTemplate(
           values, webHookName, "_send_login_template", ".default.send-login.template");
     } else {
+      System.out.println("vide");
       throw new NoReceiverMailException("There is no mail address to send the message to");
     }
   }
@@ -115,6 +117,8 @@ public class WebHookServiceImpl implements WebHookService {
       headers.keySet().stream().forEach(header -> finalHeaders.add(header, headers.get(header)));
       RestTemplate restTemplate = new RestTemplate();
       HttpEntity<String> request = new HttpEntity<>(content, finalHeaders);
+      System.out.println("map : " + headers);
+      System.out.println("finalmap : " + finalHeaders);
       restTemplate.postForEntity(target, request, String.class);
       logger.info("Sending webHook to {} success", target);
     } catch (HttpServerErrorException | HttpClientErrorException e) {
@@ -158,9 +162,11 @@ public class WebHookServiceImpl implements WebHookService {
 
   private String injectValueInTemplate(String content, Map<String, Object> values) {
     try {
-      Configuration cfg = new Configuration(Configuration.VERSION_2_3_30);
+      Configuration cfg = new Configuration(Configuration.VERSION_2_3_34);
+      System.out.println("toto : " + cfg);
       Template t;
       t = new Template("name", new StringReader(content), cfg);
+      System.out.println("tata : " + t);
       Writer out = new StringWriter();
       t.process(values, out);
       return out.toString();
@@ -187,6 +193,8 @@ public class WebHookServiceImpl implements WebHookService {
     } catch (Exception e) {
       // we don't need to manage this exception here
     }
+
+    System.out.println("tutu : " + propertyTemplateConfiguration + " rrr : " + env.getProperty(propertyTemplateConfiguration));
     if (template == null && propertyTemplateConfiguration != null) {
       template = loadResource(env.getProperty(propertyTemplateConfiguration));
     }
