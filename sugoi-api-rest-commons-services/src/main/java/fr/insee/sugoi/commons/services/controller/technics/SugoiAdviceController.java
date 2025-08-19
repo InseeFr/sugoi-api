@@ -14,10 +14,7 @@
 package fr.insee.sugoi.commons.services.controller.technics;
 
 import fr.insee.sugoi.commons.services.view.ErrorView;
-import fr.insee.sugoi.model.exceptions.BadRequestException;
-import fr.insee.sugoi.model.exceptions.ConflictException;
-import fr.insee.sugoi.model.exceptions.ForbiddenException;
-import fr.insee.sugoi.model.exceptions.NotFoundException;
+import fr.insee.sugoi.model.exceptions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -63,6 +60,8 @@ public class SugoiAdviceController {
       return HttpStatus.NOT_IMPLEMENTED;
     } else if (e instanceof HttpRequestMethodNotSupportedException) {
       return HttpStatus.METHOD_NOT_ALLOWED;
+    } else if (e instanceof JmsResponseException) {
+      return computeStatusFromException((Exception) e.getCause());
     } else {
       return HttpStatus.INTERNAL_SERVER_ERROR;
     }

@@ -27,6 +27,7 @@ import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.Realm;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.UserStorage;
+import fr.insee.sugoi.model.exceptions.JmsResponseException;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +44,8 @@ public class JmsWriterStore implements WriterStore {
   private Realm realm;
 
   private UserStorage userStorage;
+
+  private static final String hostName = System.getenv("HOSTNAME");
 
   public JmsWriterStore(
       JmsWriter jmsWriter,
@@ -381,6 +384,7 @@ public class JmsWriterStore implements WriterStore {
 
     // Send Request
     params.put(JmsAtttributes.PROVIDER_REQUEST, providerRequest);
+    params.put(JmsAtttributes.PROVIDER_HOSTNAME, hostName);
     String correlationId =
         providerRequest.isAsynchronousAllowed()
             ? jmsWriter.writeRequestInQueueAsynchronous(queueAsyncRequestName, method, params)
@@ -407,7 +411,7 @@ public class JmsWriterStore implements WriterStore {
         response = br.getProviderResponse();
 
         if (response.getStatus() == ProviderResponseStatus.KO) {
-          throw createExceptionFromResponse(response);
+          throw createExceptionFromResponse(response, correlationId);
         }
       } catch (JmsException e) {
         response.setStatus(ProviderResponseStatus.REQUESTED);
@@ -418,13 +422,17 @@ public class JmsWriterStore implements WriterStore {
     return response;
   }
 
-  private RuntimeException createExceptionFromResponse(ProviderResponse providerResponse) {
+  private RuntimeException createExceptionFromResponse(
+      ProviderResponse providerResponse, String correlationID) {
     try {
       Class<?> c = Class.forName(providerResponse.getExceptionType());
-      return (RuntimeException)
-          c.getDeclaredConstructor(String.class, Throwable.class)
-              .newInstance(
-                  providerResponse.getException().getMessage(), providerResponse.getException());
+      RuntimeException e =
+          (RuntimeException)
+              c.getDeclaredConstructor(String.class, Throwable.class)
+                  .newInstance(
+                      providerResponse.getException().getMessage(),
+                      providerResponse.getException());
+      return new JmsResponseException(e, correlationID, providerResponse.getHostname());
     } catch (Exception e) {
       return new RuntimeException(
           providerResponse.getException().getMessage(), providerResponse.getException());
