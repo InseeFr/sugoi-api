@@ -26,6 +26,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,6 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Base64Utils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -78,9 +78,11 @@ public class WebHookServiceImpl implements WebHookService {
   @Override
   public void sendLogin(String webHookName, Map<String, Object> values) {
     if (!((List<String>) values.get(EventKeysConfig.MAILS)).isEmpty()) {
+      System.out.println("pas vide");
       sendRequestToWebhookFromTemplate(
           values, webHookName, "_send_login_template", ".default.send-login.template");
     } else {
+      System.out.println("vide");
       throw new NoReceiverMailException("There is no mail address to send the message to");
     }
   }
@@ -115,6 +117,8 @@ public class WebHookServiceImpl implements WebHookService {
       headers.keySet().stream().forEach(header -> finalHeaders.add(header, headers.get(header)));
       RestTemplate restTemplate = new RestTemplate();
       HttpEntity<String> request = new HttpEntity<>(content, finalHeaders);
+      System.out.println("map : " + headers);
+      System.out.println("finalmap : " + finalHeaders);
       restTemplate.postForEntity(target, request, String.class);
       logger.info("Sending webHook to {} success", target);
     } catch (HttpServerErrorException | HttpClientErrorException e) {
@@ -134,7 +138,7 @@ public class WebHookServiceImpl implements WebHookService {
       String username = env.getProperty(WEBHOOK_PROPERTY_PREFIX + webHookName + ".auth.user");
       String password = env.getProperty(WEBHOOK_PROPERTY_PREFIX + webHookName + ".auth.password");
       String auth = username + ":" + password;
-      byte[] encodedAuth = Base64Utils.encode(auth.getBytes());
+      byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes());
       String authHeader = "Basic " + new String(encodedAuth);
       headers.put("Authorization", authHeader);
     } else if (authType.equalsIgnoreCase("oauth")) {
@@ -158,9 +162,11 @@ public class WebHookServiceImpl implements WebHookService {
 
   private String injectValueInTemplate(String content, Map<String, Object> values) {
     try {
-      Configuration cfg = new Configuration(Configuration.VERSION_2_3_30);
+      Configuration cfg = new Configuration(Configuration.VERSION_2_3_34);
+      System.out.println("toto : " + cfg);
       Template t;
       t = new Template("name", new StringReader(content), cfg);
+      System.out.println("tata : " + t);
       Writer out = new StringWriter();
       t.process(values, out);
       return out.toString();

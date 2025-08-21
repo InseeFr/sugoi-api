@@ -401,7 +401,7 @@ public class OrganizationController {
             content = {@Content(mediaType = "application/json")}),
         @ApiResponse(
             responseCode = "404",
-            description = "Organization does'nt exist",
+            description = "Organization doesn't exist",
             content = {@Content(mediaType = "application/json")})
       })
   public ResponseEntity<ProviderResponse> deleteOrganizations(
@@ -438,6 +438,10 @@ public class OrganizationController {
                         .collect(Collectors.toList())),
                 isAsynchronous,
                 transactionId));
+    System.out.println("le realm : " + realm);
+    System.out.println("username : " + authentication.getName());
+    System.out.println("le storage : " + storage);
+    System.out.println("la réponse : " + response);
     return ResponseEntity.status(Utils.convertStatusTHttpStatus(response, false, true))
         .header("X-SUGOI-TRANSACTION-ID", response.getRequestId())
         .header("X-SUGOI-REQUEST-STATUS", response.getStatus().toString())

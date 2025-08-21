@@ -64,6 +64,7 @@ public class OrganizationServiceImpl implements OrganizationService {
   @Override
   public ProviderResponse delete(
       String realm, String storageName, String id, ProviderRequest providerRequest) {
+    System.out.println("on passe dans organisation service impl avec " + providerRequest);
     return storeProvider.getWriterStore(realm, storageName).deleteOrganization(id, providerRequest);
   }
 
