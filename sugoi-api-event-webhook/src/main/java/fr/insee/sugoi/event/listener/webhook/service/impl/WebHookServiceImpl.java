@@ -193,8 +193,6 @@ public class WebHookServiceImpl implements WebHookService {
     } catch (Exception e) {
       // we don't need to manage this exception here
     }
-
-    System.out.println("tutu : " + propertyTemplateConfiguration + " rrr : " + env.getProperty(propertyTemplateConfiguration));
     if (template == null && propertyTemplateConfiguration != null) {
       template = loadResource(env.getProperty(propertyTemplateConfiguration));
     }
