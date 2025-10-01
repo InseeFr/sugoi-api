@@ -26,9 +26,9 @@ public class EventKeysConfig {
   public static final String MAILS = "mails";
   public static final String PROPERTIES = "properties";
 
-  public static final String PASSWORD = "password";
+  public static final String PWD = "password";
 
-  public static final String NEW_PASSWORD = "new-password";
-  public static final String OLD_PASSWORD = "old-password";
+  public static final String NEW_PWD = "new-password";
+  public static final String OLD_PWD = "old-password";
   public static final String WEBSERVICE_TAG = "webserviceTag";
 }

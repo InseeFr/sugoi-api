@@ -206,7 +206,7 @@ All actuator endpoints are available to admin users. You can also enable a speci
 ```
 fr.insee.sugoi.security.monitor-user-enabled=true
 fr.insee.sugoi.security.monitor-user-name=monitor
-fr.insee.sugoi.security.monitor-user-password=monitor
+fr.insee.sugoi.security.monitor-user-password=
 ```
 
 This user only has rights on `/actuator` endpoints.
