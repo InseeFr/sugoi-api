@@ -113,7 +113,7 @@ public class CredentialsServiceImpl implements CredentialsService {
             Map.entry(EventKeysConfig.MAILS, computeReceiverMails(templateProperties, user)),
             Map.entry(EventKeysConfig.USER, user),
             Map.entry(EventKeysConfig.WEBSERVICE_TAG, webserviceTag != null ? webserviceTag : ""),
-            Map.entry(EventKeysConfig.PASSWORD, password)));
+            Map.entry(EventKeysConfig.PWD, password)));
     return response;
   }
 
@@ -156,8 +156,8 @@ public class CredentialsServiceImpl implements CredentialsService {
           userStorage,
           SugoiEventTypeEnum.CHANGE_PASSWORD,
           Map.ofEntries(
-              Map.entry(EventKeysConfig.NEW_PASSWORD, newPassword),
-              Map.entry(EventKeysConfig.OLD_PASSWORD, newPassword),
+              Map.entry(EventKeysConfig.NEW_PWD, newPassword),
+              Map.entry(EventKeysConfig.OLD_PWD, newPassword),
               Map.entry(EventKeysConfig.USER_ID, userId),
               Map.entry(EventKeysConfig.PROPERTIES, templateProperties),
               Map.entry(EventKeysConfig.MAILS, computeReceiverMails(templateProperties, user)),

@@ -32,21 +32,16 @@ public class JmsAtttributes {
 
   public static final String ORGANIZATION = "organization";
 
-  public static final String PASSWORD = "password";
-
-  public static final String IS_RESET = "isReset";
+  public static final String PWD = "password";
 
   public static final String APPLICATION = "application";
 
-  public static final String OLD_PASSWORD = "oldPassword";
+  public static final String OLD_PWD = "oldPassword";
 
-  public static final String NEW_PASSWORD = "newPassword";
-
-  public static final String PASSWORD_CHANGE_REQUEST = "passwordChangeRequest";
-
-  public static final String SEND_MODE = "sendMode";
+  public static final String NEW_PWD = "newPassword";
 
   public static final String ATTRIBUTE_KEY = "attributeKey";
+
   public static final String ATTRIBUTE_VALUE = "attributeValue";
 
   public static final String PROVIDER_REQUEST = "providerRequest";
@@ -59,5 +54,5 @@ public class JmsAtttributes {
 
   public static final String WEBHOOK_TAG = "webhookTag";
 
-  public static final String SHOULD_RESET_PASSWORD = "should-reset-password";
+  public static final String SHOULD_RESET_PWD = "should-reset-password";
 }

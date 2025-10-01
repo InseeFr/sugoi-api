@@ -84,7 +84,6 @@ cn: WebServicesLdap
 sn: WebServicesLdap
 givenname: WebServicesLdap
 uid: appli_WebServicesLdap
-userpassword: webservices
 
 dn: ou=WebServicesLdap_Objets,ou=WebServicesLdap,ou=Applications,o=insee,c=fr
 objectclass: top
@@ -518,8 +517,6 @@ inseegroupedefaut: prop1_TestIgnoreCase_applitest
 inseegroupedefaut: Prop2_TestIgnoreCase_applitest
 memberOf: cn=Utilisateurs_Applitest,ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
 
-
-
 dn: uid=admin,ou=Applitest,ou=Applications,o=insee,c=fr
 objectclass: top
 objectclass: person
@@ -532,7 +529,6 @@ givenname: admin
 uid: admin
 userpassword: admin
 
-
 dn: uid=consultant_domaine_1,ou=Applitest,ou=Applications,o=insee,c=fr
 objectclass: top
 objectclass: person
@@ -543,8 +539,6 @@ cn: consultant_domaine_1
 sn: consultant_domaine_1
 givenname: consultant_domaine_1
 uid: consultant_domaine_1
-userpassword: consultant
-
 
 dn: uid=gestionnaire_domaine_2,ou=Applitest,ou=Applications,o=insee,c=fr
 objectclass: top
@@ -556,7 +550,6 @@ cn: gestionnaire_domaine_2
 sn: gestionnaire_domaine_2
 givenname: gestionnaire_domaine_2
 uid: gestionnaire_domaine_2
-userpassword: gestionnaire
 
 dn: uid=appli_sugoi,ou=Applitest,ou=Applications,o=insee,c=fr
 objectclass: top

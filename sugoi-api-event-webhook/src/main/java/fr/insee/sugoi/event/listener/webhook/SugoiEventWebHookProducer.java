@@ -85,14 +85,14 @@ public class SugoiEventWebHookProducer {
     } else if (event.getProperties().containsKey(EventKeysConfig.USER_ID)) {
       values.put(EventKeysConfig.USER_ID, event.getProperties().get(EventKeysConfig.USER_ID));
     }
-    String password = (String) event.getProperties().get(EventKeysConfig.PASSWORD);
+    String password = (String) event.getProperties().get(EventKeysConfig.PWD);
     String realm = event.getRealm();
     String userStorage = event.getUserStorage() != null ? event.getUserStorage() : "default";
 
     values.put(EventKeysConfig.REALM, realm);
     values.put(EventKeysConfig.USERSTORAGE, userStorage);
     values.put(EventKeysConfig.MAILS, event.getProperties().get(EventKeysConfig.MAILS));
-    values.put(EventKeysConfig.PASSWORD, password);
+    values.put(EventKeysConfig.PWD, password);
     values.put(EventKeysConfig.PROPERTIES, event.getProperties().get(EventKeysConfig.PROPERTIES));
     return values;
   }

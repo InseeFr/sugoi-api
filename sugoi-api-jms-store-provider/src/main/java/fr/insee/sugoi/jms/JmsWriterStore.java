@@ -191,11 +191,11 @@ public class JmsWriterStore implements WriterStore {
     params.put(JmsAtttributes.USER_ID, userId);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    params.put(JmsAtttributes.PASSWORD, password);
-    params.put(JmsAtttributes.SHOULD_RESET_PASSWORD, changePasswordResetStatus);
+    params.put(JmsAtttributes.PWD, password);
+    params.put(JmsAtttributes.SHOULD_RESET_PWD, changePasswordResetStatus);
     params.put(JmsAtttributes.TEMPLATE_PROPERTIES, templateProperties);
     params.put(JmsAtttributes.WEBHOOK_TAG, webhookTag);
-    return checkAndSend(Method.REINIT_PASSWORD, params, userId, providerRequest);
+    return checkAndSend(Method.REINIT_PWD, params, userId, providerRequest);
   }
 
   @Override
@@ -206,11 +206,11 @@ public class JmsWriterStore implements WriterStore {
       ProviderRequest providerRequest) {
     Map<String, Object> params = new HashMap<>();
     params.put(JmsAtttributes.USER_ID, userId);
-    params.put(JmsAtttributes.PASSWORD, password);
+    params.put(JmsAtttributes.PWD, password);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
-    params.put(JmsAtttributes.SHOULD_RESET_PASSWORD, changePasswordResetStatus);
-    return checkAndSend(Method.INIT_PASSWORD, params, userId, providerRequest);
+    params.put(JmsAtttributes.SHOULD_RESET_PWD, changePasswordResetStatus);
+    return checkAndSend(Method.INIT_PWD, params, userId, providerRequest);
   }
 
   @Override
@@ -254,13 +254,13 @@ public class JmsWriterStore implements WriterStore {
       ProviderRequest providerRequest) {
     Map<String, Object> params = new HashMap<>();
     params.put(JmsAtttributes.USER_ID, userId);
-    params.put(JmsAtttributes.NEW_PASSWORD, newPassword);
-    params.put(JmsAtttributes.OLD_PASSWORD, oldPassword);
+    params.put(JmsAtttributes.NEW_PWD, newPassword);
+    params.put(JmsAtttributes.OLD_PWD, oldPassword);
     params.put(JmsAtttributes.REALM, realm.getName());
     params.put(JmsAtttributes.USER_STORAGE, userStorage.getName());
     params.put(JmsAtttributes.WEBHOOK_TAG, webhookTag);
     params.put(JmsAtttributes.TEMPLATE_PROPERTIES, templateProperties);
-    return checkAndSend(Method.CHANGE_PASSWORD, params, userId, providerRequest);
+    return checkAndSend(Method.CHANGE_PWD, params, userId, providerRequest);
   }
 
   @Override

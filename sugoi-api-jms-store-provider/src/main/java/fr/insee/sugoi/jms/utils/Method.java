@@ -16,7 +16,9 @@ package fr.insee.sugoi.jms.utils;
 public class Method {
 
   public static final String DELETE_USER = "deleteUser";
+
   public static final String CREATE_USER = "createUser";
+
   public static final String UPDATE_USER = "updateUser";
 
   public static final String DELETE_GROUP = "deleteGroup";
@@ -39,11 +41,9 @@ public class Method {
 
   public static final String ADD_USER_TO_MANAGER_GROUP = "addUserToManagerGroup";
 
-  public static final String REINIT_PASSWORD = "reinitPassword";
+  public static final String REINIT_PWD = "reinitPassword";
 
-  public static final String INIT_PASSWORD = "initPassword";
-
-  public static final String CHANGE_PASSWORD_RESET_STATUS = "changePasswordResetStatus";
+  public static final String INIT_PWD = "initPassword";
 
   public static final String CREATE_APPLICATION = "createApplication";
 
@@ -51,7 +51,7 @@ public class Method {
 
   public static final String DELETE_APPLICATION = "deleteApplication";
 
-  public static final String CHANGE_PASSWORD = "changePassword";
+  public static final String CHANGE_PWD = "changePassword";
 
   public static final String ADD_APP_MANAGED_ATTRIBUTE = "addAppManagedAttribute";
 

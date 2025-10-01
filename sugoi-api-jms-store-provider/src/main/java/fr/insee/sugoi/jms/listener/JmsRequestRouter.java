@@ -128,10 +128,10 @@ public class JmsRequestRouter {
           groupService.addUserToGroup(
               realm, userStorage, userId, appName, groupName, providerRequest);
           break;
-        case Method.REINIT_PASSWORD:
+        case Method.REINIT_PWD:
           userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
           boolean pwdChangeRequest =
-              ((Boolean) request.getmethodParams().get(JmsAtttributes.SHOULD_RESET_PASSWORD));
+              ((Boolean) request.getmethodParams().get(JmsAtttributes.SHOULD_RESET_PWD));
           Map<String, String> templateProperties =
               converter.toMapStringString(
                   request.getmethodParams().get(JmsAtttributes.TEMPLATE_PROPERTIES));
@@ -145,11 +145,11 @@ public class JmsRequestRouter {
               pwdChangeRequest,
               providerRequest);
           break;
-        case Method.INIT_PASSWORD:
+        case Method.INIT_PWD:
           userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
-          String password = (String) request.getmethodParams().get(JmsAtttributes.PASSWORD);
+          String password = (String) request.getmethodParams().get(JmsAtttributes.PWD);
           boolean changePasswordResetStatus =
-              (Boolean) request.getmethodParams().get(JmsAtttributes.SHOULD_RESET_PASSWORD);
+              (Boolean) request.getmethodParams().get(JmsAtttributes.SHOULD_RESET_PWD);
           credentialsService.initPassword(
               realm, userStorage, userId, password, changePasswordResetStatus, providerRequest);
           break;
@@ -173,14 +173,14 @@ public class JmsRequestRouter {
               .getWriterStore(realm, userStorage)
               .deleteApplication(applicationName, providerRequest);
           break;
-        case Method.CHANGE_PASSWORD:
+        case Method.CHANGE_PWD:
           userId = (String) request.getmethodParams().get(JmsAtttributes.USER_ID);
           credentialsService.changePassword(
               realm,
               userStorage,
               userId,
-              (String) request.getmethodParams().get(JmsAtttributes.OLD_PASSWORD),
-              (String) request.getmethodParams().get(JmsAtttributes.NEW_PASSWORD),
+              (String) request.getmethodParams().get(JmsAtttributes.OLD_PWD),
+              (String) request.getmethodParams().get(JmsAtttributes.NEW_PWD),
               (String) request.getmethodParams().get(JmsAtttributes.WEBHOOK_TAG),
               converter.toMapStringString(
                   request.getmethodParams().get(JmsAtttributes.TEMPLATE_PROPERTIES)),
