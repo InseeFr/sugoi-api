@@ -85,7 +85,7 @@ public class SecurityConfiguration {
   private List<String> defaultRolesForUsers;
 
 
-  private String ldapBindOn = null;
+  private String ldapBindDn = null;
 
   private String ldapPassword;
 
@@ -286,9 +286,9 @@ public class SecurityConfiguration {
     this.oidcClaimRole = oidcClaimRole;
   }
 
-  public String getLdapBindOn() { return ldapBindOn; }
+  public String getLdapBindDn() { return ldapBindDn; }
 
-  public void setLdapBindOn(String ldapBindOn) { this.ldapBindOn = ldapBindOn; }
+  public void setLdapBindDn(String ldapBindDn) { this.ldapBindDn = ldapBindDn; }
 
   public String getLdapPassword() { return ldapPassword; }
 
