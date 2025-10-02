@@ -84,6 +84,14 @@ public class SecurityConfiguration {
   @Value("${fr.insee.sugoi.security.default-roles-for-users:}")
   private List<String> defaultRolesForUsers;
 
+
+  private String ldapBindOn = null;
+
+  private String ldapPassword;
+
+
+  private boolean pooled = false;
+
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     // api, so csrf is disabled
@@ -181,6 +189,9 @@ public class SecurityConfiguration {
   LdapContextSource contextSourceFactoryBean() {
     LdapContextSource ldapContextSource = new LdapContextSource();
     ldapContextSource.setUrl(ldapAccountManagmentUrl);
+    ldapContextSource.setUserDn(ldapBindDn);
+    ldapContextSource.setPassword(ldapPassword);
+    ldapContextSource.setPooled(pooled);
     return ldapContextSource;
   }
 
@@ -274,4 +285,16 @@ public class SecurityConfiguration {
   public void setOidcClaimRole(String oidcClaimRole) {
     this.oidcClaimRole = oidcClaimRole;
   }
+
+  public String getLdapBindOn() { return ldapBindOn; }
+
+  public void setLdapBindOn(String ldapBindOn) { this.ldapBindOn = ldapBindOn; }
+
+  public String getLdapPassword() { return ldapPassword; }
+
+  public void setLdapPassword(String ldapPassword) { this.ldapPassword = ldapPassword; }
+
+  public boolean getPooled() { return pooled; }
+
+  public void setPooled(boolean pooled) { this.pooled = pooled; }
 }
