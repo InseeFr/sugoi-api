@@ -84,12 +84,11 @@ public class SecurityConfiguration {
   @Value("${fr.insee.sugoi.security.default-roles-for-users:}")
   private List<String> defaultRolesForUsers;
 
+  private String ldapAccountManagementBindDn = null;
 
-  private String ldapAccountManagmentBindDn = null;
+  private String ldapAccountManagementPassword;
 
-  private String ldapAccountManagmentPassword;
-
-  private boolean ldapAccountManagmentPooled = false;
+  private boolean ldapAccountManagementPooled = false;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -188,7 +187,7 @@ public class SecurityConfiguration {
   LdapContextSource contextSourceFactoryBean() {
     LdapContextSource ldapContextSource = new LdapContextSource();
     ldapContextSource.setUrl(ldapAccountManagmentUrl);
-    ldapContextSource.setUserDn(ldapAccountManagmentBindDn);
+    ldapContextSource.setUserDn(ldapAccountManagementBindDn);
     ldapContextSource.setPassword(ldapAccountManagementPassword);
     ldapContextSource.setPooled(ldapAccountManagementPooled);
     return ldapContextSource;
@@ -285,28 +284,28 @@ public class SecurityConfiguration {
     this.oidcClaimRole = oidcClaimRole;
   }
 
-  public String getLdapAccountManagmentBindDn() {
-    return ldapAccountManagmentBindDn;
+  public String getLdapAccountManagementBindDn() {
+    return ldapAccountManagementBindDn;
   }
 
-  public void setLdapAccountManagmentBindDn(String ldapAccountManagmentBindDn) {
-    this.ldapAccountManagmentBindDn = ldapAccountManagmentBindDn;
+  public void setLdapAccountManagementBindDn(String ldapAccountManagementBindDn) {
+    this.ldapAccountManagementBindDn = ldapAccountManagementBindDn;
   }
 
-  public String getLdapAccountManagmentPassword() {
-    return ldapAccountManagmentPassword;
+  public String getLdapAccountManagementPassword() {
+    return ldapAccountManagementPassword;
   }
 
-  public void setLdapAccountManagmentPassword(String ldapAccountManagmentPassword) {
-    this.ldapAccountManagmentPassword = ldapAccountManagmentPassword;
+  public void setLdapAccountManagementPassword(String ldapAccountManagementPassword) {
+    this.ldapAccountManagementPassword = ldapAccountManagementPassword;
   }
 
-  public boolean isLdapAccountManagmentPooled() {
-    return ldapAccountManagmentPooled;
+  public boolean isLdapAccountManagementPooled() {
+    return ldapAccountManagementPooled;
   }
 
-  public void setLdapAccountManagmentPooled(boolean ldapAccountManagmentPooled) {
-    this.ldapAccountManagmentPooled = ldapAccountManagmentPooled;
+  public void setLdapAccountManagementPooled(boolean ldapAccountManagementPooled) {
+    this.ldapAccountManagementPooled = ldapAccountManagementPooled;
   }
 
 }
