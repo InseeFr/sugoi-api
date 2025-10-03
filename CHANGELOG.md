@@ -1,3 +1,19 @@
+# 2.6.0
+
+
+- [UP] spotless apply
+- [UP] correction coquille 'management'
+- [UP] harmonisation noms variable
+- [UP] Correction coquille ldapBindDn
+- [UP] Correction coquille authentification accès
+- [UP] :arrow_up: Bump org.apache.tomcat:tomcat-catalina
+- [UP] :arrow_up: Bump org.apache.maven.plugins:maven-war-plugin
+- [UP] :arrow_up: Bump commons-io:commons-io from 2.11.0 to 2.14.0
+- [UP] :arrow_up: Bump org.xmlunit:xmlunit-core from 2.9.1 to 2.10.0
+- [UP] montée de version tomcat.version -> 10.1.41
+
+
+
 # 2.5.1
 
 
