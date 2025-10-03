@@ -307,5 +307,4 @@ public class SecurityConfiguration {
   public void setLdapAccountManagementPooled(boolean ldapAccountManagementPooled) {
     this.ldapAccountManagementPooled = ldapAccountManagementPooled;
   }
-
 }
