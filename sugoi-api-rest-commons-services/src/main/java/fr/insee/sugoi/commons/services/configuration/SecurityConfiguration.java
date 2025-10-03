@@ -85,12 +85,11 @@ public class SecurityConfiguration {
   private List<String> defaultRolesForUsers;
 
 
-  private String ldapBindDn = null;
+  private String ldapAccountManagmentBindDn = null;
 
-  private String ldapPassword;
+  private String ldapAccountManagmentPassword;
 
-
-  private boolean pooled = false;
+  private boolean ldapAccountManagmentPooled = false;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -189,9 +188,9 @@ public class SecurityConfiguration {
   LdapContextSource contextSourceFactoryBean() {
     LdapContextSource ldapContextSource = new LdapContextSource();
     ldapContextSource.setUrl(ldapAccountManagmentUrl);
-    ldapContextSource.setUserDn(ldapBindDn);
-    ldapContextSource.setPassword(ldapPassword);
-    ldapContextSource.setPooled(pooled);
+    ldapContextSource.setUserDn(ldapAccountManagmentBindDn);
+    ldapContextSource.setPassword(ldapAccountManagementPassword);
+    ldapContextSource.setPooled(ldapAccountManagementPooled);
     return ldapContextSource;
   }
 
@@ -286,15 +285,28 @@ public class SecurityConfiguration {
     this.oidcClaimRole = oidcClaimRole;
   }
 
-  public String getLdapBindDn() { return ldapBindDn; }
+  public String getLdapAccountManagmentBindDn() {
+    return ldapAccountManagmentBindDn;
+  }
 
-  public void setLdapBindDn(String ldapBindDn) { this.ldapBindDn = ldapBindDn; }
+  public void setLdapAccountManagmentBindDn(String ldapAccountManagmentBindDn) {
+    this.ldapAccountManagmentBindDn = ldapAccountManagmentBindDn;
+  }
 
-  public String getLdapPassword() { return ldapPassword; }
+  public String getLdapAccountManagmentPassword() {
+    return ldapAccountManagmentPassword;
+  }
 
-  public void setLdapPassword(String ldapPassword) { this.ldapPassword = ldapPassword; }
+  public void setLdapAccountManagmentPassword(String ldapAccountManagmentPassword) {
+    this.ldapAccountManagmentPassword = ldapAccountManagmentPassword;
+  }
 
-  public boolean getPooled() { return pooled; }
+  public boolean isLdapAccountManagmentPooled() {
+    return ldapAccountManagmentPooled;
+  }
 
-  public void setPooled(boolean pooled) { this.pooled = pooled; }
+  public void setLdapAccountManagmentPooled(boolean ldapAccountManagmentPooled) {
+    this.ldapAccountManagmentPooled = ldapAccountManagmentPooled;
+  }
+
 }
