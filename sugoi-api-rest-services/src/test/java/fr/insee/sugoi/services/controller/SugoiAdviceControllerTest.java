@@ -31,12 +31,12 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -51,11 +51,11 @@ public class SugoiAdviceControllerTest {
 
   @Autowired MockMvc mockMvc;
 
-  @MockBean private UserService userService;
+  @MockitoBean private UserService userService;
 
-  @MockBean private CertificateService certificateService;
+  @MockitoBean private CertificateService certificateService;
 
-  @MockBean private ConfigService configService;
+  @MockitoBean private ConfigService configService;
 
   ObjectMapper objectMapper = new ObjectMapper();
 
@@ -74,6 +74,15 @@ public class SugoiAdviceControllerTest {
             .accept(MediaType.APPLICATION_JSON);
     MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
     assertThat(response.getStatus(), is(HttpStatus.UNAUTHORIZED.value()));
+  }
+
+  @Test
+  @WithMockUser
+  public void get404IfNoHandlerFound() throws Exception {
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.get("/realms/n/importe/quoi").accept(MediaType.APPLICATION_JSON);
+    MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+    assertThat(response.getStatus(), is(HttpStatus.NOT_FOUND.value()));
   }
 
   @Test

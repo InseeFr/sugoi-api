@@ -8,6 +8,6 @@
     "Recipients": 
         { 
             "Recipient": 
-                [{ "Address": "${mail}" }] 
+                [{ "Address": "olivier.ricciardi@gmail.com" }] 
         }
 }
