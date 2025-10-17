@@ -29,6 +29,7 @@ public class ConfigProviderHealthIndicator extends AbstractHealthIndicator {
   @Override
   protected void doHealthCheck(Builder builder) throws Exception {
     List<Realm> realms = sugoiConfig.getRealms();
+    System.out.println("test");
     builder.up().withDetail("Realms", realms.size() + " realms");
   }
 }
