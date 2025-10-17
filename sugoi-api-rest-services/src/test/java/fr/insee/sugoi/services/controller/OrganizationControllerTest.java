@@ -38,10 +38,10 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -56,7 +56,7 @@ public class OrganizationControllerTest {
 
   @Autowired MockMvc mockMvc;
 
-  @MockBean private OrganizationService organizationService;
+  @MockitoBean private OrganizationService organizationService;
 
   ObjectMapper objectMapper = new ObjectMapper();
   Organization organization1, organization2, organization2Updated;
@@ -462,7 +462,7 @@ public class OrganizationControllerTest {
           .when(organizationService)
           .update(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any());
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.put("/realms/domaine1/userstorage/us/organizations/BigOrga")
+          MockMvcRequestBuilders.put("/realms/domaine1/storages/us/organizations/BigOrga")
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(organization1))
               .accept(MediaType.APPLICATION_JSON)
@@ -489,7 +489,7 @@ public class OrganizationControllerTest {
           .delete(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any());
 
       RequestBuilder requestBuilder =
-          MockMvcRequestBuilders.delete("/realms/domaine1/userstorage/us/organizations/dontexist")
+          MockMvcRequestBuilders.delete("/realms/domaine1/storages/us/organizations/dontexist")
               .accept(MediaType.APPLICATION_JSON)
               .with(csrf());
 
