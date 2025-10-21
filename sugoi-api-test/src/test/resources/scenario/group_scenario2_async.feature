@@ -3,7 +3,7 @@ Feature: Groups scenario asynchrone
 
     Background: Use tomcat2
         Given the client is using tomcat2
-        Given the client authentified with username appli_applitest and password applitest
+        Given the client authentified with username appli_applitest and password REPLACE_ME
         Given the client make an asynchronous request
 
     Scenario: Get groups
