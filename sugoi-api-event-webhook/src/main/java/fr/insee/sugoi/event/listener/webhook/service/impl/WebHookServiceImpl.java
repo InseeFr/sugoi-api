@@ -158,7 +158,7 @@ public class WebHookServiceImpl implements WebHookService {
 
   private String injectValueInTemplate(String content, Map<String, Object> values) {
     try {
-      Configuration cfg = new Configuration(Configuration.VERSION_2_3_30);
+      Configuration cfg = new Configuration(Configuration.VERSION_2_3_32);
       Template t;
       t = new Template("name", new StringReader(content), cfg);
       Writer out = new StringWriter();
