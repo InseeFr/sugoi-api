@@ -39,7 +39,6 @@
 		<apache.commons.version>1.10.0</apache.commons.version>
 		<apache.commons.csv.version>1.10.0</apache.commons.csv.version>
 		<wiremock-standalone.version>2.27.2</wiremock-standalone.version>
-		<freemarker.version>2.3.32</freemarker.version>
 		<git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
 		<org.ehcache.version>3.10.8</org.ehcache.version>
 		<maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
