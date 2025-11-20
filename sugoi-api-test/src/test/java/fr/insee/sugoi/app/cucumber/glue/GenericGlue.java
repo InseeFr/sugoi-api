@@ -250,7 +250,6 @@ public class GenericGlue {
         ResponseResults response =
             webRequest.executeGet(stepData.getDefaultTomcatUrl() + "/realms", headers, null);
         List<Realm> realms = Arrays.asList(mapper.readValue(response.getBody(), Realm[].class));
-
         if (realms.size() > 0) {
           isReady = true;
         } else {
