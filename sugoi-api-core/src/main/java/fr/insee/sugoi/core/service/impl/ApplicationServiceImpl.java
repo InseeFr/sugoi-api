@@ -68,6 +68,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
   @Override
   public Application findById(String realm, String id) {
+    System.out.println("test");
     Application app =
         storeProvider
             .getReaderStore(realm)
