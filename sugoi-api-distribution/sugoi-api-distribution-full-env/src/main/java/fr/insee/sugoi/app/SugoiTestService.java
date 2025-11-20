@@ -67,7 +67,7 @@ public class SugoiTestService {
       if (args.length > 1 && args[1].equals("fork")) {
         fork = true;
       }
-      startServers();
+//      startServers();
     }
     if (args.length > 0 && "stop".equalsIgnoreCase(args[0])) {
       try (Socket socket = new Socket("localhost", 4567)) {
@@ -76,72 +76,72 @@ public class SugoiTestService {
     }
   }
 
-  private static void startServers() throws InterruptedException {
-    ExecutorService execs =
-        Executors.newFixedThreadPool(
-            4,
-            runnable -> {
-              Thread thread = new Thread(runnable);
-              thread.setDaemon(true);
-              return thread;
-            });
-    if (enabledEmbeddedLdap) {
-      execs.submit(
-          () -> {
-            try {
-              LdapEmbeddedService.start();
-            } catch (Exception e) {
-              e.printStackTrace();
-            }
-          });
-    }
-    if (enabledEmbeddedBroker) {
-      execs.submit(
-          () -> {
-            try {
-              BrokerEmbeddedService.start();
-            } catch (Exception e) {
-              e.printStackTrace();
-            }
-          });
-    }
-    if (enabledEmbeddedTomcat) {
-      execs.submit(
-          () -> {
-            try {
-              TomcatEmbeddedService.start(
-                  nameEmbeddedTomcat1,
-                  propertiesFileEmbeddedTomcat1,
-                  nameEmbeddedTomcat2,
-                  propertiesFileEmbeddedTomcat2,
-                  httpPortEmbeddedTomcat,
-                  httpsPortEmbeddedTomcat);
-            } catch (Exception e) {
-              e.printStackTrace();
-            }
-          });
-    }
-    execs.submit(
-        () -> {
-          try {
-            ServerSocket shutdownSocket = new ServerSocket(4567);
-            Socket sock = shutdownSocket.accept();
-            sock.close();
-            shutdownSocket.close();
-            stopAll();
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-        });
-
-    if (!fork) {
-      execs.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
-    } else {
-      System.out.println("sleeping ...");
-      Thread.sleep(60000);
-      System.out.println("continue");
-    }
-  }
+//  private static void startServers() throws InterruptedException {
+//    ExecutorService execs =
+//        Executors.newFixedThreadPool(
+//            4,
+//            runnable -> {
+//              Thread thread = new Thread(runnable);
+//              thread.setDaemon(true);
+//              return thread;
+//            });
+//    if (enabledEmbeddedLdap) {
+//      execs.submit(
+//          () -> {
+//            try {
+//              LdapEmbeddedService.start();
+//            } catch (Exception e) {
+//              e.printStackTrace();
+//            }
+//          });
+//    }
+//    if (enabledEmbeddedBroker) {
+//      execs.submit(
+//          () -> {
+//            try {
+//              BrokerEmbeddedService.start();
+//            } catch (Exception e) {
+//              e.printStackTrace();
+//            }
+//          });
+//    }
+//    if (enabledEmbeddedTomcat) {
+//      execs.submit(
+//          () -> {
+//            try {
+//              TomcatEmbeddedService.start(
+//                  nameEmbeddedTomcat1,
+//                  propertiesFileEmbeddedTomcat1,
+//                  nameEmbeddedTomcat2,
+//                  propertiesFileEmbeddedTomcat2,
+//                  httpPortEmbeddedTomcat,
+//                  httpsPortEmbeddedTomcat);
+//            } catch (Exception e) {
+//              e.printStackTrace();
+//            }
+//          });
+//    }
+//    execs.submit(
+//        () -> {
+//          try {
+//            ServerSocket shutdownSocket = new ServerSocket(4567);
+//            Socket sock = shutdownSocket.accept();
+//            sock.close();
+//            shutdownSocket.close();
+//            stopAll();
+//          } catch (Exception e) {
+//            e.printStackTrace();
+//          }
+//        });
+//
+//    if (!fork) {
+//      execs.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+//    } else {
+//      System.out.println("sleeping ...");
+//      Thread.sleep(60000);
+//      System.out.println("continue");
+//    }
+//  }
 
   private static void stopAll() throws Exception {
 
