@@ -29,7 +29,7 @@ cn: appli_applitest
 sn: appli_applitest
 givenname: appli_applitest
 uid: appli_applitest
-userpassword: applitest
+userpassword: REPLACE_ME
 memberOf: cn=ASI_domaine1_Applitest,ou=Applitest,ou=Applications,o=insee,c=fr
 
 dn: ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
