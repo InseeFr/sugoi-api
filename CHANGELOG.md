@@ -1,3 +1,16 @@
+# 2.7.0
+
+
+- [UP] Montée de version tomcat -> 11.0.13 (#948)
+- [FIX] parameters compile option required
+- [UP] Change freemarker to starter-freemarker
+- [UP] montée de la dépendance common.io -> 2.11.14
+- [FIX] fix needed when upgrade Spring version
+- [UP] Montée de dépendance Spring-boot 3.1.4 -> 3.5.6 et fixation mockweserver à 5.1.0
+- [UP] test (#934)
+
+
+
 # 2.6.0
 
 
