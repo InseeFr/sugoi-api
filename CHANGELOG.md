@@ -1,3 +1,10 @@
+# 2.8.0
+
+
+- [FIX] montée de version de springdoc -> 2.8.14
+
+
+
 # 2.7.0
 
 
