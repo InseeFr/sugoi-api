@@ -25,7 +25,5 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Build with Maven
-        run: mvn -B package -D.maven.test.skip=true --file pom.xml
       - name: Test with Maven
-        run: mvn verify
+        run: mvn verify -Dsurefire.skip
