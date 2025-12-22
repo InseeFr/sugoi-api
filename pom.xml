@@ -24,7 +24,7 @@
 		<jacoco.unit-tests.limit.class-complexity>20</jacoco.unit-tests.limit.class-complexity>
 		<jacoco.unit-tests.limit.method-complexity>5</jacoco.unit-tests.limit.method-complexity>
 		<java.version>17</java.version>
-		<spring-boot.version>3.5.6</spring-boot.version>
+		<spring-boot.version>4.0.1</spring-boot.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<tomcat.version>11.0.13</tomcat.version>
 		<commons-io.version>2.14.0</commons-io.version>
