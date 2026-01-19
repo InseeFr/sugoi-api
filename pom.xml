@@ -42,7 +42,7 @@
 		<org.ehcache.version>3.10.8</org.ehcache.version>
 		<maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
 		<javax.jms-api.version>2.0.1</javax.jms-api.version>
-		<org.activemq.version>6.0.1</org.activemq.version>
+		<org.activemq.version>6.2.0</org.activemq.version>
 	</properties>
 
 	<dependencies></dependencies>
