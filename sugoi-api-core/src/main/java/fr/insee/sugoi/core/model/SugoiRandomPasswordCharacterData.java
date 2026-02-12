@@ -34,7 +34,7 @@ public enum SugoiRandomPasswordCharacterData implements CharacterData {
   Special(
       "INSUFFICIENT_SPECIAL",
       // ASCII symbols
-      "!$%&()*+?@");
+      "!%&()*+?@");
 
   /** Error code. */
   private final String errorCode;
