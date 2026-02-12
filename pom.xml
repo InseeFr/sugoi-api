@@ -32,7 +32,7 @@
 		<org.xmlunit.version>2.10.0</org.xmlunit.version>
 		<commons-lang.version>2.6</commons-lang.version>
 		<org.springdoc.version>2.8.14</org.springdoc.version>
-		<cucumber.version>7.5.0</cucumber.version>
+		<cucumber.version>7.34.2</cucumber.version>
 		<httpclient.version>4.5.14</httpclient.version>
 		<apache.commons.version>1.10.0</apache.commons.version>
 		<apache.commons.csv.version>1.14.1</apache.commons.csv.version>
