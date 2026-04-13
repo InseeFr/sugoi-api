@@ -1,3 +1,14 @@
+# 2.8.2
+
+
+- [UP] :arrow_up: Bump org.xmlunit:xmlunit-core from 2.10.0 to 2.11.0
+- [UP] :arrow_up: Bump org.apache.maven.plugins:maven-war-plugin
+- Update pom.xml
+- [UP] :arrow_up: Bump spring-boot.version from 3.5.6 to 4.0.2
+- [UP] :arrow_up: Bump org.apache.tomcat.embed:tomcat-embed-core
+
+
+
 # 2.8.1
 
 
