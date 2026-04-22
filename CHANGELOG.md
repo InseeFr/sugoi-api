@@ -1,3 +1,16 @@
+# 2.8.1
+
+
+- [FIX] retrait caractère problematique dans mdp (#960)
+- [UP] :arrow_up: Bump cucumber.version from 7.5.0 to 7.33.0
+- [UP] :arrow_up: Bump tomcat.version from 11.0.13 to 11.0.14
+- [CI] Avoid duplicate unit test (#952)
+- [UP] :arrow_up: Bump org.codehaus.mojo:exec-maven-plugin (#957)
+- [UP] :arrow_up: Bump com.unboundid:unboundid-ldapsdk from 6.0.8 to 7.0.3 (#953)
+- [UP] :arrow_up: Bump org.apache.commons:commons-csv (#916)
+
+
+
 # 2.8.0
 
 
