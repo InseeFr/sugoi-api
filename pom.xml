@@ -26,8 +26,8 @@
 		<java.version>17</java.version>
 		<spring-boot.version>3.5.13</spring-boot.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<commons-io.version>2.21.0</commons-io.version>
 		<tomcat.version>11.0.21</tomcat.version>
-		<commons-io.version>2.14.0</commons-io.version>
 		<com.unboundid.version>7.0.3</com.unboundid.version>
 		<org.xmlunit.version>2.11.0</org.xmlunit.version>
 		<commons-lang.version>2.6</commons-lang.version>
