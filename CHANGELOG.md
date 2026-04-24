@@ -1,3 +1,19 @@
+# 2.8.4
+
+
+- Version284 (#978)
+- [UP] :arrow_up: Bump com.unboundid:unboundid-ldapsdk from 7.0.3 to 7.0.4
+- [UP] :arrow_up: Bump cucumber.version from 7.34.2 to 7.34.3
+- [UP] :arrow_up: Bump org.xmlunit:xmlunit-core from 2.10.0 to 2.11.0
+- [UP] :arrow_up: Bump org.apache.maven.plugins:maven-war-plugin
+- [UP] :arrow_up: Bump spring-boot.version from 3.5.6 to 3.5.13
+- [UP] :arrow_up: Bump org.xmlunit:xmlunit-core from 2.10.0 to 2.11.0
+- [UP] :arrow_up: Bump org.apache.maven.plugins:maven-war-plugin
+- Update pom.xml
+- [UP] :arrow_up: Bump spring-boot.version from 3.5.6 to 4.0.2
+
+
+
 # 2.8.1
 
 
