@@ -785,15 +785,10 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
         ldapPoolConnection.modify(
             new ModifyRequest(
                 getUserDN(user.getUsername()),
-                List.of(
-                    new Modification(
-                        ModificationType.DELETE,
-                        "usercertificate;binary",
-                        certificate.getEncoded()),
-                    new Modification(
-                        ModificationType.DELETE,
-                        "inseePropriete",
-                        "certificateId$" + certificateId))));
+                new Modification(
+                    ModificationType.DELETE, "usercertificate;binary", certificate.getEncoded())));
+        deleteInseeProprieteValueIfPresent(user.getUsername(), "certificateId$" + certificateId);
+        deleteInseeProprieteValueIfPresent(user.getUsername(), certificateId);
       }
 
       X509Certificate certificate = cfs.getCertificateFromByte(bytes);
@@ -805,7 +800,10 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
                   new Modification(
                       ModificationType.ADD, "usercertificate;binary", certificate.getEncoded()),
                   new Modification(
-                      ModificationType.ADD, "inseePropriete", "certificateId$" + certificateId))));
+                      ModificationType.ADD,
+                      "inseePropriete",
+                      "certificateId$" + certificateId,
+                      certificateId))));
       ProviderResponse response = new ProviderResponse();
       response.setStatus(ProviderResponseStatus.OK);
       response.setEntityId(user.getUsername());
@@ -826,15 +824,10 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
         ldapPoolConnection.modify(
             new ModifyRequest(
                 getUserDN(user.getUsername()),
-                List.of(
-                    new Modification(
-                        ModificationType.DELETE,
-                        "usercertificate;binary",
-                        certificate.getEncoded()),
-                    new Modification(
-                        ModificationType.DELETE,
-                        "inseePropriete",
-                        "certificateId$" + certificateId))));
+                new Modification(
+                    ModificationType.DELETE, "usercertificate;binary", certificate.getEncoded())));
+        deleteInseeProprieteValueIfPresent(user.getUsername(), "certificateId$" + certificateId);
+        deleteInseeProprieteValueIfPresent(user.getUsername(), certificateId);
         ProviderResponse response = new ProviderResponse();
         response.setStatus(ProviderResponseStatus.OK);
         response.setEntityId(user.getUsername());
@@ -847,6 +840,24 @@ public class LdapWriterStore extends LdapStore implements WriterStore {
     response.setStatus(ProviderResponseStatus.OK);
     response.setEntityId(user.getUsername());
     return response;
+  }
+
+  /**
+   * Delete a value from inseePropriete, tolerating the case where it is not present (e.g. a
+   * certificate added before this value was introduced, or already removed).
+   */
+  private void deleteInseeProprieteValueIfPresent(String username, String value)
+      throws LDAPException {
+    try {
+      ldapPoolConnection.modify(
+          new ModifyRequest(
+              getUserDN(username),
+              new Modification(ModificationType.DELETE, "inseePropriete", value)));
+    } catch (LDAPException e) {
+      if (!e.getResultCode().equals(ResultCode.NO_SUCH_ATTRIBUTE)) {
+        throw e;
+      }
+    }
   }
 
   @Override
