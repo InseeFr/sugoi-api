@@ -50,6 +50,7 @@ Feature: Credential scenario asynchrone
             """
         And show body received
         Then the client receives status code 202
+        Then Pause de 10 secondes
 
     Scenario: Don't validate password
         Given the client authentified with username appli_sugoi and password sugoi

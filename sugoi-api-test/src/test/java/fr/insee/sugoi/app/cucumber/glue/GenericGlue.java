@@ -265,4 +265,9 @@ public class GenericGlue {
       }
     }
   }
+
+  @Then("Pause de {int} secondes")
+  public void wait(int nb) throws InterruptedException {
+    Thread.sleep(nb * 1000L);
+  }
 }
