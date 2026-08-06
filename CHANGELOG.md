@@ -1,3 +1,10 @@
+# 2.8.5
+
+
+- [UP] :arrow_up: Bump org.apache.tomcat.embed:tomcat-embed-core
+
+
+
 # 2.8.4
 
 
