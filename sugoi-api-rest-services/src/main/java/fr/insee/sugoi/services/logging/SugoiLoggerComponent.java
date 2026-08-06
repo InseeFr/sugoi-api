@@ -66,7 +66,7 @@ public class SugoiLoggerComponent {
 
   @AfterThrowing(pointcut = POINTCUT, throwing = "e")
   public void logAfterException(JoinPoint jp, Exception e) {
-    ResponseEntity<?> error = sugoiAdviceController.exception(e);
+    ResponseEntity<?> error = sugoiAdviceController.createErrorView(e);
     if (log.isInfoEnabled())
       log.info(
           "type={} user={} requestArguments='{}' responseCode='{}' exception='{}'",
