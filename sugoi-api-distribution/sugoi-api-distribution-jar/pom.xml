@@ -77,11 +77,6 @@
 
     <dependency>
       <groupId>fr.insee.sugoi</groupId>
-      <artifactId>sugoi-api-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>fr.insee.sugoi</groupId>
       <artifactId>sugoi-api-event-webhook</artifactId>
     </dependency>
 
