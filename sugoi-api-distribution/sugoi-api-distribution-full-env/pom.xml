@@ -21,11 +21,6 @@
         </dependency>
 
         <dependency>
-            <groupId>fr.insee.sugoi</groupId>
-            <artifactId>sugoi-api-model</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-broker</artifactId>
         </dependency>
