@@ -15,7 +15,7 @@ package fr.insee.sugoi.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import fr.insee.sugoi.model.technics.StoreMapping;
-import org.apache.commons.lang3.text.StrSubstitutor;
+import org.apache.commons.text.StringSubstitutor;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -110,7 +110,7 @@ public class UserStorage implements Serializable {
         .getAttributes()
         .put(
             userDefinedAttributeTemplate.split(":")[0],
-            StrSubstitutor.replace(
+            StringSubstitutor.replace(
                 userDefinedAttributeTemplate.split(":", 2)[1],
                 userToModify.getMapOfStringFields(getUserMappings()),
                 "$(",

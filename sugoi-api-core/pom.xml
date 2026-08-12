@@ -19,13 +19,10 @@
 			<artifactId>spring-boot-starter-cache</artifactId>
 		</dependency>
 
-
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
-
-		
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -72,6 +69,13 @@
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>1.15.0</version>
+		</dependency>
+
 	</dependencies>
 
 </project>

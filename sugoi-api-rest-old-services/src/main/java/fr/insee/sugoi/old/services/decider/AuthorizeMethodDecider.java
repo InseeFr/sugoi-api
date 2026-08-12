@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.text.StrSubstitutor;
+import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,7 +51,7 @@ public class AuthorizeMethodDecider {
       valueMap.put("domaine", domaine.toUpperCase());
       List<String> searchRoles =
           regexpConsult.stream()
-              .map(s -> StrSubstitutor.replace(s, valueMap, "$(", ")"))
+              .map(s -> StringSubstitutor.replace(s, valueMap, "$(", ")"))
               .collect(Collectors.toList());
       logger.debug("Checking if user is in : {}", searchRoles);
       return checkIfUserGetRoles(searchRoles) || isAtLeastGestionnaire(domaine);
@@ -67,7 +67,7 @@ public class AuthorizeMethodDecider {
       valueMap.put("domaine", domaine.toUpperCase());
       List<String> searchRoles =
           regexpGest.stream()
-              .map(s -> StrSubstitutor.replace(s, valueMap, "$(", ")"))
+              .map(s -> StringSubstitutor.replace(s, valueMap, "$(", ")"))
               .collect(Collectors.toList());
       logger.debug("Checking if user is in : {}", searchRoles);
       return checkIfUserGetRoles(searchRoles) || isAdmin();
