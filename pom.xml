@@ -23,9 +23,9 @@
 		<spring-boot.version>3.5.13</spring-boot.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<tomcat.version>11.0.22</tomcat.version>
-		<commons-io.version>2.14.0</commons-io.version>
-		<com.unboundid.version>7.0.4</com.unboundid.version>
-		<org.xmlunit.version>2.11.0</org.xmlunit.version>
+		<commons-io.version>2.22.0</commons-io.version>
+		<com.unboundid.version>7.0.5</com.unboundid.version>
+		<org.xmlunit.version>2.13.0</org.xmlunit.version>
 		<commons-lang.version>2.6</commons-lang.version>
 		<org.springdoc.version>2.8.14</org.springdoc.version>
 		<cucumber.version>7.34.3</cucumber.version>
