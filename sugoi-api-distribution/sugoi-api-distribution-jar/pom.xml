@@ -75,56 +75,6 @@
       <optional>true</optional>
     </dependency>
 
-    <dependency>
-      <groupId>fr.insee.sugoi</groupId>
-      <artifactId>sugoi-api-event-webhook</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>fr.insee.sugoi</groupId>
-      <artifactId>sugoi-api-rest-services</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>fr.insee.sugoi</groupId>
-      <artifactId>sugoi-api-rest-old-services</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>fr.insee.sugoi</groupId>
-      <artifactId>sugoi-api-file-config-provider</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>fr.insee.sugoi</groupId>
-      <artifactId>sugoi-api-file-store-provider</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>fr.insee.sugoi</groupId>
-      <artifactId>sugoi-api-ldap-config-provider</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>fr.insee.sugoi</groupId>
-      <artifactId>sugoi-api-ldap-store-provider</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>fr.insee.sugoi</groupId>
-      <artifactId>sugoi-api-jms-store-provider</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>fr.insee.sugoi</groupId>
-      <artifactId>sugoi-api-seealso-http</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>fr.insee.sugoi</groupId>
-      <artifactId>sugoi-api-seealso-ldap</artifactId>
-    </dependency>
-
   </dependencies>
 
   <build>
