@@ -13,11 +13,6 @@
 	<description>Core library for Sugoi</description>
 
 	<dependencies>
-		<!-- Manage Cache -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-cache</artifactId>
-		</dependency>
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>
