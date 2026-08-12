@@ -175,7 +175,7 @@ public class WebRequest {
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
-      hadError = response.getRawStatusCode() >= 400;
+      hadError = response.getStatusCode().value() >= 400;
       return hadError;
     }
 
