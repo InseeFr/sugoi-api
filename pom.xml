@@ -15,7 +15,7 @@
 		<maven-checkstyle-plugin.version>3.1.0</maven-checkstyle-plugin.version>
 		<checkstyle.version>8.29</checkstyle.version>		<checkstyle-rules.version>4.0.1</checkstyle-rules.version>
 		<maven-surefire-plugin.version>3.0.0</maven-surefire-plugin.version>
-		<jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
+		<jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
 		<maven-javadoc-plugin.version>3.0.0</maven-javadoc-plugin.version>
 		<coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
 		<!-- JaCoCo thresholds. Increase gradually as you add tests. -->
@@ -24,6 +24,8 @@
 		<jacoco.unit-tests.limit.class-complexity>20</jacoco.unit-tests.limit.class-complexity>
 		<jacoco.unit-tests.limit.method-complexity>5</jacoco.unit-tests.limit.method-complexity>
 		<java.version>17</java.version>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
 		<spring-boot.version>3.5.13</spring-boot.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<tomcat.version>11.0.22</tomcat.version>
