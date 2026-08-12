@@ -43,7 +43,8 @@ import fr.insee.sugoi.model.technics.StoreMapping;
 import java.text.Normalizer;
 import java.util.*;
 import java.util.stream.Collectors;
-import org.apache.commons.lang.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
 public class LdapReaderStore extends LdapStore implements ReaderStore {

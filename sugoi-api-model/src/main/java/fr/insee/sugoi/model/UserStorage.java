@@ -15,12 +15,13 @@ package fr.insee.sugoi.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import fr.insee.sugoi.model.technics.StoreMapping;
+import org.apache.commons.lang3.text.StrSubstitutor;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import org.apache.commons.lang.text.StrSubstitutor;
 
 public class UserStorage implements Serializable {
   private String name;
