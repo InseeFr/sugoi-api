@@ -24,7 +24,7 @@ public class InfoFormattageTest {
   private static InfoFormattageOuganext info;
 
   @BeforeAll
-  private static void initialize() {
+  public static void initialize() {
     info = new InfoFormattageOuganext();
     info.setChefSignataire("Moi");
     info.setUrlSite("https://entreprises.insee.fr");

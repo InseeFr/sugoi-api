@@ -25,7 +25,7 @@ public class PasswordChangeRequestTest {
   private static PasswordChangeRequestOuganext pcr;
 
   @BeforeAll
-  private static void initialize() {
+  public static void initialize() {
     pcr = new PasswordChangeRequestOuganext();
     pcr.setAncienMotDePasse("rrrèé~~~kfl)%");
     pcr.setNouveauMotDePasse("ffgjktiuyed_<gh>");
