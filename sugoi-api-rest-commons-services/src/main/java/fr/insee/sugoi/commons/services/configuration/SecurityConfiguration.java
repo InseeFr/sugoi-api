@@ -16,10 +16,15 @@ package fr.insee.sugoi.commons.services.configuration;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 import fr.insee.sugoi.commons.services.configuration.basic.CustomLdapAuthoritiesPopulator;
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
@@ -36,6 +41,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.ldap.core.support.BaseLdapPathContextSource;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationManagerResolver;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -44,12 +50,19 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
+import org.springframework.security.oauth2.server.resource.authentication.JwtIssuerAuthenticationManagerResolver;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.validation.annotation.Validated;
 
 @Configuration
 @ConfigurationProperties("fr.insee.sugoi.security")
 @EnableMethodSecurity
+@Validated
 public class SecurityConfiguration {
 
   private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
@@ -62,12 +75,19 @@ public class SecurityConfiguration {
   /**
    * Enable bearer authentication
    *
-   * <p>A Spring Security oAuth configuration is mandatory if enabled
+   * <p>An oAuth configuration is mandatory if enabled
    *
-   * <p>For instance you should add the spring.security.oauth2.resourceserver.jwt.jwk-set-uri
-   * property by the public key location of your oAuth server
+   * <p>For common Spring Boot configuration, you should add the
+   * spring.security.oauth2.resourceserver.jwt.jwk-set-uri property by the public key location of
+   * your oAuth server
+   *
+   * <p>For multi providers, you should add an array of fr.insee.sugoi.security.issuers with
+   * fr.insee.sugoi.security.issuers[0].issuer-uri (must be the value of claim "iss") and
+   * fr.insee.sugoi.security.issuers[0].jwk-set-uri
    */
   private boolean bearerAuthenticationEnabled = false;
+
+  @Valid private List<JwtIssuerProperties> issuers = new ArrayList<>();
 
   /** Ldap url where are stored accounts for managment */
   private String ldapAccountManagmentUrl;
@@ -102,12 +122,20 @@ public class SecurityConfiguration {
     }
     // allow jwt bearer authentication
     if (bearerAuthenticationEnabled) {
-      http.oauth2ResourceServer(
-          oauth2 ->
-              oauth2.jwt(
-                  jwtConfigurer -> {
-                    jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter());
-                  }));
+      if (issuers != null && !issuers.isEmpty()) {
+        // Multi-source : résolution dynamique selon le claim "iss" du jeton
+        http.oauth2ResourceServer(
+            oauth2 ->
+                oauth2.authenticationManagerResolver(jwtIssuerAuthenticationManagerResolver()));
+      } else {
+        // Comportement historique : une seule source configurée via
+        // spring.security.oauth2.resourceserver.jwt.jwk-set-uri
+        http.oauth2ResourceServer(
+            oauth2 ->
+                oauth2.jwt(
+                    jwtConfigurer ->
+                        jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter())));
+      }
     }
 
     String adminRegex =
@@ -181,6 +209,61 @@ public class SecurityConfiguration {
     };
   }
 
+  private final Map<String, AuthenticationManager> issuerAuthenticationManagers =
+      new ConcurrentHashMap<>();
+
+  @PostConstruct
+  public void initIssuerAuthenticationManagers() {
+    if (issuers != null) {
+      issuers.forEach(
+          props ->
+              issuerAuthenticationManagers.put(
+                  props.getIssuerUri(), buildAuthenticationManager(props)));
+    }
+  }
+
+  private AuthenticationManager buildAuthenticationManager(JwtIssuerProperties props) {
+    JwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(props.getJwkSetUri()).build();
+    JwtAuthenticationProvider provider = new JwtAuthenticationProvider(decoder);
+    provider.setJwtAuthenticationConverter(jwtAuthenticationConverter());
+    return provider::authenticate;
+  }
+
+  private AuthenticationManagerResolver<HttpServletRequest>
+      jwtIssuerAuthenticationManagerResolver() {
+    AuthenticationManagerResolver<String> issuerResolver =
+        issuerUri -> {
+          AuthenticationManager manager = issuerAuthenticationManagers.get(issuerUri);
+          if (manager == null) {
+            throw new InvalidBearerTokenException("Invalid issuer : " + issuerUri);
+          }
+          return manager;
+        };
+    return new JwtIssuerAuthenticationManagerResolver(issuerResolver);
+  }
+
+  public static class JwtIssuerProperties {
+
+    @NotBlank private String issuerUri;
+    @NotBlank private String jwkSetUri;
+
+    public String getIssuerUri() {
+      return issuerUri;
+    }
+
+    public void setIssuerUri(String issuerUri) {
+      this.issuerUri = issuerUri;
+    }
+
+    public String getJwkSetUri() {
+      return jwkSetUri;
+    }
+
+    public void setJwkSetUri(String jwkSetUri) {
+      this.jwkSetUri = jwkSetUri;
+    }
+  }
+
   @Bean
   @ConditionalOnProperty(
       value = "fr.insee.sugoi.security.ldap-account-managment-enabled",
@@ -235,6 +318,14 @@ public class SecurityConfiguration {
 
   public void setBearerAuthenticationEnabled(boolean bearerAuthenticationEnabled) {
     this.bearerAuthenticationEnabled = bearerAuthenticationEnabled;
+  }
+
+  public List<JwtIssuerProperties> getIssuers() {
+    return issuers;
+  }
+
+  public void setIssuers(List<JwtIssuerProperties> issuers) {
+    this.issuers = issuers;
   }
 
   public String getLdapAccountManagmentUrl() {
