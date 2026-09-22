@@ -13,17 +13,15 @@
 */
 package fr.insee.sugoi.model;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
 public class RealmConfigKeysDeserializer
     extends StdDeserializer<Map<RealmConfigKeys, List<String>>> {
@@ -31,25 +29,18 @@ public class RealmConfigKeysDeserializer
   private static final RealmConfigKeysFinder configuration = new RealmConfigKeysFinder();
 
   protected RealmConfigKeysDeserializer() {
-    this(null);
-  }
-
-  protected RealmConfigKeysDeserializer(Class<?> vc) {
-    super(vc);
+    super(RealmConfigKeys.class);
   }
 
   @Override
-  public Map<RealmConfigKeys, List<String>> deserialize(JsonParser p, DeserializationContext ctxt)
-      throws IOException {
+  public Map<RealmConfigKeys, List<String>> deserialize(JsonParser p, DeserializationContext ctxt) {
     JsonNode node = p.readValueAsTree();
     Map<RealmConfigKeys, List<String>> map = new HashMap<>();
-    Iterator<Entry<String, JsonNode>> fieldsIterator = node.fields();
-    while (fieldsIterator.hasNext()) {
-      Entry<String, JsonNode> field = fieldsIterator.next();
+    for (Entry<String, JsonNode> field : node.properties()) {
       RealmConfigKeys keyConfig = configuration.getRealmConfigKey(field.getKey());
       if (keyConfig != null) {
         map.put(keyConfig, new ArrayList<>());
-        field.getValue().elements().forEachRemaining(e -> map.get(keyConfig).add(e.asText()));
+        field.getValue().values().forEach(e -> map.get(keyConfig).add(e.asString()));
       }
     }
     return map;

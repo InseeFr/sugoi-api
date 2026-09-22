@@ -46,7 +46,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -59,6 +58,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -337,8 +337,9 @@ public class UserController {
       @Parameter(description = "Transaction Id", required = false)
           @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
           String transactionId,
-      Authentication authentication,
       @Parameter(description = "User to create", required = true) @RequestBody User user) {
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
     ProviderResponse response =
         userService.create(
@@ -533,8 +534,18 @@ public class UserController {
           boolean isAsynchronous,
       @Parameter(description = "Transaction Id", required = false)
           @RequestHeader(name = "X-SUGOI-TRANSACTION-ID", required = false)
-          String transactionId,
-      Authentication authentication) {
+          String transactionId) {
+
+    System.out.println(
+        "DANS CONTROLLER SecurityContextHolder = "
+            + SecurityContextHolder.getContext().getAuthentication());
+
+    //      System.out.println(
+    //              "DANS CONTROLLER authentication param = " +
+    //                      authentication
+    //      );
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
     ProviderResponse response =
         userService.delete(
@@ -598,8 +609,7 @@ public class UserController {
         (String) foundUser.getMetadatas().get(GlobalKeysConfig.USERSTORAGE.getName()),
         id,
         isAsynchronous,
-        transactionId,
-        authentication);
+        transactionId);
   }
 
   @GetMapping(

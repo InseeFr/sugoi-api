@@ -13,34 +13,30 @@
 */
 package fr.insee.sugoi.converter.ouganext.adapters;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import java.io.IOException;
+import java.io.Serial;
+import java.io.Serializable;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
-public class CertificateDeserializer extends StdDeserializer<byte[]> {
+public class CertificateDeserializer extends StdDeserializer<byte[]> implements Serializable {
 
   public static final String BEGIN_CERTIFICATE = "-----BEGIN CERTIFICATE-----\n";
   public static final String END_CERTIFICATE = "\n-----END CERTIFICATE-----\n";
   /** */
-  private static final long serialVersionUID = 1L;
+  @Serial private static final long serialVersionUID = 1L;
 
   public CertificateDeserializer() {
-    this(null);
-  }
-
-  public CertificateDeserializer(Class<byte[]> t) {
-    super(t);
+    super(CertificateDeserializer.class);
   }
 
   @Override
-  public byte[] deserialize(JsonParser p, DeserializationContext ctxt)
-      throws IOException, JsonProcessingException {
+  public byte[] deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
 
     String certstring =
         BEGIN_CERTIFICATE
-            + p.getText().replaceAll("\n", "").replaceAll(" ", "").replaceAll("\t", "")
+            + p.getString().replace("\n", "").replace(" ", "").replace("\t", "")
             + END_CERTIFICATE;
 
     return certstring.getBytes();

@@ -141,6 +141,7 @@ Feature: Groups scenario admin
         Then the client receives status code 200
         Then the client expect to receive a group
 
+
     Scenario: Add user group to group manager
         When the client perform PUT request on url /realms/domaine1/applications/applitest/group_manager/members/testc
         And show body received

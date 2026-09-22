@@ -41,9 +41,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
@@ -63,9 +61,7 @@ public class CredentialsServiceTest {
 
   @Autowired CredentialsServiceImpl credentialsService;
 
-  @Spy private WriterStore writerStore;
-
-  @Captor ArgumentCaptor<String> argumentCaptorProperties;
+  @MockitoBean private WriterStore writerStore;
 
   private User user1;
 
@@ -119,6 +115,8 @@ public class CredentialsServiceTest {
         .thenReturn(user1);
     Mockito.when(userService.findById("realmWithoutUpperCase", "us2", "test", false))
         .thenReturn(user2);
+    Mockito.when(storeProvider.getWriterStore("realmWithoutUpperCase", "us1"))
+        .thenReturn(writerStore);
   }
 
   @Test
@@ -189,6 +187,9 @@ public class CredentialsServiceTest {
   public void passwordShouldFollowPasswordLengthRealmProperty() {
     credentialsService.reinitPassword(
         "realmWithoutUpperCase", "us1", "test", Map.of(), null, false, null);
+
+    ArgumentCaptor<String> argumentCaptorProperties = ArgumentCaptor.forClass(String.class);
+
     Mockito.verify(writerStore)
         .reinitPassword(
             any(), argumentCaptorProperties.capture(), anyBoolean(), any(), any(), any());

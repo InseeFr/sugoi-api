@@ -266,7 +266,7 @@ public class PermissionServiceImpl implements PermissionService {
       valueMap.put("realm", realm);
       valueMap.put("storage", storage);
       regexpAttributesAllowed.add(
-              StringSubstitutor.replace(pattern, valueMap, "$(", ")").toUpperCase());
+          StringSubstitutor.replace(pattern, valueMap, "$(", ")").toUpperCase());
     }
     return regexpAttributesAllowed;
   }

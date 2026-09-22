@@ -16,8 +16,6 @@ package fr.insee.sugoi.app.cucumber.glue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.app.cucumber.utils.StepData;
 import fr.insee.sugoi.model.Organization;
 import fr.insee.sugoi.model.paging.PageResult;
@@ -26,6 +24,8 @@ import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Then;
 import java.util.ArrayList;
 import java.util.List;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 public class OrganizationGlue {
 
@@ -52,7 +52,7 @@ public class OrganizationGlue {
           mapper.readValue(stepData.getLatestResponse().getBody(), PageResult.class);
       stepData.setOrganizations(organizations.getResults());
       isOrga = true;
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       e.printStackTrace();
     }
     assertThat("Data receive is a list of organizations", isOrga, is(true));
@@ -67,7 +67,7 @@ public class OrganizationGlue {
       organization = mapper.readValue(stepData.getLatestResponse().getBody(), Organization.class);
       stepData.setOrganization(organization);
       isOrga = true;
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       e.printStackTrace();
     }
     assertThat("Data receive is an organization", isOrga, is(true));
@@ -93,7 +93,7 @@ public class OrganizationGlue {
       PageResult<Organization> organizations =
           mapper.readValue(stepData.getLatestResponse().getBody(), PageResult.class);
       organizationList = organizations.getResults();
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       e.printStackTrace();
     }
     assertThat("Data receive is a list of user", organizationList.size(), is(size));

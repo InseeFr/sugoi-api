@@ -16,7 +16,6 @@ package fr.insee.sugoi.store.file;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.model.*;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -31,6 +30,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ResourceLoader;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(classes = {FileWriterStore.class, FileStoreBeans.class})
 public class FileWriterStoreTest {

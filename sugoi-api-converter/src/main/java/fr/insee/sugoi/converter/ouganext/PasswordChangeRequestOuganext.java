@@ -15,9 +15,9 @@ package fr.insee.sugoi.converter.ouganext;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.annotation.JsonRootName;
 import fr.insee.sugoi.converter.utils.MapFromAttribute;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 /**
  * Java class for PasswordChangeRequestType complex type.
@@ -46,7 +46,7 @@ import fr.insee.sugoi.converter.utils.MapFromAttribute;
   "nouveauMotDePasse",
   "infoFormattageEnvoi"
 })
-@JacksonXmlRootElement(localName = "PasswordChangeRequest", namespace = Namespace.ANNUAIRE)
+@JsonRootName(value = "PasswordChangeRequest", namespace = Namespace.ANNUAIRE)
 public class PasswordChangeRequestOuganext {
 
   @JacksonXmlProperty(localName = "AdresseMessagerie")

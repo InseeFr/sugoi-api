@@ -14,8 +14,7 @@
 package fr.insee.sugoi.event.listener.webhook;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 import fr.insee.sugoi.core.event.publisher.SugoiEventPublisher;
 import fr.insee.sugoi.core.model.ProviderRequest;
@@ -35,22 +34,26 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 @SpringBootTest(
     classes = {
       CredentialsServiceImpl.class,
       SugoiEventPublisher.class,
       SugoiEventWebHookProducer.class,
+      WebHookServiceImpl.class
     })
 @TestPropertySource(locations = "classpath:/application.properties")
+@ExtendWith(MockitoExtension.class)
 public class CredentialWebhookTest {
 
   @Autowired CredentialsServiceImpl credentialsServiceImpl;
@@ -59,7 +62,9 @@ public class CredentialWebhookTest {
 
   @MockitoBean private PasswordService passwordService;
 
-  @SpyBean private WebHookServiceImpl webHookServiceImpl;
+  @MockitoSpyBean private WebHookServiceImpl webHookServiceImpl;
+
+  // @MockitoBean private WebHookServiceImpl webHookServiceImpl;
 
   @MockitoBean private RealmProvider realmProvider;
 

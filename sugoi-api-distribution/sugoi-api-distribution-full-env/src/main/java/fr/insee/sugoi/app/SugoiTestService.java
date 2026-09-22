@@ -138,7 +138,7 @@ public class SugoiTestService {
       execs.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
     } else {
       System.out.println("sleeping ...");
-      Thread.sleep(60000);
+      Thread.sleep(6000);
       System.out.println("continue");
     }
   }

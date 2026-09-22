@@ -13,29 +13,29 @@
 */
 package fr.insee.sugoi.converter.utils;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
-import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationModule;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.dataformat.xml.XmlMapper;
+import tools.jackson.dataformat.xml.XmlWriteFeature;
 
 public class CustomObjectMapper {
 
   public static ObjectMapper JsonObjectMapper() {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true);
-    return mapper;
+
+    return JsonMapper.builder()
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true)
+        .build();
   }
 
   public static XmlMapper XMLObjectMapper() {
-    XmlMapper xmlMapper = new XmlMapper();
-    JakartaXmlBindAnnotationModule module = new JakartaXmlBindAnnotationModule();
-    xmlMapper.registerModule(module);
-    xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
-    xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
-    return xmlMapper;
+
+    return XmlMapper.builder()
+        .enable(SerializationFeature.INDENT_OUTPUT)
+        .configure(XmlWriteFeature.WRITE_XML_DECLARATION, true)
+        .build();
   }
 }

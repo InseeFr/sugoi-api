@@ -121,7 +121,7 @@ public class WebHookServiceImpl implements WebHookService {
       throw new RuntimeException(
           String.format(
               "Something went wrong on server when sending request to %s receive status %s response %s",
-              target, e.getRawStatusCode(), e.getResponseBodyAsString()),
+              target, e.getStatusCode().value(), e.getResponseBodyAsString()),
           e);
     } catch (Exception e) {
       throw new RuntimeException(

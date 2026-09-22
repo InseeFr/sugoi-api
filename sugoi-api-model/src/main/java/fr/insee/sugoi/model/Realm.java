@@ -14,10 +14,10 @@
 package fr.insee.sugoi.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import fr.insee.sugoi.model.technics.UiField;
 import java.util.*;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 public class Realm implements SugoiObject {
 

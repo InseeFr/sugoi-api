@@ -53,7 +53,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,11 +70,11 @@ public class UserServiceTest {
 
   @MockitoBean private RealmProvider realmProvider;
 
-  @Mock private ReaderStore readerStore1;
+  @MockitoBean private ReaderStore readerStore1;
 
-  @Mock private ReaderStore readerStore2;
+  @MockitoBean private ReaderStore readerStore2;
 
-  @Mock private WriterStore writerStore;
+  @MockitoBean private WriterStore writerStore;
 
   @Autowired private UserServiceImpl userService;
 
