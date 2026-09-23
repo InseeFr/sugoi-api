@@ -17,12 +17,16 @@ import fr.insee.sugoi.app.service.BrokerEmbeddedService;
 import fr.insee.sugoi.app.service.LdapEmbeddedService;
 import fr.insee.sugoi.app.service.TomcatEmbeddedService;
 import fr.insee.sugoi.app.service.utils.PropertiesLoaderService;
+
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class SugoiTestService {
 
@@ -62,11 +66,24 @@ public class SugoiTestService {
 
   /** Démarrage des services de test. */
   public static void main(String[] args) throws InterruptedException, IOException {
-
-    if (args.length == 0 || "start".equalsIgnoreCase(args[0])) {
-      if (args.length > 1 && args[1].equals("fork")) {
-        fork = true;
+      String targetClass = "org/springframework/boot/tomcat/autoconfigure/TomcatServerProperties.class";
+      String cp = System.getProperty("java.class.path");
+      java.util.Arrays.stream(cp.split(File.pathSeparator))
+              .filter(p -> p.toLowerCase().contains("tomcat"))
+              .forEach(System.out::println);
+      for (String entry : cp.split(File.pathSeparator)) {
+          if (entry.endsWith(".jar")) {
+              try (JarFile jar = new JarFile(entry)) {
+                  JarEntry je = jar.getJarEntry(targetClass);
+                  if (je != null) {
+                      System.out.println("FOUND in: " + entry);
+                  }
+              } catch (Exception e) {
+                  // ignore unreadable jars
+              }
+          }
       }
+    if (args.length == 0 || "start".equalsIgnoreCase(args[0])) {
       startServers();
     }
     if (args.length > 0 && "stop".equalsIgnoreCase(args[0])) {
@@ -134,13 +151,7 @@ public class SugoiTestService {
           }
         });
 
-    if (!fork) {
       execs.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
-    } else {
-      System.out.println("sleeping ...");
-      Thread.sleep(6000);
-      System.out.println("continue");
-    }
   }
 
   private static void stopAll() throws Exception {

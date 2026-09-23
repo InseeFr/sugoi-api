@@ -82,6 +82,10 @@
             <artifactId>httpclient</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+        </dependency>
 
     </dependencies>
 
@@ -138,10 +142,10 @@
                         <configuration>
                             <async>true</async>
                             <classpathScope>compile</classpathScope>
-                            <longClasspath>true</longClasspath>
+<!--                            <longClasspath>true</longClasspath>-->
                             <executable>java</executable>
                             <addResourcesToClasspath>true</addResourcesToClasspath>
-                            <commandlineArgs>-cp %classpath fr.insee.sugoi.app.SugoiTestService start fork</commandlineArgs>
+                            <commandlineArgs>-Dspring.backgroundpreinitializer.ignore=true -cp %classpath fr.insee.sugoi.app.SugoiTestService start</commandlineArgs>
                         </configuration>
                     </execution>
                     <execution>

@@ -202,7 +202,7 @@ public class TomcatEmbeddedService {
     String warRelativePath =
         PropertiesLoaderService.load(
             "fr.insee.sugoi.full.env.war.relative.path",
-            "/sugoi-api-distribution/sugoi-api-distribution-war/target/");
+            "/sugoi-api-distribution/sugoi-api-distribution-war/target/sugoi-api.war");
     Path userDir = UserDirService.getUserDir();
     return userDir + warRelativePath;
   }
