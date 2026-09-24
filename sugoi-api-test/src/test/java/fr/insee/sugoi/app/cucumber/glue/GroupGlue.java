@@ -16,8 +16,6 @@ package fr.insee.sugoi.app.cucumber.glue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.app.cucumber.utils.StepData;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.paging.PageResult;
@@ -25,6 +23,8 @@ import io.cucumber.java.en.Then;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 public class GroupGlue {
 
@@ -44,7 +44,7 @@ public class GroupGlue {
           mapper.readValue(stepData.getLatestResponse().getBody(), PageResult.class);
       stepData.setGroups(groups.getResults());
       isGroups = true;
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       e.printStackTrace();
     }
     assertThat("Data receive is a list of groups", isGroups, is(true));
@@ -59,7 +59,7 @@ public class GroupGlue {
       group = mapper.readValue(stepData.getLatestResponse().getBody(), Group.class);
       stepData.setGroup(group);
       isGroup = true;
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       e.printStackTrace();
     }
     assertThat("Data receive is a group", isGroup, is(true));
@@ -88,7 +88,7 @@ public class GroupGlue {
       PageResult<Group> groups =
           mapper.readValue(stepData.getLatestResponse().getBody(), PageResult.class);
       groupList = groups.getResults();
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       e.printStackTrace();
     }
     assertThat("Data receive is a list of user", groupList.size(), is(size));

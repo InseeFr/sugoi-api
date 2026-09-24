@@ -15,6 +15,7 @@ package fr.insee.sugoi.app.cucumber.utils;
 
 import fr.insee.sugoi.app.cucumber.configuration.RestTemplateConfiguration;
 import java.io.IOException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.HttpMethod;
@@ -175,12 +176,13 @@ public class WebRequest {
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
-      hadError = response.getRawStatusCode() >= 400;
+      hadError = response.getStatusCode().value() >= 400;
       return hadError;
     }
 
     @Override
-    public void handleError(ClientHttpResponse response) throws IOException {
+    public void handleError(URI url, HttpMethod method, ClientHttpResponse response)
+        throws IOException {
       results = new ResponseResults(response);
     }
   }

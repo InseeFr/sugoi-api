@@ -76,7 +76,7 @@ public class JmsReceiverRequest {
         (boolean)
             ((java.util.LinkedHashMap<String, Object>)
                     request
-                        .getmethodParams()
+                        .getMethodParams()
                         .get(fr.insee.sugoi.jms.utils.JmsAtttributes.PROVIDER_REQUEST))
                 .get("asynchronousAllowed");
     jmsTemplate.convertAndSend(

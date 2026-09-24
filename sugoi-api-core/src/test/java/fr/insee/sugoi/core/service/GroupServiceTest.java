@@ -33,7 +33,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,8 +51,8 @@ public class GroupServiceTest {
 
   private Realm realm;
 
-  @Mock private Store store;
-  @Mock private ReaderStore readerStore;
+  @MockitoBean private Store store;
+  @MockitoBean private ReaderStore readerStore;
 
   @BeforeEach
   public void setup() {

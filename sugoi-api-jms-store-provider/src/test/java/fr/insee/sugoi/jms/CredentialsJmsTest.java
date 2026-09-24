@@ -32,15 +32,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -49,14 +48,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 public class CredentialsJmsTest {
 
   @Autowired JmsWriter jmsWriter;
-  @SpyBean private CredentialsService credentialsServiceImpl;
+  @MockitoSpyBean private CredentialsService credentialsServiceImpl;
 
   @Autowired
   @Qualifier("asynchronous")
   JmsTemplate jmsTemplate;
 
   private JmsWriterStore jmsWriterStore;
-  @Mock private JmsWriterStore doNothingWriterStore;
+  @MockitoBean private JmsWriterStore doNothingWriterStore;
 
   @MockitoBean private StoreProvider storeProvider;
   @MockitoBean private PasswordService passwordService;

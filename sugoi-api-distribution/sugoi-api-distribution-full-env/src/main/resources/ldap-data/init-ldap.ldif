@@ -29,6 +29,7 @@ cn: appli_applitest
 sn: appli_applitest
 givenname: appli_applitest
 uid: appli_applitest
+userPassword: REPLACE_ME
 memberOf: cn=ASI_domaine1_Applitest,ou=Applitest,ou=Applications,o=insee,c=fr
 
 dn: ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
@@ -132,7 +133,7 @@ inseepropriete: groupMapping$name:cn,String,rw
 inseepropriete: groupMapping$description:description,String,rw
 inseepropriete: groupMapping$users:uniquemember,list_user,rw
 inseepropriete: description$Le profil domaine2
-inseepropriete: enableMailUnicity$true
+# inseepropriete: enableMailUnicity$true
 inseepropriete: uiUserMapping$Identifiant;Identifiant de l'utilisateur;Il servira pour le rechercher a travers l'annuaire. Caracteres autorises alphabetiques chiffres apostrophes espaces tirets;username;string;true;main;
 inseepropriete: uiUserMapping$Nom commun;Nom commun de l'utilisateur;Caracteres autorises alphabetiques chiffres apostrophes espaces tirets;attributes.common_name;string;true;main;
 inseepropriete: uiUserMapping$Nom;Nom de l'utilisateur;Caracteres autorises alphabetiques chiffres apostrophes espaces tirets;lastName;string;true;main;
@@ -287,6 +288,7 @@ inseepropriete: uiUserMapping$Certificat issuer;;;metadatas.cert.issuer;string;f
 inseepropriete: uiUserMapping$Certificat subject;;;metadatas.cert.subject;string;false;authentification;
 inseepropriete: uiUserMapping$Certificat expiration;;;metadatas.cert.expiration;string;false;authentification;
 inseepropriete: uiUserMapping$Certificat;;;certificate;manageCertificate;false;authentification;
+inseepropriete: enableMailUnicity$true
 description: domaine1
 
 dn: cn=default,cn=Profil_domaine1_WebServiceLdap,cn=profil-contact-WebServicesLdap,ou=We

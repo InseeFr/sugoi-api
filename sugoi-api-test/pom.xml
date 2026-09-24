@@ -33,13 +33,24 @@
 		    <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-jersey</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>fr.insee.sugoi</groupId>
             <artifactId>sugoi-api-distribution-full-env</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
 
         <dependency>
             <groupId>io.cucumber</groupId>
@@ -82,6 +93,10 @@
             <artifactId>httpclient</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+        </dependency>
 
     </dependencies>
 
@@ -138,10 +153,10 @@
                         <configuration>
                             <async>true</async>
                             <classpathScope>compile</classpathScope>
-                            <longClasspath>true</longClasspath>
+<!--                            <longClasspath>true</longClasspath>-->
                             <executable>java</executable>
                             <addResourcesToClasspath>true</addResourcesToClasspath>
-                            <commandlineArgs>-cp %classpath fr.insee.sugoi.app.SugoiTestService start fork</commandlineArgs>
+                            <commandlineArgs>-Dspring.backgroundpreinitializer.ignore=true -cp %classpath fr.insee.sugoi.app.SugoiTestService start</commandlineArgs>
                         </configuration>
                     </execution>
                     <execution>

@@ -13,14 +13,14 @@
 */
 package fr.insee.sugoi.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import fr.insee.sugoi.model.technics.StoreMapping;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import org.apache.commons.lang.text.StrSubstitutor;
+import org.apache.commons.text.StringSubstitutor;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 public class UserStorage implements Serializable {
   private String name;
@@ -109,7 +109,7 @@ public class UserStorage implements Serializable {
         .getAttributes()
         .put(
             userDefinedAttributeTemplate.split(":")[0],
-            StrSubstitutor.replace(
+            StringSubstitutor.replace(
                 userDefinedAttributeTemplate.split(":", 2)[1],
                 userToModify.getMapOfStringFields(getUserMappings()),
                 "$(",

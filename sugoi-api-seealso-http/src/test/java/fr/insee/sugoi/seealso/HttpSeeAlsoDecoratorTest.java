@@ -16,8 +16,6 @@ package fr.insee.sugoi.seealso;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.core.seealso.SeeAlsoCredentialsConfiguration;
 import fr.insee.sugoi.model.Group;
 import fr.insee.sugoi.model.User;
@@ -35,6 +33,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(classes = {HttpSeeAlsoDecorator.class, SeeAlsoCredentialsConfiguration.class})
 @TestPropertySource(locations = "classpath:/application.properties")
@@ -67,7 +67,7 @@ public class HttpSeeAlsoDecoratorTest {
             return new MockResponse().setResponseCode(200).setBody(mapper.writeValueAsString(toto));
           } else return response403;
         } else return response401;
-      } catch (JsonProcessingException e) {
+      } catch (JacksonException e) {
         return response500;
       }
     }
