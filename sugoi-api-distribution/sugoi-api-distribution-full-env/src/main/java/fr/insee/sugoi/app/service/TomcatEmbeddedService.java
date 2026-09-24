@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -146,14 +147,33 @@ public class TomcatEmbeddedService {
       }
     }
 
-    // Copy properties on tomcat and reload
+    // Trouver la racine du projet (sugoi-api) pour accéder aux fichiers de propriétés
+    Path projectRoot = Paths.get(UserDirService.getUserDir().toUri());
+    while (!projectRoot.getFileName().toString().equals("sugoi-api")
+        && projectRoot.getParent() != null) {
+      projectRoot = projectRoot.getParent();
+    }
+
+    // Copier les propriétés pour tomcat1
+    Path propertiesPath1 =
+        projectRoot.resolve(
+            "sugoi-api-distribution/sugoi-api-distribution-full-env/src/main/resources/tomcat-properties/"
+                + name
+                + ".properties");
     FileUtils.copyFile(
-        new File(UserDirService.getUserDir() + configFile),
+        propertiesPath1.toFile(),
         new File(
             workUri + "/tomcatit/webapps/" + name + "/WEB-INF/classes/application.properties"));
     ctx.reload();
+
+    // Copier les propriétés pour tomcat2
+    Path propertiesPath2 =
+        projectRoot.resolve(
+            "sugoi-api-distribution/sugoi-api-distribution-full-env/src/main/resources/tomcat-properties/"
+                + name2
+                + ".properties");
     FileUtils.copyFile(
-        new File(UserDirService.getUserDir() + configFile2),
+        propertiesPath2.toFile(),
         new File(
             workUri + "/tomcatit/webapps/" + name2 + "/WEB-INF/classes/application.properties"));
     ctx2.reload();
