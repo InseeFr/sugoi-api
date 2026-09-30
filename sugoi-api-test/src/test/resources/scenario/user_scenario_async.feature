@@ -48,7 +48,7 @@ Feature: User scenario asynchrone
             """
         And show body received
         Then the client receives status code 202
-        Then Pause de 10 secondes
+        Then Pause de 100 secondes
 
     # fail
     Scenario: Update user
