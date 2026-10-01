@@ -5,6 +5,7 @@ Feature: Groups scenario asynchrone
         Given the client is using tomcat2
         Given the client authentified with username appli_applitest and password REPLACE_ME
         Given the client make an asynchronous request
+        Then Pause de 100 secondes
 
     Scenario: Get groups
         When the client perform GET request on url /realms/domaine1/applications/applitest/groups

@@ -14,11 +14,11 @@
 package fr.insee.sugoi.converter.ouganext;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.annotation.JsonRootName;
 import fr.insee.sugoi.converter.utils.MapFromAttribute;
 import java.util.Arrays;
 import java.util.List;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 @JsonPropertyOrder({
   "nomProfil",
@@ -42,7 +42,7 @@ import java.util.List;
   "branchesApplicativesPossibles",
   "groupesPossibles"
 })
-@JacksonXmlRootElement(localName = "Profil", namespace = Namespace.ANNUAIRE)
+@JsonRootName(value = "Profil", namespace = Namespace.ANNUAIRE)
 public class ProfilOuganext {
 
   public static final ObjectClass[] TABLEAU_CLASSES_DEFAUT = {

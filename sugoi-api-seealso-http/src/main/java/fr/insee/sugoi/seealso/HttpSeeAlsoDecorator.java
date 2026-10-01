@@ -13,8 +13,6 @@
 */
 package fr.insee.sugoi.seealso;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.core.seealso.SeeAlsoCredentialsConfiguration.SeeAlsoCredential;
 import fr.insee.sugoi.core.seealso.SeeAlsoDecorator;
 import java.io.IOException;
@@ -32,6 +30,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Service
 public class HttpSeeAlsoDecorator implements SeeAlsoDecorator {

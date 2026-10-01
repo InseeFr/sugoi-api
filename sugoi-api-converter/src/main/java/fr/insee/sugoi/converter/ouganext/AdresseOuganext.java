@@ -16,8 +16,9 @@ package fr.insee.sugoi.converter.ouganext;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonRootName;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 /**
  * Java class for AdressePostaleType complex type.
@@ -43,7 +44,16 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
  * </pre>
  */
 @JsonInclude(Include.NON_NULL)
-@JacksonXmlRootElement(localName = "AdressePostale", namespace = Namespace.INSEE)
+@JsonRootName(value = "AdressePostale", namespace = Namespace.INSEE)
+@JsonPropertyOrder({
+  "ligneUne",
+  "ligneDeux",
+  "ligneTrois",
+  "ligneQuatre",
+  "ligneCinq",
+  "ligneSix",
+  "ligneSept"
+})
 public class AdresseOuganext {
 
   @JsonIgnore private String identifiant;

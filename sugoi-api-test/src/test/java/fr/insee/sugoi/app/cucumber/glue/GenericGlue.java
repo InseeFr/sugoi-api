@@ -17,8 +17,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.app.cucumber.utils.ResponseResults;
 import fr.insee.sugoi.app.cucumber.utils.StepData;
 import fr.insee.sugoi.app.cucumber.utils.WebRequest;
@@ -35,6 +33,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.codec.binary.Base64;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 public class GenericGlue {
 
@@ -264,5 +264,10 @@ public class GenericGlue {
         System.out.println("continue...");
       }
     }
+  }
+
+  @Then("Pause de {int} secondes")
+  public void wait(int nb) throws InterruptedException {
+    Thread.sleep(nb * 1000L);
   }
 }

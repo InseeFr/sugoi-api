@@ -14,14 +14,14 @@
 package fr.insee.sugoi.converter.ouganext;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.annotation.JsonRootName;
 import fr.insee.sugoi.model.Habilitation;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 
 /**
  * Java class for HabilitationsType complex type.
@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
  * &lt;/complexType>
  * </pre>
  */
-@JacksonXmlRootElement(localName = "Habilitations", namespace = Namespace.ANNUAIRE)
+@JsonRootName(value = "Habilitations", namespace = Namespace.ANNUAIRE)
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonPropertyOrder({"application"})
 public class HabilitationsOuganext {

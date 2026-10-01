@@ -15,7 +15,6 @@ package fr.insee.sugoi.converter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
 import fr.insee.sugoi.converter.ouganext.AdresseOuganext;
 import fr.insee.sugoi.converter.ouganext.OrganisationOuganext;
@@ -27,6 +26,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
+import tools.jackson.core.JacksonException;
 
 public class OrganisationTest {
 
@@ -79,7 +79,7 @@ public class OrganisationTest {
   }
 
   @Test
-  public void testOrganisationJson() throws JsonProcessingException {
+  public void testOrganisationJson() throws JacksonException {
     OrganisationOuganext organisation = generateOrganisation();
     String expectedJson =
         "{\"identifiant\":\"XJHFLG4\",\"nomCommun\":\"INSEE-DG\",\"domaineDeGestion\":\"TEST\",\"description\":\"INSEE\",\"adresseMessagerie\":\"accueil@domain.tld\",\"facSimile\":\"0123456789\",\"adresse\":{\"ligneUne\":\"17 bd adolphe pinard\",\"ligneDeux\":\"\",\"ligneTrois\":\"\",\"ligneQuatre\":\"\",\"ligneCinq\":\"\",\"ligneSix\":\"\",\"ligneSept\":\"92240 Malakoff\"},\"organisationDeRattachement\":\"133546546\",\"propriete\":[\"Test1\",\"Test2\"]}";
@@ -88,7 +88,7 @@ public class OrganisationTest {
   }
 
   @Test
-  public void testXMLJackson() throws JsonProcessingException {
+  public void testXMLJackson() throws JacksonException {
     OrganisationOuganext organisation = generateOrganisation();
     String expectedXML =
         "<?xml version='1.0' encoding='UTF-8'?>\r\n"
@@ -121,7 +121,7 @@ public class OrganisationTest {
   }
 
   @Test
-  public void testConvertOrganisationToOrganizationJson() throws JsonProcessingException {
+  public void testConvertOrganisationToOrganizationJson() throws JacksonException {
     try {
       OrganisationOuganext organisation = generateOrganisation();
       OuganextSugoiMapper osm = new OuganextSugoiMapper();
@@ -136,7 +136,7 @@ public class OrganisationTest {
   }
 
   @Test
-  public void testConvertOrganizationToOrganisationXml() throws JsonProcessingException {
+  public void testConvertOrganizationToOrganisationXml() throws JacksonException {
 
     Organization organization = generateOrganization(true);
     OuganextSugoiMapper osm = new OuganextSugoiMapper();
@@ -163,5 +163,17 @@ public class OrganisationTest {
             .withTest(CustomObjectMapper.XMLObjectMapper().writeValueAsString(organisation))
             .build();
     assertFalse(myDiff.hasDifferences());
+  }
+
+  @Test
+  public void testOrganisationDeRattachementDeserializer() throws JacksonException {
+
+    String json = "{\"organisationDeRattachement\":\"133546546\"}";
+
+    OrganisationOuganext organisation =
+        CustomObjectMapper.JsonObjectMapper().readValue(json, OrganisationOuganext.class);
+
+    assertNotNull(organisation.getOrganisationDeRattachement());
+    assertEquals("133546546", organisation.getOrganisationDeRattachement().getIdentifiant());
   }
 }

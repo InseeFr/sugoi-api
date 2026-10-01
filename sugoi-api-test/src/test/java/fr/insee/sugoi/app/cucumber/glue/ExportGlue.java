@@ -15,12 +15,12 @@ package fr.insee.sugoi.app.cucumber.glue;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.app.cucumber.utils.StepData;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Then;
 import java.util.Arrays;
+import tools.jackson.databind.ObjectMapper;
 
 public class ExportGlue {
 

@@ -149,7 +149,7 @@ Feature: User scenario
         And show body received
         Then the client receives status code 404
 
-    Scenario: Post user
+    Scenario: Post user 2
         When the client perform POST request with body on url /realms/domaine1/storages/default/users body:
             """
             {

@@ -38,12 +38,12 @@ public class BrokerRequest {
     this.method = method;
   }
 
-  public Map<String, Object> getmethodParams() {
+  public Map<String, Object> getMethodParams() {
     return this.methodParams;
   }
 
-  public void setmethodParams(String name, Object value) {
-    this.methodParams.put(name, value);
+  public void setMethodParams(Map<String, Object> methodParams) {
+    this.methodParams = methodParams;
   }
 
   public String getCorrelationId() {

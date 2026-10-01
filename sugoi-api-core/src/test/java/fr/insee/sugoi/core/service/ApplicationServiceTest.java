@@ -27,7 +27,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,9 +40,9 @@ public class ApplicationServiceTest {
 
   @MockitoBean private RealmProvider realmProvider;
 
-  @Mock private ReaderStore readerStore2;
+  @MockitoBean private ReaderStore readerStore2;
 
-  @Mock private WriterStore writerStore;
+  @MockitoBean private WriterStore writerStore;
 
   @Autowired private ApplicationServiceImpl applicationService;
 

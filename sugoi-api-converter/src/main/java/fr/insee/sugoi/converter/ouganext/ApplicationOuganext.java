@@ -14,16 +14,16 @@
 package fr.insee.sugoi.converter.ouganext;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.annotation.JsonRootName;
 import fr.insee.sugoi.converter.utils.MapFromAttribute;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
-@JacksonXmlRootElement(localName = "application", namespace = Namespace.ANNUAIRE)
+@JsonRootName(value = "application", namespace = Namespace.ANNUAIRE)
 @JsonPropertyOrder({"name", "role"})
 public class ApplicationOuganext {
 

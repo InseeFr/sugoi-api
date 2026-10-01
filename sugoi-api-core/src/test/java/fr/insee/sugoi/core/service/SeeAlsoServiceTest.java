@@ -22,15 +22,15 @@ import fr.insee.sugoi.core.seealso.SeeAlsoService;
 import fr.insee.sugoi.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest(classes = {SeeAlsoService.class, MapProtocolSeeAlsoDecorator.class})
 public class SeeAlsoServiceTest {
 
-  @Mock MapProtocolSeeAlsoDecorator mapProtocolSeeAlsoDecorator;
-  @InjectMocks SeeAlsoService seeAlsoService;
+  @MockitoBean MapProtocolSeeAlsoDecorator mapProtocolSeeAlsoDecorator;
+  @Autowired SeeAlsoService seeAlsoService;
 
   @BeforeEach
   public void setup() {

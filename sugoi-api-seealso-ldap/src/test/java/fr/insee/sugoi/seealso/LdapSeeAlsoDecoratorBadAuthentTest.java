@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.is;
 import fr.insee.sugoi.core.seealso.SeeAlsoCredentialsConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.ldap.embedded.EmbeddedLdapAutoConfiguration;
+import org.springframework.boot.ldap.autoconfigure.embedded.EmbeddedLdapAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 

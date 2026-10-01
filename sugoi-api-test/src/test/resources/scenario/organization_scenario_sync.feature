@@ -21,6 +21,7 @@ Feature: Organization scenario
         When the client perform GET request on url /realms/domaine1/organizations/notExistOrga
         And show body received
         Then the client receives status code 404
+        Then Pause de 10 secondes
 
     Scenario: Post organization
         When the client perform POST request with body on url /realms/domaine1/storages/default/organizations body:
