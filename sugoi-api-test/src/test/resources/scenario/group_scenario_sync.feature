@@ -21,6 +21,7 @@ Feature: Groups scenario admin
         When the client perform GET request on url /realms/domaine1/applications/applitest/groups/Administrateurs_AppliTest
         And show body received
         Then the client receives status code 200
+        Then Pause de 100 secondes
 
     Scenario: Post group
         When the client perform POST request with body on url /realms/domaine1/applications/applitest/groups body:
@@ -35,7 +36,7 @@ Feature: Groups scenario admin
         Then the client receives status code 201
         Then the client expect to receive a group
 
-    Scenario: Post group
+    Scenario: Post group 2
         When the client perform POST request with body on url /realms/domaine1/applications/applitest/groups body:
             """
             {
