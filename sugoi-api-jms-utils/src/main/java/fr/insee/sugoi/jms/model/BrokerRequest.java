@@ -13,9 +13,11 @@
 */
 package fr.insee.sugoi.jms.model;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.util.HashMap;
 import java.util.Map;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "_type")
 public class BrokerRequest {
 
   private String method;

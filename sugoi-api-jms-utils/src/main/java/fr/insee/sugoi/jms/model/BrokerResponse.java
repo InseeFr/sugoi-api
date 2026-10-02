@@ -13,8 +13,10 @@
 */
 package fr.insee.sugoi.jms.model;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import fr.insee.sugoi.core.model.ProviderResponse;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "_type")
 public class BrokerResponse {
 
   private String comment;
