@@ -37,6 +37,7 @@ Feature: Credential scenario
             """
         And show body received
         Then the client receives status code 403
+        Then Pause de 10 secondes
 
     Scenario: Change password
         Given the client authentified with username appli_sugoi and password sugoi
@@ -60,6 +61,7 @@ Feature: Credential scenario
             """
         And show body received
         Then the client receives status code 401
+        Then Pause de 10 secondes
 
     Scenario: Validate password
         Given the client authentified with username appli_sugoi and password sugoi
