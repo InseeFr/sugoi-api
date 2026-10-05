@@ -102,14 +102,16 @@ public class JmsConfiguration {
       DefaultJmsListenerContainerFactoryConfigurer configurer) {
     DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
     factory.setMessageConverter(messageConverter());
-    factory.setErrorHandler(new org.springframework.util.ErrorHandler() {
-      private final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("JmsListenerErrorHandler");
-      
-      @Override
-      public void handleError(Throwable t) {
-        logger.error("JMS Listener error: {}", t.getMessage(), t);
-      }
-    });
+    factory.setErrorHandler(
+        new org.springframework.util.ErrorHandler() {
+          private final org.slf4j.Logger logger =
+              org.slf4j.LoggerFactory.getLogger("JmsListenerErrorHandler");
+
+          @Override
+          public void handleError(Throwable t) {
+            logger.error("JMS Listener error: {}", t.getMessage(), t);
+          }
+        });
     configurer.configure(factory, connectionFactory);
     return factory;
   }
