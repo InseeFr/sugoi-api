@@ -11,24 +11,93 @@
    <name>sugoi-api-ldap-store-provider</name>
 
    <dependencies>
+
+      <!-- Source: https://mvnrepository.com/artifact/org.springframework/spring-beans -->
       <dependency>
-         <groupId>org.springframework.boot</groupId>
-         <artifactId>spring-boot-starter-test</artifactId>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-beans</artifactId>
+      </dependency>
+
+      <!-- Source: https://mvnrepository.com/artifact/org.springframework/spring-beans -->
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-test</artifactId>
          <scope>test</scope>
       </dependency>
+
+      <!-- Source: https://mvnrepository.com/artifact/org.hamcrest/hamcrest -->
       <dependency>
-         <groupId>org.springframework.boot</groupId>
-         <artifactId>spring-boot-starter-data-ldap</artifactId>
+         <groupId>org.hamcrest</groupId>
+         <artifactId>hamcrest</artifactId>
          <scope>test</scope>
       </dependency>
+
+      <!-- Source: https://mvnrepository.com/artifact/org.springframework/spring-beans -->
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-ldap</artifactId>
+         <scope>test</scope>
+      </dependency>
+
+      <!-- Source: https://mvnrepository.com/artifact/org.springframework/spring-beans -->
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-test</artifactId>
+         <scope>test</scope>
+      </dependency>
+
+      <!-- Source: https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+      <dependency>
+         <groupId>org.junit.jupiter</groupId>
+         <artifactId>junit-jupiter-api</artifactId>
+         <scope>test</scope>
+      </dependency>
+
+      <!-- Source: https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-api</artifactId>
+      </dependency>
+
+      <!-- Source: https://mvnrepository.com/artifact/org.springframework/spring-beans -->
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-core</artifactId>
+      </dependency>
+
+      <!-- Source: https://mvnrepository.com/artifact/org.springframework/spring-beans -->
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot</artifactId>
+      </dependency>
+
+      <!-- Source: https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+      <dependency>
+         <groupId>org.apache.commons</groupId>
+         <artifactId>commons-lang3</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>fr.insee.sugoi</groupId>
+         <artifactId>sugoi-api-core</artifactId>
+      </dependency>
+
+      <!-- Source: https://mvnrepository.com/artifact/org.springframework/spring-beans -->
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-context</artifactId>
+      </dependency>
+
       <dependency>
          <groupId>com.unboundid</groupId>
          <artifactId>unboundid-ldapsdk</artifactId>
       </dependency>
+
       <dependency>
          <groupId>fr.insee.sugoi</groupId>
          <artifactId>sugoi-api-ldap-utils</artifactId>
       </dependency>
+
       <dependency>
          <groupId>fr.insee.sugoi</groupId>
          <artifactId>sugoi-api-model</artifactId>
@@ -36,5 +105,6 @@
          <type>test-jar</type>
          <scope>test</scope>
       </dependency>
+
    </dependencies>
 </project>
