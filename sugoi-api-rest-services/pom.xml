@@ -119,7 +119,6 @@
 			<groupId>io.swagger.core.v3</groupId>
 			<artifactId>swagger-annotations-jakarta</artifactId>
 			<version>2.2.54</version>
-			<scope>compile</scope>
 		</dependency>
 
 		<!-- Source: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot -->
