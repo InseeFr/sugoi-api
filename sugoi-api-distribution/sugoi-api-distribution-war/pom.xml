@@ -16,11 +16,62 @@
   <name>sugoi-api-distribution-war</name>
 
   <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jersey</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-tomcat</artifactId>
+<!--      <scope>provided</scope>-->
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.tomcat.embed</groupId>
+      <artifactId>tomcat-embed-jasper</artifactId>
+    </dependency>
+
+<!--    <dependency>-->
+<!--      <groupId>org.apache.tomcat</groupId>-->
+<!--      <artifactId>tomcat-jasper</artifactId>-->
+<!--    </dependency>-->
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-devtools</artifactId>
       <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-ldap</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
     </dependency>
 
     <!-- To manage metadata properties -->
@@ -30,37 +81,66 @@
       <optional>true</optional>
     </dependency>
 
-    <!-- Source: https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <groupId>fr.insee.sugoi</groupId>
+      <artifactId>sugoi-api-core</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot</artifactId>
+      <groupId>fr.insee.sugoi</groupId>
+      <artifactId>sugoi-api-rest-services</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
+      <groupId>fr.insee.sugoi</groupId>
+      <artifactId>sugoi-api-rest-old-services</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-autoconfigure</artifactId>
+      <groupId>fr.insee.sugoi</groupId>
+      <artifactId>sugoi-api-converter</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-web</artifactId>
+      <groupId>fr.insee.sugoi</groupId>
+      <artifactId>sugoi-api-file-config-provider</artifactId>
     </dependency>
 
-    <!-- Source: https://mvnrepository.com/artifact/jakarta.servlet/jakarta.servlet-api -->
     <dependency>
-      <groupId>jakarta.servlet</groupId>
-      <artifactId>jakarta.servlet-api</artifactId>
+      <groupId>fr.insee.sugoi</groupId>
+      <artifactId>sugoi-api-file-store-provider</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>fr.insee.sugoi</groupId>
+      <artifactId>sugoi-api-ldap-config-provider</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>fr.insee.sugoi</groupId>
+      <artifactId>sugoi-api-ldap-store-provider</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>fr.insee.sugoi</groupId>
+      <artifactId>sugoi-api-jms-store-provider</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>fr.insee.sugoi</groupId>
+      <artifactId>sugoi-api-event-webhook</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>fr.insee.sugoi</groupId>
+      <artifactId>sugoi-api-seealso-http</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>fr.insee.sugoi</groupId>
+      <artifactId>sugoi-api-seealso-ldap</artifactId>
+    </dependency>
+
 
   </dependencies>
 
