@@ -57,7 +57,7 @@ public class OrganizationServiceTest {
 
   private Organization orga1;
 
-    @BeforeEach
+  @BeforeEach
   public void setup() {
     orga1 = new Organization();
     orga1.setIdentifiant("Toto");

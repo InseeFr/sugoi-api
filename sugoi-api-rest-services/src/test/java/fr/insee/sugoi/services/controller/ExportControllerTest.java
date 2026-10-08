@@ -60,7 +60,7 @@ public class ExportControllerTest {
   @MockitoBean private ConfigService configService;
   @MockitoBean private GroupService groupService;
 
-    @BeforeEach
+  @BeforeEach
   public void setup() {
     Realm reamlOneUS = new Realm();
     reamlOneUS.setName("realmOneUS");

@@ -34,8 +34,7 @@ public class RealmGlue {
   private final ObjectMapper mapper = new ObjectMapper();
 
   @Before
-  public void before(Scenario scenario) {
-  }
+  public void before(Scenario scenario) {}
 
   private StepData stepData;
 

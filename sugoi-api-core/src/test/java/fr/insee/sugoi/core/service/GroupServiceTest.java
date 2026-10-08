@@ -49,7 +49,7 @@ public class GroupServiceTest {
 
   @Autowired private GroupServiceImpl groupService;
 
-    @MockitoBean private Store store;
+  @MockitoBean private Store store;
   @MockitoBean private ReaderStore readerStore;
 
   @BeforeEach

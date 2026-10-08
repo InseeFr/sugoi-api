@@ -63,7 +63,7 @@ public class CredentialsServiceTest {
 
   @MockitoBean private WriterStore writerStore;
 
-    @BeforeEach
+  @BeforeEach
   public void setup() {
     UserStorage us1 = new UserStorage();
     us1.setName("us1");

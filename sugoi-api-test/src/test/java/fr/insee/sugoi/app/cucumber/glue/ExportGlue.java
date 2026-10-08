@@ -20,13 +20,11 @@ import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Then;
 import java.util.Arrays;
-import tools.jackson.databind.ObjectMapper;
 
 public class ExportGlue {
 
   @Before
-  public void before(Scenario scenario) {
-  }
+  public void before(Scenario scenario) {}
 
   private final StepData stepData;
 

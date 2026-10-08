@@ -46,7 +46,7 @@ public class ApplicationServiceTest {
 
   @Autowired private ApplicationServiceImpl applicationService;
 
-    @BeforeEach
+  @BeforeEach
   public void setup() {
     Mockito.when(realmProvider.load("idonotexist")).thenReturn(Optional.empty());
 

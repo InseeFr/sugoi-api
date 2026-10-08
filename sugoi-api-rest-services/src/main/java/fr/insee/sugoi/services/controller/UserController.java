@@ -86,7 +86,7 @@ public class UserController {
 
   @Autowired private CertificateService certificateService;
 
-    @GetMapping(
+  @GetMapping(
       path = {"/realms/{realm}/storages/{storage}/users"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary = "Search users according to parameters, paginate working")
@@ -711,8 +711,8 @@ public class UserController {
           String storage,
       @Parameter(description = "User's mail to search", required = true) @PathVariable("mail")
           String mail) {
-      boolean verifyUniqueMail = false;
-      if (Boolean.parseBoolean(
+    boolean verifyUniqueMail = false;
+    if (Boolean.parseBoolean(
         configService
             .getRealm(realm)
             .getProperties()

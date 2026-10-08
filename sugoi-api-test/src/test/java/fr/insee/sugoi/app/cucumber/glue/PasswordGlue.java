@@ -20,10 +20,8 @@ import io.cucumber.java.Scenario;
 @SuppressWarnings("unused")
 public class PasswordGlue {
 
-    @Before
-  public void before(Scenario scenario) {
-    }
+  @Before
+  public void before(Scenario scenario) {}
 
-    public PasswordGlue(StepData stepData) {
-    }
+  public PasswordGlue(StepData stepData) {}
 }

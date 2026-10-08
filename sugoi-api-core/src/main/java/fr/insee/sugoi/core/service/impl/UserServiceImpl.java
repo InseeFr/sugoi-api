@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
 
   private boolean verifyUniqueMail = false;
 
-    /* Size of the ids randomly generated */
+  /* Size of the ids randomly generated */
   private int idCreateLength = 7;
 
   /*
@@ -235,8 +235,8 @@ public class UserServiceImpl implements UserService {
 
     PageResult<User> result = new PageResult<>();
     Realm r = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
-      int usersMaxoutputsize = 1000;
-      pageable.setSizeWithMax(
+    int usersMaxoutputsize = 1000;
+    pageable.setSizeWithMax(
         Integer.parseInt(
             r.getProperties()
                 .getOrDefault(
