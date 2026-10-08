@@ -28,7 +28,7 @@ public class ResponseResults {
   ResponseResults(final ClientHttpResponse response) throws IOException {
     this.theResponse = response;
     final InputStream bodyInputStream = response.getBody();
-    this.body = IOUtils.toString(bodyInputStream, StandardCharsets.UTF_8.name());
+    this.body = IOUtils.toString(bodyInputStream, StandardCharsets.UTF_8);
   }
 
   ClientHttpResponse getTheResponse() {

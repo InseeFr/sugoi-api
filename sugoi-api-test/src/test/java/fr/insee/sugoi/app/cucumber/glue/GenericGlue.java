@@ -250,7 +250,7 @@ public class GenericGlue {
         ResponseResults response =
             webRequest.executeGet(stepData.getDefaultTomcatUrl() + "/realms", headers, null);
         List<Realm> realms = Arrays.asList(mapper.readValue(response.getBody(), Realm[].class));
-        if (realms.size() > 0) {
+        if (!realms.isEmpty()) {
           isReady = true;
         } else {
           System.out.println("App is not ready sleeping...");

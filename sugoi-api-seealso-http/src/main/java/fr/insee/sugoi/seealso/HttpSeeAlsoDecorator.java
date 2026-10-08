@@ -130,10 +130,10 @@ public class HttpSeeAlsoDecorator implements SeeAlsoDecorator {
 
     if (rootNode.isArray()) {
       List<String> result = new ArrayList<>();
-      rootNode.forEach(e -> result.add(e.asText()));
+      rootNode.forEach(e -> result.add(e.asString()));
       return result;
     } else {
-      return rootNode.asText();
+      return rootNode.asString();
     }
   }
 }

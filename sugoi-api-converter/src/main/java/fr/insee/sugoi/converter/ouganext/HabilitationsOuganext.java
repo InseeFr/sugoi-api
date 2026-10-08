@@ -107,7 +107,7 @@ public class HabilitationsOuganext {
               app.getRole().stream()
                   .forEach(
                       role -> {
-                        if (role.getPropriete().size() == 0) {
+                        if (role.getPropriete().isEmpty()) {
                           habilitations.add(new Habilitation(app.getName(), role.getName(), null));
                         } else {
                           role.getPropriete().stream()
@@ -219,7 +219,6 @@ public class HabilitationsOuganext {
       }
     }
     proprietes.stream().forEach(prop -> role.addPropriete(prop));
-    ;
   }
 
   /**

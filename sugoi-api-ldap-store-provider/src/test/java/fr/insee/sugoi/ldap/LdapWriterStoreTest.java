@@ -367,7 +367,7 @@ public class LdapWriterStoreTest {
             .anyMatch(
                 group ->
                     group.getName().equalsIgnoreCase("ToUpdate_Applitest")
-                        && group.getUsers().size() > 0));
+                        && !group.getUsers().isEmpty()));
   }
 
   @Test

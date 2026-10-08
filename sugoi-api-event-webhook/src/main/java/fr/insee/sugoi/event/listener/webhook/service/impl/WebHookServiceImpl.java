@@ -150,7 +150,7 @@ public class WebHookServiceImpl implements WebHookService {
     try {
       ResourceLoader resourceLoader = new DefaultResourceLoader();
       Resource resource = resourceLoader.getResource(path);
-      return IOUtils.toString(resource.getInputStream(), StandardCharsets.UTF_8.name());
+      return IOUtils.toString(resource.getInputStream(), StandardCharsets.UTF_8);
     } catch (IOException e) {
       throw new RuntimeException("Unable to load " + path, e);
     }

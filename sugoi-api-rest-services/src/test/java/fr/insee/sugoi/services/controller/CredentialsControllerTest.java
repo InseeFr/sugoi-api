@@ -158,7 +158,6 @@ public class CredentialsControllerTest {
     MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
     assertThat("Response status should be 200", response.getStatus(), is(200));
   }
-  ;
 
   @Test
   @WithMockUser(roles = "Admin_Sugoi")
@@ -192,7 +191,6 @@ public class CredentialsControllerTest {
 
     assertThat("Response status should be 401", response.getStatus(), is(401));
   }
-  ;
 
   @Test
   @WithMockUser(roles = "Admin_Sugoi")

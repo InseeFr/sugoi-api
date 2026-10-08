@@ -49,7 +49,7 @@ public class RealmGlue {
       List<Realm> realms =
           Arrays.asList(mapper.readValue(stepData.getLatestResponse().getBody(), Realm[].class));
       stepData.setRealms(realms);
-      if (realms.size() > 0) {
+      if (!realms.isEmpty()) {
         haveRealmAccess = true;
       }
     } catch (JacksonException e) {

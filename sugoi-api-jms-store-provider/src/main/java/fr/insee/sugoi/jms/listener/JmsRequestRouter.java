@@ -213,7 +213,7 @@ public class JmsRequestRouter {
           break;
         case Method.UPDATE_CERTIFICATE:
           String cert = (String) request.getMethodParams().get(JmsAtttributes.CERTIFICATE);
-          byte encodedCert[] = Base64.getDecoder().decode(cert);
+          byte[] encodedCert = Base64.getDecoder().decode(cert);
           ByteArrayInputStream inputStream = new ByteArrayInputStream(encodedCert);
           CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
           X509Certificate certificate =

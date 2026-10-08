@@ -359,8 +359,7 @@ public class UserServiceImpl implements UserService {
               .updateUserCertificate(user, certificat, providerRequest);
       return response;
     } catch (Exception e) {
-      throw new UnableToUpdateCertificateException(
-          "Cannot update certificate because: " + e.toString(), e);
+      throw new UnableToUpdateCertificateException("Cannot update certificate because: " + e, e);
     }
   }
 
