@@ -46,13 +46,11 @@ public class ApplicationServiceTest {
 
   @Autowired private ApplicationServiceImpl applicationService;
 
-  private Realm realm;
-
-  @BeforeEach
+    @BeforeEach
   public void setup() {
     Mockito.when(realmProvider.load("idonotexist")).thenReturn(Optional.empty());
 
-    realm = new Realm();
+    Realm realm = new Realm();
     realm.setName("realm");
     Mockito.when(realmProvider.load("realm")).thenReturn(Optional.of(realm));
 

@@ -54,8 +54,7 @@ public class CredentialsJmsTest {
   @Qualifier("asynchronous")
   JmsTemplate jmsTemplate;
 
-  private JmsWriterStore jmsWriterStore;
-  @MockitoBean private JmsWriterStore doNothingWriterStore;
+    @MockitoBean private JmsWriterStore doNothingWriterStore;
 
   @MockitoBean private StoreProvider storeProvider;
   @MockitoBean private PasswordService passwordService;
@@ -73,9 +72,8 @@ public class CredentialsJmsTest {
     userStorage.setName("default");
     realm.setUserStorages(List.of(userStorage));
 
-    jmsWriterStore =
-        new JmsWriterStore(
-            jmsWriter, "queue.request", "queue.response", null, null, realm, userStorage);
+    JmsWriterStore jmsWriterStore = new JmsWriterStore(
+              jmsWriter, "queue.request", "queue.response", null, null, realm, userStorage);
 
     Mockito.when(
             doNothingWriterStore.initPassword(

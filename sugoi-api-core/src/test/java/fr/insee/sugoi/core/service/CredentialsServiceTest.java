@@ -63,14 +63,7 @@ public class CredentialsServiceTest {
 
   @MockitoBean private WriterStore writerStore;
 
-  private User user1;
-
-  private User user2;
-
-  private Realm realmUpperCase;
-  private Realm realmNoUpperCase;
-
-  @BeforeEach
+    @BeforeEach
   public void setup() {
     UserStorage us1 = new UserStorage();
     us1.setName("us1");
@@ -84,14 +77,14 @@ public class CredentialsServiceTest {
         .getProperties()
         .put(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE, List.of("true"));
 
-    user1 = new User();
+    User user1 = new User();
     user1.setUsername("Toto");
     user1.setMail("toto@insee.fr");
 
-    user2 = new User();
+    User user2 = new User();
     user2.setUsername("dodo");
 
-    realmUpperCase = new Realm();
+    Realm realmUpperCase = new Realm();
     realmUpperCase.setUserStorages(List.of(usUppercase));
     realmUpperCase.setName("realmWithUpperCase");
     realmUpperCase
@@ -99,7 +92,7 @@ public class CredentialsServiceTest {
         .put(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE, List.of("true"));
     Mockito.when(realmProvider.load("realmWithUpperCase")).thenReturn(Optional.of(realmUpperCase));
 
-    realmNoUpperCase = new Realm();
+    Realm realmNoUpperCase = new Realm();
     realmNoUpperCase.setUserStorages(List.of(us1));
     realmNoUpperCase.setName("realmWithoutUpperCase");
     Mockito.when(realmProvider.load("realmWithoutUpperCase"))

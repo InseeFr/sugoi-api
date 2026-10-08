@@ -57,16 +57,14 @@ public class OrganizationServiceTest {
 
   private Organization orga1;
 
-  private Realm realm;
-
-  @BeforeEach
+    @BeforeEach
   public void setup() {
     orga1 = new Organization();
     orga1.setIdentifiant("Toto");
 
     Mockito.when(realmProvider.load("idonotexist")).thenReturn(Optional.empty());
 
-    realm = new Realm();
+    Realm realm = new Realm();
     realm.setName("realm");
     UserStorage us1 = new UserStorage();
     us1.setName("us1");

@@ -31,13 +31,10 @@ import tools.jackson.databind.ObjectMapper;
 @SuppressWarnings("unused")
 public class RealmGlue {
 
-  private Scenario scenario;
-
-  private ObjectMapper mapper = new ObjectMapper();
+  private final ObjectMapper mapper = new ObjectMapper();
 
   @Before
   public void before(Scenario scenario) {
-    this.scenario = scenario;
   }
 
   private StepData stepData;

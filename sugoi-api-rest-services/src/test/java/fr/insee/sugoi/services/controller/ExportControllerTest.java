@@ -60,15 +60,12 @@ public class ExportControllerTest {
   @MockitoBean private ConfigService configService;
   @MockitoBean private GroupService groupService;
 
-  private Realm reamlOneUS;
-  private Realm realmTwoUS;
-
-  @BeforeEach
+    @BeforeEach
   public void setup() {
-    reamlOneUS = new Realm();
+    Realm reamlOneUS = new Realm();
     reamlOneUS.setName("realmOneUS");
 
-    realmTwoUS = new Realm();
+    Realm realmTwoUS = new Realm();
     realmTwoUS.setName("realmTwoUs");
 
     UserStorage userStorage = new UserStorage();

@@ -49,16 +49,14 @@ public class GroupServiceTest {
 
   @Autowired private GroupServiceImpl groupService;
 
-  private Realm realm;
-
-  @MockitoBean private Store store;
+    @MockitoBean private Store store;
   @MockitoBean private ReaderStore readerStore;
 
   @BeforeEach
   public void setup() {
     Mockito.when(realmProvider.load("idonotexist")).thenReturn(Optional.empty());
 
-    realm = new Realm();
+    Realm realm = new Realm();
     realm.setName("realm");
     UserStorage us1 = new UserStorage();
     us1.setName("us1");

@@ -24,16 +24,11 @@ import tools.jackson.databind.ObjectMapper;
 
 public class ExportGlue {
 
-  private Scenario scenario;
-
-  private ObjectMapper mapper = new ObjectMapper();
-
   @Before
   public void before(Scenario scenario) {
-    this.scenario = scenario;
   }
 
-  private StepData stepData;
+  private final StepData stepData;
 
   public ExportGlue(StepData stepData) {
     this.stepData = stepData;
