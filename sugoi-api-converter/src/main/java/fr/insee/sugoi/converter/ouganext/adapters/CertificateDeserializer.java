@@ -24,6 +24,7 @@ public class CertificateDeserializer extends StdDeserializer<byte[]> implements 
 
   public static final String BEGIN_CERTIFICATE = "-----BEGIN CERTIFICATE-----\n";
   public static final String END_CERTIFICATE = "\n-----END CERTIFICATE-----\n";
+
   /** */
   @Serial private static final long serialVersionUID = 1L;
 

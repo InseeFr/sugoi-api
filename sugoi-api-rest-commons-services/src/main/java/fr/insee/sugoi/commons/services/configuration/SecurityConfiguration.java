@@ -89,14 +89,18 @@ public class SecurityConfiguration {
 
   /** Ldap url where are stored accounts for managment */
   private String ldapAccountManagmentUrl;
+
   /** Base DN where are stored ldap accounts for managment */
   private String ldapAccountManagmentUserBase;
+
   /** Group DN where are stored permissions for ldap accounts for managment */
   private String ldapAccountManagmentGroupeBase;
+
   /** Search in subtree * */
   private boolean ldapAccountManagmentGroupSubtree;
 
   private String oidcClaimUsername = "sub";
+
   /** Path to the role field in token. For instance realm_access.role */
   private String oidcClaimRole = "realm_access.roles";
 
