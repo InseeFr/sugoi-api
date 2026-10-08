@@ -214,7 +214,7 @@ public class PermissionServiceImpl implements PermissionService {
                       }
                       try {
                         if (m.group("APPLICATION") != null) {
-                          if (realm.equals("")) {
+                          if (realm.isEmpty()) {
                             realm = "*";
                             userStorage = "_*";
                           }

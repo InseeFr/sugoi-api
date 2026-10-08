@@ -95,11 +95,10 @@ public class DebugController {
       for (MessageKeyValueGeneriqueBean mkgb : listeKeyProperties) {
         MessageKeyValueGeneriqueBean messageKeyValueGeneriqueBean =
             (MessageKeyValueGeneriqueBean) mkgb;
-        sb.append(
-            messageKeyValueGeneriqueBean.getKey().toString()
-                + " = "
-                + messageKeyValueGeneriqueBean.getValue().toString()
-                + RETOUR_A_LA_LIGNE);
+        sb.append(messageKeyValueGeneriqueBean.getKey())
+            .append(" = ")
+            .append(messageKeyValueGeneriqueBean.getValue())
+            .append(RETOUR_A_LA_LIGNE);
         sb.append(
             "--------------------------------------------"
                 + "-------------------------------------------------------------"
