@@ -17,6 +17,8 @@ import fr.insee.sugoi.core.seealso.SeeAlsoCredentialsConfiguration.SeeAlsoCreden
 import fr.insee.sugoi.core.seealso.SeeAlsoDecorator;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -70,10 +72,12 @@ public class HttpSeeAlsoDecorator implements SeeAlsoDecorator {
     } catch (IOException e) {
       logger.error("Failed to retrieve object from {} : {}", url, e.getLocalizedMessage());
       return null;
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
     }
   }
 
-  private String getHttpResourceBody(String url) throws MalformedURLException {
+  private String getHttpResourceBody(String url) throws MalformedURLException, URISyntaxException {
     return getClientByDomain(url)
         .get()
         .retrieve()
@@ -82,14 +86,21 @@ public class HttpSeeAlsoDecorator implements SeeAlsoDecorator {
         .block();
   }
 
-  private WebClient getClientByDomain(String stringUrl) throws MalformedURLException {
+  private WebClient getClientByDomain(String stringUrl)
+      throws MalformedURLException, URISyntaxException {
+
+    URI uri = URI.create(stringUrl);
+
+    URI baseUri =
+        new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), "", null, null);
+
     URL url = new URL(stringUrl);
     URL baseUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(), "");
-    clientsByDomain.putIfAbsent(baseUrl.toString(), createWebClient(baseUrl));
+    clientsByDomain.putIfAbsent(baseUri.toString(), createWebClient(baseUri));
     return clientsByDomain.get(baseUrl.toString());
   }
 
-  private WebClient createWebClient(URL baseUrl) {
+  private WebClient createWebClient(URI baseUrl) {
     return WebClient.builder()
         .baseUrl(baseUrl.toString())
         .defaultHeaders(httpHeaders -> addBasicAuthFromUrl(httpHeaders, baseUrl.getHost()))
