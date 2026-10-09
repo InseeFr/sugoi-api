@@ -55,12 +55,19 @@ public class SugoiLoggerComponent {
   public Object logArroundExec(ProceedingJoinPoint pjp) throws Throwable {
     ResponseEntity<?> proceed = (ResponseEntity<?>) pjp.proceed();
     if (log.isInfoEnabled())
-      log.info(
-          "type={} user={} requestArguments='{}' responseCode='{}'",
-          computeRequestType(pjp),
-          getAuthentication().getName(),
-          computeRequestArguments(pjp),
-          proceed.getStatusCode());
+      log.atInfo()
+              .addKeyValue("event.action", computeRequestType(pjp))
+              .addKeyValue("user.name", getAuthentication().getName())
+              .addKeyValue("http.response.status_code", proceed.getStatusCode())
+              .addKeyValue("sugoi.request.arguments", computeRequestArguments(pjp))
+              .log("EVENT");
+
+//      log.info(
+//          "type={} user={} requestArguments='{}' responseCode='{}'",
+//          computeRequestType(pjp),
+//          getAuthentication().getName(),
+//          computeRequestArguments(pjp),
+//          proceed.getStatusCode());
     return proceed;
   }
 
@@ -68,13 +75,23 @@ public class SugoiLoggerComponent {
   public void logAfterException(JoinPoint jp, Exception e) {
     ResponseEntity<?> error = sugoiAdviceController.exception(e);
     if (log.isInfoEnabled())
-      log.info(
-          "type={} user={} requestArguments='{}' responseCode='{}' exception='{}'",
-          computeRequestType(jp) + "_ERROR",
-          getAuthentication().getName(),
-          computeRequestArguments(jp),
-          error.getStatusCode(),
-          e.toString());
+
+      log.atInfo()
+              .addKeyValue("event.action", computeRequestType(jp) + "_ERROR")
+              .addKeyValue("user.name", getAuthentication().getName())
+              .addKeyValue("http.response.status_code", error.getStatusCode())
+              .addKeyValue("sugoi.request.arguments", computeRequestArguments(jp))
+              .setCause(e)
+              .log("EVENT");
+
+
+//      log.info(
+//          "type={} user={} requestArguments='{}' responseCode='{}' exception='{}'",
+//          computeRequestType(jp) + "_ERROR",
+//          getAuthentication().getName(),
+//          computeRequestArguments(jp),
+//          error.getStatusCode(),
+//          e.toString());
   }
 
   private String computeRequestType(JoinPoint jp) {
