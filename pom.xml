@@ -26,7 +26,7 @@
 		<commons-io.version>2.22.0</commons-io.version>
 		<com.unboundid.version>7.0.5</com.unboundid.version>
 		<org.xmlunit.version>2.14.0</org.xmlunit.version>
-		<commons-lang.version>3.20.0</commons-lang.version>
+		<commons-lang.version>3.21.0</commons-lang.version>
 		<org.springdoc.version>3.1.0</org.springdoc.version>
 		<cucumber.version>7.34.6</cucumber.version>
 		<httpclient.version>4.5.14</httpclient.version>
