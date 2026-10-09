@@ -149,7 +149,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <version>3.5.1</version>
+        <version>${maven-war-plugin.version}</version>
         <configuration>
           <warName>sugoi-api</warName>
           <failOnMissingWebXml>false</failOnMissingWebXml>
