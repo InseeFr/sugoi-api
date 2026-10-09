@@ -27,8 +27,8 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -214,7 +214,7 @@ public class PermissionServiceImpl implements PermissionService {
                       }
                       try {
                         if (m.group("APPLICATION") != null) {
-                          if (realm.equals("")) {
+                          if (realm.isEmpty()) {
                             realm = "*";
                             userStorage = "_*";
                           }
@@ -247,7 +247,7 @@ public class PermissionServiceImpl implements PermissionService {
       valueMap.put("group", group);
     }
     return regexpList.stream()
-        .map(regexp -> StrSubstitutor.replace(regexp, valueMap, "$(", ")"))
+        .map(regexp -> StringSubstitutor.replace(regexp, valueMap, "$(", ")"))
         .collect(Collectors.toList());
   }
 
@@ -266,7 +266,7 @@ public class PermissionServiceImpl implements PermissionService {
       valueMap.put("realm", realm);
       valueMap.put("storage", storage);
       regexpAttributesAllowed.add(
-          StrSubstitutor.replace(pattern, valueMap, "$(", ")").toUpperCase());
+          StringSubstitutor.replace(pattern, valueMap, "$(", ")").toUpperCase());
     }
     return regexpAttributesAllowed;
   }

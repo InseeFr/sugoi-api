@@ -25,6 +25,7 @@
         <dependency>
             <groupId>fr.insee.sugoi</groupId>
             <artifactId>sugoi-api-model</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -33,13 +34,24 @@
 		    <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-jersey</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>fr.insee.sugoi</groupId>
             <artifactId>sugoi-api-distribution-full-env</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
 
         <dependency>
             <groupId>io.cucumber</groupId>
@@ -78,10 +90,50 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+
+        <!-- Source: https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- Source: https://mvnrepository.com/artifact/commons-codec/commons-codec -->
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
@@ -127,7 +179,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.6.3</version>
+                <version>${exec-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>start-local-server</id>
@@ -138,10 +190,10 @@
                         <configuration>
                             <async>true</async>
                             <classpathScope>compile</classpathScope>
-                            <longClasspath>true</longClasspath>
+<!--                            <longClasspath>true</longClasspath>-->
                             <executable>java</executable>
                             <addResourcesToClasspath>true</addResourcesToClasspath>
-                            <commandlineArgs>-cp %classpath fr.insee.sugoi.app.SugoiTestService start fork</commandlineArgs>
+                            <commandlineArgs>-Dspring.backgroundpreinitializer.ignore=true -cp %classpath fr.insee.sugoi.app.SugoiTestService start</commandlineArgs>
                         </configuration>
                     </execution>
                     <execution>

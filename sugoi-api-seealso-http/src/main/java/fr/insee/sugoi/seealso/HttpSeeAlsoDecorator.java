@@ -13,12 +13,12 @@
 */
 package fr.insee.sugoi.seealso;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.core.seealso.SeeAlsoCredentialsConfiguration.SeeAlsoCredential;
 import fr.insee.sugoi.core.seealso.SeeAlsoDecorator;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -32,6 +32,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Service
 public class HttpSeeAlsoDecorator implements SeeAlsoDecorator {
@@ -70,10 +72,12 @@ public class HttpSeeAlsoDecorator implements SeeAlsoDecorator {
     } catch (IOException e) {
       logger.error("Failed to retrieve object from {} : {}", url, e.getLocalizedMessage());
       return null;
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
     }
   }
 
-  private String getHttpResourceBody(String url) throws MalformedURLException {
+  private String getHttpResourceBody(String url) throws MalformedURLException, URISyntaxException {
     return getClientByDomain(url)
         .get()
         .retrieve()
@@ -82,14 +86,21 @@ public class HttpSeeAlsoDecorator implements SeeAlsoDecorator {
         .block();
   }
 
-  private WebClient getClientByDomain(String stringUrl) throws MalformedURLException {
+  private WebClient getClientByDomain(String stringUrl)
+      throws MalformedURLException, URISyntaxException {
+
+    URI uri = URI.create(stringUrl);
+
+    URI baseUri =
+        new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), "", null, null);
+
     URL url = new URL(stringUrl);
     URL baseUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(), "");
-    clientsByDomain.putIfAbsent(baseUrl.toString(), createWebClient(baseUrl));
+    clientsByDomain.putIfAbsent(baseUri.toString(), createWebClient(baseUri));
     return clientsByDomain.get(baseUrl.toString());
   }
 
-  private WebClient createWebClient(URL baseUrl) {
+  private WebClient createWebClient(URI baseUrl) {
     return WebClient.builder()
         .baseUrl(baseUrl.toString())
         .defaultHeaders(httpHeaders -> addBasicAuthFromUrl(httpHeaders, baseUrl.getHost()))
@@ -119,10 +130,10 @@ public class HttpSeeAlsoDecorator implements SeeAlsoDecorator {
 
     if (rootNode.isArray()) {
       List<String> result = new ArrayList<>();
-      rootNode.forEach(e -> result.add(e.asText()));
+      rootNode.forEach(e -> result.add(e.asString()));
       return result;
     } else {
-      return rootNode.asText();
+      return rootNode.asString();
     }
   }
 }

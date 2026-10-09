@@ -19,19 +19,6 @@ objectclass: organizationalUnit
 ou: Applitest
 description: Branche privative de l'application applitest
 
-dn: uid=appli_applitest,ou=Applitest,ou=Applications,o=insee,c=fr
-objectclass: top
-objectclass: person
-objectclass: organizationalPerson
-objectclass: inetOrgPerson
-objectclass: inseeApplication
-cn: appli_applitest
-sn: appli_applitest
-givenname: appli_applitest
-uid: appli_applitest
-userpassword: REPLACE_ME
-memberOf: cn=ASI_domaine1_Applitest,ou=Applitest,ou=Applications,o=insee,c=fr
-
 dn: ou=Applitest_Objets,ou=Applitest,ou=Applications,o=insee,c=fr
 objectclass: top
 objectclass: organizationalUnit
@@ -274,6 +261,7 @@ inseepropriete: userMapping$attributes.insee_organisme:inseeOrganisme,String,rw
 inseepropriete: userMapping$attributes.properties:inseePropriete,list_string,rw
 inseepropriete: userMapping$metadatas.modifyTimestamp:modifyTimestamp,string,ro
 inseepropriete: userMapping$attributes.seeAlsos:seeAlso,list_string,ro,singl
+inseepropriete: enableMailUnicity$true
 
 dn: cn=Utilisateurs_contacts_domaine1_WebServicesLdap,ou=WebServicesLdap_Obje
  ts,ou=WebServicesLdap,ou=Applications,o=insee,c=fr

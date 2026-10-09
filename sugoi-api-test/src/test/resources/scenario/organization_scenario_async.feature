@@ -32,6 +32,7 @@ Feature: Organization scenario asynchrone
             """
         And show body received
         Then the client receives status code 202
+        Then Pause de 10 secondes
 
     Scenario: Post organization already exist
         When the client perform POST request with body on url /realms/domaine1/storages/default/organizations body:
@@ -42,6 +43,7 @@ Feature: Organization scenario asynchrone
             """
         And show body received
         Then the client receives status code 202
+        Then Pause de 100 secondes
 
     Scenario: Update organization
         When the client, in 10 max retry, perform PUT request with body on url /realms/domaine1/organizations/identifiant and expect a statuscode 202 with body:
@@ -74,6 +76,7 @@ Feature: Organization scenario asynchrone
         When the client, in 10 max retry, perform DELETE request on url /realms/domaine1/organizations/identifiant and expect a statuscode 202
         And show body received
         Then the client receives status code 202
+        Then Pause de 10 secondes
 
     Scenario: Delete organization not exist
         When the client, in 10 max retry, perform DELETE request on url /realms/domaine1/organizations/identifiant and expect a statuscode 202

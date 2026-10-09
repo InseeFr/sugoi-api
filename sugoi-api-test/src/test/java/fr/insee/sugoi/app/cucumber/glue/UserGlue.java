@@ -19,10 +19,6 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.app.cucumber.utils.StepData;
 import fr.insee.sugoi.model.User;
 import fr.insee.sugoi.model.paging.PageResult;
@@ -32,6 +28,11 @@ import io.cucumber.java.en.Then;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public class UserGlue {
 
@@ -58,7 +59,7 @@ public class UserGlue {
           mapper.readValue(stepData.getLatestResponse().getBody(), PageResult.class);
       stepData.setUsers(users.getResults());
       isUsers = true;
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       e.printStackTrace();
     }
     assertThat("Data receive is a list of user", isUsers, is(true));
@@ -73,7 +74,7 @@ public class UserGlue {
       PageResult<User> users =
           mapper.readValue(stepData.getLatestResponse().getBody(), PageResult.class);
       usersList = users.getResults();
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       e.printStackTrace();
     }
     assertThat("Data receive is a list of user", usersList.size(), is(size));
@@ -82,14 +83,18 @@ public class UserGlue {
   @Then("the client expect to receive an user")
   public void expect_to_receive_a_user() {
     Boolean isUser = false;
+
     ObjectMapper mapper =
-        new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        JsonMapper.builder()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .build();
+
     User user;
     try {
       user = mapper.readValue(stepData.getLatestResponse().getBody(), User.class);
       stepData.setUser(user);
       isUser = true;
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       e.printStackTrace();
     }
     assertThat("Data receive is a user", isUser, is(true));
@@ -115,12 +120,14 @@ public class UserGlue {
   @Then("the client expect the username of user not to be null")
   public void expect_username_of_user_to_be_not_null() {
     ObjectMapper mapper =
-        new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        JsonMapper.builder()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .build();
     User user;
     try {
       user = mapper.readValue(stepData.getLatestResponse().getBody(), User.class);
       stepData.setUser(user);
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       e.printStackTrace();
     }
     assertThat(stepData.getUser().getUsername(), notNullValue());

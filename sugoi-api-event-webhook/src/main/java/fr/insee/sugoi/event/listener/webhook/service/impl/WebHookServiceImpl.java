@@ -121,7 +121,7 @@ public class WebHookServiceImpl implements WebHookService {
       throw new RuntimeException(
           String.format(
               "Something went wrong on server when sending request to %s receive status %s response %s",
-              target, e.getRawStatusCode(), e.getResponseBodyAsString()),
+              target, e.getStatusCode().value(), e.getResponseBodyAsString()),
           e);
     } catch (Exception e) {
       throw new RuntimeException(
@@ -150,7 +150,7 @@ public class WebHookServiceImpl implements WebHookService {
     try {
       ResourceLoader resourceLoader = new DefaultResourceLoader();
       Resource resource = resourceLoader.getResource(path);
-      return IOUtils.toString(resource.getInputStream(), StandardCharsets.UTF_8.name());
+      return IOUtils.toString(resource.getInputStream(), StandardCharsets.UTF_8);
     } catch (IOException e) {
       throw new RuntimeException("Unable to load " + path, e);
     }

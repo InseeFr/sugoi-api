@@ -28,7 +28,7 @@ public enum PasswordPolicyConstants implements RealmConfigKeys {
   VALIDATE_PASSWORD_WITH_SPECIAL("validate_password_WITHSpecial"),
   VALIDATE_PASSWORD_MIN_SIZE("validate_password_size");
 
-  private String name;
+  private final String name;
 
   PasswordPolicyConstants(String name) {
     this.name = name;

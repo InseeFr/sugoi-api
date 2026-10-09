@@ -13,16 +13,8 @@
 */
 package fr.insee.sugoi.converter.ouganext;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import fr.insee.sugoi.converter.ouganext.adapters.CertificateDeserializer;
 import fr.insee.sugoi.converter.ouganext.adapters.CertificateSerializer;
 import fr.insee.sugoi.converter.ouganext.adapters.OrganisationDeserializer;
@@ -32,6 +24,10 @@ import fr.insee.sugoi.converter.utils.MapFromHashmapElement;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 /**
  * Java class for ContactType complex type.
@@ -111,7 +107,7 @@ import java.util.HashSet;
   "inseeMailCorrespondant",
   "inseeTelephoneNumberCorrespondant"
 })
-@JacksonXmlRootElement(localName = "Contact", namespace = Namespace.ANNUAIRE)
+@JsonRootName(value = "Contact", namespace = Namespace.ANNUAIRE)
 public class ContactOuganext {
 
   @JacksonXmlProperty(localName = "Identifiant")
@@ -221,6 +217,7 @@ public class ContactOuganext {
   @JacksonXmlProperty(localName = "DateCreation")
   @MapFromHashmapElement(hashMapName = "metadatas", hashMapKey = "dateCreation")
   @JsonProperty(value = "DateCreation")
+  @JsonFormat(shape = JsonFormat.Shape.NUMBER)
   private Date dateCreation;
 
   /* CAS DE L'AGENT INSEE */

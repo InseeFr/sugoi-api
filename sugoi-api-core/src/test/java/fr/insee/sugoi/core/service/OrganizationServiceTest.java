@@ -34,7 +34,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,17 +47,15 @@ public class OrganizationServiceTest {
 
   @MockitoBean private RealmProvider realmProvider;
 
-  @Mock private ReaderStore readerStore1;
+  @MockitoBean private ReaderStore readerStore1;
 
-  @Mock private ReaderStore readerStore2;
+  @MockitoBean private ReaderStore readerStore2;
 
-  @Mock private WriterStore writerStore;
+  @MockitoBean private WriterStore writerStore;
 
   @Autowired private OrganizationServiceImpl orgaService;
 
   private Organization orga1;
-
-  private Realm realm;
 
   @BeforeEach
   public void setup() {
@@ -67,7 +64,7 @@ public class OrganizationServiceTest {
 
     Mockito.when(realmProvider.load("idonotexist")).thenReturn(Optional.empty());
 
-    realm = new Realm();
+    Realm realm = new Realm();
     realm.setName("realm");
     UserStorage us1 = new UserStorage();
     us1.setName("us1");

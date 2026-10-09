@@ -53,7 +53,7 @@ public enum ObjectClass {
 
   public static final String ATTRIBUT_OBJECT_CLASS = "objectClass";
 
-  private String name;
+  private final String name;
 
   private ObjectClass(String name) {
     this.name = name;

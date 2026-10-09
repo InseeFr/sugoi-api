@@ -35,8 +35,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -60,15 +60,12 @@ public class ExportControllerTest {
   @MockitoBean private ConfigService configService;
   @MockitoBean private GroupService groupService;
 
-  private Realm reamlOneUS;
-  private Realm realmTwoUS;
-
   @BeforeEach
   public void setup() {
-    reamlOneUS = new Realm();
+    Realm reamlOneUS = new Realm();
     reamlOneUS.setName("realmOneUS");
 
-    realmTwoUS = new Realm();
+    Realm realmTwoUS = new Realm();
     realmTwoUS.setName("realmTwoUs");
 
     UserStorage userStorage = new UserStorage();

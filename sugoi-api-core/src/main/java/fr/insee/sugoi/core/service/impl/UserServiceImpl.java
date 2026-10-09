@@ -55,8 +55,6 @@ public class UserServiceImpl implements UserService {
 
   private boolean verifyUniqueMail = false;
 
-  private int usersMaxoutputsize = 1000;
-
   /* Size of the ids randomly generated */
   private int idCreateLength = 7;
 
@@ -237,6 +235,7 @@ public class UserServiceImpl implements UserService {
 
     PageResult<User> result = new PageResult<>();
     Realm r = realmProvider.load(realm).orElseThrow(() -> new RealmNotFoundException(realm));
+    int usersMaxoutputsize = 1000;
     pageable.setSizeWithMax(
         Integer.parseInt(
             r.getProperties()
@@ -360,8 +359,7 @@ public class UserServiceImpl implements UserService {
               .updateUserCertificate(user, certificat, providerRequest);
       return response;
     } catch (Exception e) {
-      throw new UnableToUpdateCertificateException(
-          "Cannot update certificate because: " + e.toString(), e);
+      throw new UnableToUpdateCertificateException("Cannot update certificate because: " + e, e);
     }
   }
 

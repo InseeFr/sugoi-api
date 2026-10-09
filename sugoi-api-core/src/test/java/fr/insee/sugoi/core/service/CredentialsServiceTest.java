@@ -41,9 +41,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
@@ -63,16 +61,7 @@ public class CredentialsServiceTest {
 
   @Autowired CredentialsServiceImpl credentialsService;
 
-  @Spy private WriterStore writerStore;
-
-  @Captor ArgumentCaptor<String> argumentCaptorProperties;
-
-  private User user1;
-
-  private User user2;
-
-  private Realm realmUpperCase;
-  private Realm realmNoUpperCase;
+  @MockitoBean private WriterStore writerStore;
 
   @BeforeEach
   public void setup() {
@@ -88,14 +77,14 @@ public class CredentialsServiceTest {
         .getProperties()
         .put(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE, List.of("true"));
 
-    user1 = new User();
+    User user1 = new User();
     user1.setUsername("Toto");
     user1.setMail("toto@insee.fr");
 
-    user2 = new User();
+    User user2 = new User();
     user2.setUsername("dodo");
 
-    realmUpperCase = new Realm();
+    Realm realmUpperCase = new Realm();
     realmUpperCase.setUserStorages(List.of(usUppercase));
     realmUpperCase.setName("realmWithUpperCase");
     realmUpperCase
@@ -103,7 +92,7 @@ public class CredentialsServiceTest {
         .put(PasswordPolicyConstants.VALIDATE_PASSWORD_WITH_UPPERCASE, List.of("true"));
     Mockito.when(realmProvider.load("realmWithUpperCase")).thenReturn(Optional.of(realmUpperCase));
 
-    realmNoUpperCase = new Realm();
+    Realm realmNoUpperCase = new Realm();
     realmNoUpperCase.setUserStorages(List.of(us1));
     realmNoUpperCase.setName("realmWithoutUpperCase");
     Mockito.when(realmProvider.load("realmWithoutUpperCase"))
@@ -119,6 +108,8 @@ public class CredentialsServiceTest {
         .thenReturn(user1);
     Mockito.when(userService.findById("realmWithoutUpperCase", "us2", "test", false))
         .thenReturn(user2);
+    Mockito.when(storeProvider.getWriterStore("realmWithoutUpperCase", "us1"))
+        .thenReturn(writerStore);
   }
 
   @Test
@@ -189,6 +180,9 @@ public class CredentialsServiceTest {
   public void passwordShouldFollowPasswordLengthRealmProperty() {
     credentialsService.reinitPassword(
         "realmWithoutUpperCase", "us1", "test", Map.of(), null, false, null);
+
+    ArgumentCaptor<String> argumentCaptorProperties = ArgumentCaptor.forClass(String.class);
+
     Mockito.verify(writerStore)
         .reinitPassword(
             any(), argumentCaptorProperties.capture(), anyBoolean(), any(), any(), any());
