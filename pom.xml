@@ -12,6 +12,9 @@
 	<properties>
 		<maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
 		<jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
+		<maven.compiler.plugin.version>3.16.0</maven.compiler.plugin.version>
+		<spotless.version>3.10.3</spotless.version>
+		<googleJavaFormat.version>1.36.1</googleJavaFormat.version>
 		<!-- JaCoCo thresholds. Increase gradually as you add tests. -->
 		<jacoco.unit-tests.limit.instruction-ratio>0%</jacoco.unit-tests.limit.instruction-ratio>
 		<jacoco.unit-tests.limit.branch-ratio>0%</jacoco.unit-tests.limit.branch-ratio>
@@ -343,9 +346,9 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
 				<groupId>org.apache.maven.plugins</groupId>
-				<version>3.14.0</version>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven.compiler.plugin.version}</version>
 				<configuration>
 					<release>${java.version}</release>
 					<parameters>true</parameters>
@@ -392,7 +395,7 @@
 			<plugin>
 				<groupId>com.diffplug.spotless</groupId>
 				<artifactId>spotless-maven-plugin</artifactId>
-				<version>3.10.3</version>
+				<version>${spotless.version}</version>
 				<configuration>
 					<!-- optional: limit format enforcement to just the files changed by 
 						this feature branch -->
@@ -420,7 +423,7 @@
 							if you want -->
 						<!-- apply a specific flavor of google-java-format -->
 						<googleJavaFormat>
-							<version>1.36.1</version>
+							<version>${googleJavaFormat.version}</version>
 							<style>GOOGLE</style>
 						</googleJavaFormat>
 						<!-- make sure every file has the following copyright header. optionally, 
