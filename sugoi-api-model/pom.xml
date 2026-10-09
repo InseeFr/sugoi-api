@@ -17,13 +17,11 @@
 		<dependency>
     		<groupId>org.reflections</groupId>
     		<artifactId>reflections</artifactId>
-    		<version>0.10.2</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
-			<version>1.15.0</version>
 		</dependency>
 
 		<!-- Source: https://mvnrepository.com/artifact/tools.jackson.core/jackson-core -->
