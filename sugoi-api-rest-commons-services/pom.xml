@@ -97,7 +97,6 @@
 		<dependency>
 			<groupId>io.swagger.core.v3</groupId>
 			<artifactId>swagger-models-jakarta</artifactId>
-			<version>2.2.54</version>
 		</dependency>
 
 		<!-- Source: https://mvnrepository.com/artifact/org.springframework/spring-test -->
@@ -165,7 +164,6 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-common</artifactId>
-			<version>3.1.1</version>
 		</dependency>
 
 		<!-- Source: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-health -->

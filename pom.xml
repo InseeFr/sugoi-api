@@ -33,7 +33,7 @@
 		<com.unboundid.version>7.0.5</com.unboundid.version>
 		<org.xmlunit.version>2.14.0</org.xmlunit.version>
 		<commons-lang.version>3.21.0</commons-lang.version>
-		<org.springdoc.version>3.1.1</org.springdoc.version>
+		<springdoc.version>3.1.1</springdoc.version>
 		<cucumber.version>8.0.4</cucumber.version>
 		<httpclient.version>5.6.4</httpclient.version>
 		<apache.commons.text.version>1.15.0</apache.commons.text.version>
@@ -46,6 +46,8 @@
 		<jackson-module-jakarta-xmlbind-annotations.version>3.2.3</jackson-module-jakarta-xmlbind-annotations.version>
 		<passay.version>1.6.6</passay.version>
 		<reflections.version>0.10.2</reflections.version>
+		<swagger-models-jakarta.version>2.2.54</swagger-models-jakarta.version>
+
 	</properties>
 
 	<dependencyManagement>
@@ -236,7 +238,7 @@
 			<dependency>
 				<groupId>org.springdoc</groupId>
 				<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-				<version>${org.springdoc.version}</version>
+				<version>${springdoc.version}</version>
 			</dependency>
 
 			<dependency>
@@ -316,6 +318,18 @@
 				<groupId>org.reflections</groupId>
 				<artifactId>reflections</artifactId>
 				<version>${reflections.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.swagger.core.v3</groupId>
+				<artifactId>swagger-models-jakarta</artifactId>
+				<version>${swagger-models-jakarta.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springdoc</groupId>
+				<artifactId>springdoc-openapi-starter-common</artifactId>
+				<version>${springdoc.version}</version>
 			</dependency>
 
 		</dependencies>
