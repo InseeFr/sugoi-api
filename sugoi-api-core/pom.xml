@@ -45,7 +45,6 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
-			<version>1.15.0</version>
 		</dependency>
 
 		<!-- Source: https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
@@ -132,7 +131,5 @@
 		</dependency>
 
 	</dependencies>
-
-
 
 </project>
