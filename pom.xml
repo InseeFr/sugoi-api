@@ -36,7 +36,8 @@
 		<git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
 		<org.ehcache.version>3.12.0</org.ehcache.version>
 		<maven.jar.plugin.version>3.5.1</maven.jar.plugin.version>
-		<javax.jms-api.version>2.0.1</javax.jms-api.version>
+		<jakarta.jms-api.version>3.1.0</jakarta.jms-api.version>
+		<jackson-module-jakarta-xmlbind-annotations.version>3.2.3</jackson-module-jakarta-xmlbind-annotations.version>
 	</properties>
 
 	<dependencyManagement>
@@ -280,14 +281,14 @@
 			<dependency>
 				<groupId>jakarta.jms</groupId>
 				<artifactId>jakarta.jms-api</artifactId>
-				<version>3.1.0</version>
+				<version>${jakarta.jms-api.version}</version>
 			</dependency>
 
 			<!-- Source: https://mvnrepository.com/artifact/tools.jackson.module/jackson-module-jakarta-xmlbind-annotations -->
 			<dependency>
 				<groupId>tools.jackson.module</groupId>
 				<artifactId>jackson-module-jakarta-xmlbind-annotations</artifactId>
-				<version>3.2.2</version>
+				<version>${jackson-module-jakarta-xmlbind-annotations.version}</version>
 			</dependency>
 
 			<dependency>
