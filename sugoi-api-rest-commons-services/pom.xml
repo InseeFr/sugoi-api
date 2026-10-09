@@ -183,5 +183,17 @@
 			<artifactId>sugoi-api-model</artifactId>
 		</dependency>
 
+		<!-- Source: https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-core -->
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-core</artifactId>
+		</dependency>
+
+		<!-- Source: https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api -->
+		<dependency>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
+		</dependency>
+
 	</dependencies>
 </project>
