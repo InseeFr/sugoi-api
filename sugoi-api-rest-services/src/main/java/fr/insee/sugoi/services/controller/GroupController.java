@@ -173,6 +173,7 @@ public class GroupController {
     group.setAppName(groupView.getAppName());
     group.setDescription(groupView.getDescription());
     group.setName(groupView.getName());
+    group.setIsSelfManaged(groupView.getIsSelfManaged());
 
     ProviderResponse response =
         groupService.create(
