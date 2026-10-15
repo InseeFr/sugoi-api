@@ -13,11 +13,11 @@
 */
 package fr.insee.sugoi.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.sugoi.converter.ouganext.ProfilOuganext;
 import fr.insee.sugoi.converter.utils.CustomObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import tools.jackson.core.JacksonException;
 
 public class ProfilXmlTest {
 
@@ -41,12 +41,12 @@ public class ProfilXmlTest {
   }
 
   @Test
-  public void TestJson() throws JsonProcessingException {
+  public void TestJson() throws JacksonException {
     System.out.println(CustomObjectMapper.JsonObjectMapper().writeValueAsString(profil));
   }
 
   @Test
-  public void testXMLJackson() throws JsonProcessingException {
+  public void testXMLJackson() throws JacksonException {
     System.out.println(CustomObjectMapper.XMLObjectMapper().writeValueAsString(profil));
   }
 }

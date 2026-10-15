@@ -15,25 +15,24 @@ package fr.insee.sugoi.converter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
 import fr.insee.sugoi.converter.ouganext.AdresseOuganext;
 import fr.insee.sugoi.converter.ouganext.ContactOuganext;
 import fr.insee.sugoi.converter.ouganext.OrganisationOuganext;
 import fr.insee.sugoi.converter.utils.CustomObjectMapper;
 import fr.insee.sugoi.model.*;
-import jakarta.xml.bind.JAXBException;
-import java.security.cert.CertificateException;
+import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
+import tools.jackson.core.JacksonException;
 
 public class ContactsTest {
 
-  private static ContactOuganext generateContact() throws CertificateException, JAXBException {
+  private static ContactOuganext generateContact() {
     ContactOuganext contact = new ContactOuganext();
     contact.setIdentifiant("test");
     contact.setNomCommun("Test");
@@ -103,19 +102,20 @@ public class ContactsTest {
   }
 
   @Test
-  public void testJson() throws JsonProcessingException {
+  public void testJson() throws JacksonException {
     try {
       ContactOuganext object = generateContact();
       String expectedJson =
           "{\"Identifiant\":\"test\",\"NomCommun\":\"Test\",\"Nom\":\"test\",\"Prenom\":\"test\",\"DomaineDeGestion\":\"testDG\",\"Description\":\"description\",\"Civilite\":\"Camarade\",\"IdentifiantMetier\":\"123456789\",\"AdresseMessagerie\":\"tes.tkmgfdl@jhk.gmail\",\"NumeroTelephone\":\"0123456789\",\"TelephonePortable\":\"061245789636\",\"FacSimile\":\"0123456789\",\"MotDePasseExiste\":false,\"AdressePostale\":{\"ligneUne\":\"15 rue Gabriel Peri\",\"ligneDeux\":\"\",\"ligneTrois\":\"\",\"ligneQuatre\":\"\",\"ligneCinq\":\"\",\"ligneSix\":\"\",\"ligneSept\":\"92240 Malakoff\"},\"Propriete\":[],\"InseeRoleApplicatif\":[],\"CodePin\":\"AAA=\",\"OrganisationDeRattachementUri\":\"lorganisation\"}";
-      assertEquals(expectedJson, CustomObjectMapper.JsonObjectMapper().writeValueAsString(object));
+      String obtainedJson = CustomObjectMapper.JsonObjectMapper().writeValueAsString(object);
+      assertEquals(expectedJson, obtainedJson);
     } catch (Exception e) {
       fail(e);
     }
   }
 
   @Test
-  public void testXMLJackson() throws JsonProcessingException {
+  public void testXMLJackson() throws JacksonException {
     ContactOuganext contact;
     try {
       contact = generateContact();
@@ -160,7 +160,7 @@ public class ContactsTest {
   }
 
   @Test
-  public void testConvertUserToContactXML() throws JsonProcessingException {
+  public void testConvertUserToContactXML() throws JacksonException {
     User user = generateUser();
     OuganextSugoiMapper osm = new OuganextSugoiMapper();
     ContactOuganext contact = osm.serializeToOuganext(user, ContactOuganext.class);
@@ -181,16 +181,18 @@ public class ContactsTest {
             + "  <DateCreation>1603294311926</DateCreation>\r\n"
             + "  <OrganisationDeRattachementUri>Lorganisation</OrganisationDeRattachementUri>\r\n"
             + "</ns1:Contact>\r\n";
+
     Diff myDiff =
         DiffBuilder.compare(expectedXml)
             .checkForSimilar()
             .withTest(CustomObjectMapper.XMLObjectMapper().writeValueAsString(contact))
             .build();
+    myDiff.getDifferences().forEach(System.out::println);
     assertFalse(myDiff.hasDifferences());
   }
 
   @Test
-  public void testConvertContactToUserJson() throws JsonProcessingException {
+  public void testConvertContactToUserJson() throws JacksonException {
     try {
       ContactOuganext contact = generateContact();
       OuganextSugoiMapper osm = new OuganextSugoiMapper();
@@ -201,5 +203,29 @@ public class ContactsTest {
     } catch (Exception e) {
       fail(e);
     }
+  }
+
+  @Test
+  public void testOrganisationDeRattachementDeserializer() throws JacksonException {
+    String json = "{\"OrganisationDeRattachementUri\":\"133546546\"}";
+
+    ContactOuganext contact =
+        CustomObjectMapper.JsonObjectMapper().readValue(json, ContactOuganext.class);
+
+    assertNotNull(contact.getOrganisationDeRattachement());
+    assertEquals("133546546", contact.getOrganisationDeRattachement().getIdentifiant());
+  }
+
+  @Test
+  public void testCertificatDeserializer() throws JacksonException {
+    String json = "{\"CertificatAuthentification\":\"dGVzdA==\"}";
+
+    ContactOuganext contact =
+        CustomObjectMapper.JsonObjectMapper().readValue(json, ContactOuganext.class);
+
+    assertNotNull(contact.getCertificate());
+    assertEquals(
+        "-----BEGIN CERTIFICATE-----\ndGVzdA==\n-----END CERTIFICATE-----\n",
+        new String(contact.getCertificate(), StandardCharsets.UTF_8));
   }
 }

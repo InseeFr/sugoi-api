@@ -52,7 +52,7 @@ public class JmsWriter {
     String correlationId = UUID.randomUUID().toString();
     request.setMethod(methodName);
     for (String key : new ArrayList<>(methodParams.keySet())) {
-      request.setmethodParams(key, methodParams.get(key));
+      request.setMethodParams(methodParams);
     }
     request.setCorrelationId(correlationId);
     try {
@@ -95,7 +95,7 @@ public class JmsWriter {
     String correlationId = UUID.randomUUID().toString();
     request.setMethod(methodName);
     for (String key : new ArrayList<>(methodParams.keySet())) {
-      request.setmethodParams(key, methodParams.get(key));
+      request.setMethodParams(methodParams);
     }
     request.setCorrelationId(correlationId);
     try {

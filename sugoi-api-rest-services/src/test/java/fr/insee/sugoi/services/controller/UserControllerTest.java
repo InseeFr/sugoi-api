@@ -19,8 +19,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.sugoi.commons.services.configuration.SecurityConfiguration;
 import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
 import fr.insee.sugoi.core.model.ProviderResponse;
 import fr.insee.sugoi.core.model.ProviderResponse.ProviderResponseStatus;
@@ -38,23 +37,29 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.web.FilterChainProxy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(
     classes = {UserController.class, SugoiAdviceController.class},
     properties = "spring.config.location=classpath:/controller/application.properties")
 @AutoConfigureMockMvc
 @EnableWebMvc
+// @WebMvcTest(UserController.class)
 public class UserControllerTest {
 
   @Autowired MockMvc mockMvc;
@@ -64,6 +69,21 @@ public class UserControllerTest {
   @MockitoBean private CertificateService certificateService;
 
   @MockitoBean private ConfigService configService;
+
+  @Autowired ApplicationContext applicationContext;
+
+  @Test
+  void debugSecurity() {
+    System.out.println(
+        "SecurityConfiguration = "
+            + applicationContext.getBeansOfType(SecurityConfiguration.class));
+
+    System.out.println(
+        "SecurityFilterChain = " + applicationContext.getBeansOfType(SecurityFilterChain.class));
+
+    System.out.println(
+        "FilterChainProxy = " + applicationContext.getBeansOfType(FilterChainProxy.class));
+  }
 
   ObjectMapper objectMapper = new ObjectMapper();
   User user1, user2, user1Updated;

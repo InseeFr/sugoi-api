@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.sugoi.converter.mapper.OuganextSugoiMapper;
 import fr.insee.sugoi.converter.ouganext.ApplicationOuganext;
 import fr.insee.sugoi.converter.ouganext.HabilitationsOuganext;
@@ -29,6 +28,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
+import tools.jackson.core.JacksonException;
 
 public class HabilitationsTest {
 
@@ -83,7 +83,7 @@ public class HabilitationsTest {
   }
 
   @Test
-  public void testJson() throws JsonProcessingException {
+  public void testJson() throws JacksonException {
     HabilitationsOuganext habs = generateHabilitations();
     String jsonExpected =
         "{\"application\":[{\"name\":\"app1\",\"role\":[{\"name\":\"download\",\"propriete\":[\"DW2012\"]},{\"name\":\"upload\",\"propriete\":[\"UP2012\"]}]},{\"name\":\"app2\",\"role\":[{\"name\":\"download\",\"propriete\":[]},{\"name\":\"dedfze\",\"propriete\":[]}]}]}";
@@ -92,7 +92,7 @@ public class HabilitationsTest {
   }
 
   @Test
-  public void testXMLJackson() throws JsonProcessingException {
+  public void testXMLJackson() throws JacksonException {
     HabilitationsOuganext habs = generateHabilitations();
     String xmlExpected =
         "<?xml version='1.0' encoding='UTF-8'?>\r\n"
@@ -149,7 +149,7 @@ public class HabilitationsTest {
                   CustomObjectMapper.XMLObjectMapper().writeValueAsString(habilitationsOuganext))
               .build();
       assertFalse(myDiff.hasDifferences());
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       fail(e);
     }
   }

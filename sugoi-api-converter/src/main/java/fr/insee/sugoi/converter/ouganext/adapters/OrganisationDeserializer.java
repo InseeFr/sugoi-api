@@ -13,31 +13,29 @@
 */
 package fr.insee.sugoi.converter.ouganext.adapters;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import fr.insee.sugoi.converter.ouganext.OrganisationOuganext;
-import java.io.IOException;
+import java.io.Serial;
+import java.io.Serializable;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
-public class OrganisationDeserializer extends StdDeserializer<OrganisationOuganext> {
+public class OrganisationDeserializer extends StdDeserializer<OrganisationOuganext>
+    implements Serializable {
 
   /** */
-  private static final long serialVersionUID = 1L;
+  @Serial private static final long serialVersionUID = 1L;
 
   public OrganisationDeserializer() {
-    this(null);
-  }
-
-  public OrganisationDeserializer(Class<OrganisationOuganext> t) {
-    super(t);
+    super(OrganisationOuganext.class);
   }
 
   @Override
   public OrganisationOuganext deserialize(JsonParser p, DeserializationContext ctxt)
-      throws IOException, JsonProcessingException {
+      throws JacksonException {
     OrganisationOuganext organisation = new OrganisationOuganext();
-    organisation.setIdentifiant(p.getText());
+    organisation.setIdentifiant(p.getString());
     return organisation;
   }
 }

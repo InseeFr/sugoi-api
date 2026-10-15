@@ -52,7 +52,7 @@ public class OuganextSugoiMapper {
   public <O, N extends SugoiObject> N serializeToSugoi(O ouganextObject, Class<N> clazz) {
     try {
       N sugoiObject = clazz.getDeclaredConstructor().newInstance();
-      Class<? extends Object> ouganextObjectClass = ouganextObject.getClass();
+      Class<?> ouganextObjectClass = ouganextObject.getClass();
       Field[] ouganextObjectFields = ouganextObjectClass.getDeclaredFields();
       for (Field ouganextObjectField : ouganextObjectFields) {
         try {
@@ -86,7 +86,7 @@ public class OuganextSugoiMapper {
         } catch (Exception e) {
           logger.info(
               "Erreur lors de la conversion de l'objet "
-                  + ouganextObject.getClass().toString()
+                  + ouganextObject.getClass()
                   + " sur le champs "
                   + ouganextObjectField.getName(),
               e);
@@ -156,7 +156,7 @@ public class OuganextSugoiMapper {
         } catch (Exception e) {
           logger.info(
               "Erreur lors de la conversion de l'objet "
-                  + ouganextObject.getClass().toString()
+                  + ouganextObject.getClass()
                   + " sur le champs "
                   + ouganextObjectField.getName(),
               e);

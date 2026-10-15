@@ -16,10 +16,10 @@ package fr.insee.sugoi.model;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 @Disabled
 public class SerializeTest {
@@ -63,7 +63,7 @@ public class SerializeTest {
           + "}";
 
   @Test
-  public void serializeRealmTest() throws JsonProcessingException {
+  public void serializeRealmTest() throws JacksonException {
     Realm realm = objectMapper.readValue(realmToTest, Realm.class);
     assertThat("Should be domaine1", realm.getName(), is("newrealm"));
     assertThat(

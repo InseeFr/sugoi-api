@@ -4,6 +4,7 @@ Feature: Whoami scenario
     Background: Use tomcat1
         Given the client is using tomcat1
         Given the client authentified with username appli_sugoi and password sugoi
+        Then Pause de 100 secondes
 
     Scenario: Whoami ?
         When the client perform GET request on url /whoami

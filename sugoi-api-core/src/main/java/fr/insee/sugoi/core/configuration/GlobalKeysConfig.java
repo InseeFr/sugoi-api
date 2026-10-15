@@ -35,7 +35,7 @@ public enum GlobalKeysConfig implements RealmConfigKeys {
   ORGANIZATIONS_MAX_OUTPUT_SIZE("organizationsMaxOutputSize"),
   USER_USERSTORAGE_DEFINED_ATTRIBUTES("user_us_defined_attributes");
 
-  private String name;
+  private final String name;
 
   GlobalKeysConfig(String name) {
     this.name = name;

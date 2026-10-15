@@ -14,12 +14,12 @@
 package fr.insee.sugoi.converter.ouganext;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.annotation.JsonRootName;
 import java.util.ArrayList;
 import java.util.List;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
-@JacksonXmlRootElement(localName = "ListeOrganisations", namespace = Namespace.ANNUAIRE)
+@JsonRootName(value = "ListeOrganisations", namespace = Namespace.ANNUAIRE)
 @JsonPropertyOrder({"liste"})
 public class OrganisationsOuganext {
 
