@@ -50,6 +50,7 @@ Feature: Credential scenario asynchrone
             """
         And show body received
         Then the client receives status code 202
+        Then Pause de 10 secondes
 
     Scenario: Don't validate password
         Given the client authentified with username appli_sugoi and password sugoi
@@ -61,6 +62,7 @@ Feature: Credential scenario asynchrone
             """
         And show body received
         Then the client receives status code 401
+        Then Pause de 10 secondes
 
     Scenario: Validate password
         Given the client authentified with username appli_sugoi and password sugoi
@@ -72,6 +74,7 @@ Feature: Credential scenario asynchrone
             """
         And show body received
         Then the client receives status code 200
+        Then Pause de 10 secondes
 
     Scenario: ResetPassword
         Given the client authentified with username appli_sugoi and password sugoi

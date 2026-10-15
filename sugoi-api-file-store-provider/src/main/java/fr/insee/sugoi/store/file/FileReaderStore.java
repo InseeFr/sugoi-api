@@ -13,7 +13,6 @@
 */
 package fr.insee.sugoi.store.file;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.store.ReaderStore;
 import fr.insee.sugoi.model.Application;
@@ -37,14 +36,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import tools.jackson.databind.ObjectMapper;
 
 public class FileReaderStore implements ReaderStore {
 

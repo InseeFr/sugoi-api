@@ -13,8 +13,6 @@
 */
 package fr.insee.sugoi.store.file;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.core.model.ProviderRequest;
 import fr.insee.sugoi.core.model.ProviderResponse;
@@ -33,10 +31,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 public class FileWriterStore implements WriterStore {
 
@@ -75,7 +75,7 @@ public class FileWriterStore implements WriterStore {
           config.get(GlobalKeysConfig.USER_SOURCE),
           user.getUsername(),
           mapper.writeValueAsString(user));
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       throw new RuntimeException("Error mapping user" + user.getUsername(), e);
     }
     ProviderResponse response = new ProviderResponse();
@@ -95,7 +95,7 @@ public class FileWriterStore implements WriterStore {
       response.setEntityId(updatedUser.getUsername());
       response.setStatus(ProviderResponseStatus.OK);
       return response;
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       throw new RuntimeException("Error mapping user" + updatedUser.getUsername(), e);
     }
   }
@@ -193,7 +193,7 @@ public class FileWriterStore implements WriterStore {
             config.get(GlobalKeysConfig.ORGANIZATION_SOURCE),
             organization.getIdentifiant(),
             mapper.writeValueAsString(organization));
-      } catch (JsonProcessingException e) {
+      } catch (JacksonException e) {
         throw new RuntimeException(
             "Error mapping organization " + organization.getIdentifiant(), e);
       }
@@ -220,7 +220,7 @@ public class FileWriterStore implements WriterStore {
         response.setEntityId(updatedOrganization.getIdentifiant());
         response.setStatus(ProviderResponseStatus.OK);
         return response;
-      } catch (JsonProcessingException e) {
+      } catch (JacksonException e) {
         throw new RuntimeException(
             "Error mapping organization" + updatedOrganization.getIdentifiant(), e);
       }
@@ -267,7 +267,7 @@ public class FileWriterStore implements WriterStore {
               config.get(GlobalKeysConfig.APP_SOURCE),
               application.getName(),
               mapper.writeValueAsString(application));
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
           throw new RuntimeException("Error mapping application " + application.getName(), e);
         }
       }
@@ -322,7 +322,7 @@ public class FileWriterStore implements WriterStore {
           response.setEntityId(userId);
           response.setStatus(ProviderResponseStatus.OK);
           return response;
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
           throw new RuntimeException("Error mapping application " + application.getName(), e);
         }
       } else {
@@ -367,7 +367,7 @@ public class FileWriterStore implements WriterStore {
         response.setEntityId(application.getName());
         response.setStatus(ProviderResponseStatus.OK);
         return response;
-      } catch (JsonProcessingException e) {
+      } catch (JacksonException e) {
         throw new RuntimeException("Error mapping application " + application.getName(), e);
       }
     } else {
@@ -394,7 +394,7 @@ public class FileWriterStore implements WriterStore {
         response.setEntityId(updatedApplication.getName());
         response.setStatus(ProviderResponseStatus.OK);
         return response;
-      } catch (JsonProcessingException e) {
+      } catch (JacksonException e) {
         throw new RuntimeException("Error mapping application" + updatedApplication.getName(), e);
       }
     } else {

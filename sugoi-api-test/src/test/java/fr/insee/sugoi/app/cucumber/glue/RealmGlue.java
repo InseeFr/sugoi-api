@@ -16,9 +16,6 @@ package fr.insee.sugoi.app.cucumber.glue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.app.cucumber.utils.StepData;
 import fr.insee.sugoi.core.configuration.GlobalKeysConfig;
 import fr.insee.sugoi.model.Realm;
@@ -27,18 +24,17 @@ import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Then;
 import java.util.Arrays;
 import java.util.List;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.ObjectMapper;
 
 @SuppressWarnings("unused")
 public class RealmGlue {
 
-  private Scenario scenario;
-
-  private ObjectMapper mapper = new ObjectMapper();
+  private final ObjectMapper mapper = new ObjectMapper();
 
   @Before
-  public void before(Scenario scenario) {
-    this.scenario = scenario;
-  }
+  public void before(Scenario scenario) {}
 
   private StepData stepData;
 
@@ -53,10 +49,10 @@ public class RealmGlue {
       List<Realm> realms =
           Arrays.asList(mapper.readValue(stepData.getLatestResponse().getBody(), Realm[].class));
       stepData.setRealms(realms);
-      if (realms.size() > 0) {
+      if (!realms.isEmpty()) {
         haveRealmAccess = true;
       }
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       e.printStackTrace();
     }
     assertThat(haveRealmAccess, is(true));
@@ -64,7 +60,7 @@ public class RealmGlue {
 
   @Then("the client expect description to be {}")
   public void expect_description_of_realm_to_be(String description)
-      throws JsonMappingException, JsonProcessingException {
+      throws DatabindException, JacksonException {
     Realm realm = mapper.readValue(stepData.getLatestResponse().getBody(), Realm.class);
     assertThat(
         realm.getProperties().get(GlobalKeysConfig.REALM_DESCRIPTION).get(0), is(description));
@@ -72,7 +68,7 @@ public class RealmGlue {
 
   @Then("the client expect uiUserMapping to contain {}")
   public void expect_uiusermapping_to_contain(String uiMappingProperty)
-      throws JsonMappingException, JsonProcessingException {
+      throws DatabindException, JacksonException {
     Realm realm = mapper.readValue(stepData.getLatestResponse().getBody(), Realm.class);
     assertThat(
         "UiField " + uiMappingProperty + " should be contained in realm",

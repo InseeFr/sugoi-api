@@ -17,8 +17,8 @@ import fr.insee.sugoi.core.service.ConfigService;
 import fr.insee.sugoi.model.Realm;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.health.AbstractHealthIndicator;
-import org.springframework.boot.actuate.health.Health.Builder;
+import org.springframework.boot.health.contributor.AbstractHealthIndicator;
+import org.springframework.boot.health.contributor.Health;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,7 +27,7 @@ public class ConfigProviderHealthIndicator extends AbstractHealthIndicator {
   @Autowired private ConfigService sugoiConfig;
 
   @Override
-  protected void doHealthCheck(Builder builder) throws Exception {
+  protected void doHealthCheck(Health.Builder builder) throws Exception {
     List<Realm> realms = sugoiConfig.getRealms();
     builder.up().withDetail("Realms", realms.size() + " realms");
   }

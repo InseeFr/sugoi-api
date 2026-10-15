@@ -16,13 +16,13 @@ package fr.insee.sugoi.converter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.sugoi.converter.ouganext.ErrorResultOuganext;
 import fr.insee.sugoi.converter.utils.CustomObjectMapper;
 import java.io.IOException;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
+import tools.jackson.core.JacksonException;
 
 public class ErrorTest {
 
@@ -38,7 +38,7 @@ public class ErrorTest {
   }
 
   @Test
-  public void testJsonError() throws JsonProcessingException {
+  public void testJsonError() throws JacksonException {
     ErrorResultOuganext errorResult = createErrorResult();
     String expectedErrorJson =
         "{\"exception\":\"java.io.IOException\",\"message\":\"Ioexception Test\"}";
@@ -47,7 +47,7 @@ public class ErrorTest {
   }
 
   @Test
-  public void testXMLJacksonError() throws JsonProcessingException {
+  public void testXMLJacksonError() throws JacksonException {
     ErrorResultOuganext errorResult = createErrorResult();
     String expectedErrorXml =
         "<?xml version='1.0' encoding='UTF-8'?>\r\n"

@@ -14,8 +14,8 @@
 package fr.insee.sugoi.converter.ouganext;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.annotation.JsonRootName;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 /**
  * Java class for InfoFormattageType complex type.
@@ -47,7 +47,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
  * &lt;/complexType>
  * </pre>
  */
-@JacksonXmlRootElement(localName = "InfoFormattage", namespace = Namespace.ANNUAIRE)
+@JsonRootName(value = "InfoFormattage", namespace = Namespace.ANNUAIRE)
 @JsonPropertyOrder({
   "chefSignataire",
   "hotlineFax",
