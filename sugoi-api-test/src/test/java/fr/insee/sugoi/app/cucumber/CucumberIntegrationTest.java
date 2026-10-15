@@ -13,20 +13,16 @@
 */
 package fr.insee.sugoi.app.cucumber;
 
-import io.cucumber.junit.Cucumber;
-import io.cucumber.junit.CucumberOptions;
-import org.junit.runner.RunWith;
+import org.junit.platform.suite.api.*;
 
-/** CucumberIntegrationTest */
-@RunWith(Cucumber.class)
-@CucumberOptions(
-    features = {"src/test/resources/scenario/"},
-    glue = {"fr.insee.sugoi.app.cucumber.glue"},
-    dryRun = false,
-    plugin = {
-      "pretty",
-      "json:target/cucumber/cucumber.json",
-      "usage:target/cucumber/usage.jsonx",
-      "junit:target/cucumber/junit.xml"
-    })
-public class CucumberIntegrationTest {}
+@Suite
+@IncludeEngines("cucumber")
+@SelectClasspathResource("scenario/")
+@ConfigurationParameters({
+    @ConfigurationParameter(key = "cucumber.glue", value = "fr.insee.sugoi.app.cucumber.glue"),
+    @ConfigurationParameter(key = "cucumber.plugin", value = "pretty"),
+    @ConfigurationParameter(key = "cucumber.plugin", value = "json:target/cucumber/cucumber.json"),
+    @ConfigurationParameter(key = "cucumber.plugin", value = "junit:target/cucumber/junit.xml")
+})
+public class CucumberIntegrationTest {
+}

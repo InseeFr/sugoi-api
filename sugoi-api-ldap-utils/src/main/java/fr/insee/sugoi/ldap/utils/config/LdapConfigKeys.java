@@ -44,7 +44,7 @@ public enum LdapConfigKeys implements RealmConfigKeys {
   LDAP_CONNECTION_TIMEOUT("ldap_connection_timeout"),
   MAX_POOL_CONNECTION_AGE("max_pool_connection_age");
 
-  private String name;
+  private final String name;
 
   LdapConfigKeys(String name) {
     this.name = name;

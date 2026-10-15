@@ -55,7 +55,7 @@ public class ProviderResponse implements Serializable {
     PENDING,
     // Request is executed with success but could be effective later on (Response
     // have been take from the broker cue)
-    ACCEPTED;
+    ACCEPTED
   }
 
   public ProviderResponseStatus getStatus() {

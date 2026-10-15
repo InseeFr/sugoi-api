@@ -15,7 +15,6 @@ package fr.insee.sugoi.app.cucumber.glue;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.app.cucumber.utils.StepData;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
@@ -24,16 +23,10 @@ import java.util.Arrays;
 
 public class ExportGlue {
 
-  private Scenario scenario;
-
-  private ObjectMapper mapper = new ObjectMapper();
-
   @Before
-  public void before(Scenario scenario) {
-    this.scenario = scenario;
-  }
+  public void before(Scenario scenario) {}
 
-  private StepData stepData;
+  private final StepData stepData;
 
   public ExportGlue(StepData stepData) {
     this.stepData = stepData;

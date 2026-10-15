@@ -15,6 +15,7 @@ package fr.insee.sugoi.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import fr.insee.sugoi.model.exceptions.StoreException;
 import fr.insee.sugoi.model.technics.ModelType;
 import fr.insee.sugoi.model.technics.StoreMapping;
@@ -22,6 +23,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @JsonInclude(Include.NON_NULL)
+@JsonPropertyOrder({
+  "lastName",
+  "firstName",
+  "mail",
+  "username",
+  "organization",
+  "address",
+  "metadatas",
+  "attributes"
+})
 public class User implements SugoiObject {
 
   private String lastName;

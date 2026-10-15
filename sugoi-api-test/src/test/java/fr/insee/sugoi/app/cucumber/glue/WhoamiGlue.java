@@ -16,11 +16,11 @@ package fr.insee.sugoi.app.cucumber.glue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.app.cucumber.utils.StepData;
 import fr.insee.sugoi.app.cucumber.utils.WhoamiView;
 import io.cucumber.java.en.Then;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 public class WhoamiGlue {
   private StepData stepData;
@@ -35,7 +35,7 @@ public class WhoamiGlue {
     try {
       mapper.readValue(stepData.getLatestResponse().getBody(), WhoamiView.class);
       assertThat("Data receive is a whoamiView", true, is(true));
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       assertThat("Data receive is a whoamiView", false, is(true));
       e.printStackTrace();
     }

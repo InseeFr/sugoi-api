@@ -119,7 +119,7 @@ public class ContactPasswordDomaineController {
         realmUserStorage.getUserStorage(),
         identifiant,
         templateProperties,
-        modeEnvoisString != null && modeEnvoisString.size() > 0 ? modeEnvoisString.get(0) : "MAIL",
+        modeEnvoisString != null && !modeEnvoisString.isEmpty() ? modeEnvoisString.get(0) : "MAIL",
         true,
         new ProviderRequest(
             new SugoiUser(
@@ -259,7 +259,7 @@ public class ContactPasswordDomaineController {
         identifiant,
         pcr.getAncienMotDePasse(),
         pcr.getNouveauMotDePasse(),
-        modeEnvoisString != null && modeEnvoisString.size() > 0 ? modeEnvoisString.get(0) : "MAIL",
+        modeEnvoisString != null && !modeEnvoisString.isEmpty() ? modeEnvoisString.get(0) : "MAIL",
         getTemplatePropertiesFromPCR(pcr),
         new ProviderRequest(
             new SugoiUser(

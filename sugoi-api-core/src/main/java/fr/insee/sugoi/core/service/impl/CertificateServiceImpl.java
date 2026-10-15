@@ -38,7 +38,7 @@ public class CertificateServiceImpl implements CertificateService {
   private static final int EMPLACEMENT_KEY_USAGE_AC = 5;
   public static final String BEGIN_CERT = "-----BEGIN CERTIFICATE-----";
   public static final String END_CERT = "-----END CERTIFICATE-----";
-  public static final String LINE_SEPARATOR = System.getProperty("line.separator");
+  public static final String LINE_SEPARATOR = System.lineSeparator();
 
   @Override
   public X509Certificate getCertificateClientFromMultipartFile(MultipartFile file)
