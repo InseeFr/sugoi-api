@@ -13,9 +13,6 @@
 */
 package fr.insee.sugoi.jms;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.jms.model.BrokerRequest;
 import fr.insee.sugoi.jms.writer.JmsWriter;
 import jakarta.jms.JMSException;
@@ -38,6 +35,8 @@ import org.springframework.jms.core.BrowserCallback;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 @ActiveProfiles("brokerEmbedded")
 @ExtendWith(SpringExtension.class)
@@ -52,8 +51,7 @@ public class JmsBrokerTests {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void testSender()
-      throws InterruptedException, JsonMappingException, JsonProcessingException, JMSException {
+  public void testSender() throws InterruptedException, JacksonException, JMSException {
     // Start Listener
     List<TextMessage> messages =
         jmsTemplate.browse(
@@ -74,10 +72,11 @@ public class JmsBrokerTests {
                 return messages;
               }
             });
+    assert messages != null;
     Assertions.assertEquals(1, messages.size());
     ObjectMapper mapper = new ObjectMapper();
     BrokerRequest requestReceive = mapper.readValue(messages.get(0).getText(), BrokerRequest.class);
-    Assertions.assertEquals(requestReceive.getMethod(), "toto");
-    Assertions.assertEquals(requestReceive.getmethodParams(), new HashMap<>());
+    Assertions.assertEquals("toto", requestReceive.getMethod());
+    Assertions.assertEquals(new HashMap<>(), requestReceive.getMethodParams());
   }
 }

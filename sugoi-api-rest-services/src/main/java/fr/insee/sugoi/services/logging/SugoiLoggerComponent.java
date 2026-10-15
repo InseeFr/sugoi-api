@@ -13,8 +13,6 @@
 */
 package fr.insee.sugoi.services.logging;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
 import java.lang.reflect.Parameter;
 import java.util.stream.Collectors;
@@ -36,6 +34,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 @Aspect
 @Component
@@ -98,7 +98,7 @@ public class SugoiLoggerComponent {
                       Pair::getValue,
                       p -> jp.getArgs()[p.getKey()] != null ? jp.getArgs()[p.getKey()] : "null"));
       return objectMapper.writeValueAsString(mapOfParamNameParamValue);
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       log.error("Logging failed during argument creation with exception {}", e.getMessage());
       return "{\"error\": \"error while parsing data\"}";
     }

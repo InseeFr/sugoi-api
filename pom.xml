@@ -10,40 +10,47 @@
 	<packaging>pom</packaging>
 
 	<properties>
-		<junit.version>5.6.0</junit.version>
-		<maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version>
-		<maven-checkstyle-plugin.version>3.1.0</maven-checkstyle-plugin.version>
-		<checkstyle.version>8.29</checkstyle.version>		<checkstyle-rules.version>4.0.1</checkstyle-rules.version>
-		<maven-surefire-plugin.version>3.0.0</maven-surefire-plugin.version>
-		<jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
-		<maven-javadoc-plugin.version>3.0.0</maven-javadoc-plugin.version>
-		<coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
+		<maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
+		<jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
+		<maven.compiler.plugin.version>3.16.0</maven.compiler.plugin.version>
+		<maven-assembly-plugin.version>3.8.0</maven-assembly-plugin.version>
+		<maven-war-plugin.version>3.5.1</maven-war-plugin.version>
+		<exec-maven-plugin.version>3.6.4</exec-maven-plugin.version>
+
+		<spotless.version>3.10.3</spotless.version>
+		<googleJavaFormat.version>1.36.1</googleJavaFormat.version>
 		<!-- JaCoCo thresholds. Increase gradually as you add tests. -->
 		<jacoco.unit-tests.limit.instruction-ratio>0%</jacoco.unit-tests.limit.instruction-ratio>
 		<jacoco.unit-tests.limit.branch-ratio>0%</jacoco.unit-tests.limit.branch-ratio>
 		<jacoco.unit-tests.limit.class-complexity>20</jacoco.unit-tests.limit.class-complexity>
 		<jacoco.unit-tests.limit.method-complexity>5</jacoco.unit-tests.limit.method-complexity>
-		<java.version>17</java.version>
-		<spring-boot.version>3.5.13</spring-boot.version>
+		<java.version>25</java.version>
+		<maven.compiler.source>25</maven.compiler.source>
+		<maven.compiler.target>25</maven.compiler.target>
+		<spring-boot.version>4.1.1</spring-boot.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<tomcat.version>11.0.22</tomcat.version>
-		<commons-io.version>2.14.0</commons-io.version>
-		<com.unboundid.version>7.0.4</com.unboundid.version>
-		<org.xmlunit.version>2.11.0</org.xmlunit.version>
-		<commons-lang.version>2.6</commons-lang.version>
-		<org.springdoc.version>2.8.14</org.springdoc.version>
-		<cucumber.version>7.34.3</cucumber.version>
-		<httpclient.version>4.5.14</httpclient.version>
-		<apache.commons.version>1.10.0</apache.commons.version>
+		<commons-io.version>2.22.0</commons-io.version>
+		<com.unboundid.version>7.0.5</com.unboundid.version>
+		<org.xmlunit.version>2.14.0</org.xmlunit.version>
+		<commons-lang.version>3.21.0</commons-lang.version>
+		<springdoc.version>3.1.1</springdoc.version>
+		<cucumber.version>8.0.4</cucumber.version>
+		<httpclient.version>5.6.4</httpclient.version>
+		<apache.commons.text.version>1.15.0</apache.commons.text.version>
 		<apache.commons.csv.version>1.14.1</apache.commons.csv.version>
-		<wiremock-standalone.version>2.27.2</wiremock-standalone.version>
+<!--		<wiremock-standalone.version>2.27.2</wiremock-standalone.version>-->
 		<git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
-		<org.ehcache.version>3.10.8</org.ehcache.version>
-		<maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
-		<javax.jms-api.version>2.0.1</javax.jms-api.version>
-	</properties>
+		<org.ehcache.version>3.12.0</org.ehcache.version>
+		<maven.jar.plugin.version>3.5.1</maven.jar.plugin.version>
+		<jakarta.jms-api.version>3.1.0</jakarta.jms-api.version>
+		<jackson-module-jakarta-xmlbind-annotations.version>3.2.3</jackson-module-jakarta-xmlbind-annotations.version>
+		<passay.version>1.6.6</passay.version>
+		<reflections.version>0.10.2</reflections.version>
+		<swagger-models-jakarta.version>2.2.54</swagger-models-jakarta.version>
+		<swagger-annotations-jakarta.version>2.2.54</swagger-annotations-jakarta.version>
 
-	<dependencies></dependencies>
+	</properties>
 
 	<dependencyManagement>
 		<dependencies>
@@ -225,27 +232,27 @@
 			</dependency>
 
 			<dependency>
-				<groupId>commons-lang</groupId>
-				<artifactId>commons-lang</artifactId>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
 				<version>${commons-lang.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.springdoc</groupId>
 				<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-				<version>${org.springdoc.version}</version>
+				<version>${springdoc.version}</version>
 			</dependency>
 
 			<dependency>
-				<groupId>org.apache.httpcomponents</groupId>
-				<artifactId>httpclient</artifactId>
+				<groupId>org.apache.httpcomponents.client5</groupId>
+				<artifactId>httpclient5</artifactId>
 				<version>${httpclient.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-text</artifactId>
-				<version>${apache.commons.version}</version>
+				<version>${apache.commons.text.version}</version>
 			</dependency>
 
 			<dependency>
@@ -254,11 +261,11 @@
 				<version>${apache.commons.csv.version}</version>
 			</dependency>
 
-			<dependency>
-				<groupId>com.github.tomakehurst</groupId>
-				<artifactId>wiremock-standalone</artifactId>
-				<version>${wiremock-standalone.version}</version>
-			</dependency>
+<!--			<dependency>-->
+<!--				<groupId>com.github.tomakehurst</groupId>-->
+<!--				<artifactId>wiremock-standalone</artifactId>-->
+<!--				<version>${wiremock-standalone.version}</version>-->
+<!--			</dependency>-->
 
 			<dependency>
 				<groupId>fr.insee.sugoi</groupId>
@@ -282,10 +289,55 @@
 				<version>${org.ehcache.version}</version>
 			</dependency>
 
+			<!-- Source: https://mvnrepository.com/artifact/jakarta.jms/jakarta.jms-api -->
 			<dependency>
-				<groupId>javax.jms</groupId>
-				<artifactId>javax.jms-api</artifactId>
-				<version>${javax.jms-api.version}</version>
+				<groupId>jakarta.jms</groupId>
+				<artifactId>jakarta.jms-api</artifactId>
+				<version>${jakarta.jms-api.version}</version>
+			</dependency>
+
+			<!-- Source: https://mvnrepository.com/artifact/tools.jackson.module/jackson-module-jakarta-xmlbind-annotations -->
+			<dependency>
+				<groupId>tools.jackson.module</groupId>
+				<artifactId>jackson-module-jakarta-xmlbind-annotations</artifactId>
+				<version>${jackson-module-jakarta-xmlbind-annotations.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.cucumber</groupId>
+				<artifactId>cucumber-spring</artifactId>
+				<version>${cucumber.version}</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.passay</groupId>
+				<artifactId>passay</artifactId>
+				<version>${passay.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.reflections</groupId>
+				<artifactId>reflections</artifactId>
+				<version>${reflections.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.swagger.core.v3</groupId>
+				<artifactId>swagger-models-jakarta</artifactId>
+				<version>${swagger-models-jakarta.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springdoc</groupId>
+				<artifactId>springdoc-openapi-starter-common</artifactId>
+				<version>${springdoc.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.swagger.core.v3</groupId>
+				<artifactId>swagger-annotations-jakarta</artifactId>
+				<version>${swagger-annotations-jakarta.version}</version>
 			</dependency>
 
 		</dependencies>
@@ -333,9 +385,9 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
 				<groupId>org.apache.maven.plugins</groupId>
-				<version>3.14.0</version>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven.compiler.plugin.version}</version>
 				<configuration>
 					<release>${java.version}</release>
 					<parameters>true</parameters>
@@ -382,7 +434,7 @@
 			<plugin>
 				<groupId>com.diffplug.spotless</groupId>
 				<artifactId>spotless-maven-plugin</artifactId>
-				<version>2.33.0</version>
+				<version>${spotless.version}</version>
 				<configuration>
 					<!-- optional: limit format enforcement to just the files changed by 
 						this feature branch -->
@@ -410,7 +462,7 @@
 							if you want -->
 						<!-- apply a specific flavor of google-java-format -->
 						<googleJavaFormat>
-							<version>1.15.0</version>
+							<version>${googleJavaFormat.version}</version>
 							<style>GOOGLE</style>
 						</googleJavaFormat>
 						<!-- make sure every file has the following copyright header. optionally, 

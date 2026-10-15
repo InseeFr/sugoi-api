@@ -17,7 +17,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.sugoi.commons.services.controller.technics.SugoiAdviceController;
 import fr.insee.sugoi.core.service.CredentialsService;
 import fr.insee.sugoi.core.service.UserService;
@@ -28,8 +27,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -38,6 +37,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(
     classes = {CredentialsController.class, SugoiAdviceController.class},
@@ -158,7 +158,6 @@ public class CredentialsControllerTest {
     MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
     assertThat("Response status should be 200", response.getStatus(), is(200));
   }
-  ;
 
   @Test
   @WithMockUser(roles = "Admin_Sugoi")
@@ -192,7 +191,6 @@ public class CredentialsControllerTest {
 
     assertThat("Response status should be 401", response.getStatus(), is(401));
   }
-  ;
 
   @Test
   @WithMockUser(roles = "Admin_Sugoi")

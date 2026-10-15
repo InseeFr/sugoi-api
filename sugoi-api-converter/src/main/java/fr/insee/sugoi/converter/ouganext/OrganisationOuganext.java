@@ -14,13 +14,8 @@
 package fr.insee.sugoi.converter.ouganext;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.annotation.JsonRootName;
 import fr.insee.sugoi.converter.ouganext.adapters.OrganisationDeserializer;
 import fr.insee.sugoi.converter.ouganext.adapters.OrganisationSerializer;
 import fr.insee.sugoi.converter.utils.MapFromAttribute;
@@ -28,6 +23,10 @@ import fr.insee.sugoi.converter.utils.MapFromHashmapElement;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 /**
  * Java class for OrganisationType complex type.
@@ -55,7 +54,7 @@ import java.util.HashSet;
  * &lt;/complexType>
  * </pre>
  */
-@JsonInclude(Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
   "identifiant",
   "nomCommun",
@@ -70,7 +69,7 @@ import java.util.HashSet;
   "repertoireDeDistribution",
   "propriete"
 })
-@JacksonXmlRootElement(localName = "Organisation", namespace = Namespace.ANNUAIRE)
+@JsonRootName(value = "Organisation", namespace = Namespace.ANNUAIRE)
 public class OrganisationOuganext {
 
   @JacksonXmlProperty(localName = "Identifiant")

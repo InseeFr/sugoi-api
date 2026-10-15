@@ -13,9 +13,11 @@
 */
 package fr.insee.sugoi.model;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.HashMap;
 import java.util.Map;
 
+@JsonPropertyOrder({"identifiant", "gpgkey", "organization", "address", "metadatas", "attributes"})
 public class Organization implements SugoiObject {
   private String identifiant;
   private byte[] gpgkey;

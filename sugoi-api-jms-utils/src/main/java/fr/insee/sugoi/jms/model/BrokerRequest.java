@@ -13,9 +13,11 @@
 */
 package fr.insee.sugoi.jms.model;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.util.HashMap;
 import java.util.Map;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "_type")
 public class BrokerRequest {
 
   private String method;
@@ -38,12 +40,12 @@ public class BrokerRequest {
     this.method = method;
   }
 
-  public Map<String, Object> getmethodParams() {
+  public Map<String, Object> getMethodParams() {
     return this.methodParams;
   }
 
-  public void setmethodParams(String name, Object value) {
-    this.methodParams.put(name, value);
+  public void setMethodParams(Map<String, Object> methodParams) {
+    this.methodParams = methodParams;
   }
 
   public String getCorrelationId() {

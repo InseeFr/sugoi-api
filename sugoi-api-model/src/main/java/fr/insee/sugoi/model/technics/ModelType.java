@@ -24,5 +24,5 @@ public enum ModelType {
   LIST_USER,
   LIST_STRING,
   EXISTS,
-  BOOLEAN;
+  BOOLEAN
 }

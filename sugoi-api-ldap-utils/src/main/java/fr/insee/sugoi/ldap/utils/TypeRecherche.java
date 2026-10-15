@@ -20,7 +20,7 @@ public enum TypeRecherche {
   ET("et"),
   OU("ou");
 
-  private String typeRechercheLitteral;
+  private final String typeRechercheLitteral;
 
   private TypeRecherche(String typeRecherche) {
     this.typeRechercheLitteral = typeRecherche;
