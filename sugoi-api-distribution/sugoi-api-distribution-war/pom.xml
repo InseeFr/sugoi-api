@@ -93,16 +93,6 @@
 
     <dependency>
       <groupId>fr.insee.sugoi</groupId>
-      <artifactId>sugoi-api-rest-old-services</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>fr.insee.sugoi</groupId>
-      <artifactId>sugoi-api-converter</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>fr.insee.sugoi</groupId>
       <artifactId>sugoi-api-file-config-provider</artifactId>
     </dependency>
 
