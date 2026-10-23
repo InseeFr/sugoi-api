@@ -29,7 +29,7 @@
 		<maven.compiler.target>25</maven.compiler.target>
 		<spring-boot.version>4.1.1</spring-boot.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<tomcat.version>11.0.22</tomcat.version>
+		<tomcat.version>11.0.25</tomcat.version>
 		<commons-io.version>2.22.0</commons-io.version>
 		<com.unboundid.version>7.0.5</com.unboundid.version>
 		<org.xmlunit.version>2.14.0</org.xmlunit.version>
