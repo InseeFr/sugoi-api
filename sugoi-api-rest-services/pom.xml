@@ -206,5 +206,10 @@
 			<artifactId>sugoi-api-model</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+		</dependency>
+
     </dependencies>
 </project>
