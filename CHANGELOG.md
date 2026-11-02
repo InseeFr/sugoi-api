@@ -1,3 +1,12 @@
+# 2.10.0
+
+
+- [FIX] Coquille tag.yml
+- [UP] :arrow_up: Bump org.apache.tomcat.embed:tomcat-embed-core
+- [UP] Spring boot 4
+
+
+
 # 2.9.0
 
 
