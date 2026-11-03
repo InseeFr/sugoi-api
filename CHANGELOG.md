@@ -1,3 +1,10 @@
+# 2.10.1
+
+
+- [FIX] Coquille chemins avec slashes
+
+
+
 # 2.10.0
 
 
