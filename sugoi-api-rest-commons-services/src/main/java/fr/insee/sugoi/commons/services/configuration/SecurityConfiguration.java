@@ -18,10 +18,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
@@ -181,7 +178,7 @@ public class SecurityConfiguration {
         try {
 
           for (int i = 0; i < claimPath.length - 1; i++) {
-            claims = (Map<String, Object>) claims.get(claimPath[i]);
+            claims = (Map<String, Object>) claims.getOrDefault(claimPath[i], new HashMap<>());
           }
 
           List<String> roles =
