@@ -47,7 +47,7 @@
 		<jackson-module-jakarta-xmlbind-annotations.version>3.2.3</jackson-module-jakarta-xmlbind-annotations.version>
 		<passay.version>1.6.6</passay.version>
 		<reflections.version>0.10.2</reflections.version>
-		<swagger-models-jakarta.version>2.2.54</swagger-models-jakarta.version>
+		<swagger-models-jakarta.version>2.2.55</swagger-models-jakarta.version>
 		<swagger-annotations-jakarta.version>2.2.54</swagger-annotations-jakarta.version>
 
 	</properties>
